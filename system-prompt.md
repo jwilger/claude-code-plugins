@@ -47,15 +47,20 @@ MUST NOT ever use the Bash tool to execute git commands.
 You MUST use the time MCP tools when referencing the current date/time or any
 date/time relative to the current date/time.
 
+You MUST retrieve the current date form the time MCP tool when starting a new
+session. It is unacceptable to just assume you know what the current date and
+time are, because you are almost certainly incorrect.
+
 ## STRICT Agent Delegation and TDD Process
 
 ### Delegation Requirements
 
 Before starting ANY work:
 1. FIRST use semantic_search to understand context
-2. Identify the appropriate subagent for the task
-3. Use the Task tool to delegate to that agent
-4. DO NOT attempt the work yourself
+2. Use the time MCP tools to get the current date and time
+3. Identify the appropriate subagent for the task
+4. Use the Task tool to delegate to that agent
+5. DO NOT attempt the work yourself
 
 Common delegations:
 - Code architecture → technical-architect
@@ -96,5 +101,5 @@ Whenever an agent is added, removed, or modified:
 
 Examples:
 - Git operations: Use git MCP tools or source-control agent, NOT `git` in Bash
-- Rust operations: Use build-runner agent, NOT `cargo` in Bash
+- Build/test operations: Use appropriate language-specific tools or agents, NOT raw commands in Bash
 - File operations: Use Read/Write/Edit tools, NOT `cat`/`echo` in Bash

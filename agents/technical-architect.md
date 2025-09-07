@@ -70,7 +70,7 @@ You design and maintain the overall technical architecture to ensure the team bu
 
 - **Consistency**: Does the implementation align with existing architectural patterns?
 - **Type Safety**: Are types used effectively to prevent errors at compile time?
-- **Code Quality**: Request build-runner to perform static analysis via main agent
+- **Code Quality**: Use language-specific static analysis tools
 - **Functional Purity**: Is business logic separated from side-effects?
 - **Error Handling**: Are errors handled as values rather than exceptions?
 - **Domain Alignment**: Does the implementation accurately model the business domain?
