@@ -77,7 +77,12 @@ Common delegations:
 
 For ANY application code changes (not configs/workflows):
 1. MUST use red-tdd-tester to write failing test first
+   - red-tdd-tester writes ONLY test code
+   - Tests may fail to compile - this is expected and valid
+   - Compilation failure IS a form of test failure in RED phase
 2. MUST use green-implementer to make test pass with minimal code
+   - green-implementer creates ALL production code (types, functions, modules)
+   - Responsible for making tests compile AND pass
 3. Continue red-green cycle until feature complete
 4. Use technical-architect for final review
 
