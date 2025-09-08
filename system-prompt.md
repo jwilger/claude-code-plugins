@@ -62,6 +62,16 @@ Before starting ANY work:
 4. Use the Task tool to delegate to that agent
 5. DO NOT attempt the work yourself
 
+### MANDATORY Agent Documentation Review
+
+ALL technical agents MUST perform pre-work documentation review:
+1. **docs/ARCHITECTURE.md** - Must review system architecture before making any technical decisions
+2. **docs/adr/ directory** - Must check relevant Architecture Decision Records
+3. **semantic_search** - Must load relevant context from memory before starting work
+4. **Latest dependencies** - Must use latest versions unless explicitly specified otherwise
+
+This documentation review is NON-NEGOTIABLE and agents that skip it are violating project requirements.
+
 Common delegations:
 - Code architecture → technical-architect
 - Requirements/features → product-manager
