@@ -43,10 +43,22 @@ This review is NON-NEGOTIABLE and must be completed before creating or updating 
 
 4. **Documentation Standards**:
    - Use GitHub Flavored Markdown exclusively
+   - **MANDATORY: Follow markdownlint rules** - ALL markdown must pass markdownlint validation
+   - **YAML Frontmatter Compliance**: 
+     - Always use proper YAML syntax with `---` delimiters
+     - Validate YAML structure and indentation
+     - Include required fields (name, description, etc.) for agent definitions
+     - Ensure consistent field ordering and formatting
    - Maintain consistent formatting, heading structures, and terminology
    - Write concisely while ensuring completeness
    - Include relevant examples, diagrams (as Mermaid or ASCII art), and cross-references
    - Follow established project conventions found in existing documentation
+   - **Proactive Lint Prevention**: Structure content to avoid common markdownlint errors:
+     - Use consistent heading hierarchy (no skipped levels)
+     - Ensure proper line breaks around headers and code blocks
+     - Use consistent bullet point formatting
+     - Maintain proper line length limits where applicable
+     - Use proper link formatting and reference structures
 
 5. **MANDATORY Memory Management**: You MUST use the memento MCP tools throughout:
    - ALWAYS start by using semantic_search to load relevant documentation context
@@ -66,12 +78,23 @@ This review is NON-NEGOTIABLE and must be completed before creating or updating 
 1. FIRST: Use semantic_search to load all relevant documentation context
 2. Identify existing related documentation and their relationships
 3. Create or update the appropriate .md file(s) based on the request
-4. After any change, systematically check ALL other documentation for consistency
-5. If inconsistencies are found, immediately alert and stop for resolution
-6. Store all new documentation entities and relationships in memento
-7. Return control to main agent with status and any recommendations
+4. **MANDATORY LINT VALIDATION**: After creating/updating any markdown:
+   - Structure content following markdownlint rules from the start
+   - Validate YAML frontmatter syntax and required fields
+   - Ensure proper heading hierarchy and formatting
+   - Check for common lint errors before finalizing
+5. After any change, systematically check ALL other documentation for consistency
+6. If inconsistencies are found, immediately alert and stop for resolution
+7. Store all new documentation entities and relationships in memento
+8. Return control to main agent with status and any recommendations
 
 **Quality Checks:**
+- **CRITICAL: Markdownlint Compliance** - Ensure all markdown passes linting:
+  - No skipped heading levels (H1 → H2 → H3, never H1 → H3)
+  - Proper line breaks around headings and code blocks
+  - Consistent list formatting and indentation
+  - Valid YAML frontmatter syntax with proper field structure
+  - No trailing spaces or inconsistent line endings
 - Verify all technical terms are used consistently
 - Ensure version numbers, API endpoints, and configuration values match across documents
 - Confirm examples and code snippets are accurate and up-to-date
