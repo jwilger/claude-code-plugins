@@ -80,6 +80,135 @@ ALL technical agents MUST perform pre-work documentation review:
 
 This documentation review is NON-NEGOTIABLE and agents that skip it are violating project requirements.
 
+### MAXIMUM PARALLELIZATION STRATEGY
+
+Claude Code supports up to **10 CONCURRENT AGENTS/TASKS**. This capability MUST be leveraged fully to maximize productivity and minimize wait times.
+
+#### CRITICAL PARALLELIZATION PRINCIPLE
+
+**ALWAYS ask: "What can run in parallel?"** before starting work. If multiple independent tasks exist, you MUST use multiple agents concurrently rather than processing sequentially.
+
+#### IMMEDIATE PARALLEL EXECUTION STRATEGIES
+
+1. **Multiple Error Fixing**
+   - Linter errors in different files → Launch multiple green-implementer instances
+   - Type errors across different modules → Parallel green-implementer tasks
+   - Test failures in different components → Multiple red-tdd-tester instances
+   - Build errors in different packages → Parallel build-runner instances
+
+2. **Independent Feature Development**
+   - Different features with no shared dependencies → Parallel feature teams
+   - Multiple bug fixes in different areas → Concurrent green-implementer instances  
+   - Documentation updates for different modules → Multiple technical-documentation-writer instances
+   - Code reviews of different files → Parallel technical-architect instances
+
+3. **Batch Processing Patterns**
+   - Multiple API endpoint implementations → Parallel green-implementer tasks
+   - Different domain model definitions → Multiple domain-model-expert instances
+   - Various configuration updates → Concurrent devops instances
+   - Multiple test suite creations → Parallel red-tdd-tester tasks
+
+#### MANDATORY PARALLEL EXECUTION CHECKLIST
+
+Before delegating ANY work, you MUST evaluate:
+
+✅ **Can this work be split into independent parallel tasks?**
+✅ **Are there multiple similar tasks that can run concurrently?**
+✅ **Are we using all 10 available concurrent agent slots?**
+✅ **Would parallel execution reduce total completion time?**
+
+If YES to any question → IMMEDIATELY launch parallel agents
+
+#### PARALLELIZABLE WORK PATTERNS
+
+**ALWAYS PARALLELIZE:**
+- Multiple linter/compiler errors (use multiple green-implementer instances)
+- Independent feature implementations (parallel feature development)
+- Documentation updates for different modules (multiple technical-documentation-writer)
+- Testing different components (multiple red-tdd-tester instances)
+- Multiple bug fixes in different areas (parallel green-implementer)
+- Code review of multiple files (multiple technical-architect instances)
+- Multiple architectural reviews of different components (parallel technical-architect)
+- Multiple domain modeling tasks for different domains (parallel domain-model-expert)
+- Different configuration files (multiple devops instances)
+- Multiple deployment targets (parallel devops tasks)
+
+**PRACTICAL EXAMPLE:**
+If user reports "Fix these 8 linter errors", DO NOT process sequentially. Instead:
+1. Group errors by independence
+2. Launch 8 green-implementer instances (or max available slots)
+3. Each handles different errors simultaneously
+4. Monitor and coordinate completion
+
+#### SEQUENTIAL WORK PATTERNS (DO NOT PARALLELIZE)
+
+- **TDD cycles within same component** (red MUST precede green)
+- **Feature dependencies** (Feature B depends on Feature A completion)  
+- **Database migrations** that build on each other
+- **Domain modeling** that establishes types before implementation
+- **CI/CD pipeline stages** with dependencies
+- **Integration tests** that require completed components
+
+#### HYBRID PATTERNS (MIXED PARALLEL/SEQUENTIAL)
+
+**Domain-First Development:**
+1. **PARALLEL**: Multiple domain-model-expert instances for different domains
+2. **SEQUENTIAL**: Within each domain, types before tests before implementation
+3. **PARALLEL**: Once types exist, multiple red-tdd-tester instances for different features
+4. **PARALLEL**: Multiple green-implementer instances for different components
+
+#### AGENT ORCHESTRATION STRATEGIES
+
+1. **Batch Launch Pattern**
+   ```
+   Launch agents simultaneously:
+   - Task /agent1 [work1]
+   - Task /agent2 [work2]  
+   - Task /agent3 [work3]
+   Monitor all concurrently
+   ```
+
+2. **Wave Pattern**
+   ```
+   Wave 1: Launch dependency-free tasks (max parallel)
+   Wave 2: Launch tasks dependent on Wave 1 completion
+   Wave 3: Final integration tasks
+   ```
+
+3. **Domain Separation Pattern**
+   ```
+   Each domain gets parallel agent team:
+   Domain A: domain-model + red-tdd + green-implementer
+   Domain B: domain-model + red-tdd + green-implementer  
+   Domain C: domain-model + red-tdd + green-implementer
+   ```
+
+#### PARALLELIZATION ANTI-PATTERNS (AVOID)
+
+❌ **Processing lists sequentially** when items are independent
+❌ **Waiting for one task completion** before starting unrelated tasks
+❌ **Using only 1-2 agents** when 10 are available
+❌ **Batching unrelated work** into single agent tasks
+❌ **Not identifying parallel opportunities** in user requests
+
+#### MAXIMUM THROUGHPUT GUIDELINES
+
+1. **Always aim for 10/10 agent utilization** when sufficient work exists
+2. **Break large tasks into parallelizable chunks** when possible
+3. **Start independent work immediately** rather than planning everything sequentially
+4. **Monitor agent completion** and immediately launch new parallel work
+5. **Use Task tool concurrency** to coordinate multiple simultaneous delegations
+
+#### PARALLEL COORDINATION RESPONSIBILITIES
+
+As main agent, you MUST:
+- **Identify parallel opportunities** in every user request
+- **Launch agents simultaneously** for independent work
+- **Monitor multiple agent streams** concurrently  
+- **Coordinate handoffs** between parallel and sequential phases
+- **Synthesize results** from multiple concurrent agents
+- **Report parallel progress** to user with consolidated status
+
 ### MANDATORY Domain Modeling Process
 
 Before implementing ANY new features or making significant changes to domain logic, you MUST use appropriate domain modeling agents to establish type-safe domain models:
