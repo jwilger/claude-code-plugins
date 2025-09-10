@@ -15,6 +15,7 @@ You MUST NOT:
 - Define requirements (use product-manager)
 - Manage tasks (use project-manager)
 - Write documentation (use technical-documentation-writer)
+- Create domain types (use appropriate domain modeling agent)
 
 If no appropriate subagent exists for a task, you MUST:
 
@@ -63,9 +64,10 @@ Before starting ANY work:
 
 1. FIRST use semantic_search to understand context
 2. Use the time MCP tools to get the current date and time
-3. Identify the appropriate subagent for the task
-4. Use the Task tool to delegate to that agent
-5. DO NOT attempt the work yourself
+3. **Identify the technology stack** (check project files like Cargo.toml, package.json, etc.)
+4. Identify the appropriate subagent for the task (including domain modeling agent if needed)
+5. Use the Task tool to delegate to that agent
+6. DO NOT attempt the work yourself
 
 ### MANDATORY Agent Documentation Review
 
@@ -78,12 +80,61 @@ ALL technical agents MUST perform pre-work documentation review:
 
 This documentation review is NON-NEGOTIABLE and agents that skip it are violating project requirements.
 
+### MANDATORY Domain Modeling Process
+
+Before implementing ANY new features or making significant changes to domain logic, you MUST use appropriate domain modeling agents to establish type-safe domain models:
+
+#### Domain Modeling Agent Selection
+
+Choose the domain modeling agent based on the project's primary technology stack:
+
+- **Rust projects** → rust-domain-model-expert
+- **TypeScript/JavaScript projects** → typescript-domain-model-expert (if available)
+- **Python projects** → python-domain-model-expert (if available)
+- **Java projects** → java-domain-model-expert (if available)
+- **C# projects** → csharp-domain-model-expert (if available)
+
+If no domain modeling agent exists for your technology stack, you MUST:
+1. Inform the user that a domain modeling agent needs to be created
+2. Suggest creating one with `/agents create [language]-domain-model-expert`
+3. Wait for the agent to be created before proceeding
+
+#### When to Use Domain Modeling Agents
+
+Domain modeling agents should be invoked:
+
+1. **Before feature development**: When starting any new feature that introduces domain concepts
+2. **During requirements analysis**: When business rules need to be encoded as types
+3. **When illegal states are discovered**: If current types allow invalid business states
+4. **During architectural review**: When technical-architect identifies domain modeling needs
+5. **Type strengthening**: When primitive obsession or weak typing is discovered
+
+#### Domain Modeling Integration with TDD
+
+Domain modeling works alongside the TDD process:
+
+1. **Domain First**: Use domain modeling agent to create types and signatures
+2. **Then TDD**: Use red-tdd-tester to write tests against the domain model
+3. **Green Implementation**: Use green-implementer to implement minimal logic
+4. **Refactor**: Strengthen domain types if illegal states are discovered
+
+#### Domain Modeling Principles
+
+All domain modeling agents follow these core principles:
+- **Make illegal states unrepresentable** through type design
+- **Eliminate primitive obsession** with domain-specific types
+- **Parse, don't validate** - transform data at boundaries
+- **Railway-oriented programming** with Result types
+- **Types over tests** - use type system to eliminate runtime testing when possible
+- **NO implementation logic** - only types and function signatures
+
 Common delegations:
 
 - Code architecture → technical-architect
 - Requirements/features → product-manager
 - Task management → project-manager
 - Documentation → technical-documentation-writer
+- Domain modeling → domain modeling agent (language-specific)
 - Test creation → red-tdd-tester
 - Implementation → green-implementer
 - Source control/git → source-control
@@ -94,15 +145,38 @@ Common delegations:
 
 For ANY application code changes (not configs/workflows):
 
-1. MUST use red-tdd-tester to write failing test first
+**DOMAIN-FIRST TDD WORKFLOW:**
+
+1. **Domain Modeling Phase** (if new domain concepts):
+   - Use appropriate domain modeling agent (e.g., rust-domain-model-expert for Rust)
+   - Create domain types and function signatures
+   - NO implementation logic - only types and signatures
+   
+2. **Red Phase**:
+   - MUST use red-tdd-tester to write failing test first
+   - Tests written against domain types (may not compile yet)
    - red-tdd-tester writes ONLY test code
-   - Tests may fail to compile - this is expected and valid
    - Compilation failure IS a form of test failure in RED phase
-2. MUST use green-implementer to make test pass with minimal code
+   
+3. **Green Phase**:
+   - MUST use green-implementer to make test pass with minimal code
    - green-implementer creates ALL production code (types, functions, modules)
    - Responsible for making tests compile AND pass
-3. Continue red-green cycle until feature complete
-4. Use technical-architect for final review
+   - Must implement domain types if they don't exist
+   
+4. **Type System Consultation** (MANDATORY after each green phase):
+   - MUST use domain modeling agent to evaluate if type system can make test impossible to fail
+   - Domain modeling agent determines if stronger types can eliminate the need for runtime testing
+   - If types can prevent the failure condition: strengthen types and remove redundant test
+   - If types cannot prevent failure: keep test and continue TDD cycle
+   
+5. **Refactor Phase** (as needed):
+   - If illegal states discovered, return to domain modeling agent
+   - Otherwise continue red-green cycle until feature complete
+   
+6. **Final Review**:
+   - Use technical-architect for architectural review
+   - Use domain modeling agent for domain compliance review
 
 This is NON-NEGOTIABLE for production code.
 

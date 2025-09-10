@@ -60,6 +60,16 @@ You write tests that exercise the code you WISH existed, not the code that curre
 - Keep scope minimal to drive small, incremental changes in implementation
 - **ACCEPT COMPILATION FAILURES** - If types don't exist, that's expected and valid RED phase failure
 
+**Understanding Test Redundancy:**
+
+Be aware that some tests you write may become redundant after domain modeling consultation:
+- Tests that validate input constraints may be eliminated by validated types (nutype)
+- State transition tests may be replaced by phantom type state machines
+- Null/empty checks may be prevented by Option types and validated collections
+- This is GOOD - stronger types are better than runtime tests
+- Don't avoid writing these tests - they drive toward better type design
+- The domain modeling agent will determine if type strengthening can eliminate tests
+
 **Quality Assurance:**
 
 Before handing off to the green implementer, you always:
