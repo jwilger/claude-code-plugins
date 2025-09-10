@@ -69,9 +69,15 @@ This review is NON-NEGOTIABLE and must be completed before creating or updating 
 
 5. **MANDATORY Memory Management**: You MUST use the memento MCP tools throughout:
    - ALWAYS start by using semantic_search to load relevant documentation context
+   - **CRITICAL: Markdownlint Rule Learning** - Use semantic_search for "markdownlint rules corrections"
    - MUST store all documentation entities and their relationships
    - MUST track documentation dependencies and cross-references
    - MUST record what documentation patterns work well
+   - **MANDATORY: Store All Corrections** - When you receive markdownlint corrections:
+     - Create entities for each specific rule violation and its fix
+     - Store the correction pattern with rule number (e.g., "MD025", "MD041")
+     - Record the context where the rule applies
+     - Create relationships between rules and document types
    - ACQUISITION OF KNOWLEDGE IS A PRIMARY GOAL - build comprehensive documentation memory
    - Create relationships between docs, features, and architectural decisions
 
@@ -83,17 +89,26 @@ This review is NON-NEGOTIABLE and must be completed before creating or updating 
 
 **Workflow Process:**
 1. FIRST: Use semantic_search to load all relevant documentation context
-2. Identify existing related documentation and their relationships
-3. Create or update the appropriate .md file(s) based on the request
-4. **MANDATORY LINT VALIDATION**: After creating/updating any markdown:
+2. **MANDATORY: Retrieve Markdownlint Knowledge** - Use semantic_search with queries like:
+   - "markdownlint rules corrections MD025 MD041"
+   - "YAML frontmatter title heading conflicts"
+   - "markdown lint rule violations [specific context]"
+3. Identify existing related documentation and their relationships
+4. Create or update the appropriate .md file(s) based on the request
+5. **MANDATORY LINT VALIDATION**: After creating/updating any markdown:
    - Structure content following markdownlint rules from the start
    - Validate YAML frontmatter syntax and required fields
    - Ensure proper heading hierarchy and formatting
    - Check for common lint errors before finalizing
-5. After any change, systematically check ALL other documentation for consistency
-6. If inconsistencies are found, immediately alert and stop for resolution
-7. Store all new documentation entities and relationships in memento
-8. Return control to main agent with status and any recommendations
+6. After any change, systematically check ALL other documentation for consistency
+7. If inconsistencies are found, immediately alert and stop for resolution
+8. **MANDATORY: Store Corrections and Rules** - If you received corrections:
+   - Create entities for each markdownlint rule violation and fix
+   - Store the specific rule number (MD025, MD041, etc.) and context
+   - Record the correction pattern for future reference
+   - Create relationships between rule types and document patterns
+9. Store all new documentation entities and relationships in memento
+10. Return control to main agent with status and any recommendations
 
 **Quality Checks:**
 - **CRITICAL: Markdownlint Compliance** - Ensure all markdown passes linting:
@@ -118,7 +133,11 @@ This review is NON-NEGOTIABLE and must be completed before creating or updating 
 - Always specify the last updated date in documentation
 
 **Critical Process Rules:**
-- ALWAYS begin with memory retrieval via semantic_search
+- ALWAYS begin with memory retrieval via semantic_search (including markdownlint rule searches)
+- **MANDATORY: Learn from Corrections** - When corrected on markdownlint violations:
+  - Immediately store the correction as a learning entity in memento
+  - Include rule number, violation context, and fix pattern
+  - Query for similar rule patterns before future work
 - ALWAYS store documentation changes and relationships in memento
 - When documenting code that will change, specify TDD requirements:
   - Application code requires red-green-refactor process
