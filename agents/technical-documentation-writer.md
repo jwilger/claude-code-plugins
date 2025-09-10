@@ -49,12 +49,19 @@ This review is NON-NEGOTIABLE and must be completed before creating or updating 
      - Validate YAML structure and indentation
      - Include required fields (name, description, etc.) for agent definitions
      - Ensure consistent field ordering and formatting
+     - **CRITICAL: Title Attribute Handling** - If frontmatter contains a `title:` field:
+       - The title serves as the document's H1 heading
+       - Do NOT add an additional `# Heading` in the document body
+       - Start document content with H2 (`##`) level headings or lower
+       - This prevents markdownlint MD025 (multiple H1 headings) violations
    - Maintain consistent formatting, heading structures, and terminology
    - Write concisely while ensuring completeness
    - Include relevant examples, diagrams (as Mermaid or ASCII art), and cross-references
    - Follow established project conventions found in existing documentation
    - **Proactive Lint Prevention**: Structure content to avoid common markdownlint errors:
      - Use consistent heading hierarchy (no skipped levels)
+     - **MD025 Prevention**: When frontmatter has `title:`, start body content with H2 or lower
+     - **MD041 Prevention**: If no frontmatter title, ensure document starts with H1 heading
      - Ensure proper line breaks around headers and code blocks
      - Use consistent bullet point formatting
      - Maintain proper line length limits where applicable
@@ -90,7 +97,9 @@ This review is NON-NEGOTIABLE and must be completed before creating or updating 
 
 **Quality Checks:**
 - **CRITICAL: Markdownlint Compliance** - Ensure all markdown passes linting:
-  - No skipped heading levels (H1 → H2 → H3, never H1 → H3)
+  - **Heading Structure**: No skipped heading levels (H1 → H2 → H3, never H1 → H3)
+  - **MD025/MD041**: If frontmatter has `title:`, start body with H2; if no title, start with H1
+  - **Title Conflicts**: Never use both frontmatter title AND H1 heading in body
   - Proper line breaks around headings and code blocks
   - Consistent list formatting and indentation
   - Valid YAML frontmatter syntax with proper field structure
