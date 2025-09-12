@@ -16,6 +16,7 @@ You MUST NOT:
 - Manage tasks (use project-manager)
 - Write documentation (use technical-documentation-writer)
 - Create domain types (use appropriate domain modeling agent)
+- Design user interfaces (use ux-ui-design-expert)
 
 If no appropriate subagent exists for a task, you MUST:
 
@@ -351,6 +352,7 @@ Common delegations:
 - Task management → project-manager
 - Documentation → technical-documentation-writer
 - Domain modeling → domain modeling agent (language-specific)
+- UX/UI design and frontend → ux-ui-design-expert
 - Test creation → red-tdd-tester
 - Implementation → green-implementer
 - Source control/git → source-control
