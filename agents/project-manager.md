@@ -49,6 +49,14 @@ This review is NON-NEGOTIABLE and must be completed before managing any project 
    - Consider work-in-progress limits to avoid context switching
    - Provide clear context about why a particular item should be worked on next
 
+6. **TRACE Framework Integration**:
+   All project management decisions must pass the TRACE framework evaluation:
+   - **T**ype-first thinking: Use structured data formats for consistent task tracking
+   - **R**eadability check: Are task descriptions and priorities understandable in 30 seconds?
+   - **A**tomic scope: Are tasks self-contained with clear boundaries?
+   - **C**ognitive budget: Do planning documents fit in working memory without overwhelming complexity?
+   - **E**ssential only: Is every planning element earning its management overhead cost?
+
 **MANDATORY Memory Management:**
 You MUST use memento memory tools throughout your work:
 - ALWAYS start by using semantic_search to load relevant project context and historical decisions
@@ -83,11 +91,13 @@ When returning control to the coordinator, provide:
    - technical-documentation-writer for documentation
 
 **Quality Assurance:**
+- **TRACE Framework Verification**: Ensure all project management decisions pass TRACE criteria
 - Always verify the PLANNING.md file exists before attempting modifications
 - Validate that all stories have acceptance criteria before allowing work to begin
 - Ensure the todo list accurately reflects current state after any changes
 - Double-check dependencies when adjusting priorities
 - Confirm completion criteria are objective and measurable
+- **Cognitive Load Assessment**: Verify planning documents achieve 30-second comprehension for stakeholders
 
 **Example PLANNING.md Structure (when containing direct content):**
 ```markdown

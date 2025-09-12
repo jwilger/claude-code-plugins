@@ -56,6 +56,93 @@ You MUST retrieve the current date form the time MCP tool when starting a new
 session. It is unacceptable to just assume you know what the current date and
 time are, because you are almost certainly incorrect.
 
+## Solution Philosophy: The TRACE Framework
+
+Every code change follows TRACE - a decision framework that keeps code understandable and maintainable:
+
+**T**ype-first thinking - Can the type system prevent this bug entirely?
+**R**eadability check - Would a new developer understand this in 30 seconds?
+**A**tomic scope - Is the change self-contained with clear boundaries?
+**C**ognitive budget - Does understanding require holding multiple files in your head?
+**E**ssential only - Is every line earning its complexity cost?
+
+## The Enhanced Semantic Density Doctrine (E-SDD)
+
+When crafting prompts, documentation, or any communication, apply the Enhanced Semantic Density Doctrine:
+
+> "Precision through sophistication, brevity through vocabulary, clarity through structure, eloquence through erudition."
+
+This transcends mere compression, achieving:
+- **Maximize meaning per token** - Each word carries maximum semantic weight
+- **Strategic vocabulary selection** - Rare but precise terms focus attention better than verbose explanations
+- **Structural clarity** - Markdown and formatting preserve comprehension despite brevity
+- **Eloquent expression** - Beautiful language that persuades and persists in memory
+
+## The Surgeon's Principle
+
+Think like a surgeon: minimal incision, maximum precision. Every cut has a purpose.
+
+```
+BAD:  "While I'm here, let me refactor this whole module..."
+GOOD: "This one-line fix solves the issue. Ship it."
+```
+
+## Cognitive Load Indicators
+
+🟢 **Green flags** (low cognitive load):
+- Function fits on one screen
+- Clear inputs → outputs mapping
+- Types document the intent
+- Tests are trivial to write
+
+🔴 **Red flags** (cognitive overload):
+- "Let me explain how this works..."
+- Multiple files open to understand one function
+- Test setup longer than the test
+- "It's complicated because..."
+
+## The Hierarchy of Understanding
+
+```
+1. Glance     → "I see what this does"           (5 seconds)
+2. Read       → "I understand how it works"      (30 seconds)
+3. Trace      → "I can follow the full flow"     (2 minutes)
+4. Archaeology → "Let me check the git history"  (∞ time)
+```
+
+Never go past level 2 for routine changes.
+
+## Parse, Don't Validate Philosophy
+
+- Use a data structure that makes illegal states unrepresentable
+- Push the burden of proof upward as far as possible, but no further
+- Let your data types inform your code, don't let your code control your data types
+- Don't be afraid to parse data in multiple passes
+- Avoid denormalized representations of data, especially if it's mutable
+
+## Making the Right Choice
+
+When facing a decision, ask in order:
+1. **What would types do?** - Can we make the bad path impossible?
+2. **What would a stranger think?** - Is this obvious without context?
+3. **What would tomorrow need?** - Does this help or hinder future work?
+
+## Technical Debt Budget System
+
+Track complexity debt with actual metrics:
+- **Essential complexity**: Irreducible difficulty in the problem domain (preserve)
+- **Incidental complexity**: Complexity from poor implementation choices (eliminate)
+- Each abstraction charges interest - only borrow what you must
+
+## Comments Philosophy
+
+**Place comments on these primary declarations only:**
+- Classes, structs, types, interfaces, functions, enums
+- Focus on "why" and "what", not "how"
+- Use canonical documentation style for the language
+- **Never add inline or trailing comments**
+- Code should be self-documenting through clear naming
+
 ## STRICT Agent Delegation and TDD Process
 
 ### Delegation Requirements

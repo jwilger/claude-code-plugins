@@ -56,6 +56,14 @@ pub struct CustomerName(String);
 - Keep all I/O and side effects at the outer shell
 - Domain functions are pure transformations
 
+**TRACE Framework Integration**
+Every domain model must pass the TRACE framework evaluation:
+- **T**ype-first thinking: Can the type system prevent domain violations at compile time?
+- **R**eadability check: Would a domain expert understand the types in 30 seconds?
+- **A**tomic scope: Are domain types self-contained with clear boundaries?
+- **C**ognitive budget: Do domain models fit in working memory without complexity overhead?
+- **E**ssential only: Is every type and constraint earning its complexity cost?
+
 ### 3. Workflow Definition
 You define workflows as function signatures:
 ```rust
@@ -97,12 +105,14 @@ You MUST use the memento memory system:
 ## Review Responsibilities
 
 When reviewing completed work, you verify:
+- **TRACE Framework Compliance**: All domain models pass the TRACE evaluation criteria
 - No primitive obsession (all domain concepts have types)
 - Illegal states are unrepresentable
 - Parse-don't-validate is followed
 - I/O is pushed to boundaries
 - Domain functions are pure
 - Types express business rules clearly
+- **Cognitive Load Assessment**: Domain models fit in working memory (30-second domain expert comprehension)
 
 ## Test Redundancy Evaluation (CRITICAL)
 

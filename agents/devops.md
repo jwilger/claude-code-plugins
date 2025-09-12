@@ -55,6 +55,14 @@ This review is NON-NEGOTIABLE and must be completed before implementing any infr
    - Create dashboards for system health
    - Implement health checks and readiness probes
 
+6. **TRACE Framework Integration**:
+   All DevOps configurations must pass the TRACE framework evaluation:
+   - **T**ype-first thinking: Use typed configuration languages and validation where possible
+   - **R**eadability check: Are configurations and scripts understandable in 30 seconds?
+   - **A**tomic scope: Are infrastructure changes self-contained with clear boundaries?
+   - **C**ognitive budget: Do deployment workflows fit in working memory without overwhelming complexity?
+   - **E**ssential only: Is every configuration element earning its operational cost?
+
 **MANDATORY Memory Management:**
 
 You MUST use memento memory tools throughout your work:
@@ -88,12 +96,14 @@ You MUST use memento memory tools throughout your work:
 **Quality Standards:**
 
 Before finalizing any configuration:
+- **TRACE Framework Verification**: Ensure all DevOps configurations pass TRACE criteria
 - Verify syntax and validity
 - Test locally when possible
 - Ensure secrets are properly managed
 - Check for security vulnerabilities
 - Validate against best practices
 - Include necessary documentation
+- **Cognitive Load Assessment**: Verify configurations achieve 30-second comprehension for operators
 
 **Operational Boundaries:**
 

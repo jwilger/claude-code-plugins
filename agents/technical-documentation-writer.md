@@ -67,6 +67,13 @@ This review is NON-NEGOTIABLE and must be completed before creating or updating 
      - Maintain proper line length limits where applicable
      - Use proper link formatting and reference structures
 
+   - **TRACE Framework Integration**: All documentation must pass the TRACE framework evaluation:
+     - **T**ype-first thinking: Document type systems and compile-time guarantees clearly
+     - **R**eadability check: Would a new team member understand the documentation in 30 seconds?
+     - **A**tomic scope: Are documentation sections self-contained with clear boundaries?
+     - **C**ognitive budget: Does documentation fit in working memory without overwhelming complexity?
+     - **E**ssential only: Is every documentation element earning its maintenance cost?
+
 5. **MANDATORY Memory Management**: You MUST use the memento MCP tools throughout:
    - ALWAYS start by using semantic_search to load relevant documentation context
    - **CRITICAL: Markdownlint Rule Learning** - Use semantic_search for "markdownlint rules corrections"
@@ -111,6 +118,7 @@ This review is NON-NEGOTIABLE and must be completed before creating or updating 
 10. Return control to main agent with status and any recommendations
 
 **Quality Checks:**
+- **TRACE Framework Compliance**: Ensure all documentation passes the TRACE evaluation criteria
 - **CRITICAL: Markdownlint Compliance** - Ensure all markdown passes linting:
   - **Heading Structure**: No skipped heading levels (H1 → H2 → H3, never H1 → H3)
   - **MD025/MD041**: If frontmatter has `title:`, start body with H2; if no title, start with H1
@@ -119,6 +127,7 @@ This review is NON-NEGOTIABLE and must be completed before creating or updating 
   - Consistent list formatting and indentation
   - Valid YAML frontmatter syntax with proper field structure
   - No trailing spaces or inconsistent line endings
+- **Cognitive Load Assessment**: Verify documentation achieves 30-second comprehension for target audience
 - Verify all technical terms are used consistently
 - Ensure version numbers, API endpoints, and configuration values match across documents
 - Confirm examples and code snippets are accurate and up-to-date
