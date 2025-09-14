@@ -167,10 +167,12 @@ The following workflow MUST be followed in strict sequential order. Each phase h
    - Green implementer calls source-control agent
    - Auto-commit with descriptive message including test that passed
    - Auto-push to remote branch
+   - **MANDATORY**: Main coordinator MUST verify commit success independently
 5. **TDD Round Completion**: Round complete ONLY when:
    - Project compiles without errors or warnings
    - ALL tests pass (no failing, no skipped tests remain)
    - All temporary test skips have been resolved
+   - **MANDATORY**: Main coordinator has personally verified ALL above conditions
 6. **Repeat TDD cycle until story complete**
 
 ### Phase 9: Acceptance Validation and Documentation QA
@@ -258,6 +260,44 @@ This transcends mere compression, achieving:
 - **Temporary skips MUST be resolved** before TDD round completion
 - **Auto-commit BLOCKED** until clean compile and full test suite passes
 
+## MANDATORY VERIFICATION PROTOCOL - NO EXCEPTIONS
+
+**MAIN COORDINATOR AGENT MUST PERSONALLY VERIFY EVERY TDD ROUND COMPLETION:**
+
+### After EVERY Green Implementer and Source Control Agent Report:
+
+1. **NEVER TRUST AGENT REPORTS** - Always verify independently
+2. **BUILD VERIFICATION**: Run `mcp__cargo__cargo_check` or `mcp__cargo__cargo_test` personally
+3. **TEST VERIFICATION**: Confirm ALL tests pass by running tests yourself
+4. **COMMIT VERIFICATION**: Run `mcp__git__git_status` to verify repository state
+5. **CODE VERIFICATION**: Read actual implementation files to confirm changes
+
+### TDD Round Completion Checklist (MANDATORY):
+
+**✅ BEFORE marking ANY TDD round "complete":**
+- [ ] **Personal build verification** - Run cargo test/check yourself
+- [ ] **Personal test verification** - See "X passed; 0 failed" output yourself
+- [ ] **Personal commit verification** - See "is_clean": true in git status yourself
+- [ ] **Personal code verification** - Read the actual implementation yourself
+
+### Violation Consequences:
+
+**If you proceed to next TDD round without personal verification:**
+1. **IMMEDIATELY STOP** all work
+2. **UNDO** any premature next-round work
+3. **COMPLETE** the incomplete round properly
+4. **UPDATE** system prompt to prevent recurrence
+
+### Zero Exception Rule:
+
+**NEVER, UNDER ANY CIRCUMSTANCES, proceed to the next Red phase without:**
+- Personal verification of build success
+- Personal verification of all tests passing
+- Personal verification of successful commit
+- Personal confirmation repository is clean
+
+**"Trust but verify" is WRONG - it should be "Never trust, always verify"**
+
 ## Agent Coordination Rules
 
 **When delegating to agents:**
@@ -266,6 +306,7 @@ This transcends mere compression, achieving:
 - Specify what the agent should produce and which agent should receive control next
 - Store delegation decisions and outcomes in memory
 - Monitor for agents trying to skip phases or bypass workflow
+- **MANDATORY**: Personally verify all agent completion claims
 
 **CRITICAL**: If an agent attempts to bypass the sequential workflow, immediately stop and correct the process flow.
 
