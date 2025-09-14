@@ -51,11 +51,13 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 5. **Handoff**: Return control specifying project-manager should create PLANNING.md
 
 **Phase 8: Type-System-First TDD Integration**
-1. **Test Analysis**: Review failing test from red-tdd-tester
-2. **Type Evaluation**: Can Pydantic validation prevent this test failure?
-3. **If Types Can Prevent**: Strengthen types, return control to red-tdd-tester
-4. **If Types Cannot Prevent**: Approve runtime testing for green-implementer
-5. **Iteration**: Continue red → domain → red → domain cycle until optimal
+1. **BUILD/TEST STATE AWARENESS**: Understand that red-tdd-tester only works when project compiles cleanly and all tests pass
+2. **Test Analysis**: Review failing test from red-tdd-tester
+3. **Type Evaluation**: Can Pydantic validation prevent this test failure?
+4. **If Types Can Prevent**: Strengthen types, return control to red-tdd-tester
+5. **If Types Cannot Prevent**: Approve runtime testing for green-implementer
+6. **TDD COMPLETION AWARENESS**: Understand that TDD round not complete until project compiles cleanly and ALL tests pass
+7. **Iteration**: Continue red → domain → red → domain cycle until optimal
 
 ## Type-Strengthening Evaluation Process
 
@@ -92,6 +94,9 @@ Before approving runtime testing:
 
 - ALWAYS begin with memory loading (temporal anchoring + semantic_search + graph traversal)
 - ALWAYS store type design decisions and their relationships with proper temporal markers
+- **TDD STATE AWARENESS**: Understand that tests only come when project compiles cleanly and all tests pass
+- **TDD COMPLETION RESPONSIBILITY**: TDD round not complete until project compiles cleanly and ALL tests pass
+- **GREEN IMPLEMENTER APPROVAL**: Never approve green-implementer unless truly essential runtime behavior
 - FOLLOW STRICT SEQUENTIAL WORKFLOW - only work during phases 6 and 8
 - During Phase 6: CREATE comprehensive type system based on ARCHITECTURE.md and EVENT_MODEL.md
 - During Phase 8: NEVER allow green-implementer without reviewing tests first

@@ -141,18 +141,37 @@ The following workflow MUST be followed in strict sequential order. Each phase h
 
 #### Phase 8.1: Type-System-First TDD Implementation
 **Enhanced TDD Cycle with Auto-Commit (per story):**
+
+**CRITICAL TDD COMPLETION RULES:**
+- **Project MUST compile cleanly before any TDD round is considered complete**
+- **ALL tests MUST pass before any TDD round is considered complete**
+- **NEVER write new tests when build is failing OR any test is failing**
+- **NEVER exit TDD cycle with failing build or failing tests**
+
+**Enhanced TDD Cycle:**
 1. **Red-TDD-Tester**: Write/refine failing test (ONE ASSERTION, compilation failure counts)
+   - **PREREQUISITE**: Project must compile cleanly and all other tests must pass
+   - **TEST SKIPPING PROTOCOL**: If need tighter-scoped test for error clarity:
+     - FIRST mark current failing test as "skipped"
+     - THEN write new tighter-scoped test (only if testing same component flow)
+     - AFTER new test passes, remove skip mark from original test
    - If missing dependency discovered: Call Phase 8.05 Dependency Resolution, then continue
 2. **Domain Modeling Agent**: Review test - "Can type system prevent this failure?"
    - If YES: Strengthen types ONLY, return to Red-TDD-Tester
    - If NO: Proceed to Green Implementer
 3. **Green Implementer**: Make minimal change to pass ONE assertion
+   - **BUILD VERIFICATION**: MUST verify project compiles cleanly after changes
+   - **TEST VERIFICATION**: MUST verify ALL tests pass after changes
    - If missing dependency discovered: Call Phase 8.05 Dependency Resolution, then continue
-4. **Auto-Commit Integration**: When full test suite goes from failing to passing:
+4. **Auto-Commit Integration**: ONLY when project compiles cleanly AND all tests pass:
    - Green implementer calls source-control agent
    - Auto-commit with descriptive message including test that passed
    - Auto-push to remote branch
-5. **Repeat TDD cycle until story complete**
+5. **TDD Round Completion**: Round complete ONLY when:
+   - Project compiles without errors or warnings
+   - ALL tests pass (no failing, no skipped tests remain)
+   - All temporary test skips have been resolved
+6. **Repeat TDD cycle until story complete**
 
 ### Phase 9: Acceptance Validation and Documentation QA
 **Agents**: product-manager → technical-documentation-writer → source-control
@@ -230,6 +249,14 @@ This transcends mere compression, achieving:
 - Red-TDD-Tester MUST write failing test before any implementation
 - Domain modeling agent MUST review EVERY test for type-system opportunities
 - Green implementer only gets control AFTER domain modeling agent approval
+
+**CRITICAL TDD STATE MANAGEMENT:**
+- **NO new tests while build is failing** - fix compilation errors first
+- **NO new tests while any test is failing** - resolve all failures first
+- **TDD round NEVER complete** until project compiles cleanly and ALL tests pass
+- **Test skipping ONLY for error clarification** within same component flow
+- **Temporary skips MUST be resolved** before TDD round completion
+- **Auto-commit BLOCKED** until clean compile and full test suite passes
 
 ## Agent Coordination Rules
 
