@@ -37,6 +37,35 @@ You and ALL subagents MUST use comprehensive memory management:
 
 You MUST use the git MCP tools for any and all git repository operations. You MUST NOT ever use the Bash tool to execute git commands.
 
+## CRITICAL: Source Control Failure Handling Protocol
+
+**ALL source-control agents MUST follow this MANDATORY protocol:**
+
+**Commit Verification (REQUIRED):**
+1. **ALWAYS verify commit success** by checking git status after EVERY commit attempt
+2. **NEVER assume commits succeeded** - always verify with `mcp__git__git_status`
+3. **If commit fails**: IMMEDIATELY escalate to appropriate agents for resolution
+4. **NEVER proceed** with further git operations if commit failed
+
+**Pre-commit Hook Failure Handling (MANDATORY):**
+1. **If pre-commit hooks fail**: IMMEDIATELY escalate to appropriate agents:
+   - Code quality issues (clippy, rustfmt): escalate to rust-domain-model-expert or green-implementer
+   - Formatting issues: escalate to technical-documentation-writer
+   - Test failures: escalate to red-tdd-tester or green-implementer
+2. **NEVER ignore pre-commit hook failures**
+3. **NEVER proceed** until all pre-commit hook issues are resolved
+
+**File Staging Protocol (REQUIRED):**
+1. **If pre-commit hooks modify files**: IMMEDIATELY stage the modified files
+2. **Re-attempt commit** after staging pre-commit hook changes
+3. **Verify final commit success** with git status
+
+**Escalation Requirements:**
+- **MUST provide specific error details** when escalating
+- **MUST identify which pre-commit hooks failed**
+- **MUST specify which files need attention**
+- **MUST wait for resolution** before continuing git operations
+
 ## CRITICAL: Dependency Management Protocol
 
 **ALL dependency operations MUST use the dependency-management agent:**
@@ -187,10 +216,12 @@ The following workflow MUST be followed in strict sequential order. Each phase h
    - If resolvable formatting/consistency issues: Fix directly
    - NO requirement to create missing documentation - only QA existing docs
 3. **PR Management**: source-control agent handles repository finalization:
-   - If PR-based workflow: Create pull request or update existing PR for story
-   - If trunk-based workflow: Merge to main branch directly
-   - Include story completion details in PR description
-   - Link PR to story in PLANNING.md
+   - **MANDATORY**: If PR-based workflow: MUST actually create pull request using `gh pr create` command
+   - **MANDATORY**: If trunk-based workflow: MUST actually merge to main branch directly
+   - **NEVER** report "ready for PR creation" - MUST create the actual PR
+   - **MUST** include story completion details in PR description
+   - **MUST** link PR to story in PLANNING.md
+   - **MUST** provide PR URL in completion report
 **Gate**: Feature validated, documentation consistent, and ready for code review (PR-based) or deployed (trunk-based)
 
 ### Phase 10: Project Status Update

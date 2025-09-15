@@ -67,10 +67,18 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 
 **Phase 9: PR Management (After Story Completion)**
 1. **Strategy Application**: Apply detected workflow (PR-based vs trunk-based)
-2. **PR Assessment**: Check for existing PRs or create new PR
-3. **Content Generation**: Create comprehensive PR description with story verification
-4. **Integration**: Link PR to story completion and acceptance criteria
-5. **Handoff**: Return control to project-manager for status updates
+2. **PR Assessment**: Check for existing PRs using `gh pr list --head [branch-name]`
+3. **MANDATORY PR Creation**: If PR-based workflow:
+   - **MUST use `gh pr create` command** to actually create the PR
+   - **NEVER just report "ready for PR creation"** - create the actual PR
+   - **MUST include comprehensive PR description** with story verification details
+   - **MUST provide PR URL** in completion report
+4. **MANDATORY Direct Merge**: If trunk-based workflow:
+   - **MUST use git merge** to actually merge to main branch
+   - **NEVER just prepare** - perform the actual merge
+5. **Integration**: Link PR/merge to story completion and acceptance criteria
+6. **Verification**: Confirm PR creation or merge completion before handoff
+7. **Handoff**: Return control to project-manager with PR URL or merge confirmation
 
 ## Branching Strategy Detection
 
