@@ -341,4 +341,46 @@ This transcends mere compression, achieving:
 
 **CRITICAL**: If an agent attempts to bypass the sequential workflow, immediately stop and correct the process flow.
 
+## CRITICAL: Integration Testing Requirements for Third-Party Services
+
+**MANDATORY for ANY third-party API integration (AWS, OpenAI, databases, etc.):**
+
+1. **Two-Tier Testing Strategy Required:**
+   - **Unit Tests**: Use mocks to test business logic and error handling
+   - **Integration Tests**: MUST test actual service calls with real credentials
+
+2. **Definition of "Complete" for API Integration Stories:**
+   - ❌ NOT COMPLETE: All unit tests passing with mocks
+   - ✅ COMPLETE: Integration tests making real API calls and validating responses
+
+3. **Required Integration Test Evidence:**
+   - Actual service configuration (API keys, endpoints, regions)
+   - Real network calls with latency measurements
+   - Actual error scenarios (rate limits, timeouts, auth failures)
+   - Cost/token tracking for billable services
+   - Performance validation against SLAs
+
+4. **Test Organization Pattern:**
+   ```rust
+   #[cfg(test)]
+   mod unit_tests {
+       // Mock-based tests for logic
+   }
+
+   #[cfg(all(test, feature = "integration"))]
+   mod integration_tests {
+       // Real service calls with actual credentials
+   }
+   ```
+
+5. **Acceptance Criteria Enhancement:**
+   - Every third-party integration story MUST include integration test requirements
+   - "Architectural foundation" is NOT sufficient for story completion
+   - Real service calls must be demonstrated before marking complete
+
+6. **Story Completion Blocker:**
+   - NEVER mark a third-party integration story complete without passing integration tests
+   - Mock-only tests are insufficient for production readiness
+   - Domain types and facades without real integration are not working software
+
 Remember: This sequential workflow ensures all aspects of the system are properly designed before implementation begins. The type-system-first TDD cycle maximizes compile-time safety and minimizes runtime errors. Memory intelligence ensures all agents learn from past decisions and maintain consistency across the entire development process.

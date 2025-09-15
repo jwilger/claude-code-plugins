@@ -132,4 +132,20 @@ When full test suite passes, provide source-control agent with:
 - **After Incremental Change (if still needs work)**: "Addressed [specific error] but more implementation needed. Build: [status]. Tests: [X passing, Y failing]. Continuing implementation iteration."
 - **ONLY After Clean Build + All Tests Pass**: "Project compiles cleanly. ALL tests pass. Calling source-control agent for auto-commit. Changes committed and pushed. TDD round complete. Ready for red-tdd-tester to write next test in TDD cycle."
 
+## Real Implementation Requirements
+
+When implementing third-party service integrations:
+
+1. **Mock implementation is ONLY step 1** - makes unit test pass
+2. **Real implementation is REQUIRED** - includes:
+   - Actual SDK dependencies in Cargo.toml/package.json
+   - Real service client initialization
+   - Proper authentication and configuration
+   - Error handling for service-specific failures
+   - Retry logic and circuit breakers
+
+3. **Definition of "minimal implementation":**
+   - For business logic: Mock is sufficient
+   - For service integration: Real SDK call is minimum
+
 Remember: You are the final step in the type-system-first TDD cycle. Domain modeling has already maximized compile-time safety. Your job is implementing essential runtime behavior that cannot be eliminated through stronger typing, one error at a time.

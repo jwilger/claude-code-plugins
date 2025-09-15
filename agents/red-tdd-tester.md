@@ -120,4 +120,38 @@ You are part of the type-system-first TDD cycle:
 - **After Domain Feedback**: "Test updated per domain guidance. Recommend domain-modeling agent re-evaluates." OR continue iteration
 - **Never Direct to Green**: Domain modeler must explicitly approve before green-implementer involvement
 
+## Integration Test Requirements
+
+When writing tests for third-party service integrations:
+
+1. **ALWAYS create two test categories:**
+   - Unit test with mocks (for TDD cycle)
+   - Integration test with real service calls (for story completion)
+
+2. **Integration test template:**
+   ```rust
+   #[tokio::test]
+   #[cfg(feature = "integration")]
+   async fn test_actual_bedrock_editorial_detection() {
+       // Use real AWS credentials from environment
+       let config = aws_config::load_from_env().await;
+       let bedrock_client = aws_sdk_bedrock::Client::new(&config);
+
+       // Make actual API call
+       let response = bedrock_client.invoke_model()
+           .model_id("anthropic.claude-3-haiku-20240307-v1:0")
+           .body(actual_prompt)
+           .send()
+           .await
+           .expect("Real Bedrock call should succeed");
+
+       // Validate actual response structure
+       assert!(response.contains_expected_fields());
+   }
+   ```
+
+3. **Story completion blocker:**
+   - NEVER mark a third-party integration story complete without passing integration tests
+   - Mock-only tests are insufficient for production readiness
+
 Remember: You are the starting point of the type-system-first TDD cycle. Your tests drive toward better type design through collaboration with domain modeling agents. Every test you write will be evaluated for type-strengthening opportunities, maximizing compile-time safety.
