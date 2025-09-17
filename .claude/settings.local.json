@@ -14,7 +14,8 @@
       "mcp__git__git_add",
       "Read(//home/jwilger/projects/tim-dotfiles/**)",
       "mcp__git__git_log",
-      "WebSearch"
+      "WebSearch",
+      "mcp__memento__read_graph"
     ],
     "deny": [],
     "ask": []

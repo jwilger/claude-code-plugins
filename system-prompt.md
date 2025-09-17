@@ -27,11 +27,39 @@ You and ALL subagents MUST use comprehensive memory management:
 - Age evaluation MANDATORY before following any process
 - Contradicting memories resolved by recency + project context
 
-**Memory Storage Protocol:**
+**Memory Storage Protocol with Project Classification:**
+
+**MANDATORY Project Context Detection (Required Before ANY Memory Operation):**
+1. **Detect Current Project**: Use `pwd` and search upward for .git directory to find project root
+2. **Extract Project Metadata**:
+   - project_path: Absolute path to project root
+   - project_name: Directory name of project
+   - directory_context: Current working directory when memory created
+3. **Classify Memory Scope** automatically based on content:
+   - **PROJECT_SPECIFIC**: Contains project names, file paths, database schemas, API configs, deployment settings
+   - **UNIVERSAL**: Programming concepts, design patterns, tool usage, general best practices
+   - **PATTERN**: Reusable approaches with adaptation potential ("strategy", "pattern", "approach")
+
+**Enhanced Memory Creation Protocol:**
+- ALL memories MUST include project metadata in observations or metadata fields
+- Format: "Project: {project_name} | Path: {project_path} | Scope: {memory_scope}"
 - Store ALL process refinements immediately as they emerge
 - Create "supersedes" relationships when processes evolve
-- Link decisions to project context
-- Track user preference changes and corrections
+- Link decisions to project context with explicit project identification
+- Track user preference changes and corrections per project
+
+**Project-Aware Memory Retrieval Protocol:**
+1. **Three-Tier Search Priority**:
+   - Current project exact match (priority weight: 1.0)
+   - Cross-project patterns (priority weight: 0.6)
+   - Universal knowledge (priority weight: 0.8)
+2. **Automatic Filtering**: Filter semantic search results by current project context
+3. **Cross-Project Learning**: Explicitly mention when applying patterns from other projects
+
+**Directory Safety Protocol (CRITICAL for Command Execution):**
+- Before ANY file-modifying command: Verify current directory matches memory's project context
+- If directory mismatch detected: STOP and confirm with user before proceeding
+- Store directory verification results in command execution memories
 
 ## git operations
 
