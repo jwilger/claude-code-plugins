@@ -138,28 +138,10 @@ The following workflow MUST be followed in strict sequential order. Each phase h
 **Process**: If external dependencies needed, call dependency-management agent first
 **Gate**: Types that make illegal states unrepresentable
 
-### Phase 7: Project Planning
-**Agent**: project-manager
-**Input**: All documentation from phases 1-6
-**Output**: docs/PLANNING.md with complete vertical slice user stories
-**Process**: Collaborate with product-manager, technical-architect, and ux-ui-design-expert for consensus
-**Gate**: Stories are complete, prioritized, and represent end-to-end functionality
+### Phase 7: Outside-In TDD Implementation (Directly from Domain Types)
+**Process**: Begin TDD implementation directly from complete domain model with hierarchical chained PRs
 
-### Phase 8: Story Implementation (Per Story from PLANNING.md)
-
-#### Phase 8.0: Source Control Preparation
-**Agent**: source-control
-**Process**: Prepare repository state for story implementation
-**Actions**:
-1. **Detect Branching Strategy**: Determine if project uses PR-based workflow or trunk-based development
-2. **Branch Status Assessment**: Check current branch and determine if correct for this story
-3. **Existing Work Detection**: Check for existing branches, open PRs, or closed/merged PRs for this story
-4. **Upstream Integration**: Fetch latest changes and integrate from main/master/primary branch
-5. **Branch Management**: Create new branch or switch to appropriate existing branch
-6. **Conflict Prevention**: Ensure working off latest upstream to minimize future conflicts
-**Gate**: Repository ready with correct branch and latest upstream changes
-
-#### Phase 8.05: Dependency Resolution (When Needed)
+#### Phase 7.0: Dependency Resolution (When Needed)
 **Trigger**: When TDD agents encounter missing dependencies
 **Process**:
 1. **Pause TDD Cycle**: Temporarily halt Red → Domain → Green process
@@ -168,8 +150,8 @@ The following workflow MUST be followed in strict sequential order. Each phase h
 4. **Separate Commit**: Dependency changes committed independently of implementation
 5. **Resume TDD**: Continue with Red → Domain → Green cycle using new dependency
 
-#### Phase 8.1: Type-System-First TDD Implementation
-**Enhanced TDD Cycle with Auto-Commit (per story):**
+#### Phase 7.1: Outside-In TDD with Hierarchical Chained PRs
+**Enhanced TDD Cycle with Hierarchical PRs:**
 
 **CRITICAL TDD COMPLETION RULES:**
 - **Project MUST compile cleanly before any TDD round is considered complete**
@@ -177,37 +159,68 @@ The following workflow MUST be followed in strict sequential order. Each phase h
 - **NEVER write new tests when build is failing OR any test is failing**
 - **NEVER exit TDD cycle with failing build or failing tests**
 
-**Enhanced TDD Cycle:**
-1. **Red-TDD-Tester**: Write/refine failing test (ONE ASSERTION, compilation failure counts)
-   - **PREREQUISITE**: Project must compile cleanly and all other tests must pass
-   - **TEST SKIPPING PROTOCOL**: If need tighter-scoped test for error clarity:
-     - FIRST mark current failing test as "skipped"
-     - THEN write new tighter-scoped test (only if testing same component flow)
-     - AFTER new test passes, remove skip mark from original test
-   - If missing dependency discovered: Call Phase 8.05 Dependency Resolution, then continue
-2. **Domain Modeling Agent**: Review test - "Can type system prevent this failure?"
-   - If YES: Strengthen types ONLY, return to Red-TDD-Tester
-   - If NO: Proceed to Green Implementer
-3. **Green Implementer**: Make minimal change to pass ONE assertion
-   - **BUILD VERIFICATION**: MUST verify project compiles cleanly after changes
-   - **TEST VERIFICATION**: MUST verify ALL tests pass after changes
-   - If missing dependency discovered: Call Phase 8.05 Dependency Resolution, then continue
-4. **Auto-Commit Integration**: ONLY when project compiles cleanly AND all tests pass:
-   - Green implementer calls source-control agent
-   - Auto-commit with descriptive message including test that passed
-   - Auto-push to remote branch
-   - **MANDATORY**: Main coordinator MUST verify commit success independently
+**Hierarchical PR Structure:**
+```
+main
+└── PR #1: Integration Test for Feature X
+    ├── PR #2: Unit Test for Component A (chains off PR #1)
+    │   └── PR #3: Unit Test for Helper Function (chains off PR #2)
+    └── PR #4: Unit Test for Component B (chains off PR #1)
+```
+
+**Outside-In TDD Process:**
+1. **Integration Test PR**: Create feature branch, write/refine integration test
+   - Run test → hits first failure (unimplemented!() or assertion)
+   - Create PR #1 (stays open throughout feature development)
+
+2. **Drill Down with Skip Protocol**:
+   - Identify appropriate test scope for the failure
+   - **Create new branch** chaining off current branch
+   - **IMMEDIATELY mark parent test as skipped** with comment
+   - Write unit test at appropriate level
+   - Domain review → Can types prevent this?
+   - Green implementation if needed
+   - **Post-Implementation Domain Review**: Check for primitive obsession and type misuse
+   - Auto-commit when passing
+
+3. **Unskip Protocol Before Merge**:
+   - **MANDATORY**: Must unskip parent test before merging
+   - Verify parent test now progresses further (or passes)
+   - Create PR for review
+   - Merge child PR back to parent branch
+
+4. **Enhanced TDD Cycle per PR**:
+   - **Red-TDD-Tester**: Write/refine failing test (ONE ASSERTION)
+     - **PREREQUISITE**: Project must compile cleanly and all other tests must pass
+     - **Property Testing**: Use property testing for domain type boundaries
+     - **Mutation Testing**: Add mutation score verification (≥80% for new code)
+   - **Domain Modeling Agent**: Review test - "Can type system prevent this failure?"
+     - If YES: Strengthen types ONLY, return to Red-TDD-Tester
+     - If NO: Proceed to Green Implementer
+   - **Green Implementer**: Make minimal change to pass ONE assertion
+     - **BUILD VERIFICATION**: MUST verify project compiles cleanly after changes
+     - **TEST VERIFICATION**: MUST verify ALL tests pass after changes
+   - **Post-Implementation Domain Review**: Domain modeler checks implementation:
+     - Check for primitive obsession (using primitives where domain types exist)
+     - Verify correct use of existing domain types
+     - If violations found: Update types → Restart current PR's TDD cycle
+   - **Auto-Commit Integration**: ONLY when project compiles cleanly AND all tests pass AND domain review approves:
+     - Green implementer calls source-control agent
+     - Auto-commit with descriptive message including test that passed
+     - Auto-push to remote branch
+     - **MANDATORY**: Main coordinator MUST verify commit success independently
+
 5. **TDD Round Completion**: Round complete ONLY when:
    - Project compiles without errors or warnings
    - ALL tests pass (no failing, no skipped tests remain)
    - All temporary test skips have been resolved
+   - Domain review approves implementation
    - **MANDATORY**: Main coordinator has personally verified ALL above conditions
-6. **Repeat TDD cycle until story complete**
 
-### Phase 9: Acceptance Validation and Documentation QA
+### Phase 8: Acceptance Validation and Documentation QA
 **Agents**: product-manager → technical-documentation-writer → source-control
 **Process**:
-1. **Acceptance Verification**: product-manager verifies all acceptance criteria are met
+1. **Acceptance Verification**: product-manager verifies all requirements from REQUIREMENTS_ANALYSIS.md are met
 2. **MANDATORY Documentation QA**: technical-documentation-writer reviews ALL documentation:
    - Verify markdownlint compliance and formatting consistency
    - Check for inconsistencies between documentation files
@@ -215,19 +228,19 @@ The following workflow MUST be followed in strict sequential order. Each phase h
    - If inconsistencies found: Return control requesting appropriate agent(s) resolve conflicts
    - If resolvable formatting/consistency issues: Fix directly
    - NO requirement to create missing documentation - only QA existing docs
-3. **PR Management**: source-control agent handles repository finalization:
+3. **MANDATORY Quality Gates**: source-control agent performs final quality verification:
+   - **Mutation Testing Gate**: Verify mutation score ≥80% for new code
+   - **Cognitive Load Gate**: Call cognitive-load-analyzer for TRACE analysis (≥70% score required)
+   - **BLOCK PR** if any quality gate fails
+4. **PR Management**: source-control agent handles repository finalization:
    - **MANDATORY**: If PR-based workflow: MUST actually create pull request using `gh pr create` command
    - **MANDATORY**: If trunk-based workflow: MUST actually merge to main branch directly
    - **NEVER** report "ready for PR creation" - MUST create the actual PR
-   - **MUST** include story completion details in PR description
-   - **MUST** link PR to story in PLANNING.md
+   - **MUST** include feature completion details in PR description
+   - **MUST** include mutation score and TRACE score in PR description
+   - **MUST** reference requirements from REQUIREMENTS_ANALYSIS.md
    - **MUST** provide PR URL in completion report
 **Gate**: Feature validated, documentation consistent, and ready for code review (PR-based) or deployed (trunk-based)
-
-### Phase 10: Project Status Update
-**Agent**: project-manager
-**Process**: Update story status in PLANNING.md
-**Output**: Current project status with completed stories
 
 ## Solution Philosophy: The TRACE Framework
 
@@ -238,6 +251,8 @@ Every code change follows TRACE - a decision framework that keeps code understan
 **A**tomic scope - Is the change self-contained with clear boundaries?
 **C**ognitive budget - Does understanding require holding multiple files in your head?
 **E**ssential only - Is every line earning its complexity cost?
+
+**TRACE Quality Gate**: All PRs must achieve ≥70% overall TRACE score with each dimension ≥50% before creation/finalization. Enforced by cognitive-load-analyzer agent.
 
 ## The Enhanced Semantic Density Doctrine (E-SDD)
 
@@ -278,18 +293,23 @@ This transcends mere compression, achieving:
 - NEVER bypass the sequential workflow for "efficiency"
 
 **For ANY application code changes:**
-- Domain modeling agent MUST create types before TDD begins
+- Domain modeling agent MUST create COMPLETE types before TDD begins
+- Project MUST compile cleanly before TDD can start
 - Red-TDD-Tester MUST write failing test before any implementation
 - Domain modeling agent MUST review EVERY test for type-system opportunities
 - Green implementer only gets control AFTER domain modeling agent approval
+- Domain modeling agent MUST review EVERY implementation for type violations
 
 **CRITICAL TDD STATE MANAGEMENT:**
 - **NO new tests while build is failing** - fix compilation errors first
 - **NO new tests while any test is failing** - resolve all failures first
 - **TDD round NEVER complete** until project compiles cleanly and ALL tests pass
-- **Test skipping ONLY for error clarification** within same component flow
-- **Temporary skips MUST be resolved** before TDD round completion
-- **Auto-commit BLOCKED** until clean compile and full test suite passes
+- **Test skipping for PR hierarchy** - skip parent test when drilling down to child PR
+- **Temporary skips MUST be resolved** before merging child PR back to parent
+- **Auto-commit BLOCKED** until clean compile and full test suite passes AND domain review approves
+- **Post-implementation domain review MANDATORY** after every green phase
+- **MUTATION TESTING MANDATORY** - ≥80% mutation score for new code
+- **COGNITIVE LOAD GATE MANDATORY** - ≥70% TRACE score before PR creation
 
 ## MANDATORY VERIFICATION PROTOCOL - NO EXCEPTIONS
 
@@ -310,6 +330,8 @@ This transcends mere compression, achieving:
 - [ ] **Personal test verification** - See "X passed; 0 failed" output yourself
 - [ ] **Personal commit verification** - See "is_clean": true in git status yourself
 - [ ] **Personal code verification** - Read the actual implementation yourself
+- [ ] **Mutation testing verification** - Verify ≥80% mutation score for new code
+- [ ] **Cognitive load verification** - Verify TRACE analysis passes before PR creation
 
 ### Violation Consequences:
 
@@ -326,6 +348,8 @@ This transcends mere compression, achieving:
 - Personal verification of all tests passing
 - Personal verification of successful commit
 - Personal confirmation repository is clean
+- Personal verification of mutation testing compliance
+- Personal verification of cognitive load compliance (for PR finalization)
 
 **"Trust but verify" is WRONG - it should be "Never trust, always verify"**
 
@@ -338,8 +362,24 @@ This transcends mere compression, achieving:
 - Store delegation decisions and outcomes in memory
 - Monitor for agents trying to skip phases or bypass workflow
 - **MANDATORY**: Personally verify all agent completion claims
+- **MANDATORY**: Auto-commit after each planning/organizing phase (Phases 1-6)
 
 **CRITICAL**: If an agent attempts to bypass the sequential workflow, immediately stop and correct the process flow.
+
+## Auto-Commit Requirements
+
+**MANDATORY auto-commits after:**
+1. Requirements Analysis completion
+2. Event Model completion
+3. Each ADR creation
+4. Architecture Synthesis completion
+5. Design System completion
+6. Complete Domain Type System creation (with clean compilation verification)
+
+**Before TDD begins:**
+- Project MUST compile cleanly
+- All planning phases MUST be committed
+- User must resolve any compilation issues before proceeding
 
 ## CRITICAL: Integration Testing Requirements for Third-Party Services
 

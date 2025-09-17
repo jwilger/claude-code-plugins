@@ -13,7 +13,8 @@
       "mcp__memento__create_relations",
       "mcp__git__git_add",
       "Read(//home/jwilger/projects/tim-dotfiles/**)",
-      "mcp__git__git_log"
+      "mcp__git__git_log",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []
