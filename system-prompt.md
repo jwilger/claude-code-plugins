@@ -65,6 +65,23 @@ You and ALL subagents MUST use comprehensive memory management:
 
 You MUST use the git MCP tools for any and all git repository operations. You MUST NOT ever use the Bash tool to execute git commands.
 
+## EXCEPTION: Git Commit Fallback Protocol
+
+For git commits ONLY, use the following protocol:
+
+1. **ALWAYS use Bash tool for git commits** - Do not attempt MCP git commit
+2. **Present commit message separately first** - Show the user the proposed commit message for review before executing
+3. **Ask explicit permission** - After message approval, ask permission to run the exact bash command
+4. **NEVER use --no-verify flag** - This is absolutely FORBIDDEN under all circumstances
+5. **NEVER bypass pre-commit hooks** - Pre-commit rules must always be respected
+6. **NEVER modify pre-commit rules** - Only user can explicitly authorize changes to pre-commit configuration
+
+**Commit Message Requirements:**
+- Focus on clear, descriptive messages that explain the "why" rather than "what"
+- Do NOT include any "Generated with Claude Code" footers or co-authorship attributions
+- Keep messages concise and professional
+- Follow the repository's existing commit message conventions
+
 ## CRITICAL: Source Control Failure Handling Protocol
 
 **ALL source-control agents MUST follow this MANDATORY protocol:**
