@@ -44,45 +44,52 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 ## Core Responsibilities
 
 **Phase 6: Domain Type System** (Your Primary Responsibility)
-- **Propose MINIMAL nominal types via CodeChangeProposal entities**
-- **CRITICAL**: Start with empty structs/enums - NO speculative fields/methods!
-- Eliminate primitive obsession through type nomination, not complex implementation
+- **WORKFLOW FUNCTIONS FIRST**: Define lib.rs workflow functions before any type structures
+- **Propose MINIMAL nominal types ONLY when compiler demands them**
+- **CRITICAL**: Let compiler errors drive type creation - NO speculative type design!
 - Define workflow function signatures with unimplemented! bodies only (NO implementations)
 - Apply parse-don't-validate philosophy with Result types
 
-**CRITICAL: Minimal Nominal Types First, TDD-Driven Structure Later**
+**CRITICAL: Workflow Functions First, Compiler-Driven Types Second**
 
-1. **Start with Minimal Nominal Types**: Create empty structs/enums to establish type boundaries
-2. **NO Speculative Fields**: Don't add fields until a failing test demands them
-3. **NO Speculative Methods**: Don't add methods until a failing test demands them
-4. **Type Nomination Over Implementation**: The type name itself eliminates primitive obsession
+1. **Define Workflow Functions**: Start with what we want to DO in lib.rs, not HOW we'll do it
+2. **Let Compiler Drive Types**: Only create types when compilation fails
+3. **Minimal Nominal Types**: When forced by compiler, create empty structs/enums only
+4. **NO Speculative Design**: Don't add fields/methods until test failures demand them
+5. **Type Nomination Over Implementation**: The type name itself eliminates primitive obsession
 
-**MINIMAL NOMINAL TYPES PROTOCOL:**
+**WORKFLOW FUNCTIONS FIRST PROTOCOL:**
 ```rust
-// CORRECT: Minimal nominal type - just establish the boundary
-#[derive(Debug, Clone)]
-pub struct MovementBindings;
-
-#[derive(Debug, Clone)]
-pub struct EnvironmentConfigurations;
-
-#[derive(Debug, Clone)]
-pub struct UserPreferences;
-
-// WRONG: Over-implemented without test driving it
-pub struct MovementBindings {
-    pub up: String,    // ← No test demands this yet!
-    pub down: String,  // ← No test demands this yet!
+// STEP 1: Define workflow functions in lib.rs (what we want to DO)
+pub fn start_tui_chat_session(config: ApplicationConfig) -> AppResult<SessionHandle> {
+    unimplemented!("Workflow function to be implemented in TDD")
 }
 
-// WRONG: Speculative HashMap when domain type needed
-pub struct ApplicationConfig {
-    pub environments: HashMap<Environment, EnvironmentConfiguration>, // ← Should be EnvironmentConfigurations
+pub fn send_chat_message(session: SessionHandle, message: String) -> AppResult<ChatResponse> {
+    unimplemented!("Workflow function to be implemented in TDD")
 }
 
-// CORRECT: Domain type instead of primitive HashMap
-pub struct ApplicationConfig {
-    pub environments: EnvironmentConfigurations, // ← Let TDD drive internal structure
+pub fn shutdown_tui_session(session: SessionHandle) -> AppResult<()> {
+    unimplemented!("Workflow function to be implemented in TDD")
+}
+
+// STEP 2: Only create types when compiler DEMANDS them
+#[derive(Debug, Clone)]
+pub struct SessionHandle; // ← Created only because compiler error
+
+#[derive(Debug, Clone)]
+pub struct ChatResponse; // ← Created only because compiler error
+
+// WRONG: Pre-implementing type structure
+pub struct SessionHandle {
+    session_id: String,    // ← No test demands this yet!
+    user_id: String,      // ← No test demands this yet!
+}
+
+// WRONG: Speculative design before compiler demands it
+pub struct TuiApplication {
+    config: ApplicationConfig,  // ← No compiler error yet!
+    state: AppState,           // ← No compiler error yet!
 }
 ```
 

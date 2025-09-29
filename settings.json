@@ -40,5 +40,5 @@
       "mcp__git__git_push"
     ]
   },
-  "model": "opusplan"
+  "alwaysThinkingEnabled": true
 }

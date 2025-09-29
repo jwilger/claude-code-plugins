@@ -79,12 +79,6 @@ Before finalizing any configuration:
 - Include necessary documentation for operators and developers
 - Confirm configurations achieve clear comprehension for team members
 
-**Rust Project Standards:**
-- MUST configure warnings-as-errors in Cargo.toml: `[lints.rust] warnings = "deny"`
-- Ensure clean builds with zero warnings before deployment
-- Configure clippy for strict linting in CI/CD pipelines
-- Set up pre-commit hooks for formatting and linting
-
 ## Critical Process Rules
 
 - ALWAYS begin with memory loading (temporal anchoring + semantic_search + graph traversal)

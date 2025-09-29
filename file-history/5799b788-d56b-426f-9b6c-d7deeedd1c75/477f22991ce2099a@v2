@@ -1,0 +1,32 @@
+//! Integration Test: TUI Session Startup
+//!
+//! Tests the fundamental workflow function: starting a TUI chat session.
+//! This follows the WORKFLOW FUNCTIONS FIRST approach - we test the function
+//! we WISH existed and let compiler errors drive minimal type creation.
+//!
+//! Expected to fail with compilation error: start_tui_session() doesn't exist yet.
+
+use cli_client::{ApplicationConfig, start_tui_session};
+
+#[tokio::test]
+async fn test_start_tui_session_succeeds_with_valid_config() {
+    // WORKFLOW FUNCTION TEST: Test the function we WISH existed
+    // TARGET: US-001, FR-1.1 - Multi-pane TUI with message history
+    // APPROACH: Assume start_tui_session() exists, let compiler tell us what's missing
+    // EXPECTED FAILURE: Compilation error - function doesn't exist in lib.rs
+
+    // Arrange: Create valid configuration using existing domain type
+    let config = ApplicationConfig::default();
+
+    // Act: Call the workflow function we WISH existed
+    // This will drive implementation through compiler errors
+    let result = start_tui_session(config).await;
+
+    // Assert: Single assertion driving implementation forward
+    // Once function exists with unimplemented!(), this will fail at runtime
+    // That's when we know to implement the actual behavior
+    assert!(
+        result.is_ok(),
+        "TUI session should start successfully with valid configuration"
+    );
+}

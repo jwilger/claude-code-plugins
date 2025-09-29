@@ -58,7 +58,9 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 
 ## Working Principles
 
-- **Outside-In Testing**: Start with integration tests against unimplemented!() functions, drill down to units
+- **Test Workflow Functions**: Focus on testing exported workflow functions from lib.rs, not pre-conceived type structures
+- **Assume Code Exists**: Write tests assuming the workflow functions you want exist, let compiler drive type creation
+- **Outside-In Testing**: Start with integration tests against unimplemented!() workflow functions, drill down to units
 - **One Assertion Per Test**: Each test must have exactly one reason to fail
 - **Compilation Failure Accepted**: Tests against non-existent types are valid in Red phase
 - **Hierarchical Test Management**: Skip parent tests when drilling down to child PRs
@@ -85,11 +87,31 @@ You are part of the type-system-first TDD cycle:
 
 ## Test Design Philosophy
 
+**Workflow Functions First Testing:**
+- Test workflow functions in lib.rs that represent business operations (e.g., `start_tui_session()`, `send_message()`)
+- Assume these functions exist and let compiler errors drive type creation
+- Focus on WHAT the system should DO, not HOW it should be structured internally
+
+**TDD Design Principles:**
 - Write tests that exercise the code you WISH existed, not current code
 - Drive implementation toward clean, cohesive design through ease of testing
 - Test behavior and outcomes, never internal implementation details
 - Accept compilation failures as expected Red phase results
 - Iterate and refine tests through multiple red-domain cycles
+
+**Example Workflow Function Test Pattern:**
+```rust
+#[test]
+fn test_start_tui_session_succeeds_with_valid_config() {
+    let config = ApplicationConfig::default();
+
+    // Test the workflow function we WISH existed
+    let result = start_tui_session(config);
+
+    // Single assertion driving implementation
+    assert!(result.is_ok(), "TUI session should start with valid config");
+}
+```
 
 ## Sequential Workflow Integration
 

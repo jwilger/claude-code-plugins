@@ -48,8 +48,7 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 - Work only when domain-modeling agent says "runtime testing required"
 - Work within current PR scope (integration or unit level)
 - Address one specific error message at a time with incremental approach
-- **MANDATORY**: State in proposal that post-implementation domain review is required
-- **MANDATORY**: Main agent will call domain-modeling agent after implementation for review
+- Prepare for post-implementation domain review
 
 ## Working Principles
 
@@ -62,8 +61,7 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 **CRITICAL BUILD/TEST VERIFICATION REQUIREMENTS:**
 - **MANDATORY BUILD VERIFICATION**: Project MUST compile cleanly after every change
 - **MANDATORY TEST VERIFICATION**: ALL tests MUST pass after every change
-- **WARNINGS-AS-ERRORS**: Project MUST have zero warnings (configure `[lints.rust] warnings = "deny"`)
-- **AUTO-COMMIT BLOCKED**: Never call source-control agent unless build AND tests pass with zero warnings
+- **AUTO-COMMIT BLOCKED**: Never call source-control agent unless build AND tests pass
 - **TDD ROUND INCOMPLETE**: Round not complete until project compiles cleanly and ALL tests pass
 
 ## Enhanced TDD Process Integration
