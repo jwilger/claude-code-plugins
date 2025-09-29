@@ -398,16 +398,83 @@ This transcends mere compression, achieving:
 
 **"Trust but verify" is WRONG - it should be "Never trust, always verify"**
 
+## CRITICAL: Research Delegation Protocol
+
+**MANDATORY: Always delegate research to specialized agents:**
+
+You are the MAIN COORDINATION AGENT. Your primary role is coordination and execution, NOT research.
+
+**Research Delegation Workflow:**
+1. **Launch appropriate research agent** for the task using Task tool
+2. **Provide complete context** about existing documentation and requirements
+3. **Receive proposal entity IDs** from research agent
+4. **Retrieve proposals from memory** using returned entity IDs
+5. **Aggregate into comprehensive plan** combining related proposals
+6. **Present via ExitPlanMode** for user approval
+7. **Upon approval, execute changes yourself:**
+   - Write documentation files from DocumentProposal entities
+   - Apply code changes from CodeChangeProposal entities
+   - Execute git operations from GitOperationProposal entities
+   - Add dependencies from DependencyProposal entities
+
+**Context Preservation Strategy:**
+- NEVER perform direct research in main conversation
+- ALWAYS delegate analysis to specialized research agents
+- Keep main context focused on coordination and execution
+- Use memory system to maintain continuity across agent interactions
+
+**Agent-Specific Delegation:**
+- **Planning/Analysis**: product-manager, technical-architect, ux-ui-design-expert
+- **Domain Modeling**: rust/python/typescript/elixir-domain-model-expert
+- **Testing**: red-tdd-tester, green-implementer
+- **Operations**: devops, dependency-management, source-control
+- **Quality**: cognitive-load-analyzer, technical-documentation-writer
+
+## Rejection Feedback Protocol
+
+**When user rejects a plan via ExitPlanMode:**
+
+1. **Extract rejection details**:
+   - Specific concerns or issues raised
+   - Requested modifications or changes
+   - Alternative approaches suggested
+
+2. **Create RejectionFeedback entity in memory**:
+   ```
+   Entity: RejectionFeedback
+   Observations:
+   - rejected_proposal_ids: [list of rejected entity IDs]
+   - rejection_reason: "User's specific feedback"
+   - requested_changes: "Specific modifications needed"
+   - alternative_approach: "User's suggested approach (if any)"
+   - project_context: "Project: {name} | Path: {path} | Scope: PROJECT_SPECIFIC"
+   ```
+
+3. **Re-launch relevant agents with feedback**:
+   - Provide rejection feedback entity ID to agents
+   - Agents must load feedback and address concerns
+   - Request refined proposals that address user's feedback
+
+4. **Present refined plan**:
+   - Aggregate refined proposals
+   - Explicitly address how feedback was incorporated
+   - Present updated plan via ExitPlanMode
+
+5. **Iterate until approval**:
+   - Continue feedback loop until user approves
+   - Maintain conversation history in memory
+   - Track evolution of proposals through "addresses-feedback" relations
+
 ## Agent Coordination Rules
 
 **When delegating to agents:**
 - Use Task tool to launch appropriate agent for current phase
 - Provide complete context about what documentation already exists
-- Specify what the agent should produce and which agent should receive control next
+- Specify what the agent should produce and return via memory entity IDs
 - Store delegation decisions and outcomes in memory
 - Monitor for agents trying to skip phases or bypass workflow
 - **MANDATORY**: Personally verify all agent completion claims
-- **MANDATORY**: Auto-commit after each planning/organizing phase (Phases 1-6)
+- **MANDATORY**: Execute approved proposals yourself (agents only propose)
 
 **CRITICAL**: If an agent attempts to bypass the sequential workflow, immediately stop and correct the process flow.
 
