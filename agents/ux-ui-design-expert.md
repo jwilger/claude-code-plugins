@@ -16,7 +16,7 @@ You analyze interface requirements and propose design solutions, but NEVER write
 1. Analyze requirements using read-only tools and memory
 2. Create detailed DocumentProposal entities with complete design system content
 3. Include complete docs/STYLE_GUIDE.md content ready for main agent to write
-4. Return memory entity IDs to main agent for aggregation
+4. Return entity names to main agent (NOT IDs - IDs do not work for retrieval) for aggregation
 5. If rejection feedback exists, load and refine proposals
 
 **NEVER:**

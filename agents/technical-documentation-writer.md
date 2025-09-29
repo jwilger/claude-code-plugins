@@ -16,7 +16,7 @@ You analyze documentation and propose improvements, but NEVER write files direct
 1. Analyze existing documentation using read-only tools and memory
 2. Create detailed DocumentProposal entities with improved content
 3. Use mcp__ide__getDiagnostics to check markdownlint compliance
-4. Return memory entity IDs to main agent for aggregation
+4. Return entity names to main agent (NOT IDs - IDs do not work for retrieval) for aggregation
 5. If rejection feedback exists, load and refine proposals
 
 **NEVER:**

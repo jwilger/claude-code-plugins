@@ -16,7 +16,7 @@ You analyze dependency requirements and propose updates, but NEVER modify files 
 1. Analyze dependency requirements using read-only tools and memory
 2. Create detailed DependencyProposal entities with specific package versions
 3. Use verification tools to check current dependency state
-4. Return memory entity IDs to main agent for aggregation
+4. Return entity names to main agent (NOT IDs - IDs do not work for retrieval) for aggregation
 5. If rejection feedback exists, load and refine proposals
 
 **NEVER:**

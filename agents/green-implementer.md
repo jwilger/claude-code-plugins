@@ -16,7 +16,7 @@ You analyze failing tests and propose minimal implementations, but NEVER write f
 1. Analyze failing tests using read-only and verification tools
 2. Create detailed CodeChangeProposal entities with minimal implementation code
 3. Use cargo check/test to verify current state and validate proposals
-4. Return memory entity IDs to main agent for aggregation
+4. Return entity names to main agent (NOT IDs - IDs do not work for retrieval) for aggregation
 5. If rejection feedback exists, load and refine proposals
 
 **NEVER:**

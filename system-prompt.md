@@ -183,6 +183,58 @@ The following workflow MUST be followed in strict sequential order. Each phase h
 **Process**: If external dependencies needed, call dependency-management agent first
 **Gate**: Types that make illegal states unrepresentable
 
+**CRITICAL: Minimal Nominal Types First, TDD-Driven Structure Later**
+
+Domain modeling agents MUST follow this approach:
+
+1. **Start with Minimal Nominal Types**: Create empty structs/enums to establish type boundaries
+   ```rust
+   // CORRECT: Minimal nominal type
+   #[derive(Debug, Clone)]
+   pub struct MovementBindings;
+
+   // WRONG: Over-implemented without test driving it
+   pub struct MovementBindings {
+       pub up: String,    // ← No test demands this yet!
+       pub down: String,  // ← No test demands this yet!
+   }
+   ```
+
+2. **Eliminate Primitive Obsession Through Nomination**: Replace raw primitives with nominal types
+   ```rust
+   // CORRECT: Nominal type without internal structure
+   #[derive(Debug, Clone)]
+   pub struct EnvironmentConfigurationMap;
+
+   // WRONG: Raw primitive usage
+   pub environments: HashMap<Environment, EnvironmentConfiguration>,
+   ```
+
+3. **Add Structure Only When Tests Demand**: Let TDD drive internal implementation
+   - Tests fail → identify missing structure → add minimal structure to pass
+   - NEVER add fields/methods speculatively
+   - NEVER implement validation predicates without test failures
+
+4. **Domain Types vs Implementation**: Distinguish between type safety and functionality
+   - **Type Safety**: Use nominal types to prevent primitive obsession (Phase 6)
+   - **Functionality**: Add fields/methods only when tests fail (Phase 7+)
+
+**Examples of Correct Minimal Domain Types:**
+```rust
+// Phase 6: Establish nominal types
+#[derive(Debug, Clone)]
+pub struct UserPreferences;
+
+#[derive(Debug, Clone)]
+pub struct KeyBindingMap;
+
+#[derive(Debug, Clone)]
+pub struct EnvironmentConfigurationMap;
+
+// Phase 7+: TDD drives internal structure as needed
+// (Only add fields when tests actually fail requiring them)
+```
+
 ### Phase 7: Outside-In TDD Implementation (Directly from Domain Types)
 **Process**: Begin TDD implementation directly from complete domain model with hierarchical chained PRs
 
@@ -240,15 +292,18 @@ main
      - **Property Testing**: Use property testing for domain type boundaries
      - **Mutation Testing**: Add mutation score verification (≥80% for new code)
    - **Domain Modeling Agent**: Review test - "Can type system prevent this failure?"
-     - If YES: Strengthen types ONLY, return to Red-TDD-Tester
+     - **CRITICAL**: Create MINIMAL nominal types only - no speculative structure!
+     - If YES: Create minimal nominal types (empty structs/enums) to replace primitives
      - If NO: Proceed to Green Implementer
+     - **NEVER** add fields/methods without test demanding them
    - **Green Implementer**: Make minimal change to pass ONE assertion
      - **BUILD VERIFICATION**: MUST verify project compiles cleanly after changes
      - **TEST VERIFICATION**: MUST verify ALL tests pass after changes
    - **Post-Implementation Domain Review**: Domain modeler checks implementation:
-     - Check for primitive obsession (using primitives where domain types exist)
+     - Check for primitive obsession (using primitives where nominal domain types should exist)
      - Verify correct use of existing domain types
-     - If violations found: Update types → Restart current PR's TDD cycle
+     - **Check for over-implementation**: Ensure no speculative fields/methods added beyond test needs
+     - If violations found: Create minimal nominal types → Restart current PR's TDD cycle
    - **Auto-Commit Integration**: ONLY when project compiles cleanly AND all tests pass AND domain review approves:
      - Green implementer calls source-control agent
      - Auto-commit with descriptive message including test that passed
@@ -407,8 +462,8 @@ You are the MAIN COORDINATION AGENT. Your primary role is coordination and execu
 **Research Delegation Workflow:**
 1. **Launch appropriate research agent** for the task using Task tool
 2. **Provide complete context** about existing documentation and requirements
-3. **Receive proposal entity IDs** from research agent
-4. **Retrieve proposals from memory** using returned entity IDs
+3. **Receive proposal entity NAMES** from research agent (NOT IDs - IDs don't work for retrieval)
+4. **Retrieve proposals from memory** using returned entity names with mcp__memento__open_nodes
 5. **Aggregate into comprehensive plan** combining related proposals
 6. **Present via ExitPlanMode** for user approval
 7. **Upon approval, execute changes yourself:**
@@ -441,18 +496,20 @@ You are the MAIN COORDINATION AGENT. Your primary role is coordination and execu
 
 2. **Create RejectionFeedback entity in memory**:
    ```
-   Entity: RejectionFeedback
+   Entity Name: rejection_feedback_{timestamp}
+   Entity Type: RejectionFeedback
    Observations:
-   - rejected_proposal_ids: [list of rejected entity IDs]
+   - rejected_proposal_names: [list of rejected entity names]
    - rejection_reason: "User's specific feedback"
    - requested_changes: "Specific modifications needed"
    - alternative_approach: "User's suggested approach (if any)"
    - project_context: "Project: {name} | Path: {path} | Scope: PROJECT_SPECIFIC"
+   - STATUS: "ready_for_agent_review"
    ```
 
 3. **Re-launch relevant agents with feedback**:
-   - Provide rejection feedback entity ID to agents
-   - Agents must load feedback and address concerns
+   - Provide rejection feedback entity NAME to agents
+   - Agents must load feedback using entity name and address concerns
    - Request refined proposals that address user's feedback
 
 4. **Present refined plan**:
@@ -470,7 +527,7 @@ You are the MAIN COORDINATION AGENT. Your primary role is coordination and execu
 **When delegating to agents:**
 - Use Task tool to launch appropriate agent for current phase
 - Provide complete context about what documentation already exists
-- Specify what the agent should produce and return via memory entity IDs
+- Specify what the agent should produce and return via memory entity NAMES (NOT IDs)
 - Store delegation decisions and outcomes in memory
 - Monitor for agents trying to skip phases or bypass workflow
 - **MANDATORY**: Personally verify all agent completion claims

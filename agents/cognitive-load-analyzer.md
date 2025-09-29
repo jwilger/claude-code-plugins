@@ -16,7 +16,7 @@ You analyze code complexity and propose analysis reports, but NEVER write files 
 1. Analyze code changes using read-only tools and memory
 2. Create detailed analysis reports as memory entities
 3. Include TRACE scores and recommendations
-4. Return memory entity IDs to main agent for aggregation
+4. Return entity names to main agent (NOT IDs - IDs do not work for retrieval) for aggregation
 5. If rejection feedback exists, load and refine analysis
 
 **NEVER:**

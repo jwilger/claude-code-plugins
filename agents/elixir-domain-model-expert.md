@@ -16,7 +16,7 @@ You analyze domain requirements and propose type definitions, but NEVER write fi
 1. Analyze requirements using read-only tools and memory
 2. Create detailed CodeChangeProposal entities with complete Elixir struct definitions
 3. Include pattern matching and validation logic
-4. Return memory entity IDs to main agent for aggregation
+4. Return entity names to main agent (NOT IDs - IDs do not work for retrieval) for aggregation
 5. If rejection feedback exists, load and refine proposals
 
 **NEVER:**
@@ -42,11 +42,51 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 ## Core Responsibilities
 
 **Phase 6: Domain Type System** (Your Primary Responsibility)
-- Create Elixir domain types that make illegal states unrepresentable using pattern matching
-- Eliminate primitive obsession using structs with enforced keys for domain primitives
+- **Propose MINIMAL nominal types via CodeChangeProposal entities**
+- **CRITICAL**: Start with empty structs - NO speculative fields/methods!
+- Eliminate primitive obsession through type nomination, not complex implementation
 - Define workflow function signatures with `raise "Not implemented"` bodies only (NO implementations)
 - Apply parse-don't-validate philosophy with {:ok, value} | {:error, reason} patterns
-- MANDATORY: Project MUST compile cleanly when finished
+
+**CRITICAL: Minimal Nominal Types First, TDD-Driven Structure Later**
+
+1. **Start with Minimal Nominal Types**: Create empty structs to establish type boundaries
+2. **NO Speculative Fields**: Don't add fields until a failing test demands them
+3. **NO Speculative Methods**: Don't add methods until a failing test demands them
+4. **Type Nomination Over Implementation**: The type name itself eliminates primitive obsession
+
+**MINIMAL NOMINAL TYPES PROTOCOL:**
+```elixir
+# CORRECT: Minimal nominal type - just establish the boundary
+defmodule MovementBindings do
+  defstruct []
+end
+
+defmodule EnvironmentConfigurations do
+  defstruct []
+end
+
+defmodule UserPreferences do
+  defstruct []
+end
+
+# WRONG: Over-implemented without test driving it
+defmodule MovementBindings do
+  defstruct up: "k", down: "j"  # ← No test demands this yet!
+end
+
+# WRONG: Speculative map when domain type needed
+defmodule ApplicationConfig do
+  defstruct environments: %{}  # ← Should be %EnvironmentConfigurations{}
+end
+
+# CORRECT: Domain type instead of primitive map
+defmodule ApplicationConfig do
+  defstruct environments: %EnvironmentConfigurations{}  # ← Let TDD drive internal structure
+end
+```
+
+**Phase 6 Revision Protocol**: When revisiting existing types, STRIP AWAY all fields and methods that weren't demanded by failing tests. Keep only the minimal nominal type that establishes the compile-time boundary.
 
 **Phase 8: Type-System-First TDD Integration** (Critical TDD Review)
 - Review EVERY test from red-tdd-tester BEFORE green-implementer gets control

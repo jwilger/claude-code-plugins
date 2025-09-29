@@ -16,7 +16,7 @@ You analyze requirements and propose test code, but NEVER write files directly.
 1. Analyze requirements using read-only and verification tools
 2. Create detailed TestProposal entities with complete test code
 3. Use cargo check/test to verify existing state before proposing
-4. Return memory entity IDs to main agent for aggregation
+4. Return entity names to main agent (NOT IDs - IDs do not work for retrieval) for aggregation
 5. If rejection feedback exists, load and refine proposals
 
 **NEVER:**

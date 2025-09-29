@@ -98,33 +98,48 @@ For proposing requirements:
 
 ## Memory Storage Protocol
 
+### Entity Naming Convention
+Use structured names for reliable retrieval:
+```
+{agent_type}_{proposal_type}_{timestamp}
+```
+
+Examples:
+- `product_manager_requirements_20250929134500`
+- `rust_domain_types_20250929134501`
+- `technical_architect_adr_security_20250929134502`
+
 ### Creating Proposals
 ```markdown
 1. Load project context using mcp__time__get_current_time
 2. Search for existing related proposals using semantic_search
-3. Create new entity with appropriate type
-4. Include ALL required observations for that type
-5. Create relations to existing entities (requirements, dependencies, etc.)
-6. Store with project metadata in observations
-7. Return entity ID to main agent
+3. Generate structured entity name using naming convention
+4. Create new entity with appropriate type and structured name
+5. Include ALL required observations for that type
+6. Add retrieval markers in observations (e.g., "STATUS: ready_for_review")
+7. Create relations to existing entities (requirements, dependencies, etc.)
+8. Store with project metadata in observations
+9. Return entity NAME to main agent (NOT ID - IDs don't work for retrieval)
 ```
 
 ### Retrieving Proposals
 ```markdown
-1. Main agent uses open_nodes with entity IDs from research agents
-2. Follow relations to understand dependencies and context
-3. Aggregate related proposals into comprehensive plan
-4. Present to user via ExitPlanMode
+1. Main agent uses open_nodes with entity NAMES from research agents
+2. Alternative: Use search_nodes with status patterns ("STATUS: ready_for_review")
+3. Follow relations to understand dependencies and context
+4. Aggregate related proposals into comprehensive plan
+5. Present to user via ExitPlanMode
 ```
 
 ### Handling Rejections
 ```markdown
-1. Create RejectionFeedback entity with:
-   - rejected_proposal_id: ID of rejected proposal
+1. Create RejectionFeedback entity with structured name:
+   - Entity name: rejection_feedback_{timestamp}
+   - rejected_proposal_names: Names of rejected proposals
    - rejection_reason: User's feedback/concerns
    - requested_changes: Specific modifications needed
-2. Re-launch research agent with feedback reference
-3. Agent loads feedback and refines proposal
+2. Re-launch research agent with feedback entity name
+3. Agent loads feedback using entity name and refines proposal
 4. Create new proposal with "addresses-feedback" relation
 ```
 
@@ -159,7 +174,8 @@ Project: {project_name} | Path: {project_path} | Scope: {PROJECT_SPECIFIC|UNIVER
 
 ### Code Change Proposal
 ```markdown
-Entity: CodeChangeProposal
+Entity Name: rust_domain_code_change_20250929134500
+Entity Type: CodeChangeProposal
 Observations:
 - agent_name: "rust-domain-model-expert"
 - proposal_type: "code_change"
@@ -170,6 +186,8 @@ Observations:
 - validation_command: "cargo check"
 - rationale: "Create domain type to make illegal states unrepresentable"
 - project_context: "Project: myapp | Path: /project | Scope: PROJECT_SPECIFIC"
+- STATUS: "ready_for_review"
+- RETRIEVAL_KEY: "rust_domain_user_type"
 
 Relations:
 - implements → RequirementEntity("User Management")
