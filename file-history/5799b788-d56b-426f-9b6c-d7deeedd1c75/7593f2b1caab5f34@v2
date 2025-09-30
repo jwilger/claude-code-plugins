@@ -1,0 +1,194 @@
+# ADR-009: Immutability-First Architecture
+
+**Status**: Approved
+**Date**: 2025-09-29
+**Decision Maker**: Technical Architect with User Mandate
+
+## Context
+
+The Rust TUI chat client requires a fundamental architectural principle for managing state and behavior. During Phase 7 TDD implementation, a critical design conflict emerged between mutable shared state patterns (Arc<Mutex<T>>) and immutability-first principles. The user has explicitly established immutability-first as a core principle for ALL projects, requiring a reconciliation with hexagonal architecture patterns for testing.
+
+**Key Requirements:**
+- Terminal UI with multiple panes (input, history, citations, debug)
+- Focus management across panes with keyboard navigation
+- Real-time state updates without data races
+- Testability through hexagonal architecture patterns
+- Compile-time safety guarantees through type system
+
+**Design Conflict:**
+Initial TDD implementation used Arc<Mutex<String>> for shared mutable state, directly contradicting the established immutability-first principle. This violation was identified when attempting to integrate hexagonal architecture's Backend trait for testing.
+
+## Decision
+
+**Adopt Immutability-First Architecture as the foundational principle for all state management.**
+
+### Core Principles
+
+1. **Immutable State Transformations**: All operations consume self and return new instances
+2. **Typestate Pattern**: Use zero-cost PhantomData for compile-time state tracking
+3. **No Shared Mutable State**: Eliminate Arc<Mutex<T>> in favor of immutable transformations
+4. **Hexagonal Testing**: Separate rendering (reading state) from state transitions (transforming state)
+
+### Architectural Pattern
+
+```rust
+// Immutable typestate pattern with dual state tracking
+pub struct SessionHandle<FocusState, BufferState> {
+    input_buffer: InputBuffer<BufferState>,  // Immutable
+    _focus: PhantomData<FocusState>,         // Zero-cost compile-time state
+}
+
+// All operations consume self and return new instance
+impl SessionHandle<InputFocused, HasText> {
+    pub fn send_text_input(self, text: &str) -> AppResult<SessionHandle<InputFocused, HasText>> {
+        Ok(SessionHandle {
+            input_buffer: self.input_buffer.add_text(text)?,
+            _focus: PhantomData,
+        })
+    }
+
+    pub fn press_enter(self) -> AppResult<SessionHandle<InputFocused, Empty>> {
+        Ok(SessionHandle {
+            input_buffer: self.input_buffer.clear(),
+            _focus: PhantomData,
+        })
+    }
+}
+```
+
+### Integration with Hexagonal Architecture
+
+```rust
+// Rendering is a read-only operation on immutable state
+impl<FocusState, BufferState> SessionHandle<FocusState, BufferState> {
+    pub fn render<B: Backend>(&self, terminal: &mut Terminal<B>) -> AppResult<()> {
+        // Read current immutable state and render to backend
+        // No mutation of SessionHandle
+        terminal.draw(|frame| {
+            self.render_to_frame(frame)
+        })?;
+        Ok(())
+    }
+}
+
+// Testing with TestBackend
+#[test]
+fn test_text_appears_in_buffer() {
+    let backend = TestBackend::new(80, 30);
+    let mut terminal = Terminal::new(backend)?;
+
+    let session = start_tui_session(config).await?;
+    let session = session.send_text_input("Hello")?;  // Immutable transformation
+
+    session.render(&mut terminal)?;  // Read-only rendering
+
+    assert_buffer_contains(terminal.backend().buffer(), "Hello");
+}
+```
+
+## Rationale
+
+### Why Immutability-First?
+
+1. **Compile-Time Safety**: Makes illegal states unrepresentable through types
+2. **Reasoning Clarity**: Each state transition is explicit and traceable
+3. **Thread Safety**: No data races possible without shared mutable state
+4. **Testing Simplicity**: Pure functions are easier to test
+5. **User Mandate**: Explicitly requested principle for ALL projects
+
+### Why Not Arc<Mutex<T>>?
+
+1. **Hidden Complexity**: Mutex locks hide state changes from type signatures
+2. **Runtime Failures**: Deadlocks and panics possible at runtime
+3. **Testing Difficulty**: Shared mutable state harder to test predictably
+4. **Principle Violation**: Directly contradicts immutability-first mandate
+
+### Reconciliation with Hexagonal Architecture
+
+The Backend trait pattern from ratatui is architecturally sound and compatible with immutability:
+- **Rendering is Reading**: The render() method takes &self (immutable reference)
+- **State Transitions are Transformations**: Operations return new SessionHandle instances
+- **Testing is Observation**: TestBackend observes rendered output without mutating state
+
+## Consequences
+
+### Positive
+
+1. **Type Safety**: Compile-time guarantees about state transitions
+2. **No Data Races**: Immutability eliminates concurrent mutation issues
+3. **Clear Data Flow**: Each transformation is explicit in type signatures
+4. **Testability**: Pure transformations are trivial to test
+5. **Maintainability**: State changes are localized and traceable
+
+### Negative
+
+1. **API Ergonomics**: Consuming self requires method chaining or rebinding
+2. **Memory Allocation**: New instances created on each transformation
+3. **Learning Curve**: Team must understand ownership-based state management
+4. **Refactoring Impact**: Existing mutable patterns must be rewritten
+
+### Mitigation Strategies
+
+1. **Method Chaining**: Design fluent APIs for common operation sequences
+2. **Smart Constructors**: Ensure invalid states cannot be constructed
+3. **Comprehensive Tests**: Demonstrate immutable patterns through examples
+4. **Performance Monitoring**: Profile to ensure allocations don't impact performance
+
+## Implementation Guidelines
+
+### DO:
+- Use typestate pattern with PhantomData for compile-time state tracking
+- Consume self and return new instances for all state transformations
+- Separate read operations (&self) from transformations (self)
+- Use module encapsulation to prevent invalid state construction
+- Apply parse-don't-validate at all boundaries
+
+### DON'T:
+- Use Arc<Mutex<T>> for application state
+- Mutate fields directly with &mut self
+- Allow construction of invalid states
+- Use runtime validation where compile-time types suffice
+- Compromise immutability for perceived convenience
+
+## Examples
+
+### Correct: Immutable State Transition
+```rust
+let session = start_tui_session(config).await?;
+let session = session
+    .send_text_input("Hello")?
+    .press_tab()
+    .press_tab()
+    .send_text_input(" World")?;
+```
+
+### Incorrect: Mutable Shared State
+```rust
+// WRONG: Violates immutability-first
+struct Session {
+    buffer: Arc<Mutex<String>>,
+}
+
+impl Session {
+    fn add_text(&self, text: &str) {
+        self.buffer.lock().unwrap().push_str(text);  // Mutation!
+    }
+}
+```
+
+## Related Decisions
+
+- ADR-003: State Management Pattern - Must be updated to reflect immutability-first
+- ADR-002: TUI Framework Selection - ratatui's Backend trait aligns with immutability
+- ADR-006: Error Handling Strategy - Result types complement immutable transformations
+
+## Status
+
+This decision is **MANDATORY** and supersedes any conflicting patterns in the codebase. All existing and future code must conform to immutability-first principles.
+
+## References
+
+- Parse, Don't Validate (Alexis King)
+- Making Illegal States Unrepresentable (Yaron Minsky)
+- Domain Modeling Made Functional (Scott Wlaschin)
+- Rust Ownership Model Documentation

@@ -4,7 +4,8 @@
       "WebSearch",
       "mcp__time__get_current_time",
       "mcp__git__git_status",
-      "mcp__git__git_diff_unstaged"
+      "mcp__git__git_diff_unstaged",
+      "mcp__git__git_set_working_dir"
     ],
     "deny": [],
     "ask": []

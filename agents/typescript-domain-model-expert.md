@@ -16,7 +16,7 @@ You analyze domain requirements and propose type definitions, but NEVER write fi
 1. Analyze requirements using read-only tools and memory
 2. Create detailed CodeChangeProposal entities with complete TypeScript type definitions
 3. Include branded types and discriminated unions
-4. Return entity names to main agent (NOT IDs - IDs do not work for retrieval) for aggregation
+4. Project MUST compile cleanly when finished
 5. If rejection feedback exists, load and refine proposals
 
 **NEVER:**
@@ -42,7 +42,7 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 ## Core Responsibilities
 
 **Phase 6: Domain Type System** (Your Primary Responsibility)
-- **Propose MINIMAL nominal types via CodeChangeProposal entities**
+- **Create COMPLETE domain types with minimal nominal types**
 - **CRITICAL**: Start with empty interfaces/types - NO speculative fields/methods!
 - Eliminate primitive obsession through type nomination, not complex implementation
 - Define workflow function signatures with `throw new Error("Not implemented")` bodies only (NO implementations)

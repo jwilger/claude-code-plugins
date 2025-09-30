@@ -1,0 +1,102 @@
+//! Chat TUI Library - Workflow Functions and Domain Types
+//! Phase 7: TDD-driven implementation
+
+use std::sync::{Arc, Mutex};
+
+pub mod domain;
+
+// Re-export domain types
+pub use domain::*;
+
+// Workflow functions - defining WHAT we want to DO
+
+/// Handle to an active TUI session
+/// TDD-driven implementation: Now contains real state for input buffer
+#[derive(Debug, Clone)]
+pub struct SessionHandle {
+    input_buffer: Arc<Mutex<String>>,
+}
+
+/// Start a new TUI chat session with the given configuration
+///
+/// This is the primary entry point for the TUI application.
+/// Returns a handle that can be used to interact with the session.
+pub async fn start_tui_session(_config: ApplicationConfig) -> AppResult<SessionHandle> {
+    // TDD Green Phase: Create real session state
+    // Initialize with empty input buffer
+    Ok(SessionHandle {
+        input_buffer: Arc::new(Mutex::new(String::new())),
+    })
+}
+
+/// Send text input to the TUI session's input buffer
+///
+/// Simulates user typing text into the input editor.
+/// This is a synchronous operation as it only updates local state.
+pub fn send_text_input(session: SessionHandle, text: &str) -> AppResult<()> {
+    // TDD Green Phase: Real implementation to pass TWO different test values
+    // Previous test sends "Hello", new test sends "Initial"
+    // Hard-coding no longer works - need real state management
+    let mut buffer = session.input_buffer.lock().unwrap();
+    buffer.push_str(text);
+    Ok(())
+}
+
+/// Get the current content of the input buffer
+///
+/// Returns what the user would see in their input editor pane.
+/// This represents the observable state of typed but not yet sent text.
+pub fn get_input_buffer(session: SessionHandle) -> AppResult<String> {
+    // TDD Green Phase: Real implementation reading from actual state
+    // No longer hard-coding - return actual buffer content
+    let buffer = session.input_buffer.lock().unwrap();
+    Ok(buffer.clone())
+}
+
+/// Represents keyboard input events from the user
+/// Minimal nominal type - more variants will be TDD-driven
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum KeyboardInput {
+    Tab,
+    // More variants added only as tests demand them
+}
+
+/// Send a keyboard event to the TUI session
+///
+/// Simulates user pressing a key (Tab, Enter, Esc, arrow keys, etc.).
+/// This is a synchronous operation for immediate keyboard event processing.
+pub fn send_keyboard_event(_session: SessionHandle, _key: KeyboardInput) -> AppResult<()> {
+    unimplemented!("Send keyboard event workflow to be implemented through TDD")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_send_text_input_ignores_text_when_input_has_no_focus() {
+        // UNIT TEST: Business rule - text input ignored when input editor lacks focus
+        // DRIVES: Focus-checking logic in send_text_input
+        // SINGLE ASSERTION: Buffer remains empty when focus is false
+
+        // Arrange: Create session and manually set focus to false
+        let session = start_tui_session(ApplicationConfig::default())
+            .await
+            .expect("Session should start");
+
+        // Manually set focus to false (simulating Tab or other focus change)
+        *session.input_has_focus.lock().unwrap() = false;
+
+        // Act: Try to send text when NOT focused
+        send_text_input(session.clone(), "ShouldBeIgnored")
+            .expect("Should succeed even without focus");
+
+        // Assert: Buffer remains empty - text was ignored due to no focus
+        let buffer = get_input_buffer(session)
+            .expect("Should retrieve buffer");
+        assert_eq!(
+            buffer, "",
+            "Buffer should remain empty when input has no focus - text input should be ignored"
+        );
+    }
+}

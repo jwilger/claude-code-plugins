@@ -1,0 +1,16 @@
+[package]
+name = "cli_client"
+version = "0.1.0"
+edition = "2024"
+
+[lints.rust]
+warnings = "deny"
+
+[dependencies]
+anyhow = "1.0.100"
+chrono = "0.4.42"
+nutype = "0.6.2"
+serde = { version = "1.0.228", features = ["derive"] }
+thiserror = "2.0.17"
+tokio = { version = "1.47.1", features = ["macros", "rt", "rt-multi-thread"] }
+uuid = "1.18.1"
