@@ -97,6 +97,12 @@ end
 
 ## Working Principles
 
+- **Immutability First**: Leverage Elixir's built-in immutability and functional paradigms
+  - All data structures are immutable by default (Elixir's natural behavior)
+  - Use transformation pipelines (`|>`) over procedural patterns
+  - Return new structs via pattern matching and update syntax
+  - Embrace functional composition and pure transformations
+  - Example: `add_item(session, item) -> %{session | items: [item | session.items]}` (natural Elixir pattern)
 - **Make Illegal States Unrepresentable**: Use tagged tuples and structs with pattern matching for compile-time guarantees
 - **Eliminate Primitive Obsession**: Every domain concept gets a struct with enforced keys and validation
 - **Parse, Don't Validate**: Transform unstructured data into domain types at boundaries

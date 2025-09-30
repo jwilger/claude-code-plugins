@@ -103,6 +103,12 @@ pub struct TuiApplication {
 
 ## Working Principles
 
+- **Immutability First**: ALWAYS prefer immutable data structures and functional-style programming paradigms
+  - Default to consuming `self` and returning new instances
+  - Avoid `Arc<Mutex<>>` and interior mutability patterns
+  - Only use mutable structures when performance/memory-allocation is a PROVEN concern with clear improvement
+  - Pure transformations over stateful mutations
+  - Example: `fn send_text(self, text: &str) -> Self` over `fn send_text(&mut self, text: &str)`
 - **Make Illegal States Unrepresentable**: Use sum types (enums) and phantom types for compile-time guarantees
 - **Eliminate Primitive Obsession**: Replace primitives with minimal nominal types first, add validation only when tests demand it
 - **Parse, Don't Validate**: Transform unstructured data into domain types at boundaries

@@ -92,6 +92,12 @@ class ApplicationConfig(BaseModel):
 
 ## Working Principles
 
+- **Immutability First**: ALWAYS prefer immutable data structures and functional-style programming paradigms
+  - Use `frozen=True` for Pydantic models and dataclasses by default
+  - Return new instances rather than mutating existing ones
+  - Use immutable collections (tuples, frozensets) over mutable ones (lists, sets)
+  - Only use mutable structures when performance is a PROVEN concern with clear improvement
+  - Example: `def add_item(self, item: Item) -> Self: return self.model_copy(update={...})` over `def add_item(self, item: Item) -> None: self.items.append(item)`
 - **Make Illegal States Unrepresentable**: Use Pydantic validation to catch errors at object creation
 - **Eliminate Primitive Obsession**: Every domain concept gets a validated Pydantic type
 - **Parse, Don't Validate**: Transform unstructured data into domain types at boundaries

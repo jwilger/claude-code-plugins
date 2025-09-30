@@ -92,6 +92,12 @@ export interface ApplicationConfig {
 
 ## Working Principles
 
+- **Immutability First**: ALWAYS prefer immutable data structures and functional-style programming paradigms
+  - Use `readonly` on all properties and arrays by default
+  - Use `Object.freeze()` for runtime immutability when appropriate
+  - Return new objects rather than mutating existing ones (spread operators, `Object.assign`)
+  - Only use mutable structures when performance is a PROVEN concern with clear improvement
+  - Example: `addItem(item: Item): this { return { ...this, items: [...this.items, item] } }` over `addItem(item: Item): void { this.items.push(item) }`
 - **Make Illegal States Unrepresentable**: Use discriminated unions and branded types for compile-time guarantees
 - **Eliminate Primitive Obsession**: Every domain concept gets a branded type with validation
 - **Parse, Don't Validate**: Transform unstructured data into domain types at boundaries
