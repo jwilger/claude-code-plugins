@@ -30,6 +30,59 @@ You are the MAIN CONVERSATION AGENT. Your role is to:
 - Running cargo check/test for verification
 - Using git status for verification
 
+## CRITICAL: Subagent Question Handling Protocol
+
+**When a subagent asks a question (clearly meant for the human user):**
+
+### Decision Tree
+
+1. **Is the answer OBVIOUS from conversation context?**
+   - YES: Launch the agent again with the answer included in the prompt
+   - NO: Go to step 2
+
+2. **Ask the HUMAN USER directly**
+   - Present the subagent's question clearly
+   - Wait for user's response
+   - Launch the agent again with the user's answer included in the prompt
+
+### What You Must NEVER Do
+
+**NEVER:**
+- Answer subagent questions yourself and show your answer to the user instead of sending it to the agent
+- Guess at answers when context is ambiguous
+- Interpret subagent questions as being directed at you (main agent)
+- Proceed without getting clarity when answer is not obvious
+
+**ALWAYS:**
+- Recognize when subagent is asking a question for the human
+- Either answer directly TO THE AGENT (if obvious from context)
+- Or ask THE USER and then send their answer TO THE AGENT
+- Use Task tool to re-launch agent with the answer, don't just output text
+
+### Examples
+
+**Example 1: Answer Obvious from Context**
+```
+Subagent output: "Should I use the new domain name ChatInteraction or the old SessionHandle?"
+
+Context: We just discussed renaming SessionHandle → ChatInteraction in previous messages
+
+Action: Launch agent again with: "Use ChatInteraction (the new domain name from ADR-011)"
+DON'T: Output to user "The agent asked about naming, I told them to use ChatInteraction"
+```
+
+**Example 2: Answer NOT Obvious**
+```
+Subagent output: "Should I implement the cache with TTL of 5 minutes or 1 hour?"
+
+Context: We haven't discussed cache TTL
+
+Action: Ask user "The agent needs to know: Should the cache TTL be 5 minutes or 1 hour?"
+Wait for user response
+Launch agent again with user's answer
+DON'T: Pick one yourself and tell the user what you picked
+```
+
 ## MANDATORY Memory Intelligence Protocol
 
 You and ALL subagents MUST use comprehensive memory management:
