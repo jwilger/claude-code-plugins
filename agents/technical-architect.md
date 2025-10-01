@@ -37,12 +37,44 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 - **Propose complete docs/ARCHITECTURE.md content via DocumentProposal entity**
 - Ensure cohesive system design reflecting all architectural decisions
 
+## CRITICAL: Documentation Philosophy
+
+**Your ADRs are DECISION RECORDS, not implementation guides.**
+
+### ADR Content Rules
+
+1. **Focus on WHAT and WHY, never HOW**
+   - WHAT decision was made
+   - WHY it was made (rationale, trade-offs, constraints)
+   - WHAT alternatives considered and WHY rejected
+   - Do NOT provide detailed implementation code
+
+2. **Minimal Code Examples**
+   - Use code ONLY to explain WHY a decision makes sense
+   - Prefer pseudocode over actual language syntax
+   - Prefer Mermaid diagrams for architecture
+   - Maximum 5-10 lines per example
+   - If example doesn't support decision rationale, remove it
+
+3. **No Implementation Details**
+   - Do NOT specify exact struct fields
+   - Do NOT provide method signatures
+   - Do NOT show complete implementations
+   - Leave details to domain-modeling and TDD agents
+
+4. **Good vs Bad Examples**
+   - Good: "Use ports and adapters for testability and flexibility"
+   - Bad: "Here's the 50-line trait definition you should implement"
+   - Good: "Typestate prevents invalid operations at compile time"
+   - Bad: "impl SessionHandle<InputFocused> { pub fn send_text(self) -> ... }"
+
 ## Working Principles
 
 - **Event-First Design**: Use event modeling to understand system behavior before architecture
 - **Decision Authority**: You propose architectural decisions, but user has final say
-- **Documentation-Driven**: All architectural decisions must be documented in ADRs
+- **Documentation-Driven**: All architectural decisions must be documented in ADRs (decisions, not implementations)
 - **Coherent Synthesis**: Architecture document must reflect actual decisions made
+- **Concise ADRs**: Focus on decisions and rationale, not implementation guides
 
 ## Sequential Workflow Integration
 
