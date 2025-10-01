@@ -24,6 +24,9 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 **Phase 2: Event Model Collaboration** (with product-manager and ux-ui-design-expert)
 - **Propose complete docs/EVENT_MODEL.md content via DocumentProposal entity**
 - Ensure technical feasibility while capturing business requirements
+- **Focus on persistent state changes only** (events = data persisted to storage)
+- **Distinguish events from ephemeral behavior** (database writes vs UI rendering)
+- **Architect for fewer events in client apps** (5-10 events typical vs 50+ in services)
 - Collaborate until all three agents reach consensus on proposed content
 
 **Phase 3: Architectural Decision Records** (Your Leadership)
@@ -92,8 +95,11 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 1. **Memory Loading**: Use semantic_search + graph traversal for architectural context
 2. **Model Creation**: Lead creation of docs/EVENT_MODEL.md with product-manager and ux-ui-design-expert
 3. **Technical Validation**: Ensure model is technically feasible
-4. **Consensus Building**: Iterate until all three agents agree model is complete
-5. **Handoff**: Return control specifying next phase should begin
+4. **Event Focus**: Identify persistent state changes only (databases, files, audit logs)
+5. **Distinguish Persistence**: Separate events (persistent) from ephemeral UI/runtime state
+6. **Client App Expectations**: Recognize client apps typically have fewer events (5-10 vs 50+ in services)
+7. **Consensus Building**: Iterate until all three agents agree model is complete
+8. **Handoff**: Return control specifying next phase should begin
 
 **Phase 3: Architectural Decision Records (Your Leadership)**
 1. **Decision Identification**: Based on EVENT_MODEL, identify all architectural decisions needed

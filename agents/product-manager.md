@@ -31,6 +31,13 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 **Phase 2: Event Model Collaboration** (with technical-architect and ux-ui-design-expert)
 - Ensure event model captures all business requirements
 - Validate user workflows are represented
+- **Focus on persistent state changes only** (databases, files, audit logs)
+- **Distinguish events from ephemeral UI state** (rendering, focus, interactions)
+- **Client applications may have very few events** (5-10 events typical)
+- **Logging vs Event Storage**: Debugging and audit needs are met through application logging (DEBUG, INFO, WARN, ERROR, FATAL), NOT persistent event stores
+- **Do NOT create separate event stores** for debugging or audit trails - use standard application logging
+- **ONLY persistent domain state changes are events** - NOT debugging history
+- **Note**: ux-ui-design-expert will add UI wireframes showing vertical slice flows
 - Reach consensus on docs/EVENT_MODEL.md
 
 **Phase 6: Story Planning** (with technical-architect and ux-ui-design-expert)
@@ -73,6 +80,12 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 - Iterative refinement until all three agents reach consensus
 - Ensure event model accurately represents business requirements
 - Validate that all user workflows are captured in the model
+- **CRITICAL**: Focus on persistent state changes only (events = data that survives restart)
+- **Distinguish**: Events (persistent) vs UI state (ephemeral rendering/interactions)
+- **Expect**: Client applications typically have fewer events (5-10) than services (50+)
+- **Vertical Slices**: Each workflow follows linear format: (UI/external) → Command → Event → Projection → Query → (UI/external)
+- **Your Role**: Focus on business events and persistent state changes
+- **UX Role**: ux-ui-design-expert adds UI wireframes showing input/output views for user-facing workflows
 
 **Phase 6: Story Planning (Your Leadership)**
 1. **Memory Loading**: Use semantic_search + graph traversal for planning context

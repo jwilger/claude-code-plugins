@@ -24,7 +24,77 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 **Phase 2: Event Model Collaboration** (with product-manager and technical-architect)
 - Ensure user interface requirements are captured in proposed EVENT_MODEL.md content
 - Validate interaction patterns support required user workflows
+- **MANDATORY: Create UI wireframes for all workflows involving UI interaction**
+- **Distinguish persistent events from ephemeral UI state** (data persistence vs rendering)
+- **Recognize**: Most UI interactions are NOT events (clicks, focus, rendering are ephemeral)
+- **Events in UI**: Only persistent changes (saved preferences, persisted history) - NOT debugging/audit trails
+- **Debugging/Audit**: Use application logging (DEBUG, INFO, WARN, ERROR, FATAL), NOT event stores
 - Collaborate until all three agents reach consensus on proposed content
+
+**Vertical Slice Format (MANDATORY):**
+
+Each vertical slice MUST follow this LINEAR, UNIDIRECTIONAL format:
+```
+(UI or external-service) → Command → Event → Projection → Query → (UI or external-service)
+```
+
+**Vertical Slice Rules:**
+1. **Linear Flow**: Each slice flows in ONE direction only (no forking within a single slice)
+2. **Separate Slices**: If one event updates multiple projections, create SEPARATE vertical slices
+3. **Shared Entities**: Multiple slices can reference shared entity description blocks
+4. **Complete Journey**: Show full flow from user/system trigger to displayed/returned result
+5. **UI Context**: Include layout context (panes, panels, sections) in wireframes
+
+**UI Wireframes (YOUR MANDATORY RESPONSIBILITY):**
+
+You MUST create ASCII wireframes for workflows involving UI interaction:
+
+1. **Input Wireframe**: Show what user interacts with
+   - Form fields, text inputs, buttons, interactive elements
+   - Layout context (which pane/panel/section)
+   - User action trigger (e.g., "Press Enter to Send", "Click Submit")
+   - Include surrounding UI context for clarity
+
+2. **Output Wireframe**: Show what user sees as result
+   - Displayed data, updated views, feedback messages
+   - Layout context (which pane/panel/section)
+   - Visual representation of outcome
+   - Include surrounding UI context for clarity
+
+3. **Vertical Slice Flow**: Show complete command → event → projection → query flow
+   - Connect input wireframe to command
+   - Show event (only if persistent state change)
+   - Show projection and query
+   - Connect to output wireframe
+
+**Example Format:**
+
+```
+### Vertical Slice: Send Chat Message
+
+[UI Wireframe: Input]
+┌─────────────────────────────────────────┐
+│ Chat Input Pane                         │
+│ ┌─────────────────────────────────────┐ │
+│ │ What is the capital of France?      │ │
+│ └─────────────────────────────────────┘ │
+│ [Press Enter to Send]                   │
+└─────────────────────────────────────────┘
+
+↓ Command: SendMessage
+↓ Event: (none - backend manages state)
+↓ Projection: Conversation History (from backend DynamoDB)
+↓ Query: GetConversationHistory
+
+[UI Wireframe: Output]
+┌─────────────────────────────────────────┐
+│ Message History Pane                    │
+│ ┌─────────────────────────────────────┐ │
+│ │ You: What is the capital of France? │ │
+│ │ Assistant: Paris [Citation]         │ │
+│ └─────────────────────────────────────┘ │
+└─────────────────────────────────────────┘
+```
 
 **Phase 5: Design System Creation** (Your Primary Responsibility)
 - **Propose complete docs/STYLE_GUIDE.md content via DocumentProposal entity**
@@ -56,8 +126,11 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 1. **Memory Loading**: Use semantic_search + graph traversal for design context
 2. **Model Creation**: Collaborate on docs/EVENT_MODEL.md with product-manager and technical-architect
 3. **User Interface Validation**: Ensure model captures all required user interactions
-4. **Consensus Building**: Iterate until all three agents agree model supports interface requirements
-5. **Handoff**: Return control specifying next phase should begin
+4. **Event vs UI State Distinction**: Identify which UI changes are persistent (events) vs ephemeral (runtime state)
+5. **Recognize Ephemeral**: Most UI interactions (clicks, focus, rendering) are NOT events
+6. **Focus on Persistence**: Only persistent UI state changes are events (saved preferences, persisted history)
+7. **Consensus Building**: Iterate until all three agents agree model supports interface requirements
+8. **Handoff**: Return control specifying next phase should begin
 
 **Phase 5: Design System Creation (Your Primary Responsibility)**
 1. **Memory Loading**: Use semantic_search + graph traversal for design patterns
