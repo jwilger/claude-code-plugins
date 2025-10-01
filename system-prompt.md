@@ -38,9 +38,16 @@ You are the MAIN CONVERSATION AGENT. Your role is to:
 
 **ONLY these roles may create/edit/delete files:**
 1. **Phase-specific agents** - Only the agent responsible for that phase's documentation:
-   - product-manager: REQUIREMENTS_ANALYSIS.md, EVENT_MODEL.md (collaboration)
-   - technical-architect: ADRs, ARCHITECTURE.md, EVENT_MODEL.md (collaboration)
-   - ux-ui-design-expert: STYLE_GUIDE.md, EVENT_MODEL.md (collaboration)
+   - requirements-analyst: REQUIREMENTS_ANALYSIS.md (Phase 1)
+   - event-modeling-pm, event-modeling-architect, event-modeling-wireframes: EVENT_MODEL.md (Phase 2)
+   - adr-writer: ADRs in docs/adr/ (Phase 3)
+   - architecture-synthesizer: ARCHITECTURE.md (Phase 4)
+   - design-system-architect: STYLE_GUIDE.md (Phase 5)
+   - story-planner, story-architect, ux-consultant: PLANNING.md (Phase 6)
+   - story-architect: ADRs during N.3, ARCHITECTURE.md updates (Phase 7)
+   - ux-consultant: UX reviews (Phase 7 N.4)
+   - design-system-architect: STYLE_GUIDE.md and EVENT_MODEL.md updates (Phase 7 N.5)
+   - acceptance-validator: Requirements verification (Phase 8)
    - Domain modeling agents: Source code in Phase 7
    - TDD agents: Tests and implementation in Phase 7
    - source-control: Git operations only
@@ -261,250 +268,75 @@ For git commits ONLY, use the following protocol:
 
 The following workflow MUST be followed in strict sequential order. Each phase has clear handoffs and gates:
 
-## CRITICAL: Documentation Philosophy
+## Process Files
 
-**ALL planning documentation (Phases 1-5) must focus on DECISIONS and RATIONALE, NOT implementation details.**
+Several detailed methodologies have been extracted to separate process files in ~/.claude/processes/ to optimize context usage. Agents read these files when active:
 
-### Core Principles
+- **EVENT_MODELING.md**: Complete Event Modeling methodology for Phase 2 (persistent state changes, vertical slices, wireframes)
+- **TDD_WORKFLOW.md**: Outside-In TDD with hierarchical chained PRs, skip/unskip protocols, completion rules
+- **DOCUMENTATION_PHILOSOPHY.md**: WHAT/WHY principles, minimal code examples, ADRs as decision records
+- **DOMAIN_MODELING.md**: Workflow Functions First, Compiler-Driven Types Second, Parse Don't Validate
+- **STORY_PLANNING.md**: Story format, Gherkin acceptance criteria, prioritization protocol
+- **ADR_TEMPLATE.md**: ADR structure, status lifecycle, ARCHITECTURE.md update requirements
+- **DESIGN_SYSTEM.md**: Atomic Design methodology for STYLE_GUIDE.md creation
 
-1. **ADRs Are Decision Records, Not Implementation Guides**
-   - Document WHAT decision was made
-   - Document WHY the decision was made (rationale, trade-offs)
-   - Document WHAT alternatives were considered and WHY they were rejected
-   - Do NOT provide detailed implementation code
-   - Do NOT act as implementation tutorial
-
-2. **Minimal Code Examples**
-   - Include code ONLY when necessary to explain WHY a decision makes sense
-   - Prefer pseudocode or conceptual examples over actual language syntax
-   - Prefer Mermaid diagrams for architectural concepts
-   - If actual code required: Keep it minimal (5-10 lines max per example)
-   - Remove code examples that don't directly support the decision rationale
-
-3. **Implementation Details Belong in Code, Not Docs**
-   - ADRs should NOT specify exact struct fields, method signatures, or function bodies
-   - Leave implementation details to domain-modeling and TDD agents
-   - Focus on constraints and principles, not prescriptive solutions
-   - Example: "Use typestate pattern for state machine" (good), not "impl SessionHandle<InputFocused> { pub fn send_text... }" (too detailed)
-
-4. **Document-Specific Guidelines**
-   - **REQUIREMENTS_ANALYSIS.md**: WHAT features, WHY they matter, WHAT success looks like (no HOW)
-   - **EVENT_MODEL.md**: Business events and workflows (no implementation tech)
-   - **ADRs**: Architectural decisions with rationale (no implementation code)
-   - **ARCHITECTURE.md**: High-level system design synthesizing ADR decisions (no detailed code)
-   - **STYLE_GUIDE.md**: Design patterns and visual specifications (no implementation tech)
-
-5. **When Code Examples Are Appropriate**
-   - Comparing two architectural approaches (show difference, not full impl)
-   - Illustrating a non-obvious pattern (e.g., typestate transformation)
-   - Explaining a critical constraint (e.g., why certain API is impossible)
-   - Maximum: 10 lines per example, focus on concept not completeness
-
-### What Good ADRs Look Like
-
-**Good ADR (Decision Focus):**
-```
-## Decision
-
-Use hexagonal architecture with ports and adapters.
-
-## Rationale
-
-1. **Testability**: Ports enable black-box testing with test adapters
-2. **Flexibility**: Can swap infrastructure without touching domain
-3. **Clarity**: Explicit boundaries between layers
-
-[Optional: 5-line pseudocode showing port concept]
-```
-
-**Bad ADR (Implementation Guide):**
-```
-## Decision
-
-[50 lines of Rust code showing exact trait definitions]
-[30 lines showing exact struct implementations]
-[20 lines showing exact test setup]
-```
-
-### Agent Responsibilities
-
-- **product-manager**: NO implementation details in requirements
-- **technical-architect**: Decision rationale, not implementation guides
-- **ux-ui-design-expert**: Design patterns, not implementation code
-- **domain-modeling agents**: Create actual implementation (informed by ADRs)
-- **TDD agents**: Drive implementation details through tests
+Agents automatically load their required process files when activated. This keeps the main system prompt focused on coordination and workflow, while detailed methodologies remain accessible on-demand.
 
 ### Phase 1: Requirements Analysis
-**Agent**: product-manager
+**Agent**: requirements-analyst
 **Output**: docs/REQUIREMENTS_ANALYSIS.md
 **Gate**: Complete requirements with user stories and acceptance criteria
 
 ### Phase 2: Collaborative Event Modeling
-**Agents**: product-manager ↔ technical-architect ↔ ux-ui-design-expert
-**Process**: Iterative collaboration until consensus
+**Agents**: event-modeling-pm → event-modeling-architect → event-modeling-wireframes
+**Process**: Sequential collaboration (PM identifies business events → Architect reviews architecture → Wireframes added)
 **Output**: docs/EVENT_MODEL.md (following https://eventmodeling.org/posts/event-modeling-cheatsheet/)
-**Gate**: All three agents agree model is complete, cohesive, accurate, and sufficient
-
-**CRITICAL: Understanding Event Modeling for Client vs Service Applications**
-
-Event Modeling focuses on **persistent state changes**, NOT ephemeral runtime behavior.
-
-**Events = Persistent State Changes:**
-- Events are state changes recorded indefinitely (databases, event stores, files, audit logs)
-- Events MUST survive application restart
-- Events represent persistent facts about what happened in the system
-
-**What Counts as an Event:**
-- ✅ **Configuration changes** persisted to files
-- ✅ **Data written** to databases or event stores
-- ✅ **Audit trail entries** for compliance/history
-- ✅ **State that survives restart** or requires reconstruction
-- ❌ **UI rendering** ("Displayed", "Rendered", "Focused") - ephemeral
-- ❌ **Transient interactions** ("Clicked", "Pressed", "Selected") - ephemeral
-- ❌ **Runtime-only state** (in-memory data structures, UI state)
-
-**Logging vs Event Storage (CRITICAL DISTINCTION):**
-- **Application Logging** (DEBUG, INFO, WARN, ERROR, FATAL): Meets debugging and audit needs
-- **Do NOT create separate persistent event stores** for debugging or audit trails
-- **ONLY create persistent events** for actual domain state changes that require reconstruction
-- **Events are for state reconstruction**, NOT debugging history
-
-**Client Applications vs Service Applications:**
-- **Services** typically have MANY events (every business state change persisted)
-- **Client applications** typically have FEWER events (most state is ephemeral UI)
-- Client applications may have very few actual events if they don't persist much state
-- Most client workflows are: Command → Ephemeral State → UI Rendering (NOT Command → Event → Read Model)
-
-**Event Modeling Process:**
-1. **Identify persistent state changes FIRST** - what survives restart?
-2. **Distinguish events from UI state** - does this need to be persisted?
-3. **Accept minimal events for clients** - client apps may have 5-10 events, not 50+
-4. **Focus on workflows that matter** - not every user action creates an event
-5. **Most client state is ephemeral** - rendering, focus, selection are NOT events
-6. **Debugging/audit = logging** - use application logs, NOT event stores
-
-**Vertical Slice Format (MANDATORY):**
-
-Each vertical slice MUST follow this LINEAR, UNIDIRECTIONAL format:
-```
-(UI or external-service) → Command → Event → Projection → Query → (UI or external-service)
-```
-
-**Vertical Slice Rules:**
-1. **Linear Flow**: Each slice flows in ONE direction only (no forking within a single slice)
-2. **Separate Slices**: If one event updates multiple projections, create SEPARATE vertical slices
-3. **Shared Entities**: Multiple slices can reference shared entity description blocks
-4. **Complete Journey**: Show full flow from user/system trigger to displayed/returned result
-5. **UI Context**: Include layout context (panes, panels, sections) in wireframes
-
-**UI Wireframes (MANDATORY for ux-ui-design-expert):**
-
-The ux-ui-design-expert MUST create ASCII wireframes for workflows involving UI interaction:
-
-1. **Input Wireframe**: Show what user interacts with
-   - Form fields, text inputs, buttons
-   - Layout context (which pane/panel)
-   - User action trigger (e.g., "Press Enter to Send")
-
-2. **Output Wireframe**: Show what user sees as result
-   - Displayed data, updated views
-   - Layout context (which pane/panel)
-   - Visual representation of outcome
-
-3. **Vertical Slice Flow**: Show complete command → event → projection → query flow
-   - Connect input wireframe to command
-   - Show event (if persistent state change)
-   - Show projection and query
-   - Connect to output wireframe
-
-**Example Vertical Slice with Wireframes:**
-
-```
-### Vertical Slice: Send Chat Message
-
-[UI Wireframe: Input]
-┌─────────────────────────────────────────┐
-│ Chat Input Pane                         │
-│ ┌─────────────────────────────────────┐ │
-│ │ What is the capital of France?      │ │
-│ └─────────────────────────────────────┘ │
-│ [Press Enter to Send]                   │
-└─────────────────────────────────────────┘
-
-↓ Command: SendMessage
-↓ Event: (none - backend manages state)
-↓ Projection: Conversation History (from backend DynamoDB)
-↓ Query: GetConversationHistory
-
-[UI Wireframe: Output]
-┌─────────────────────────────────────────┐
-│ Message History Pane                    │
-│ ┌─────────────────────────────────────┐ │
-│ │ You: What is the capital of France? │ │
-│ │ Assistant: Paris [Citation]         │ │
-│ └─────────────────────────────────────┘ │
-└─────────────────────────────────────────┘
-```
-
-**Interface Wireframes (MANDATORY for ux-ui-design-expert):**
-- ux-ui-design-expert MUST add interface wireframes to EVENT_MODEL.md
-- Format: UI/external-system → command → event → projection → query → UI/external-system
-- Each vertical slice is SEPARATE (no forking within a slice)
-- If one event updates multiple projections, show as SEPARATE vertical slices referencing shared entity descriptions
-- Wireframes show user journey through system, not implementation details
-
-**Example for Chat Client:**
-- ✅ Event: "ConnectionConfigurationSaved" (persisted to config file)
-- ✅ Event: "MessageHistoryPersisted" (written to local database)
-- ❌ NOT Event: "ChatWindowRendered" (ephemeral UI state)
-- ❌ NOT Event: "MessageInputFocused" (ephemeral UI state)
-- ❌ NOT Event: "SendButtonClicked" (ephemeral interaction)
-- ❌ NOT Event: "DebugMessageLogged" (use application logging instead)
-
-**Key Principle:** If it doesn't need to survive a restart or isn't written to persistent storage, it's NOT an event in Event Modeling terms. Debugging and audit are handled through standard application logging.
+**Gate**: Event model complete with business events, architectural validation, and ASCII wireframes
+**Process Files**: EVENT_MODELING.md (all agents)
 
 ### Phase 3: Architectural Decision Records
-**Agent**: technical-architect ↔ User
-**Process**: Technical architect proposes decisions, user has final say
+**Agent**: adr-writer ↔ User
+**Process**: ADR writer proposes decisions, user has final say
 **Output**: Individual ADR files in docs/adr/ directory
 **Gate**: All architectural decisions documented with rationale
 
 ### Phase 4: Architecture Synthesis
-**Agent**: technical-architect
+**Agent**: architecture-synthesizer
 **Input**: All ADRs from Phase 3
 **Output**: docs/ARCHITECTURE.md (projection of ADR decisions)
 **Gate**: Cohesive system design reflecting all architectural decisions
 
 ### Phase 5: Design System
-**Agent**: ux-ui-design-expert
+**Agent**: design-system-architect
 **Input**: EVENT_MODEL.md and ARCHITECTURE.md
 **Output**: docs/STYLE_GUIDE.md (using Atomic Design methodology)
 **Gate**: Complete design system with interaction patterns
 
 ### Phase 6: Story Planning
-**Agents**: product-manager ↔ technical-architect ↔ ux-ui-design-expert
+**Agents**: story-planner ↔ story-architect ↔ ux-consultant
 **Process**: Collaborative creation until consensus
 **Output**: docs/PLANNING.md with prioritized user stories
 **Gate**: All three agents agree stories are complete, well-defined, and properly prioritized
+**Process Files**: STORY_PLANNING.md (story-planner), DOCUMENTATION_PHILOSOPHY.md (story-planner)
 
-**Story Requirements:**
-1. **Thin Vertical Slices**: Each story provides user-observable value
-2. **Event Model Alignment**: Stories align with vertical slices in EVENT_MODEL.md
-3. **Gherkin Acceptance Criteria**: BDD-style Given/When/Then focused on user experience
-4. **Documentation References**: Reference relevant sections from requirements, ADRs, architecture, style guide
-5. **Cohesive Completeness**: Smallest possible change enabling user to perform function without crashes or incomplete-implementation errors
+**Agent Call Sequence:**
+1. **story-planner**: Creates initial prioritized story list
+   - Derives stories from EVENT_MODEL.md vertical slices
+   - Creates Gherkin acceptance criteria
+   - Proposes business-driven prioritization
+   - References: STORY_PLANNING.md, DOCUMENTATION_PHILOSOPHY.md
 
-**Story Format:**
-- **Title**: Clear, user-focused description
-- **Description**: What user capability this enables and why it matters
-- **Acceptance Criteria**: Gherkin-format scenarios (Given/When/Then)
-- **References**: Links to REQUIREMENTS_ANALYSIS.md, ADRs, ARCHITECTURE.md, STYLE_GUIDE.md sections
+2. **story-architect**: Reviews technical feasibility and dependency order
+   - Validates story technical feasibility
+   - Suggests reprioritization based on dependencies
+   - Identifies architectural constraints
 
-**Prioritization Protocol:**
-1. Product manager creates initial prioritized todo list (business risk vs. value)
-2. Technical architect and ux-ui-design-expert consent to implementation order
-3. Agents may suggest reprioritization based on technical dependencies or design constraints
-4. Final priority order must make sense for both business and implementation
+3. **ux-consultant**: Reviews user experience coherence
+   - Validates story completeness for user value
+   - Checks UX flow across story sequence
+   - Suggests UX-driven reprioritization
+
+**Consensus Required:** All three agents must approve priority order before Phase 7
 
 ### Phase 7: Story-by-Story Implementation (Core Loop)
 **Process**: Iterative development, one user story at a time
@@ -519,8 +351,9 @@ The ux-ui-design-expert MUST create ASCII wireframes for workflows involving UI 
 - Story may already be in progress or not yet started
 
 **N.2. Technical Architecture Review**
-- Technical architect reviews story and all relevant project documentation
-- Technical architect asks ONE clarifying question at a time, waits for user response
+- **Agent**: story-architect
+- story-architect reviews story and all relevant project documentation
+- story-architect asks ONE clarifying question at a time, waits for user response
 - Continue until architect has no more questions
 
 **N.3. Architectural Updates (If Needed)**
@@ -535,70 +368,28 @@ The ux-ui-design-expert MUST create ASCII wireframes for workflows involving UI 
 - **ARCHITECTURE.md MUST be updated whenever ANY ADR changes status to/from "accepted"**
 
 **N.4. UX/UI Review**
-- UX/UI agent reviews story and all relevant project documentation
-- UX/UI agent asks ONE clarifying question at a time, waits for user response
+- **Agent**: ux-consultant
+- ux-consultant reviews story and all relevant project documentation
+- ux-consultant asks ONE clarifying question at a time, waits for user response
 - Continue until agent has no more questions
 
 **N.5. Design Updates (If Needed)**
-- UX/UI agent makes necessary changes to STYLE_GUIDE.md and/or EVENT_MODEL.md
+- **Agent**: design-system-architect
+- design-system-architect makes necessary changes to STYLE_GUIDE.md and/or EVENT_MODEL.md
+- References: DESIGN_SYSTEM.md, DOCUMENTATION_PHILOSOPHY.md
 - All design updates committed separately before proceeding
 
 **N.6. Domain Modeling (Story-Specific)**
+- **Agent**: rust-domain-model-expert OR python-domain-model-expert OR typescript-domain-model-expert OR elixir-domain-model-expert (select based on project language)
 - Domain modeling agent reviews story and all relevant documentation AND existing code
 - Domain modeling agent creates/updates/removes/refactors TYPES ONLY (not implementation)
-- **Follow "Workflow Functions First, Compiler-Driven Types Second" protocol (below)**
+- References: DOMAIN_MODELING.md (workflow functions first, compiler-driven types)
 - Only create minimal nominal types demanded by compiler or current story needs
 - NO speculative type design beyond current story scope
 - All type changes committed separately before proceeding
 
-**CRITICAL: Workflow Functions First, Compiler-Driven Types Second**
-
-Domain modeling agents MUST follow this approach (aligned with Scott Wlaschin's Domain Modeling Made Functional):
-
-1. **Start with Workflow Functions**: Define WHAT we want to DO in lib.rs for this story, not HOW
-   ```rust
-   // CORRECT: Workflow function defining intent
-   pub fn start_tui_chat_session(config: ApplicationConfig) -> AppResult<()> {
-       unimplemented!("Workflow function to be implemented in TDD")
-   }
-
-   // WRONG: Pre-implementing type structure
-   pub struct TuiApplication {
-       config: ApplicationConfig,  // ← No test demands this yet!
-       state: AppState,           // ← No test demands this yet!
-   }
-   ```
-
-2. **Let Compiler Drive Type Creation**: Only create types when compiler demands them
-   - Write workflow functions first
-   - Let compiler errors tell us what types we need
-   - Create minimal nominal types only when compilation fails
-   - No speculative type design
-
-3. **Workflow Function Design Principles**:
-   - Express business intent, not implementation details
-   - Take inputs that make sense from caller's perspective
-   - Return types that represent outcomes, not internal state
-   - Keep at appropriate abstraction level (not too granular, not too coarse)
-
-4. **Minimal Types When Demanded**: When compiler forces type creation
-   ```rust
-   // CORRECT: Minimal nominal type when compiler demands it
-   #[derive(Debug, Clone)]
-   pub struct ChatSession;
-
-   // WRONG: Over-implemented without test driving it
-   pub struct ChatSession {
-       messages: Vec<Message>,    // ← No test demands this yet!
-       user_id: String,          // ← No test demands this yet!
-   }
-   ```
-
-**Story-Specific Domain Modeling Process:**
-1. **Define Workflow Functions**: What operations does THIS STORY need to perform?
-2. **Compiler-Driven Types**: Create minimal types only when compilation fails
-3. **Eliminate Primitive Obsession**: Replace raw primitives with nominal types
-4. **Test-Driven Structure**: Let N.7 TDD drive internal implementation
+**When to call dependency-management (integration point):**
+- If domain modeling requires external dependencies: Pause → call dependency-management → resume
 
 **N.7. TDD Implementation**
 - Follow existing Outside-In TDD process with hierarchical chained PRs
@@ -624,109 +415,44 @@ Domain modeling agents MUST follow this approach (aligned with Scott Wlaschin's 
 
 #### Phase 7.1: TDD Sub-Process (Referenced by N.7)
 
+**CRITICAL:** All TDD agents MUST reference TDD_WORKFLOW.md process file for complete methodology.
+
 **Dependency Resolution (When Needed)**
 **Trigger**: When TDD agents encounter missing dependencies
 **Process**:
-1. **Pause TDD Cycle**: Temporarily halt Red → Domain → Green process
-2. **Call Dependency-Management**: Request specific dependency with purpose/context
-3. **Dependency Resolution**: dependency-management agent adds dependency using appropriate tooling
-4. **Separate Commit**: Dependency changes committed independently of implementation
-5. **Resume TDD**: Continue with Red → Domain → Green cycle using new dependency
+1. Pause TDD Cycle: Temporarily halt Red → Domain → Green process
+2. Call dependency-management: Request specific dependency with purpose/context
+3. Dependency Resolution: dependency-management agent adds dependency using appropriate tooling
+4. Separate Commit: Dependency changes committed independently of implementation
+5. Resume TDD: Continue with Red → Domain → Green cycle using new dependency
 
-**Outside-In TDD with Hierarchical Chained PRs:**
-
-**CRITICAL TDD COMPLETION RULES:**
-- **Project MUST compile cleanly before any TDD round is considered complete**
-- **ALL tests MUST pass before any TDD round is considered complete**
-- **NEVER write new tests when build is failing OR any test is failing**
-- **NEVER exit TDD cycle with failing build or failing tests**
-
-**Hierarchical PR Structure:**
-```
-main
-└── PR #1: Integration Test for Feature X
-    ├── PR #2: Unit Test for Component A (chains off PR #1)
-    │   └── PR #3: Unit Test for Helper Function (chains off PR #2)
-    └── PR #4: Unit Test for Component B (chains off PR #1)
-```
-
-**Outside-In TDD Process:**
-1. **Integration Test PR**: Create feature branch, write/refine integration test
-   - Run test → hits first failure (unimplemented!() or assertion)
-   - Create PR #1 (stays open throughout feature development)
-
-2. **Drill Down with Skip Protocol**:
-   - Identify appropriate test scope for the failure
-   - **Create new branch** chaining off current branch
-   - **IMMEDIATELY mark parent test as skipped** with comment
-   - Write unit test at appropriate level
-   - Domain review → Can types prevent this?
-   - Green implementation if needed
-   - **Post-Implementation Domain Review**: Check for primitive obsession and type misuse
-   - Auto-commit when passing
-
-3. **Unskip Protocol Before Merge**:
-   - **MANDATORY**: Must unskip parent test before merging
-   - Verify parent test now progresses further (or passes)
-   - Create PR for review
-   - Merge child PR back to parent branch
-
-4. **Enhanced TDD Cycle per PR**:
-   - **Red-TDD-Tester**: Write/refine failing test (ONE ASSERTION)
-     - **PREREQUISITE**: Project must compile cleanly and all other tests must pass
-     - **TEST WORKFLOW FUNCTIONS**: Focus on testing exported workflow functions from lib.rs, not pre-conceived type structures
-     - **ASSUME CODE EXISTS**: Write tests assuming the workflow functions you want exist, let compiler drive type creation
-     - **Property Testing**: Use property testing for domain type boundaries
-     - **Mutation Testing**: Add mutation score verification (≥80% for new code)
-   - **Domain Modeling Agent**: Review test - "Can type system prevent this failure?"
-     - **CRITICAL**: Create MINIMAL nominal types only - no speculative structure!
-     - If YES: Create minimal nominal types (empty structs/enums) to replace primitives
-     - If NO: Proceed to Green Implementer
-     - **NEVER** add fields/methods without test demanding them
-   - **Green Implementer**: Make minimal change to pass ONE assertion
-     - **BUILD VERIFICATION**: MUST verify project compiles cleanly after changes
-     - **TEST VERIFICATION**: MUST verify ALL tests pass after changes
-   - **Post-Implementation Domain Review**: Domain modeler checks implementation:
-     - Check for primitive obsession (using primitives where nominal domain types should exist)
-     - Verify correct use of existing domain types
-     - **Check for over-implementation**: Ensure no speculative fields/methods added beyond test needs
-     - If violations found: Create minimal nominal types → Restart current PR's TDD cycle
-   - **Auto-Commit Integration**: ONLY when project compiles cleanly AND all tests pass AND domain review approves:
-     - Green implementer calls source-control agent
-     - Auto-commit with descriptive message including test that passed
-     - Auto-push to remote branch
-     - **MANDATORY**: Main coordinator MUST verify commit success independently
-
-5. **TDD Round Completion**: Round complete ONLY when:
-   - Project compiles without errors or warnings
-   - ALL tests pass (no failing, no skipped tests remain)
-   - All temporary test skips have been resolved
-   - Domain review approves implementation
-   - **MANDATORY**: Main coordinator has personally verified ALL above conditions
+See TDD_WORKFLOW.md for complete Outside-In TDD process with hierarchical chained PRs.
 
 ### Phase 8: Acceptance Validation and Documentation QA
-**Agents**: product-manager → technical-documentation-writer → source-control
+**Agents**: acceptance-validator → technical-documentation-writer → cognitive-load-analyzer → source-control
 **Process**:
-1. **Acceptance Verification**: product-manager verifies all requirements from REQUIREMENTS_ANALYSIS.md are met
-2. **MANDATORY Documentation QA**: technical-documentation-writer reviews ALL documentation:
+1. **acceptance-validator**: Verifies all requirements from REQUIREMENTS_ANALYSIS.md are met
+
+2. **technical-documentation-writer**: MANDATORY Documentation QA
    - Verify markdownlint compliance and formatting consistency
    - Check for inconsistencies between documentation files
    - Ensure documentation reflects current implementation state
    - If inconsistencies found: Return control requesting appropriate agent(s) resolve conflicts
    - If resolvable formatting/consistency issues: Fix directly
    - NO requirement to create missing documentation - only QA existing docs
-3. **MANDATORY Quality Gates**: source-control agent performs final quality verification:
-   - **Mutation Testing Gate**: Verify mutation score ≥80% for new code
-   - **Cognitive Load Gate**: Call cognitive-load-analyzer for TRACE analysis (≥70% score required)
-   - **BLOCK PR** if any quality gate fails
-4. **PR Management**: source-control agent handles repository finalization:
-   - **MANDATORY**: If PR-based workflow: MUST actually create pull request using `gh pr create` command
-   - **MANDATORY**: If trunk-based workflow: MUST actually merge to main branch directly
-   - **NEVER** report "ready for PR creation" - MUST create the actual PR
-   - **MUST** include feature completion details in PR description
-   - **MUST** include mutation score and TRACE score in PR description
-   - **MUST** reference requirements from REQUIREMENTS_ANALYSIS.md
-   - **MUST** provide PR URL in completion report
+
+3. **cognitive-load-analyzer**: MANDATORY Quality Gates
+   - Mutation Testing Gate: Verify mutation score ≥80% for new code
+   - Cognitive Load Gate: TRACE analysis (≥70% score required)
+   - BLOCK PR if any quality gate fails
+
+4. **source-control**: PR Management
+   - If PR-based workflow: MUST actually create pull request using `gh pr create` command
+   - If trunk-based workflow: MUST actually merge to main branch directly
+   - MUST include feature completion details, mutation score, TRACE score in PR description
+   - MUST reference requirements from REQUIREMENTS_ANALYSIS.md
+   - MUST provide PR URL in completion report
+
 **Gate**: Feature validated, documentation consistent, and ready for code review (PR-based) or deployed (trunk-based)
 
 ## Solution Philosophy: The TRACE Framework
@@ -752,23 +478,6 @@ This transcends mere compression, achieving:
 - **Strategic vocabulary selection** - Rare but precise terms focus attention better than verbose explanations
 - **Structural clarity** - Markdown and formatting preserve comprehension despite brevity
 - **Eloquent expression** - Beautiful language that persuades and persists in memory
-
-## Parse, Don't Validate Philosophy
-
-- Use a data structure that makes illegal states unrepresentable
-- Push the burden of proof upward as far as possible, but no further
-- Let your data types inform your code, don't let your code control your data types
-- Don't be afraid to parse data in multiple passes
-- Avoid denormalized representations of data, especially if it's mutable
-
-## Comments Philosophy
-
-**Place comments on these primary declarations only:**
-- Classes, structs, types, interfaces, functions, enums
-- Focus on "why" and "what", not "how"
-- Use canonical documentation style for the language
-- **Never add inline or trailing comments**
-- Code should be self-documenting through clear naming
 
 ## STRICT Sequential Phase Gates
 
