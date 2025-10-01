@@ -195,8 +195,8 @@ For git commits ONLY, use the following protocol:
 4. **Separate commits** - dependency changes committed separately from application code
 
 **Integration Points:**
-- **Phase 6**: Domain modeling agents call dependency-management before creating types requiring external dependencies
-- **Phase 8**: TDD agents call dependency-management when encountering missing dependencies (pause TDD → resolve deps → resume TDD)
+- **Phase 7 (N.6)**: Domain modeling agents call dependency-management before creating types requiring external dependencies
+- **Phase 7 (N.7)**: TDD agents call dependency-management when encountering missing dependencies (pause TDD → resolve deps → resume TDD)
 - **DevOps**: Infrastructure setup calls dependency-management for tooling dependencies
 
 **Dependency-Triggered Workflow:**
@@ -323,18 +323,81 @@ Use hexagonal architecture with ports and adapters.
 **Output**: docs/STYLE_GUIDE.md (using Atomic Design methodology)
 **Gate**: Complete design system with interaction patterns
 
-### Phase 6: Domain Type System
-**Agent**: domain-modeling agent (language-specific)
-**Input**: ARCHITECTURE.md and EVENT_MODEL.md
-**Output**: Type definitions with unimplemented! function signatures only
-**Process**: If external dependencies needed, call dependency-management agent first
-**Gate**: Types that make illegal states unrepresentable
+### Phase 6: Story Planning
+**Agents**: product-manager ↔ technical-architect ↔ ux-ui-design-expert
+**Process**: Collaborative creation until consensus
+**Output**: docs/PLANNING.md with prioritized user stories
+**Gate**: All three agents agree stories are complete, well-defined, and properly prioritized
+
+**Story Requirements:**
+1. **Thin Vertical Slices**: Each story provides user-observable value
+2. **Event Model Alignment**: Stories align with vertical slices in EVENT_MODEL.md
+3. **Gherkin Acceptance Criteria**: BDD-style Given/When/Then focused on user experience
+4. **Documentation References**: Reference relevant sections from requirements, ADRs, architecture, style guide
+5. **Cohesive Completeness**: Smallest possible change enabling user to perform function without crashes or incomplete-implementation errors
+
+**Story Format:**
+- **Title**: Clear, user-focused description
+- **Description**: What user capability this enables and why it matters
+- **Acceptance Criteria**: Gherkin-format scenarios (Given/When/Then)
+- **References**: Links to REQUIREMENTS_ANALYSIS.md, ADRs, ARCHITECTURE.md, STYLE_GUIDE.md sections
+
+**Prioritization Protocol:**
+1. Product manager creates initial prioritized todo list (business risk vs. value)
+2. Technical architect and ux-ui-design-expert consent to implementation order
+3. Agents may suggest reprioritization based on technical dependencies or design constraints
+4. Final priority order must make sense for both business and implementation
+
+### Phase 7: Story-by-Story Implementation (Core Loop)
+**Process**: Iterative development, one user story at a time
+**Gate**: Story complete when product-manager, technical-architect, and ux-ui-design-expert reach consensus
+
+**CRITICAL: Allow user to return to Phase 1 if requirements changes discovered during implementation**
+
+#### Story-by-Story Core Loop
+
+**N.1. Story Selection**
+- Product manager selects next incomplete story from PLANNING.md priority list
+- Story may already be in progress or not yet started
+
+**N.2. Technical Architecture Review**
+- Technical architect reviews story and all relevant project documentation
+- Technical architect asks ONE clarifying question at a time, waits for user response
+- Continue until architect has no more questions
+
+**N.3. Architectural Updates (If Needed)**
+- Technical architect creates new ADRs if architectural decisions needed
+- For each new ADR:
+  1. Create ADR with "proposed" status
+  2. User reviews and approves/rejects/suggests edits
+  3. If edits suggested: Make changes, return to step 2
+  4. If approved: Update ADR status to "accepted"
+  5. Check for superseded ADRs, update their status if needed
+  6. **MANDATORY**: Update ARCHITECTURE.md to reflect ADR status changes
+- **ARCHITECTURE.md MUST be updated whenever ANY ADR changes status to/from "accepted"**
+
+**N.4. UX/UI Review**
+- UX/UI agent reviews story and all relevant project documentation
+- UX/UI agent asks ONE clarifying question at a time, waits for user response
+- Continue until agent has no more questions
+
+**N.5. Design Updates (If Needed)**
+- UX/UI agent makes necessary changes to STYLE_GUIDE.md and/or EVENT_MODEL.md
+- All design updates committed separately before proceeding
+
+**N.6. Domain Modeling (Story-Specific)**
+- Domain modeling agent reviews story and all relevant documentation AND existing code
+- Domain modeling agent creates/updates/removes/refactors TYPES ONLY (not implementation)
+- **Follow "Workflow Functions First, Compiler-Driven Types Second" protocol (below)**
+- Only create minimal nominal types demanded by compiler or current story needs
+- NO speculative type design beyond current story scope
+- All type changes committed separately before proceeding
 
 **CRITICAL: Workflow Functions First, Compiler-Driven Types Second**
 
 Domain modeling agents MUST follow this approach (aligned with Scott Wlaschin's Domain Modeling Made Functional):
 
-1. **Start with Workflow Functions**: Define WHAT we want to DO in lib.rs, not HOW
+1. **Start with Workflow Functions**: Define WHAT we want to DO in lib.rs for this story, not HOW
    ```rust
    // CORRECT: Workflow function defining intent
    pub fn start_tui_chat_session(config: ApplicationConfig) -> AppResult<()> {
@@ -373,39 +436,37 @@ Domain modeling agents MUST follow this approach (aligned with Scott Wlaschin's 
    }
    ```
 
-**Phase 6 Process:**
-1. **Define Workflow Functions**: What operations does the system need to perform?
+**Story-Specific Domain Modeling Process:**
+1. **Define Workflow Functions**: What operations does THIS STORY need to perform?
 2. **Compiler-Driven Types**: Create minimal types only when compilation fails
 3. **Eliminate Primitive Obsession**: Replace raw primitives with nominal types
-4. **Test-Driven Structure**: Let Phase 7 TDD drive internal implementation
+4. **Test-Driven Structure**: Let N.7 TDD drive internal implementation
 
-**Examples of Correct Workflow-First Approach:**
-```rust
-// Phase 6: Define workflow functions first
-pub fn start_tui_session(config: ApplicationConfig) -> AppResult<SessionHandle> {
-    unimplemented!()
-}
+**N.7. TDD Implementation**
+- Follow existing Outside-In TDD process with hierarchical chained PRs
+- Domain modeling agent reviews EVERY test for type-system opportunities
+- Domain modeling agent reviews EVERY implementation for type violations
+- Continue TDD cycles until story acceptance criteria met
 
-pub fn send_chat_message(session: SessionHandle, message: String) -> AppResult<ChatResponse> {
-    unimplemented!()
-}
+**N.8. Story Completion Consensus**
+- Product manager, technical architect, and ux-ui-design-expert MUST all agree:
+  - Implementation complete and meets acceptance criteria
+  - Code well-designed per all project principles
+  - No architectural debt introduced
+- If NOT finished: Return to N.2 for additional refinement
+- If finished: Continue to N.9
 
-pub fn shutdown_tui_session(session: SessionHandle) -> AppResult<()> {
-    unimplemented!()
-}
+**N.9. Finalization**
+- If PR-based: Ensure changes pushed, create PR, verify PR URL returned
+- If trunk-based: Ensure changes committed, clean up temporary files
 
-// Minimal types created only when compiler demands them
-#[derive(Debug, Clone)]
-pub struct SessionHandle;
+**N.10. User Approval**
+- User provides final approval that story is complete
+- Upon approval: Return to N.1 for next story
 
-// Phase 7+: TDD drives internal structure as needed
-// (Only add fields when tests actually fail requiring them)
-```
+#### Phase 7.1: TDD Sub-Process (Referenced by N.7)
 
-### Phase 7: Outside-In TDD Implementation (Directly from Domain Types)
-**Process**: Begin TDD implementation directly from complete domain model with hierarchical chained PRs
-
-#### Phase 7.0: Dependency Resolution (When Needed)
+**Dependency Resolution (When Needed)**
 **Trigger**: When TDD agents encounter missing dependencies
 **Process**:
 1. **Pause TDD Cycle**: Temporarily halt Red → Domain → Green process
@@ -414,8 +475,7 @@ pub struct SessionHandle;
 4. **Separate Commit**: Dependency changes committed independently of implementation
 5. **Resume TDD**: Continue with Red → Domain → Green cycle using new dependency
 
-#### Phase 7.1: Outside-In TDD with Hierarchical Chained PRs
-**Enhanced TDD Cycle with Hierarchical PRs:**
+**Outside-In TDD with Hierarchical Chained PRs:**
 
 **CRITICAL TDD COMPLETION RULES:**
 - **Project MUST compile cleanly before any TDD round is considered complete**
@@ -562,7 +622,7 @@ This transcends mere compression, achieving:
 - NEVER bypass the sequential workflow for "efficiency"
 
 **For ANY application code changes:**
-- Domain modeling agent MUST create COMPLETE types before TDD begins
+- Domain modeling agent creates types incrementally as each story needs them (NOT upfront)
 - Project MUST compile cleanly before TDD can start
 - Red-TDD-Tester MUST write failing test before any implementation
 - Domain modeling agent MUST review EVERY test for type-system opportunities
@@ -638,17 +698,21 @@ This transcends mere compression, achieving:
 ## Auto-Commit Requirements
 
 **MANDATORY auto-commits after:**
-1. Requirements Analysis completion
-2. Event Model completion
-3. Each ADR creation
-4. Architecture Synthesis completion
-5. Design System completion
-6. Complete Domain Type System creation (with clean compilation verification)
+1. Requirements Analysis completion (Phase 1)
+2. Event Model completion (Phase 2)
+3. Each ADR creation (Phase 3)
+4. Architecture Synthesis completion (Phase 4)
+5. Design System completion (Phase 5)
+6. Story Planning completion (Phase 6)
+7. **During Core Loop**: Each architectural update (N.3)
+8. **During Core Loop**: Each design update (N.5)
+9. **During Core Loop**: Each domain modeling update (N.6)
+10. **During Core Loop**: Each successful TDD round (N.7)
 
-**Before TDD begins:**
-- Project MUST compile cleanly
-- All planning phases MUST be committed
-- User must resolve any compilation issues before proceeding
+**Story-by-Story Process:**
+- Domain types created incrementally per story, NOT upfront
+- Each mini-phase within story (architecture, design, types) committed separately
+- TDD commits happen per passing test as usual
 
 ## CRITICAL: Integration Testing Requirements for Third-Party Services
 
