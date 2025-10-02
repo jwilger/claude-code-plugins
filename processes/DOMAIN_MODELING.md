@@ -1,5 +1,19 @@
 # Domain Modeling Philosophy and Process
 
+## CRITICAL: Dependency Management
+
+**BEFORE creating any types that require external dependencies:**
+
+**MANDATORY**: Read and follow **DEPENDENCY_MANAGEMENT.md** process file
+
+**NEVER directly edit** Cargo.toml, pyproject.toml, package.json, or any dependency file.
+
+**ALWAYS call** the dependency-management agent when you need external dependencies.
+
+See DEPENDENCY_MANAGEMENT.md for complete protocol.
+
+---
+
 ## CRITICAL: Workflow Functions First, Compiler-Driven Types Second
 
 Domain modeling agents MUST follow this approach (aligned with Scott Wlaschin's Domain Modeling Made Functional):

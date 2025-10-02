@@ -1,15 +1,26 @@
 # TDD Workflow Process
 
-## Dependency Resolution (When Needed)
+## CRITICAL: Dependency Management
 
-**Trigger**: When TDD agents encounter missing dependencies
+**BEFORE writing tests that require external dependencies:**
+
+**MANDATORY**: Read and follow **DEPENDENCY_MANAGEMENT.md** process file
+
+**NEVER directly edit** Cargo.toml, pyproject.toml, package.json, or any dependency file.
+
+**ALWAYS call** the dependency-management agent when you need external dependencies.
+
+### Dependency Resolution During TDD
+
+**Trigger**: When TDD agents encounter missing dependencies during Red or Green phases
 
 **Process**:
 1. **Pause TDD Cycle**: Temporarily halt Red → Domain → Green process
-2. **Call Dependency-Management**: Request specific dependency with purpose/context
-3. **Dependency Resolution**: dependency-management agent adds dependency using appropriate tooling
-4. **Separate Commit**: Dependency changes committed independently of implementation
-5. **Resume TDD**: Continue with Red → Domain → Green cycle using new dependency
+2. **Call dependency-management agent**: Provide dependency name, purpose, required features
+3. **Wait for Resolution**: dependency-management agent adds dependency and commits separately
+4. **Resume TDD**: Continue with Red → Domain → Green cycle using new dependency
+
+See DEPENDENCY_MANAGEMENT.md for complete protocol and examples.
 
 ## Outside-In TDD with Hierarchical Chained PRs
 

@@ -234,8 +234,11 @@ For git commits ONLY, use the following protocol:
 
 ## CRITICAL: Dependency Management Protocol
 
-**ALL dependency operations MUST use the dependency-management agent:**
+**ALL agents MUST follow the dependency management protocol.**
 
+**MANDATORY**: ALL agents read and follow **DEPENDENCY_MANAGEMENT.md** process file when handling dependencies.
+
+**Key Rules:**
 1. **NEVER directly edit dependency files** (Cargo.toml, pyproject.toml, package.json, requirements.txt)
 2. **ALWAYS use dependency-management agent** for adding, updating, or removing dependencies
 3. **Platform-appropriate tooling** - dependency-management agent uses cargo/uv/npm/pnpm as appropriate
@@ -246,11 +249,11 @@ For git commits ONLY, use the following protocol:
 - **Phase 7 (N.7)**: TDD agents call dependency-management when encountering missing dependencies (pause TDD → resolve deps → resume TDD)
 - **DevOps**: Infrastructure setup calls dependency-management for tooling dependencies
 
-**Dependency-Triggered Workflow:**
-1. Agent identifies need for external dependency
-2. Call dependency-management agent with specific requirement and purpose
-3. Dependency-management researches, adds dependency using appropriate tooling, commits changes
-4. Return control to original agent to continue with dependency available
+**Complete Protocol**: See ~/.claude/processes/DEPENDENCY_MANAGEMENT.md for:
+- Detailed procedures
+- Examples for each language/platform
+- Error recovery steps
+- Rationale and best practices
 
 ## CRITICAL: Temporal Reference Anchoring
 
@@ -272,6 +275,7 @@ The following workflow MUST be followed in strict sequential order. Each phase h
 
 Several detailed methodologies have been extracted to separate process files in ~/.claude/processes/ to optimize context usage. Agents read these files when active:
 
+- **DEPENDENCY_MANAGEMENT.md**: MANDATORY protocol for all dependency operations (cargo/uv/npm/pnpm) - NEVER edit dependency files directly
 - **EVENT_MODELING.md**: Complete Event Modeling methodology for Phase 2 (persistent state changes, vertical slices, wireframes)
 - **TDD_WORKFLOW.md**: Outside-In TDD with hierarchical chained PRs, skip/unskip protocols, completion rules
 - **DOCUMENTATION_PHILOSOPHY.md**: WHAT/WHY principles, minimal code examples, ADRs as decision records
