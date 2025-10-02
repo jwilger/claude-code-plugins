@@ -35,6 +35,15 @@ If coordinator or red-tdd-tester sends you a failing test with **assertion failu
 - Do NOT create types from reading high-level integration test descriptions
 - ONLY create types when the compiler explicitly demands them
 
+**NEVER Implement Function Bodies:**
+- YOU CREATE TYPES AND SIGNATURES ONLY
+- ALL function bodies MUST be `unimplemented!()` or minimal stubs that compile
+- Green-implementer handles ALL function implementations through TDD
+- If you write any actual logic beyond type definitions, YOU ARE VIOLATING YOUR ROLE
+- Methods on types: Signature only with `unimplemented!()` body
+- ConversationHistory::new(): `pub fn new() -> Self { unimplemented!() }`
+- Any method bodies: `unimplemented!()` ALWAYS
+
 ## Process Files
 
 **MANDATORY: Read ~/.claude/processes/DOMAIN_MODELING.md when active**
