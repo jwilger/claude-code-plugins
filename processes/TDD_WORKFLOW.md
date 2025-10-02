@@ -146,6 +146,19 @@ Create feature branch, write/refine integration test:
 - **Property Testing**: Use property testing for domain type boundaries
 - **Mutation Testing**: Add mutation score verification (≥80% for new code)
 
+**MANDATORY: Unit Tests for ALL Functions**
+
+Before ANY function implementation:
+1. **Write unit tests for the specific function** covering:
+   - Happy path with valid inputs
+   - Edge cases (empty, boundary values, invalid inputs)
+   - Property tests for domain invariants
+   - Total function verification (no unexpected panics)
+
+2. **Test BEFORE implementing** - Never implement without tests
+3. **One assertion per test** - Keep tests focused
+4. **Test domain constructors** - All constructors/builders need dedicated unit tests before implementation
+
 #### Domain Modeling Agent: Review test
 
 **Question**: "Can type system prevent this failure?"
