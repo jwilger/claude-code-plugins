@@ -421,6 +421,26 @@ Agents automatically load their required process files when activated. This keep
 
 **CRITICAL:** All TDD agents MUST reference TDD_WORKFLOW.md process file for complete methodology.
 
+**5-Whys Decision Tree: When to Drill Down vs Implement**
+
+When a test fails, apply this decision tree (see TDD_WORKFLOW.md for complete details):
+
+```
+Test Fails
+  ↓
+Compiler Error? → Domain modeling agent creates types
+Assertion Failure? → Is fix OBVIOUS?
+  ├─ YES: green-implementer makes single clear change
+  └─ NO: Drill down
+      ├─ Mark parent test #[ignore = "working on: child_test"]
+      ├─ Refine test setup OR write lower-level test
+      ├─ Let compiler drive types at lower level
+      ├─ Implement when obvious at lower level
+      └─ Remove parent ignore, work back up
+```
+
+**Key Principle**: Assertion failures with multiple possible causes require drill-down to lower-level tests until the fix becomes obvious. Only implement when the change is singular and clear.
+
 **Dependency Resolution (When Needed)**
 **Trigger**: When TDD agents encounter missing dependencies
 **Process**:

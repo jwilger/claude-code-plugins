@@ -43,6 +43,75 @@ main
 
 ## Outside-In TDD Process
 
+### The 5-Whys Decision Tree: When to Drill Down vs Implement
+
+When a test fails, apply this decision tree:
+
+```
+Test Fails
+  ↓
+What type of failure?
+  ├─ Compiler Error → Domain modeling agent creates minimal types
+  └─ Assertion/Runtime Failure
+       ↓
+  Is it OBVIOUS what code needs to change?
+       ├─ YES: Make the single clear change (green-implementer)
+       └─ NO: Drill down (Ask "Why?" and refine/write lower-level test)
+              ↓
+         Mark parent test #[ignore = "working on: child_test_name"]
+              ↓
+         Lower-level test fails
+              ↓
+         Repeat decision tree...
+              ↓
+         Child test passes → Remove parent ignore
+              ↓
+         Work back up test hierarchy
+              ↓
+         Parent test progresses/passes
+```
+
+**Key Distinctions:**
+
+**Compiler Errors Always Drive Type Creation:**
+- Missing type/function: Domain agent creates minimal structure
+- Missing field: Domain agent adds field
+- Type mismatch: Domain agent refines types
+- **NEVER speculate** - only create what compiler demands
+
+**Assertion Failures Often Need Drill-Down:**
+- Multiple possible causes → NOT obvious → Drill down
+- Unclear which component failed → NOT obvious → Drill down
+- High-level behavior failure → NOT obvious → Drill down
+- Single clear fix needed → Obvious → Implement
+
+**Examples of "Obvious" Changes:**
+- Test expects "Hello" but gets empty string → Add return "Hello"
+- Test expects status=200 but gets 404 → Change response code
+- Single assertion, single line fix → Obvious
+
+**Examples of "Not Obvious" (Need Drill-Down):**
+- Integration test: "message history not displayed" → Why? Multiple possible causes
+- Unit test: "authentication failed" → Why? Could be credentials, network, config, etc.
+- Any failure where you ask "which part is wrong?" → Not obvious
+
+**The Drill-Down Process with Skip Protocol:**
+
+1. **Mark parent test ignored** - `#[ignore = "working on: test_specific_component"]` to allow commits while drilling down
+2. **Refine current test setup** - Ensure Given/Arrange properly creates the scenario (does test provide required inputs?), OR
+3. **Write lower-level test** - Create unit test focusing on suspected component
+4. **Let compiler drive types** - Setup/lower-level test won't compile → Types emerge
+5. **Implement when obvious** - Make minimal change to pass lower-level test
+6. **Remove parent ignore** - Once child test passes, unskip parent test
+7. **Work back up** - Verify parent test progresses further
+8. **Repeat** until integration test passes
+
+**Skip Annotation Requirements:**
+- Must reference specific child test: `#[ignore = "working on: test_message_rendering"]`
+- Provides metadata trail showing dependency hierarchy
+- Enables commits even with parent test incomplete
+- **MANDATORY**: Remove ignore before considering parent test complete
+
 ### 1. Integration Test PR
 
 Create feature branch, write/refine integration test:
