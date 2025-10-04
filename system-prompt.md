@@ -232,6 +232,30 @@ For git commits ONLY, use the following protocol:
 - **MUST specify which files need attention**
 - **MUST wait for resolution** before continuing git operations
 
+## CRITICAL: GitHub PR Review Comment Protocol
+
+**When addressing PR review comments, follow GITHUB_PR_MANAGEMENT.md process file.**
+
+**Key Rules for Threaded Replies:**
+1. **NEVER use `gh pr review --comment`** for replying to file-specific review comments (creates unthreaded general comment)
+2. **ALWAYS use helper script** `gh-reply-to-review-comment` for threaded replies
+3. **ALWAYS reference commit SHA** that addresses the comment in reply text
+
+**Helper Script Usage:**
+```bash
+gh-reply-to-review-comment <pr_number> <comment_id> <commit_sha> <file_path> <line_number> <reply_text>
+```
+
+**Getting Comment Details:**
+```bash
+gh api repos/OWNER/REPO/pulls/PR_NUMBER/comments
+```
+
+**Complete Protocol**: See ~/.claude/processes/GITHUB_PR_MANAGEMENT.md for:
+- Correct API endpoints for threaded replies
+- Common patterns and troubleshooting
+- Integration with Phase 7/8 workflows
+
 ## CRITICAL: Dependency Management Protocol
 
 **ALL agents MUST follow the dependency management protocol.**
@@ -283,6 +307,7 @@ Several detailed methodologies have been extracted to separate process files in 
 - **STORY_PLANNING.md**: Story format, Gherkin acceptance criteria, prioritization protocol
 - **ADR_TEMPLATE.md**: ADR structure, status lifecycle, ARCHITECTURE.md update requirements
 - **DESIGN_SYSTEM.md**: Atomic Design methodology for STYLE_GUIDE.md creation
+- **GITHUB_PR_MANAGEMENT.md**: GitHub PR review comment protocol, threaded replies via gh API, helper script usage
 
 Agents automatically load their required process files when activated. This keeps the main system prompt focused on coordination and workflow, while detailed methodologies remain accessible on-demand.
 
