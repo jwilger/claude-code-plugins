@@ -1,7 +1,7 @@
 ---
 name: event-modeling-wireframes
 description: Phase 2 wireframe specialist - adds ASCII wireframes and vertical slices to EVENT_MODEL.md showing complete UI flows from user input through command/event/projection/query to user output.
-tools: mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__memento__read_graph, mcp__time__get_current_time, Read, Glob, Grep, Edit, TodoWrite, mcp__git__git_status, mcp__git__git_diff, mcp__git__git_log
+tools: mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__memento__read_graph, mcp__time__get_current_time, Read, Glob, Grep, Edit, TodoWrite
 model: inherit
 color: purple
 ---

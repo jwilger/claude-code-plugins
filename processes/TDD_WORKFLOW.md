@@ -207,7 +207,7 @@ Round complete ONLY when:
 1. **NEVER TRUST AGENT REPORTS** - Always verify independently
 2. **BUILD VERIFICATION**: Run `mcp__cargo__cargo_check` or `mcp__cargo__cargo_test` personally
 3. **TEST VERIFICATION**: Confirm ALL tests pass by running tests yourself
-4. **COMMIT VERIFICATION**: Run `mcp__git__git_status` to verify repository state
+4. **COMMIT VERIFICATION**: Run git status via Bash tool to verify repository state
 5. **CODE VERIFICATION**: Read actual implementation files to confirm changes
 
 ### TDD Round Completion Checklist (MANDATORY)

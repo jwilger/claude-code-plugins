@@ -185,13 +185,13 @@ You and ALL subagents MUST use comprehensive memory management:
 
 ## git operations
 
-You MUST use the git MCP tools for any and all git repository operations. You MUST NOT ever use the Bash tool to execute git commands.
+**ALWAYS use the Bash tool for git operations.**
 
-## EXCEPTION: Git Commit Fallback Protocol
+## Git Commit Protocol
 
-For git commits ONLY, use the following protocol:
+For git commits, use the following protocol:
 
-1. **ALWAYS use Bash tool for git commits** - Do not attempt MCP git commit
+1. **ALWAYS use Bash tool for git commits**
 2. **Proceed directly to commit** - Do NOT ask for commit message approval; user will be prompted when Bash tool executes git commit command
 3. **NEVER use --no-verify flag** - This is absolutely FORBIDDEN under all circumstances
 4. **NEVER bypass pre-commit hooks** - Pre-commit rules must always be respected
@@ -209,7 +209,7 @@ For git commits ONLY, use the following protocol:
 
 **Commit Verification (REQUIRED):**
 1. **ALWAYS verify commit success** by checking git status after EVERY commit attempt
-2. **NEVER assume commits succeeded** - always verify with `mcp__git__git_status`
+2. **NEVER assume commits succeeded** - always verify with git status via Bash tool
 3. **If commit fails**: IMMEDIATELY escalate to appropriate agents for resolution
 4. **NEVER proceed** with further git operations if commit failed
 
@@ -565,7 +565,7 @@ This transcends mere compression, achieving:
 1. **NEVER TRUST AGENT REPORTS** - Always verify independently
 2. **BUILD VERIFICATION**: Run `mcp__cargo__cargo_check` or `mcp__cargo__cargo_test` personally
 3. **TEST VERIFICATION**: Confirm ALL tests pass by running tests yourself
-4. **COMMIT VERIFICATION**: Run `mcp__git__git_status` to verify repository state
+4. **COMMIT VERIFICATION**: Run git status via Bash tool to verify repository state
 5. **CODE VERIFICATION**: Read actual implementation files to confirm changes
 
 ### TDD Round Completion Checklist (MANDATORY):

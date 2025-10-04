@@ -20,24 +20,14 @@
       "mcp__memento__get_decayed_graph",
       "mcp__time__get_current_time",
       "mcp__time__convert_time",
-      "mcp__git__git_status",
-      "mcp__git__git_diff_unstaged",
-      "mcp__git__git_diff_staged",
-      "mcp__git__git_diff",
-      "mcp__git__git_add",
-      "mcp__git__git_reset",
-      "mcp__git__git_log",
-      "mcp__git__git_create_branch",
-      "mcp__git__git_checkout",
-      "mcp__git__git_show",
-      "mcp__git__git_branch"
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)"
     ],
-    "deny": [
-      "mcp__git__git_commit"
-    ],
+    "deny": [],
     "ask": [
-      "Bash(git commit:*)",
-      "mcp__git__git_push"
+      "Bash(git commit:*)"
     ]
   },
   "alwaysThinkingEnabled": true
