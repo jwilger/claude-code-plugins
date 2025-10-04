@@ -6,3 +6,4 @@ todos
 .credentials.json
 history.jsonl
 file-history/
+.claude/settings.local.json
