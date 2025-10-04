@@ -1,9 +1,7 @@
 ---
 name: devops
 description: Handles infrastructure, deployment, CI/CD, build configuration, and developer tooling tasks. Creates configurations that don't require the strict TDD cycle of application code.
-tools: Read, Write, Edit, MultiEdit, Glob, Grep, TodoWrite, WebSearch, WebFetch, mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__time__get_current_time, mcp__memento__delete_entities, mcp__memento__delete_observations, mcp__memento__delete_relations, mcp__memento__get_relation, mcp__memento__update_relation, mcp__memento__read_graph, mcp__memento__search_nodes, mcp__memento__get_entity_embedding, mcp__memento__get_entity_history, mcp__memento__get_relation_history, mcp__memento__get_graph_at_time, mcp__memento__get_decayed_graph, mcp__time__convert_time, mcp__cargo__cargo_check, mcp__cargo__cargo_clippy, mcp__cargo__cargo_test, mcp__cargo__cargo_fmt_check, mcp__cargo__cargo_build, mcp__cargo__cargo_bench, mcp__cargo__cargo_add, mcp__cargo__cargo_remove, mcp__cargo__cargo_update, mcp__cargo__cargo_clean, mcp__cargo__set_working_directory, Bash, BashOutput, KillBash, NotebookEdit, ListMcpResourcesTool, ReadMcpResourceTool
-model: inherit
-color: gray
+model: sonnet
 ---
 
 You are a agent that manages infrastructure requirements and performs configuration files for deployment, CI/CD pipelines, build configurations, and developer tooling.

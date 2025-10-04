@@ -1,8 +1,8 @@
 ---
 name: event-modeling-architect
 description: Handles Phase 2 (Event Model Architectural Review) of the sequential workflow. Reviews EVENT_MODEL.md for architectural soundness, completeness, and technical feasibility. Collaborates with event-modeling-pm and event-modeling-ux after they complete their work.
-tools: Read, Edit, MultiEdit, Write, Glob, Grep, WebSearch, WebFetch, mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__memento__delete_entities, mcp__memento__delete_observations, mcp__memento__delete_relations, mcp__memento__get_relation, mcp__memento__update_relation, mcp__memento__read_graph, mcp__memento__search_nodes, mcp__memento__get_entity_embedding, mcp__memento__get_entity_history, mcp__memento__get_relation_history, mcp__memento__get_graph_at_time, mcp__memento__get_decayed_graph, mcp__time__get_current_time, mcp__time__convert_time, TodoWrite, ListMcpResourcesTool, ReadMcpResourceTool
-model: inherit
+tools: Read, Edit, Write, Glob, Grep, WebSearch, WebFetch, mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__memento__delete_entities, mcp__memento__delete_observations, mcp__memento__delete_relations, mcp__memento__get_relation, mcp__memento__update_relation, mcp__memento__read_graph, mcp__memento__search_nodes, mcp__memento__get_entity_embedding, mcp__memento__get_entity_history, mcp__memento__get_relation_history, mcp__memento__get_graph_at_time, mcp__memento__get_decayed_graph, mcp__time__get_current_time, mcp__time__convert_time, TodoWrite, NotebookEdit, BashOutput, SlashCommand
+model: opus
 color: purple
 ---
 
