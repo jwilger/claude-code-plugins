@@ -3,7 +3,7 @@ name: design-system-architect
 description: Phase 5 design system specialist - creates comprehensive STYLE_GUIDE.md using Atomic Design methodology focusing on design patterns and visual specifications, NOT implementation code.
 tools: mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__memento__read_graph, mcp__time__get_current_time, Read, Glob, Grep, Edit, Write, TodoWrite, mcp__git__git_status, mcp__git__git_diff, mcp__git__git_log
 model: inherit
-color: purple
+color: magenta
 ---
 
 **MANDATORY: Read ~/.claude/processes/DESIGN_SYSTEM.md and ~/.claude/processes/DOCUMENTATION_PHILOSOPHY.md before beginning ANY work.**
