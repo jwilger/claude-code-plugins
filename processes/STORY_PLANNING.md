@@ -36,6 +36,14 @@
    - Users should never encounter "not yet implemented" messages
    - All error paths must be handled appropriately
 
+6. **Integration Requirements**: Every story MUST specify how users access the feature
+   - **Integration Point**: Where feature connects to user interface (main.rs, HTTP route, GUI element, public API)
+   - **User Access Method**: How users invoke the feature (CLI command, HTTP request, button click, library import)
+   - **Manual Testing**: Step-by-step instructions for humans to verify feature works
+   - Stories without clear integration points are INCOMPLETE
+   - "Works in tests" is NECESSARY but NOT SUFFICIENT for story completion
+   - See INTEGRATION_VALIDATION.md for complete protocol
+
 ## Story Format
 
 - **Title**: Clear, user-focused description
@@ -64,6 +72,23 @@
   - Provide specific section references, not just document names
   - Include rationale for key architectural decisions affecting this story
   - Reference design patterns that inform the UI/UX
+
+- **Integration Point**: Where feature connects to user interface
+  - For CLI apps: main.rs command/argument/prompt handling
+  - For web apps: HTTP route and method
+  - For GUI apps: Menu item or button
+  - For libraries: Public API function
+
+- **User Access Method**: How user invokes feature
+  - CLI example: `cargo run -- --single-player`
+  - Web example: `POST /api/games`
+  - GUI example: "Click File → New Game"
+  - Library example: `use mylib::start_game;`
+
+- **Manual Testing**: Step-by-step verification instructions
+  - Exact commands user runs
+  - Expected observable outcomes
+  - Success criteria
 
 ## Prioritization Protocol
 

@@ -13,6 +13,7 @@ You are an agent that leads story planning and prioritization. You break the app
 **CRITICAL**: Before starting any work, read these process documents:
 1. ~/.claude/processes/STORY_PLANNING.md - Story planning methodology and patterns
 2. ~/.claude/processes/DOCUMENTATION_PHILOSOPHY.md - Documentation principles (WHAT/WHY not HOW)
+3. ~/.claude/processes/INTEGRATION_VALIDATION.md - Integration verification requirements
 
 **Core Requirements:**
 - Stories are thin vertical slices providing user-observable value
@@ -59,6 +60,9 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 - **Documentation References**: Link stories to REQUIREMENTS_ANALYSIS.md, ADRs, ARCHITECTURE.md, STYLE_GUIDE.md
 - **Cohesive Completeness**: Smallest possible change enabling user function without crashes or incomplete-implementation errors
 - **WHAT Not HOW**: User capabilities and outcomes, not implementation approaches
+- **Integration Requirements**: Every story MUST specify integration point and user access method
+- **Application Entry Point**: Features must be accessible through main.rs (or equivalent), not just through tests
+- **Manual Testing**: Every story must include step-by-step user verification instructions
 
 ## Phase 6: Story Planning Process
 

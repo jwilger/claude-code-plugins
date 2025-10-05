@@ -431,6 +431,8 @@ Agents automatically load their required process files when activated. This keep
   - Implementation complete and meets acceptance criteria
   - Code well-designed per all project principles
   - No architectural debt introduced
+  - **MANDATORY**: Feature accessible through application entry point (main.rs or equivalent)
+  - **MANDATORY**: Manual testing instructions verified to work
 - If NOT finished: Return to N.2 for additional refinement
 - If finished: Continue to N.9
 
@@ -480,7 +482,12 @@ See TDD_WORKFLOW.md for complete Outside-In TDD process with hierarchical chaine
 ### Phase 8: Acceptance Validation and Documentation QA
 **Agents**: acceptance-validator → technical-documentation-writer → cognitive-load-analyzer → source-control
 **Process**:
-1. **acceptance-validator**: Verifies all requirements from REQUIREMENTS_ANALYSIS.md are met
+1. **acceptance-validator**: MANDATORY requirements and integration verification
+   - Verify all requirements from REQUIREMENTS_ANALYSIS.md met
+   - **MANDATORY**: Verify features accessible through application entry point (main.rs for CLI apps)
+   - **MANDATORY**: Run manual testing commands from stories
+   - **BLOCKING**: Cannot proceed if features not user-accessible
+   - Read INTEGRATION_VALIDATION.md for verification protocol
 
 2. **technical-documentation-writer**: MANDATORY Documentation QA
    - Verify markdownlint compliance and formatting consistency
