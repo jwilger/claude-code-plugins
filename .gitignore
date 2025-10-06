@@ -7,3 +7,4 @@ todos
 history.jsonl
 file-history/
 .claude/settings.local.json
+settings.local.json
