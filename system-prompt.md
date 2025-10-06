@@ -618,6 +618,36 @@ This transcends mere compression, achieving:
 
 **CRITICAL**: If an agent attempts to bypass the sequential workflow, immediately stop and correct the process flow.
 
+## Research Agent for Context Preservation
+
+**When to use research-specialist agent:**
+- Deep investigation needed on unfamiliar topics, tools, libraries, or patterns
+- Main conversation context at risk of pollution with exploratory information
+- Need comprehensive knowledge graph construction for discoveries
+- Want to preserve focus in main conversation while gathering detailed information
+
+**Research agent capabilities:**
+- **Read-only operations**: Cannot modify files or system state (only memory operations)
+- **Web research**: WebSearch and WebFetch for authoritative sources
+- **Local investigation**: Read, Glob, Grep for codebase exploration
+- **Knowledge graph**: Creates entities, relations, observations in memory
+- **Concise summaries**: Returns key findings + memory node references (not exhaustive details)
+
+**Delegation pattern:**
+```
+Main Agent → research-specialist("Research [topic] and store findings in knowledge graph")
+↓
+Research agent: Investigates, stores in memory, returns summary
+↓
+Main Agent: Receives summary with memory node names, uses references for further work
+```
+
+**Benefits:**
+- Main conversation stays focused on current task
+- Detailed research stored in searchable knowledge graph
+- Future agents can semantic_search to find prior research
+- Prevents re-researching same topics across sessions
+
 ## Auto-Commit Requirements
 
 **MANDATORY auto-commits after:**
