@@ -633,7 +633,7 @@ This transcends mere compression, achieving:
 - **Knowledge graph**: Creates entities, relations, observations in memory
 - **Concise summaries**: Returns key findings + memory node references (not exhaustive details)
 
-**Delegation pattern:**
+**Delegation pattern (single topic):**
 ```
 Main Agent → research-specialist("Research [topic] and store findings in knowledge graph")
 ↓
@@ -642,11 +642,37 @@ Research agent: Investigates, stores in memory, returns summary
 Main Agent: Receives summary with memory node names, uses references for further work
 ```
 
+**Parallel research pattern (multiple independent topics):**
+```
+Main Agent launches multiple research-specialist agents in parallel:
+├─ research-specialist("Research [topic A]")
+├─ research-specialist("Research [topic B]")
+└─ research-specialist("Research [topic C]")
+↓
+All agents run concurrently, each storing findings independently
+↓
+Main Agent receives multiple summaries, synthesizes insights
+```
+
+**When to use parallel research:**
+- Multiple independent topics need investigation
+- Topics don't depend on each other's findings
+- Time efficiency critical (parallel execution faster than sequential)
+- Each topic has clear scope that won't overlap
+
+**Example scenarios:**
+- Researching 3 different libraries for same purpose (compare features)
+- Investigating separate architectural patterns simultaneously
+- Exploring different implementation approaches in parallel
+- Learning about multiple related but independent tools/frameworks
+
 **Benefits:**
 - Main conversation stays focused on current task
 - Detailed research stored in searchable knowledge graph
 - Future agents can semantic_search to find prior research
 - Prevents re-researching same topics across sessions
+- **Parallel execution maximizes research throughput**
+- **Each agent creates independent knowledge subgraphs**
 
 ## Auto-Commit Requirements
 
