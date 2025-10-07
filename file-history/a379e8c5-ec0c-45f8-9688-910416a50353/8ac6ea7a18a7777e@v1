@@ -1,9 +1,0 @@
-# CLI Chat Client
-
-## Repository Context
-
-FYI, this chat client is a separate application in a subdirectory of the
-chat_service git repository. The subdirectory is called `cli_client`, and that
-is the directory in which _this_ specific CLAUDE.md file is located. It is
-important that you understand the difference between the git repository root
-and the root of this chat client application.

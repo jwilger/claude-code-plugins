@@ -1,7 +1,0 @@
-//! Chat TUI Library - Minimal Domain Types
-//! Phase 6: Domain type boundaries established
-
-pub mod domain;
-
-// Re-export domain types
-pub use domain::*;
