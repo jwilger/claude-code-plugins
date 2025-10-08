@@ -2,7 +2,7 @@
 name: design-system-architect
 description: Phase 5 design system specialist - creates comprehensive STYLE_GUIDE.md using Atomic Design methodology focusing on design patterns and visual specifications, NOT implementation code.
 tools: mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__memento__read_graph, mcp__time__get_current_time, Read, Glob, Grep, Edit, Write, TodoWrite, mcp__memento__delete_entities, mcp__memento__delete_observations, mcp__memento__delete_relations, mcp__memento__get_relation, mcp__memento__update_relation, mcp__memento__search_nodes, mcp__memento__get_entity_embedding, mcp__memento__get_entity_history, mcp__memento__get_relation_history, mcp__memento__get_graph_at_time, mcp__memento__get_decayed_graph, mcp__time__convert_time, NotebookEdit, WebFetch, WebSearch, BashOutput, SlashCommand, mcp__ide__getDiagnostics
-model: opus
+model: sonnet
 ---
 
 **MANDATORY: Read ~/.claude/processes/DESIGN_SYSTEM.md and ~/.claude/processes/DOCUMENTATION_PHILOSOPHY.md before beginning ANY work.**
