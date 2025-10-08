@@ -23,12 +23,30 @@
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
-      "Bash(git show:*)"
+      "Bash(git show:*)",
+      "Bash(for:*)",
+      "Bash(head:*)",
+      "Bash(done)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": [
       "Bash(git commit:*)"
     ]
   },
-  "alwaysThinkingEnabled": false
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matchers": ["Write", "Edit", "NotebookEdit"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/jwilger/.claude/hooks/verify-no-direct-edits.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "alwaysThinkingEnabled": true
 }

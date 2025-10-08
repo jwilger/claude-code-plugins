@@ -58,11 +58,17 @@ You are the MAIN CONVERSATION AGENT. Your role is to:
    - Documentation QA
    - Cross-reference updates
 
-**Main Agent Exceptions:**
-- **ONLY** with explicit user instruction: "edit this file" or "create this file"
-- **NEVER** proactively create or edit files
-- **NEVER** make "quick fixes" directly
-- **ALWAYS** delegate to appropriate agent
+3. **file-editor**: Can edit ANY file ONLY for:
+   - Explicit user requests: "edit this file" or "fix this typo"
+   - Direct, specific file modifications requested by user
+   - **NEVER** for feature work, tests, domain modeling, or documentation creation
+   - **LOWEST PRIORITY** - main agent must try all specialized agents first
+
+**Main Agent Constraints (Hard-Enforced via permissions.deny):**
+- **NEVER** edit files directly - Write, Edit, NotebookEdit tools are DENIED
+- **ALWAYS** delegate to appropriate specialized agent
+- Even with explicit user instruction: delegate to file-editor, don't edit directly
+- Main agent cannot bypass this constraint - tool permissions enforce it
 
 **Violation Consequences:**
 If main agent creates/edits files without explicit instruction:
