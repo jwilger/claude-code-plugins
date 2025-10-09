@@ -32,7 +32,17 @@ Before beginning ANY task, you MUST:
 - **Breadth-First Approach**: Identify all functional areas before detailed workflow modeling
 - **Business Capability Focus**: Group by business function, not technical layers
 - **Domain Language**: Use terminology from requirements and business domain
-- **Workflow Goals**: Name workflows by their outcome (e.g., "Complete User Registration" not "Registration Process")
+- **Jobs-to-be-Done Focus**: Each workflow represents a discrete job that brings a user to the system
+  - Ask: "Why did the user open the application RIGHT NOW?"
+  - Ask: "What specific outcome is the user trying to accomplish TODAY?"
+  - Ask: "What problem is the user hiring this system to solve in this moment?"
+- **Concrete User Intent**: Workflows should be specific, actionable user goals, not vague processes
+  - ✅ GOOD: "Check if product X is in stock for delivery by date Y"
+  - ✅ GOOD: "Find alternative supplier for delayed component Z"
+  - ✅ GOOD: "Update customer address and see impact on shipping costs"
+  - ❌ BAD: "Inventory visibility" (too vague, not a specific goal)
+  - ❌ BAD: "Manage orders" (not a discrete job, too broad)
+  - ❌ BAD: "Customer management" (too abstract, no specific outcome)
 
 ## Process
 
@@ -42,10 +52,12 @@ Before beginning ANY task, you MUST:
    - Identify 3-7 major functional areas (typical for most applications)
    - Use business capability names (Authentication, Order Management, etc.)
    - Each area should have clear business purpose
-4. **Workflow Listing**: Identify workflows within each area
-   - Each workflow should have clear goal event
-   - Workflows should be user-observable and valuable
-   - Typical: 2-5 workflows per functional area
+4. **Workflow Listing**: Identify discrete jobs-to-be-done within each area
+   - Each workflow = ONE specific job that brings a user to the system
+   - Think: "User opens the application because they need to [SPECIFIC GOAL]"
+   - Workflows should be concrete and actionable, not abstract processes
+   - Test each workflow: Can you describe a specific scenario where a user would do this TODAY?
+   - Typical: 5-12 discrete jobs per functional area (more specific = more workflows)
 5. **Document Creation**: Create EVENT_MODEL.md and area stubs
    - EVENT_MODEL.md lists all functional areas with brief descriptions
    - Create docs/event_model/functional-areas/[area-name].md stubs
@@ -107,8 +119,11 @@ Before completing Step 0:
 - Have you read REQUIREMENTS_ANALYSIS.md completely?
 - Have you identified 3-7 major functional areas?
 - Do functional areas use domain language?
-- Have you listed 2-5 workflows per area?
-- Are workflows named by their goal/outcome?
+- Have you listed 5-12 discrete jobs per area?
+- **CRITICAL**: For each workflow, can you answer "Why did the user open the application RIGHT NOW?"
+- **CRITICAL**: Are workflows specific and concrete, not vague processes?
+- **CRITICAL**: Do workflow names describe specific user goals with concrete outcomes?
+- **CRITICAL**: Have you avoided abstract process names like "Management" or "Visibility"?
 - Does EVENT_MODEL.md exist as comprehensive index?
 - Do functional area stubs exist for all areas?
 - Have you stored all entities in memento with temporal markers?

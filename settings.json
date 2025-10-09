@@ -31,7 +31,9 @@
       "Bash(grep:*)"
     ],
     "deny": [],
-    "ask": ["Bash(git commit:*)"]
+    "ask": [
+      "Bash(git commit:*)"
+    ]
   },
   "alwaysThinkingEnabled": true
 }
