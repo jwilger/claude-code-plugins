@@ -160,6 +160,14 @@ Before completing Step 11:
 - Have functional area docs been simplified to use links?
 - Have you stored entities with temporal markers?
 
+## Workflow File Status Update
+
+After establishing cross-links:
+
+1. **Read workflow file**: docs/event_model/workflows/[functional-area]/[workflow-name].md
+2. **Update status**: "Step 11 Complete - Cross-Links Established"
+3. **Write workflow file**: Save updated status
+
 ## Critical Process Rules
 
 - ALWAYS begin with memory loading

@@ -37,7 +37,7 @@ Before beginning ANY task, you MUST:
 ## Process
 
 1. **Memory Loading**: Load temporal context and event patterns
-2. **Workflow Review**: Read assigned workflow description from functional area document
+2. **Workflow Review**: Read assigned workflow description from functional area index document
 3. **Requirements Alignment**: Identify which requirement(s) this workflow satisfies
 4. **Goal Event Identification**:
    - What permanent state change marks workflow completion?
@@ -50,9 +50,13 @@ Before beginning ANY task, you MUST:
    - Create docs/event_model/events/[EventName].md stub
    - Document event description (WHAT happened, WHY it matters)
    - Mark data fields as "To be determined in Step 8"
-7. **Workflow Update**: Update functional area document with goal event
-8. **Memory Storage**: Store goal event entity with relations
-9. **Handoff**: Return control specifying Step 2 should begin for this workflow
+7. **Workflow File Creation**:
+   - Create docs/event_model/workflows/[functional-area]/[workflow-name].md
+   - Include initial Mermaid diagram with goal event only
+   - Document goal event and status
+8. **Functional Area Index Update**: Update functional area index with link to workflow file
+9. **Memory Storage**: Store goal event entity with relations
+10. **Handoff**: Return control specifying Step 2 should begin for this workflow
 
 ## Event Document Stub Structure
 
@@ -78,6 +82,51 @@ Before beginning ANY task, you MUST:
 ## References
 - **Workflow:** [Workflow Name] in [Functional Area]
 - **Requirements:** [FR-X.Y from REQUIREMENTS_ANALYSIS.md]
+```
+
+## Workflow File Initial Structure
+
+```markdown
+# Workflow: [Workflow Name]
+
+**Functional Area:** [Functional Area Name]
+**Status:** Step 1 Complete - Goal Event Defined
+
+## Workflow Overview
+
+**User Goal:** [User goal from functional area index]
+
+**Goal Event:** [EventName]
+
+**Description:** [WHAT state change occurred and WHY it matters]
+
+## Workflow Diagram
+
+```mermaid
+graph LR
+    E[Event: EventName]
+```
+
+## Requirements Alignment
+
+- **[FR-X.Y]**: [Requirement title and relevance]
+
+## Component References
+
+### Events
+- [EventName](../../events/EventName.md)
+
+### Commands
+*To be added in Step 3*
+
+### UI Screens / Automations
+*To be added in Step 4*
+
+### Projections
+*To be added in Step 6*
+
+### Queries
+*To be added in Step 6*
 ```
 
 ## Event vs Non-Event Distinction

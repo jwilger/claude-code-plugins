@@ -54,7 +54,11 @@ Before beginning ANY task, you MUST:
    - List commands triggered by automation
 6. **Command Document Update**: Update each command document
    - Add "Triggered By: [ScreenName|AutomationName]" reference
-7. **Workflow Update**: Update functional area document with trigger information
+7. **Workflow File Update**:
+   - Read docs/event_model/workflows/[functional-area]/[workflow-name].md
+   - Update Mermaid diagram to add UI screens/automations triggering commands
+   - Update status to "Step 4 Complete - Triggers Defined"
+   - Add trigger references to Component References section
 8. **Memory Storage**: Store trigger entities and relations
 9. **Handoff**: Return control specifying Step 5 should begin for this workflow
 

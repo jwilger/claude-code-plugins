@@ -51,30 +51,37 @@ Before beginning ANY task, you MUST:
    - Create docs/event_model/events/[EventName].md
    - Document what state change occurred and why
    - Mark data fields, commands, projections as "To be determined"
-6. **Sequence Documentation**: Update workflow with ordered event list
-   - Present events in chronological order (start → goal)
-   - Include brief description of each event's significance
+6. **Workflow File Update**:
+   - Read docs/event_model/workflows/[functional-area]/[workflow-name].md
+   - Update Mermaid diagram with all events in sequence
+   - Update status to "Step 2 Complete - Event Sequence Defined"
+   - Document complete event sequence in chronological order
 7. **Memory Storage**: Store event sequence entities and relations
 8. **Handoff**: Return control specifying Step 3 should begin for this workflow
 
-## Event Sequence Documentation Format
+## Workflow File Diagram Update (CRITICAL)
 
-In functional area document, update workflow section:
+After defining the event sequence:
 
-```markdown
-### Workflow: [Workflow Name]
+1. **Read workflow file**: docs/event_model/workflows/[functional-area]/[workflow-name].md
+2. **Update Mermaid diagram**: Add all events in sequence (if multiple events)
+3. **Update status**: "Step 2 Complete - Event Sequence Defined"
+4. **Document sequence**: Add event sequence list in chronological order
+5. **Write workflow file**: Save updated diagram and sequence
 
-**Goal Event:** [EventName]
-**Status:** Step 2 Complete - Event Sequence Defined
+**Example Diagram Update:**
 
-**Event Sequence:**
-1. [Event1] - [What state changed]
-2. [Event2] - [What state changed]
-3. [Event3] - [What state changed]
-...
-N. [GoalEvent] - [What state changed]
+For single-event workflow:
+```mermaid
+graph LR
+    E[Event: LicenseActivated]
+```
 
-**Vertical Slice:** Start → Event1 → Event2 → ... → GoalEvent
+For multi-event workflow:
+```mermaid
+graph LR
+    E1[Event: PaymentAuthorized] --> E2[Event: PaymentCaptured]
+    E2 --> E3[Event: InvoiceGenerated]
 ```
 
 ## Typical Event Sequence Patterns
@@ -111,6 +118,7 @@ Before completing Step 2:
 - NEVER model UI state as events
 - ALWAYS create event documents in docs/event_model/events/
 - ALWAYS present sequence in chronological order (despite backwards discovery)
+- ALWAYS update workflow file Mermaid diagram with event sequence
 - ALWAYS store decisions with temporal markers
 
 ## Workflow Handoff Protocol

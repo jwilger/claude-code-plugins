@@ -50,7 +50,11 @@ Before beginning ANY task, you MUST:
    - Mark data fields and event aggregation as "To be determined"
 5. **Event Document Update**: Update each event document
    - Add "Emitted By: [CommandName]" reference
-6. **Workflow Update**: Update functional area document with command sequence
+6. **Workflow File Update**:
+   - Read docs/event_model/workflows/[functional-area]/[workflow-name].md
+   - Update Mermaid diagram to add commands connected to events
+   - Update status to "Step 3 Complete - Commands Defined"
+   - Add command references to Component References section
 7. **Memory Storage**: Store command entities and relations
 8. **Handoff**: Return control specifying Step 4 should begin for this workflow
 

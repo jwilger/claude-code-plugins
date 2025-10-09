@@ -6,25 +6,45 @@
 
 Event Modeling is a collaborative design methodology that captures system behavior through events, commands, and data flow. This process creates living documentation that serves as both design specification and implementation guide.
 
-**CRITICAL: Understanding Event Modeling for Client vs Service Applications**
+## CRITICAL: Process Execution Strategy
 
-Event Modeling focuses on **persistent state changes**, NOT ephemeral runtime behavior.
+**BREADTH-FIRST for Step 0, then DEPTH-FIRST for Steps 1-12**
 
-## Events = Persistent State Changes
+- **Step 0 (Breadth-First)**: Identify ALL workflows across all functional areas
+- **Steps 1-12 (Depth-First)**: Complete ALL 12 steps for ONE workflow before moving to the next workflow
+  - This keeps agent context focused on a single workflow
+  - Reduces cognitive load and improves quality
+  - Easier to maintain coherence across all aspects of one workflow
 
+**CRITICAL: Understanding Event Modeling**
+
+Event Modeling focuses on **BUSINESS DOMAIN EVENTS ONLY** - persistent state changes that represent business facts.
+
+## Events = Business Domain Events ONLY
+
+**Events are PURE BUSINESS FACTS that represent persistent state changes:**
 - Events are state changes recorded indefinitely (databases, event stores, files, audit logs)
 - Events MUST survive application restart
-- Events represent persistent facts about what happened in the system
+- Events represent persistent facts about what happened in the business domain
+- Events are NOT technical operations, workflow steps, or system internals
 
 ## What Counts as an Event
 
-- ✅ **Configuration changes** persisted to files
-- ✅ **Data written** to databases or event stores
-- ✅ **Audit trail entries** for compliance/history
-- ✅ **State that survives restart** or requires reconstruction
-- ❌ **UI rendering** ("Displayed", "Rendered", "Focused") - ephemeral
-- ❌ **Transient interactions** ("Clicked", "Pressed", "Selected") - ephemeral
-- ❌ **Runtime-only state** (in-memory data structures, UI state)
+### ✅ VALID EVENTS (Business Domain Facts)
+- **Business state changes**: `SquadMemberAssignedToEngagement`, `InvoiceGenerated`, `OrderPlaced`
+- **Configuration changes persisted**: `TimeOffPolicyConfigured`, `CareerTrackDefined`
+- **Approval decisions**: `TimeOffRequestApproved`, `DealApproved`
+- **Data written to permanent storage**: `EngagementCreated`, `SkillProfileUpdated`
+- **Audit trail entries** for compliance: `UserRoleChanged`, `LicenseActivated`
+
+### ❌ NOT EVENTS (Internal Concerns or Ephemeral State)
+- **Workflow initiation**: "AssignmentInitiated", "CreationStarted" - This is just the user clicking a button
+- **Data gathering**: "AvailableSquadMembersQueried", "DataLoaded" - Internal command logic
+- **Validation steps**: "AllocationConflictChecked", "DataValidated" - Part of command execution
+- **Side effects**: "CapacityForecastsRecalculated" - This is a SEPARATE workflow triggered by automation
+- **UI rendering**: "Displayed", "Rendered", "Focused" - Ephemeral UI state
+- **Transient interactions**: "Clicked", "Pressed", "Selected" - User actions, not business facts
+- **Runtime-only state**: In-memory data structures, temporary variables
 
 ## Logging vs Event Storage (CRITICAL DISTINCTION)
 
@@ -48,11 +68,22 @@ The event model is organized as a hierarchical documentation system:
 
 **docs/EVENT_MODEL.md** - Serves as table of contents and high-level overview
 
+### Functional Area Index Documents
+
+**docs/event_model/functional-areas/*.md** - Index files listing workflows within each functional area (authentication, engagement management, etc.)
+
+### Individual Workflow Documents
+
+**docs/event_model/workflows/[functional-area]/[workflow-name].md** - One file per workflow containing:
+- Workflow overview and goal
+- Mermaid diagram (updated incrementally through Steps 1-12)
+- Complete workflow definition with all 12 steps
+- Links to all component definitions (events, commands, UI screens, projections, queries)
+
 ### Component Documents
 
 All component definitions stored in separate markdown files:
 
-- **docs/event_model/functional-areas/*.md** - Functional area documents containing workflows
 - **docs/event_model/events/*.md** - Individual event definitions
 - **docs/event_model/commands/*.md** - Individual command definitions
 - **docs/event_model/ui-screens/*.md** - Individual UI screen definitions
@@ -68,10 +99,100 @@ Multiple smaller documents make it easier for:
 - Version control to track granular changes
 - Teams to work on different components concurrently
 - Navigation and cross-referencing between related concepts
+- Each workflow to grow without bloating functional area index files
+
+## Command-to-Event Relationship
+
+**CRITICAL RULE: One Command → One Event (typically)**
+
+- A command represents a business intention/request
+- A command loads prior events (event sourcing), validates business rules, and either:
+  - **Success**: Emits ONE business event representing what happened
+  - **Failure**: Returns an error (usually NOT an event)
+- Failure events are RARE - only if another process needs to react to the failure
+
+**Data Gathering and Validation are NOT Events:**
+- Commands read event streams internally (not separate events)
+- Commands validate business rules internally (not separate events)
+- Only the OUTCOME is an event
+
+**Example:**
+- ❌ WRONG: `AssignmentInitiated` → `DataQueried` → `ValidationPassed` → `SquadMemberAssigned`
+- ✅ CORRECT: `AssignSquadMember` command → `SquadMemberAssignedToEngagement` event (or error)
+
+**Cross-Workflow Cascades:**
+- When one event needs to trigger another workflow, use: Event → Projection → Automation → Command → Event
+- Example: `SquadMemberAssignedToEngagement` event → updates `CapacityProjection` → `CapacityMonitor` automation detects change → triggers `RecalculateCapacityForecasts` command → emits `CapacityForecastsRecalculated` event
+- This is a SEPARATE workflow/vertical slice, not a "side effect"
+
+## Expected Event Counts
+
+For a system with 108 workflows:
+- **Typical**: 108-200 total events
+- **NOT**: 450+ events (that indicates modeling workflow steps as events)
+- Most workflows: 1 command → 1 event
+- Some workflows: 1 command → 2-3 events (alternate outcomes or multiple business facts)
 
 ## 12-Step Workflow Process
 
-Apply this process to EACH workflow within a functional area. This process defines WHAT each step produces, not HOW agents coordinate:
+**DEPTH-FIRST EXECUTION: Complete ALL 12 steps for ONE workflow before moving to the next workflow.**
+
+Apply this process to EACH workflow sequentially. This process defines WHAT each step produces, not HOW agents coordinate:
+
+### CRITICAL: Incremental Mermaid Diagram Updates
+
+**Each step agent MUST update the workflow's Mermaid diagram** as new components are identified:
+
+**Workflow File Location:** `docs/event_model/workflows/[functional-area]/[workflow-name].md`
+
+**Diagram Evolution Through Steps:**
+
+1. **Step 1 (Goal Event)**: Create initial diagram with goal event placeholder
+2. **Step 2 (Event Sequence)**: Update diagram with all events in sequence
+3. **Step 3 (Commands)**: Add commands connected to events
+4. **Step 4 (Triggers)**: Add UI screens or automations triggering commands
+5. **Step 5 (Final UI)**: Add final UI screen displaying results
+6. **Step 6 (Queries/Projections)**: Add projections and queries between events and UI
+7. **Steps 7-12**: Refine diagram as cross-links and data lineage are completed
+
+**Diagram Update Protocol:**
+- Read existing workflow file
+- Update Mermaid diagram section with new component
+- Maintain left-to-right flow: Trigger → Command → Event → Projection → Query → Final UI
+- Use consistent node naming: `[Type: Name]` (e.g., `[Command: ActivateLicense]`)
+- Use consistent edge labels: `|triggers|`, `|emits|`, `|updates|`, `|via|`, `|displays|`
+- Write updated workflow file back
+
+**Example Progressive Diagram:**
+
+After Step 1:
+```mermaid
+graph LR
+    E[Event: LicenseActivated]
+```
+
+After Step 3:
+```mermaid
+graph LR
+    C[Command: ActivateLicense] -->|emits| E[Event: LicenseActivated]
+```
+
+After Step 4:
+```mermaid
+graph LR
+    UI1[UI: LicenseManagement] -->|triggers| C[Command: ActivateLicense]
+    C -->|emits| E[Event: LicenseActivated]
+```
+
+After Step 6:
+```mermaid
+graph LR
+    UI1[UI: LicenseManagement] -->|triggers| C[Command: ActivateLicense]
+    C -->|emits| E[Event: LicenseActivated]
+    E -->|updates| P[Projection: LicenseStatus]
+    P -->|via| Q[Query: GetLicenseStatus]
+    Q -->|displays| UI2[UI: LicenseManagement]
+```
 
 ### Step 1: Goal Event Identification
 
@@ -87,43 +208,69 @@ Description: Invoice has been generated and is ready for customer delivery.
 
 ### Step 2: Work Backwards Defining Events
 
-What needs to be true to reach the goal? For each decision or state change, define an event.
+**CRITICAL: Most workflows have ONLY ONE EVENT (the goal event from Step 1)**
+
+Starting from the goal event, work backwards to identify any intermediate business facts that must be recorded:
 
 **Critical Rules**:
 - Define event NAMES and brief descriptions ONLY
 - Do NOT define data fields yet
-- Work backwards from goal to workflow start
-- Each event represents a persistent state change
+- Events are ONLY business domain facts (not workflow steps, validation, or data gathering)
+- Most workflows will have just the goal event
+- Only add intermediate events if they represent separate business facts that need to persist
 
 **Output**: Ordered list of event names (start → goal)
 
-**Example**:
+**Typical Example (Single Event)**:
 ```
-1. PaymentAuthorized
-2. PaymentCaptured
-3. OrderFulfilled
-4. InvoiceGenerated (goal)
+1. SquadMemberAssignedToEngagement (goal - this is the only event)
 ```
+
+**Multi-Event Example (Rare - only when multiple business facts must be recorded)**:
+```
+1. PaymentAuthorized (business fact: authorization received)
+2. PaymentCaptured (business fact: funds transferred)
+3. InvoiceGenerated (goal - business fact: invoice created)
+```
+
+**What NOT to model as events**:
+- ❌ "AssignmentInitiated" - just the user clicking a button
+- ❌ "DataQueried" - internal command logic
+- ❌ "ValidationPassed" - internal command logic
+- ❌ "CapacityRecalculated" - separate workflow triggered by automation
 
 ### Step 3: Define Commands
 
-For each event, define the command that emits it.
+For each event identified in Step 2, define the command that emits it.
 
 **Critical Rules**:
-- A command should result in either an error OR a single event
-- The same command MAY emit different events based on business logic
-- Different outcomes appear as distinct vertical slices
-- Multiple slices may share the same command box
+- **One command per event** (typically)
+- A command results in either an **error** OR a **single success event**
+- The same command MAY emit different events based on business logic (alternate outcomes)
+- Failure is typically an error response, NOT a separate event (unless another process needs to react)
+- Commands handle all internal concerns: data gathering (reading event streams), validation, business rule checks
 
 **Output**: Command name for each event
 
-**Example**:
+**Typical Example (One Command → One Event)**:
+```
+AssignSquadMember → SquadMemberAssignedToEngagement
+```
+
+**Multi-Event Workflow Example**:
 ```
 AuthorizePayment → PaymentAuthorized
 CapturePayment → PaymentCaptured
-FulfillOrder → OrderFulfilled
 GenerateInvoice → InvoiceGenerated
 ```
+
+**Command Internal Responsibilities (NOT separate events)**:
+- Read prior events from event streams
+- Aggregate event data into domain objects
+- Validate business rules
+- Check constraints
+- Make business decision
+- Emit success event OR return error
 
 ### Step 4: Define Triggers
 

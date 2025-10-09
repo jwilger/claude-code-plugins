@@ -171,6 +171,14 @@ Before completing Step 10:
 - Have you updated all command documents?
 - Have you stored entities with temporal markers?
 
+## Workflow File Status Update
+
+After writing Gherkin acceptance criteria:
+
+1. **Read workflow file**: docs/event_model/workflows/[functional-area]/[workflow-name].md
+2. **Update status**: "Step 10 Complete - Acceptance Criteria Defined"
+3. **Write workflow file**: Save updated status
+
 ## Critical Process Rules
 
 - ALWAYS begin with memory loading

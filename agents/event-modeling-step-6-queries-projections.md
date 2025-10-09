@@ -151,6 +151,18 @@ Before completing Step 6:
 - Have you avoided implementation details?
 - Have you stored entities with temporal markers?
 
+## Workflow File Diagram Update (CRITICAL)
+
+After defining projections and queries:
+
+1. **Read workflow file**: docs/event_model/workflows/[functional-area]/[workflow-name].md
+2. **Update Mermaid diagram**: Add projection and query nodes between events and final UI
+3. **Update status**: "Step 6 Complete - Queries/Projections Defined"
+4. **Add component references**: Link to projection and query documents
+5. **Write workflow file**: Save updated diagram and references
+
+The diagram should now show complete flow: Trigger UI → Command → Event → Projection → Query → Final UI
+
 ## Critical Process Rules
 
 - ALWAYS begin with memory loading
@@ -160,6 +172,7 @@ Before completing Step 6:
 - NEVER include implementation details (no database schemas, no code)
 - NEVER specify technical query languages (no SQL, GraphQL, etc.)
 - ALWAYS create documents in appropriate subdirectories
+- ALWAYS update workflow file Mermaid diagram
 - ALWAYS store decisions with temporal markers
 
 ## Workflow Handoff Protocol

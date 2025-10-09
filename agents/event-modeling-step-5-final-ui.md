@@ -117,6 +117,17 @@ Before completing Step 5:
 - Have you avoided implementation details?
 - Have you stored entities with temporal markers?
 
+## Workflow File Diagram Update (CRITICAL)
+
+After identifying final UI and completing wireframe specification:
+
+1. **Read workflow file**: docs/event_model/workflows/[functional-area]/[workflow-name].md
+2. **Update Mermaid diagram**: Add final UI screen node (may be same as trigger screen in different state)
+3. **Update status**: "Step 5 Complete - Final UI Defined"
+4. **Write workflow file**: Save updated diagram
+
+The diagram should now show: Trigger UI → Command → Event → Final UI (projections/queries added in Step 6)
+
 ## Critical Process Rules
 
 - ALWAYS begin with memory loading
@@ -126,6 +137,7 @@ Before completing Step 5:
 - FOCUS on single workflow at a time
 - NEVER create wireframes yourself (delegate to event-modeling-wireframes)
 - NEVER include implementation details or styling
+- ALWAYS update workflow file Mermaid diagram
 - ALWAYS store decisions with temporal markers
 
 ## Workflow Handoff Protocol

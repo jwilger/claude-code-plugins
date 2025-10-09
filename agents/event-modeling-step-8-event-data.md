@@ -162,6 +162,14 @@ Before completing Step 8:
 - Have you avoided implementation details?
 - Have you stored entities with temporal markers?
 
+## Workflow File Status Update
+
+After documenting event data fields:
+
+1. **Read workflow file**: docs/event_model/workflows/[functional-area]/[workflow-name].md
+2. **Update status**: "Step 8 Complete - Event Data Documented"
+3. **Write workflow file**: Save updated status
+
 ## Critical Process Rules
 
 - ALWAYS begin with memory loading

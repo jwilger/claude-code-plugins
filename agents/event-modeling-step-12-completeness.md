@@ -216,6 +216,16 @@ Before completing Step 12:
 - Have you stored entities with temporal markers?
 - Have you made handoff decision (complete vs gaps)?
 
+## Workflow File Status Update
+
+After validating information completeness:
+
+1. **Read workflow file**: docs/event_model/workflows/[functional-area]/[workflow-name].md
+2. **Update status**: "Step 12 Complete - Workflow Complete and Verified"
+3. **Write workflow file**: Save updated status
+
+This marks the workflow as fully modeled and ready for review.
+
 ## Critical Process Rules
 
 - ALWAYS begin with memory loading

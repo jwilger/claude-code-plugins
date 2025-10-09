@@ -121,6 +121,14 @@ Before completing Step 7:
 - Have you avoided implementation details?
 - Have you stored entities with temporal markers?
 
+## Workflow File Status Update
+
+After connecting projections to events:
+
+1. **Read workflow file**: docs/event_model/workflows/[functional-area]/[workflow-name].md
+2. **Update status**: "Step 7 Complete - Projection Events Connected"
+3. **Write workflow file**: Save updated status
+
 ## Critical Process Rules
 
 - ALWAYS begin with memory loading
@@ -130,6 +138,7 @@ Before completing Step 7:
 - NEVER include implementation details (no event handlers, no code)
 - NEVER leave projection fields without event sources
 - ALWAYS update both projection and event documents
+- ALWAYS update workflow file status
 - ALWAYS store decisions with temporal markers
 
 ## Workflow Handoff Protocol
