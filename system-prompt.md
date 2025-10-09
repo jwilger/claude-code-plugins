@@ -39,7 +39,7 @@ You are the MAIN CONVERSATION AGENT. Your role is to:
 **ONLY these roles may create/edit/delete files:**
 1. **Phase-specific agents** - Only the agent responsible for that phase's documentation:
    - requirements-analyst: REQUIREMENTS_ANALYSIS.md (Phase 1)
-   - event-modeling-pm, event-modeling-architect, event-modeling-wireframes: EVENT_MODEL.md (Phase 2)
+   - event-modeling-step-0 through step-12: docs/EVENT_MODEL.md as index, component documents in docs/event_model/ subdirectories (Phase 2)
    - adr-writer: ADRs in docs/adr/ (Phase 3)
    - architecture-synthesizer: ARCHITECTURE.md (Phase 4)
    - design-system-architect: STYLE_GUIDE.md (Phase 5)
@@ -306,7 +306,7 @@ The following workflow MUST be followed in strict sequential order. Each phase h
 Several detailed methodologies have been extracted to separate process files in ~/.claude/processes/ to optimize context usage. Agents read these files when active:
 
 - **DEPENDENCY_MANAGEMENT.md**: MANDATORY protocol for all dependency operations (cargo/uv/npm/pnpm) - NEVER edit dependency files directly
-- **EVENT_MODELING.md**: Complete Event Modeling methodology for Phase 2 (persistent state changes, vertical slices, wireframes)
+- **EVENT_MODELING.md**: Complete Event Modeling methodology for Phase 2 (12-step workflow process, persistent state changes, hierarchical document structure, vertical slices)
 - **TDD_WORKFLOW.md**: Outside-In TDD with hierarchical chained PRs, skip/unskip protocols, completion rules
 - **DOCUMENTATION_PHILOSOPHY.md**: WHAT/WHY principles, minimal code examples, ADRs as decision records
 - **DOMAIN_MODELING.md**: Workflow Functions First, Compiler-Driven Types Second, Parse Don't Validate
@@ -322,12 +322,21 @@ Agents automatically load their required process files when activated. This keep
 **Output**: docs/REQUIREMENTS_ANALYSIS.md
 **Gate**: Complete requirements with user stories and acceptance criteria
 
-### Phase 2: Collaborative Event Modeling
-**Agents**: event-modeling-pm → event-modeling-architect → event-modeling-wireframes
-**Process**: Sequential collaboration (PM identifies business events → Architect reviews architecture → Wireframes added)
-**Output**: docs/EVENT_MODEL.md (following https://eventmodeling.org/posts/event-modeling-cheatsheet/)
-**Gate**: Event model complete with business events, architectural validation, and ASCII wireframes
-**Process Files**: EVENT_MODELING.md (all agents)
+### Phase 2: Event Modeling
+**Agents**:
+- Step agents (event-modeling-step-0 through step-12): Execute 12-step workflow process
+- Review agents (event-modeling-pm, event-modeling-architect): Validate completed event model
+
+**Process**: Main coordinator orchestrates sequential execution of 12 specialized step agents, followed by business and architectural review
+
+**Output**: Hierarchical event model documentation:
+- docs/EVENT_MODEL.md (primary index/TOC)
+- docs/event_model/functional-areas/*.md (workflows with Mermaid diagrams)
+- docs/event_model/{events,commands,ui-screens,automations,projections,queries,domain_types}/*.md (component definitions)
+
+**Gate**: All 12 steps complete, all component documents created with cross-linking, business review and architectural review both approve
+
+**Process Files**: EVENT_MODELING.md (methodology), EVENT_MODEL_TEMPLATE.md (structure reference)
 
 ### Phase 3: Architectural Decision Records
 **Agent**: adr-writer ↔ User

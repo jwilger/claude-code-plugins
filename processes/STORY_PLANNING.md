@@ -58,10 +58,19 @@
   - Provide context about why this capability is important
   - Connect to business or user goals
 
-- **Acceptance Criteria**: Gherkin-format scenarios (Given/When/Then)
+- **Acceptance Criteria**: Gherkin-format scenarios (Given/When/Then) focusing on user-observable behavior
   - Format: Given [initial context], When [user action], Then [expected outcome]
+  - **When story includes commands from event model**: Reference command documentation instead of repeating command decision criteria
+    - Use format: "See acceptance criteria in [CommandName](../event_model/commands/CommandName.md)"
+    - This avoids duplication and maintains single source of truth for command decision logic
+  - **Add user experience scenarios**: Include Given/When/Then scenarios for user-observable aspects not covered by command criteria
+    - UI feedback and visual responses
+    - Error handling presentation to the user
+    - Workflow completion confirmation
+    - Next actions available after command completion
   - Multiple scenarios covering happy path and edge cases
-  - Focus on user-observable behavior
+  - Focus on user-observable behavior, not implementation details
+  - Command criteria cover technical decision-making; story criteria cover complete user experience
   - Example:
     ```gherkin
     Given I have an active chat session
@@ -91,6 +100,88 @@
   - Exact commands user runs
   - Expected observable outcomes
   - Success criteria
+
+## Relationship to Event Model Command Criteria
+
+**Event Model (Phase 2) and Story Acceptance Criteria (Phase 6) serve different but complementary purposes:**
+
+- **Event Model Command Documents**: Contain Gherkin acceptance criteria focused on command decision-making and state transitions
+  - Define WHAT decisions the system makes when handling a command
+  - Specify domain rules and invariants the command must enforce
+  - Written from system perspective: "Given [domain state], When [command received], Then [state changes]"
+  - Located in: `docs/event_model/commands/[CommandName].md`
+
+- **Story Acceptance Criteria**: Build upon command criteria by adding user-observable scenarios
+  - Define HOW users experience the command execution
+  - Include UI feedback, visual responses, error presentation, and workflow completion
+  - Written from user perspective: "Given [user context], When [user action], Then [user sees/can do]"
+  - Stories reference command criteria without full repetition to avoid duplication
+  - Additional story scenarios focus on:
+    - UI feedback and visual confirmation of successful actions
+    - Error handling and error message presentation to users
+    - Workflow completion confirmation and state clarity
+    - Next actions available after command completes
+
+**Avoiding Duplication:**
+- Story acceptance criteria REFERENCE command criteria using: "See acceptance criteria in [CommandName](../event_model/commands/CommandName.md)"
+- This maintains a single source of truth for command decision logic
+- Stories add additional Given/When/Then scenarios for user experience aspects
+- This keeps stories focused and maintainable while ensuring complete documentation
+
+## Example: Command to Story Relationship
+
+**Event Model Command Document** (`docs/event_model/commands/SendMessage.md`):
+```gherkin
+Acceptance Criteria:
+
+Scenario: Message accepted when conversation exists and is not archived
+Given a conversation with ID C1 exists and is active
+When SendMessage command is received with valid content and conversation_id=C1
+Then message is stored in Event Store
+And message_sent event is published
+And conversation.updated_at is set to current timestamp
+
+Scenario: Message rejected when conversation is archived
+Given a conversation with ID C1 exists and is archived
+When SendMessage command is received
+Then command is rejected with ConversationArchivedError
+And no event is published
+```
+
+**Story** (`docs/PLANNING.md` - Story: "User sends message to conversation"):
+```
+Title: User sends message to conversation
+
+Description: User can compose and send a message to an active conversation,
+with clear feedback that the message was delivered and visible in the chat thread.
+
+Acceptance Criteria:
+
+See acceptance criteria in SendMessage command: [SendMessage](../event_model/commands/SendMessage.md)
+
+Additional User Experience Scenarios:
+
+Scenario: User sees message appear immediately in chat thread
+Given I have an active conversation open
+When I type "Hello" and click Send
+Then the message appears at the bottom of the conversation
+And the message shows my name and timestamp
+And a loading indicator appears below the message
+
+Scenario: User sees confirmation message is delivered
+Given I just sent a message that is loading
+When the server confirms delivery
+Then the loading indicator disappears
+And the message appears with a checkmark icon
+And the input field is cleared and ready for next message
+
+Scenario: User sees error if conversation becomes archived
+Given I am typing in a conversation
+When the conversation is archived while I'm composing
+Then the Send button is disabled
+And an error message appears: "This conversation is archived"
+And the unsent message is preserved in the input field
+```
 
 ## Prioritization Protocol
 
