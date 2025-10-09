@@ -7,6 +7,8 @@
 **Output**: docs/PLANNING.md with prioritized user stories
 **Gate**: All three agents agree stories are complete, well-defined, and properly prioritized
 
+**CRITICAL WORKFLOW NOTE**: User stories are DERIVED from EVENT_MODEL.md (Phase 2), NOT from REQUIREMENTS_ANALYSIS.md (Phase 1). Requirements define WHAT/WHY at a high level. Event modeling defines HOW the system responds to events. Stories decompose event model vertical slices into implementable increments. This is why stories come in Phase 6, AFTER event modeling, architecture decisions, and design system definition.
+
 ## Story Requirements
 
 1. **Thin Vertical Slices**: Each story provides user-observable value

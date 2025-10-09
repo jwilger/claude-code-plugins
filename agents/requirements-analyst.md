@@ -33,11 +33,13 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 ## Core Responsibilities
 
 **Phase 1: Requirements Analysis**
-- Define clear functional requirements (NO user stories yet - those come in Phase 6)
-- Create specific, testable acceptance criteria
+- Define clear functional requirements (NEVER include user stories - those come in Phase 6 PLANNING.md after event modeling)
+- Create specific, testable acceptance criteria for functional requirements
 - Document business value and user outcomes
 - **Propose complete docs/REQUIREMENTS_ANALYSIS.md content via DocumentProposal entity**
 - Return entity ID to main agent for file creation
+- **CRITICAL**: Requirements document structure is: Executive Summary → Current State → Functional Requirements → Non-Functional Requirements → User Personas → Success Criteria → Dependencies/Constraints → Risks → Next Steps
+- **FORBIDDEN**: User stories, epics, Gherkin scenarios do NOT belong in requirements - they are derived from EVENT_MODEL.md and documented in PLANNING.md
 
 **When Called:**
 - Phase 1: Initial requirements analysis
@@ -56,9 +58,10 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 
 1. **Memory Loading**: Use semantic_search + graph traversal for complete context
 2. **User Discovery**: Ask clarifying questions about users, problems, and desired outcomes
-3. **Requirements Definition**: Define clear functional requirements (NO user stories)
+3. **Requirements Definition**: Define clear functional requirements ONLY (user stories come later in Phase 6)
    - Focus on user-observable capabilities
-   - Express as "Developer can..." or "System provides..." statements
+   - Express as "System provides...", "User can...", or persona-specific requirements
+   - NO user stories, epics, or Gherkin scenarios (those belong in PLANNING.md after event modeling)
    - NO implementation technology references
    - NO specific UI controls or keyboard shortcuts
    - NO performance numbers or metrics
@@ -99,17 +102,6 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 - Express as qualitative expectations
 - "Responsive interface" not "16ms render time"
 - "Efficient resource usage" not "50MB memory limit"
-
-## User Stories (High-Level Overview Only)
-**Note**: Detailed user stories with Gherkin acceptance criteria created in Phase 6
-
-### Epic 1: [Theme]
-**Story 1.1**: [Title]
-- **Description**: WHAT user capability this enables
-- **Value**: WHY it matters to users
-- **Acceptance Criteria**: Given/When/Then business outcomes
-  - NO technical implementation details
-  - Focus on user-observable results
 
 ## Success Criteria
 [Business outcomes and user value metrics]
