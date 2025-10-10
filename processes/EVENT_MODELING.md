@@ -680,19 +680,38 @@ to notify customer of available invoice.
 
 ### Domain Type Definitions (docs/event_model/domain_types/*.md)
 
+**CRITICAL: Keep domain types focused and minimal**
+
+Domain types describe **the value itself**, not how/when/where it's used.
+
+Domain types should contain ONLY:
+- Business purpose (what the type represents)
+- Value constraints (format, length, pattern, range, character set)
+- Examples (especially for non-trivial validations)
+- Used In section (component list only)
+
+**DO NOT include:**
+- Mutability/immutability rules (that's command/business logic, not type definition)
+- Entity relationships (EmailAddress doesn't know about Account)
+- Workflow descriptions or process descriptions
+- Usage patterns, scenarios, or context
+- Implementation details
+- Uniqueness requirements (that's a business rule enforced by commands, not the type)
+
 **Structure**:
 ```markdown
 ## Domain Type: TypeName
 
-### Description
-[1-2 sentence description of what this type represents in the domain]
+### Business Purpose
+[1 sentence describing what this type represents in the business domain]
 
-### Type Definition
+### Constraints
 
 **Base Type**: [String | Integer | Decimal | Boolean | DateTime | UUID | List | Object]
 
-**Constraints**:
-- [Constraint description]
+- [Constraint 1]
+- [Constraint 2]
+- [etc.]
 
 Examples:
 - Min length: 3 characters
@@ -701,18 +720,22 @@ Examples:
 - Range: 0.00 to 999999.99
 - Time zone: UTC
 
-### Example Values
-```
-value_1
-value_2
-value_3
-```
+### Examples
+
+Valid:
+- value_1
+- value_2
+
+Invalid:
+- bad_value_1 (why it's invalid)
+- bad_value_2 (why it's invalid)
 
 ### Used In
 - [Event: EventName](../events/EventName.md)
 - [Command: CommandName](../commands/CommandName.md)
 - [Projection: ProjectionName](../projections/ProjectionName.md)
 - [Query: QueryName](../queries/QueryName.md)
+- [Workflow: WorkflowName](../workflows/area/workflow.md)
 ```
 
 ## Domain Types
