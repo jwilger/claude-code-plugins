@@ -201,7 +201,7 @@ title: "[FunctionalAreaName] Workflows"
 
 ### Workflow 1 Name
 
-**Goal**: [What this workflow accomplishes]
+**Terminal Event**: [EventName] - [What terminal state this workflow reaches]
 
 #### Vertical Slice 1: [SliceName]
 

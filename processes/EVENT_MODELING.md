@@ -6,6 +6,20 @@
 
 Event Modeling is a collaborative design methodology that captures system behavior through events, commands, and data flow. This process creates living documentation that serves as both design specification and implementation guide.
 
+## CRITICAL: Understanding "Workflow"
+
+**A workflow is an END-TO-END JOURNEY from initial trigger to terminal state.**
+
+- **Not stages**: A workflow is NOT a single processing stage (like "text extraction" or "validation")
+- **Complete journey**: A workflow represents the ENTIRE path from start (e.g., file uploaded to S3) to terminal event (e.g., document indexed in search, OR document rejected with reason)
+- **Single path**: Each workflow follows ONE decision path - branches require separate workflows
+- **Why separate workflows?** Event models don't represent "this or that" conditionals within a single workflow. Each branch is its own workflow for clarity.
+
+**Examples:**
+- ✅ "Successfully process and index PDF document" (S3 upload → indexed in BKB)
+- ✅ "Reject invalid uploaded document" (S3 upload → document rejected with reason)
+- ❌ "Validate document" (too narrow - just one stage, not end-to-end)
+
 ## CRITICAL: Process Execution Strategy
 
 **BREADTH-FIRST for Step 0, then DEPTH-FIRST for Steps 1-12**
@@ -127,11 +141,20 @@ Multiple smaller documents make it easier for:
 
 ## Expected Event Counts
 
-For a system with 108 workflows:
-- **Typical**: 108-200 total events
-- **NOT**: 450+ events (that indicates modeling workflow steps as events)
-- Most workflows: 1 command → 1 event
-- Some workflows: 1 command → 2-3 events (alternate outcomes or multiple business facts)
+Event counts vary widely based on workflow types:
+
+**Simple Systems (CRUD, basic user interactions)**:
+- 1-2 events per workflow
+- 108 workflows → ~150-200 total events
+
+**Complex Systems (multi-step workflows, async integrations)**:
+- 3-8 events per workflow (user progression steps or async boundaries)
+- 108 workflows → ~300-800+ total events
+
+**Warning Signs**:
+- ❌ Events for every UI click without persistent state (too many)
+- ❌ Events for internal validation steps (not business facts)
+- ❌ Only 1 event per multi-step or async workflow (too few - missing coordination points)
 
 ## 12-Step Workflow Process
 
@@ -147,7 +170,7 @@ Apply this process to EACH workflow sequentially. This process defines WHAT each
 
 **Diagram Evolution Through Steps:**
 
-1. **Step 1 (Goal Event)**: Create initial diagram with goal event placeholder
+1. **Step 1 (Terminal Event)**: Create initial diagram with terminal event placeholder
 2. **Step 2 (Event Sequence)**: Update diagram with all events in sequence
 3. **Step 3 (Commands)**: Add commands connected to events
 4. **Step 4 (Triggers)**: Add UI screens or automations triggering commands
@@ -194,44 +217,65 @@ graph LR
     Q -->|displays| UI2[UI: LicenseManagement]
 ```
 
-### Step 1: Goal Event Identification
+### Step 1: Terminal Event Identification
 
-Start with the goal of the workflow. What event represents "this workflow is complete?"
+Start with the terminal state of the workflow. What event represents "this workflow has reached its end state?" This could be a success event (e.g., DocumentIndexed) or a failure event (e.g., DocumentRejected).
 
-**Output**: Single goal event name with 1-2 sentence description
+**Output**: Single terminal event name with 1-2 sentence description
 
 **Example**:
 ```
 Event: InvoiceGenerated
-Description: Invoice has been generated and is ready for customer delivery.
+Description: Invoice has been generated and is ready for customer delivery. (Terminal success event)
+```
+
+**Or**:
+```
+Event: InvoiceGenerationFailed
+Description: Invoice generation failed with specific error reason. (Terminal failure event)
 ```
 
 ### Step 2: Work Backwards Defining Events
 
-**CRITICAL: Most workflows have ONLY ONE EVENT (the goal event from Step 1)**
+**Event Count Depends on Workflow Complexity**
 
-Starting from the goal event, work backwards to identify any intermediate business facts that must be recorded:
+Starting from the terminal event, work backwards to identify all business-meaningful state transitions:
 
 **Critical Rules**:
 - Define event NAMES and brief descriptions ONLY
 - Do NOT define data fields yet
-- Events are ONLY business domain facts (not workflow steps, validation, or data gathering)
-- Most workflows will have just the goal event
-- Only add intermediate events if they represent separate business facts that need to persist
+- Events represent: persistent state changes that matter to the business
+- **Simple single-step workflows**: 1-2 events (user action → result)
+- **Multi-step user workflows**: 3-8+ events (each user progression step)
+- **Async service integration workflows**: 4-8+ events (each async boundary and stage completion)
 
-**Output**: Ordered list of event names (start → goal)
+**Output**: Ordered list of event names (start → terminal)
 
-**Typical Example (Single Event)**:
+**Simple Single-Step Example**:
 ```
-1. SquadMemberAssignedToEngagement (goal - this is the only event)
+1. SquadMemberAssignedToEngagement (terminal event - one action, one result)
 ```
 
-**Multi-Event Example (Rare - only when multiple business facts must be recorded)**:
+**Multi-Step User Workflow Example (e.g., Amazon purchase)**:
 ```
-1. PaymentAuthorized (business fact: authorization received)
-2. PaymentCaptured (business fact: funds transferred)
-3. InvoiceGenerated (goal - business fact: invoice created)
+1. ItemAddedToCart (user action - persistent cart state)
+2. CheckoutInitiated (user progresses to checkout)
+3. ShippingAddressProvided (address submitted and saved)
+4. PaymentMethodSelected (payment info provided)
+5. OrderPlaced (terminal event - order confirmed)
 ```
+
+**Async Service Integration Example (e.g., document processing)**:
+```
+1. DocumentUploaded (file in S3 - async boundary)
+2. TextExtractionStarted (sent to AWS Textract - async boundary)
+3. TextExtractionCompleted (Textract finished - async boundary)
+4. ChunksGenerated (chunking complete - processing stage)
+5. EmbeddingsGenerated (embeddings created - processing stage)
+6. DocumentIndexedInBKB (terminal event - searchable)
+```
+
+**Key Insight**: Each step that creates persistent state the business cares about is an event. Don't artificially minimize event count.
 
 **What NOT to model as events**:
 - ❌ "AssignmentInitiated" - just the user clicking a button
@@ -292,11 +336,11 @@ For each command, determine what triggers it:
 
 ### Step 5: Define Final UI Screen
 
-Define what users see after the final event is recorded.
+Define what users see after the terminal event is recorded.
 
 **Focus Areas**:
 - Data that confirms workflow completion
-- Elements that prove the goal event occurred
+- Elements that prove the terminal event occurred
 - Next actions available to user
 
 **Output**: UI screen name and layout description
@@ -867,7 +911,7 @@ Handles customer payment authorization, capture, and reconciliation for orders.
 
 ### Payment Authorization and Capture
 
-**Goal**: Successfully capture payment for customer order.
+**Terminal Event**: PaymentCaptured - Payment successfully captured for customer order.
 
 #### Vertical Slice 1: Authorize Payment
 
