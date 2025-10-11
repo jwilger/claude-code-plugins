@@ -7,10 +7,7 @@
     "email": "john@johnwilger.com"
   },
   "homepage": "https://github.com/jwilger/claude-code-setup",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/jwilger/claude-code-setup.git"
-  },
+  "repository": "https://github.com/jwilger/claude-code-setup.git",
   "license": "MIT",
   "keywords": [
     "sdlc",
