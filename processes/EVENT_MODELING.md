@@ -6,32 +6,53 @@
 
 Event Modeling is a collaborative design methodology that captures system behavior through events, commands, and data flow. This process creates living documentation that serves as both design specification and implementation guide.
 
-## CRITICAL: Understanding "Workflow"
+## CRITICAL: Understanding "Event Model" vs "Event"
 
-**A workflow is an END-TO-END JOURNEY from initial trigger to terminal state.**
+**An event model is an END-TO-END BUSINESS JOURNEY containing multiple events that represent state changes.**
 
-- **Not stages**: A workflow is NOT a single processing stage (like "text extraction" or "validation")
-- **Complete journey**: A workflow represents the ENTIRE path from start (e.g., file uploaded to S3) to terminal event (e.g., document indexed in search, OR document rejected with reason)
-- **Single path**: Each workflow follows ONE decision path - branches require separate workflows
-- **Why separate workflows?** Event models don't represent "this or that" conditionals within a single workflow. Each branch is its own workflow for clarity.
+### Event Model (The Journey)
+- **Complete business journey**: Represents ENTIRE path from initial trigger to terminal state
+- **Contains multiple events**: Each event within the model represents a distinct business decision or state change
+- **Single document**: One markdown file per event model showing all events in sequence
+- **Single path**: Each model follows ONE decision path - branches require separate models or alternative path models
 
-**Examples:**
-- ✅ "Successfully process and index PDF document" (S3 upload → indexed in BKB)
-- ✅ "Reject invalid uploaded document" (S3 upload → document rejected with reason)
-- ❌ "Validate document" (too narrow - just one stage, not end-to-end)
+### Event (The State Change)
+- **Domain-specific**: Named with business semantics (e.g., `EngagementOnboardingTaskCompleted`, not `TaskUpdated`)
+- **Separate document**: Each event has its own markdown file (can appear in multiple models)
+- **Business decision**: Represents judgment or decision made by responsible party
+- **Triggers consequences**: May unblock dependencies, trigger automation, update projections
+- **Persistent state**: Survives system restart, recorded indefinitely
 
-## CRITICAL: Workflows Must Represent State Changes
+### Key Distinction
 
-**Event modeling represents how state changes affect views. A workflow exists ONLY when users record decisions in the system.**
+**WRONG (treating events as separate models):**
+- Model #1: "Initiate engagement onboarding"
+- Model #2: "Complete engagement onboarding task"
+
+**RIGHT (events within single model):**
+- **Model: "Manage engagement onboarding"** containing events:
+  - `EngagementOnboardingInitiated`
+  - `EngagementOnboardingTaskCompleted` (repeats N times)
+  - `EngagementOnboardingCompleted`
+
+**Examples of Event Models:**
+- ✅ "Manage engagement onboarding" (initiation → N task completions → completion)
+- ✅ "Process and index PDF document" (S3 upload → extraction → chunking → embedding → indexed)
+- ✅ "Approve time-off request" (request submitted → manager reviews → approved/denied)
+- ❌ "Complete a task" (too narrow - this is an EVENT within a model, not a complete journey)
+
+## CRITICAL: Event Models Must Represent State Changes
+
+**Event modeling represents how state changes affect views. An event model exists ONLY when users record decisions in the system.**
 
 ### The Core Question
 
 **"If X happens, what affect does that have on view Y?"**
 
-- If no effect → Not a workflow, just a query
-- If view changes → Need workflow with event → projection → updated view
+- If no effect → Not an event model, just a query
+- If view changes → Need event model with events → projections → updated views
 
-### What IS a Workflow (State Changes)
+### What IS an Event Model (State Changes)
 
 ✅ **User records a decision or creates persistent state:**
 - "Deploy and configure system" → SystemActivated, ConfigurationApplied
@@ -41,7 +62,7 @@ Event Modeling is a collaborative design methodology that captures system behavi
 - "Flag operational risk" → RiskFlagged, RiskMitigated
 - "Request and approve leave" → LeaveRequested, LeaveApproved
 
-### What is NOT a Workflow (Read-Only)
+### What is NOT an Event Model (Read-Only)
 
 ❌ **User only views information without changing it:**
 - "View resource availability" - just a query against projections
@@ -51,82 +72,106 @@ Event Modeling is a collaborative design methodology that captures system behavi
 - "View schedule calendar" - just a query against projections
 - "Detect capacity issue" - automated alert (no user decision recorded)
 
-**If a user logs in, views information, and logs out without changing anything → NO WORKFLOW EXISTS**
+**If a user logs in, views information, and logs out without changing anything → NO EVENT MODEL EXISTS**
 
 ### Anti-Pattern: CRUD Thinking
 
-❌ **Avoid modeling individual CRUD operations as separate workflows:**
+❌ **Avoid modeling individual CRUD operations as separate event models:**
 
-**WRONG (CRUD operations):**
-- "Create organizational unit"
-- "Rename organizational unit"
-- "Move organizational unit"
-- "Archive organizational unit"
+**WRONG (separate models for each CRUD operation):**
+- Model #1: "Create organizational unit"
+- Model #2: "Rename organizational unit"
+- Model #3: "Move organizational unit"
+- Model #4: "Archive organizational unit"
 
-**RIGHT (Business journey):**
-- "Establish organizational hierarchy" - END-TO-END journey from no structure → complete hierarchy with leaders assigned
+**RIGHT (single model covering business journey):**
+- **Model: "Establish organizational hierarchy"** containing events:
+  - `OrganizationalUnitCreated` (repeats for each unit)
+  - `OrganizationalUnitRenamed` (when needed)
+  - `OrganizationalUnitMoved` (when restructuring)
+  - `OrganizationalUnitArchived` (when consolidating)
 
-**WRONG (Configuration steps):**
-- "Define category types"
-- "Define levels within category"
-- "Apply template configuration"
-- "Customize category settings"
+**WRONG (separate models for configuration steps):**
+- Model #1: "Define category types"
+- Model #2: "Define levels within category"
+- Model #3: "Apply template configuration"
 
-**RIGHT (Business journey):**
-- "Configure classification framework" - END-TO-END journey from no framework → complete system ready for operational use
+**RIGHT (single model covering complete setup):**
+- **Model: "Configure classification framework"** containing events:
+  - `CategoryTypeDefined` (repeats for each type)
+  - `CategoryLevelDefined` (repeats for each level)
+  - `TemplateApplied`
+  - `CategorySettingsCustomized`
 
-### Anti-Pattern: View-Only "Workflows"
+### Anti-Pattern: Confusing Events with Event Models
 
-❌ **Avoid creating workflows for read-only activities:**
+❌ **Avoid creating separate event models for each event in a journey:**
 
-**NOT workflows (just queries):**
+**WRONG (treating events as models):**
+- Model #1: "Initiate engagement onboarding"
+- Model #2: "Complete engagement onboarding task"
+- Model #3: "Finish engagement onboarding"
+
+**RIGHT (events within single model):**
+- **Model: "Manage engagement onboarding"** containing events:
+  - `EngagementOnboardingInitiated`
+  - `EngagementOnboardingTaskCompleted` (repeats N times)
+  - `EngagementOnboardingCompleted`
+
+### Anti-Pattern: View-Only "Event Models"
+
+❌ **Avoid creating event models for read-only activities:**
+
+**NOT event models (just queries):**
 - "View quarterly forecast"
 - "View team schedule"
 - "View report history"
 - "Track process progress"
 
-These are **projections and queries**, not workflows. They appear on UI screens but don't generate events.
+These are **projections and queries**, not event models. They appear on UI screens but don't generate events.
 
-### How to Identify Real Workflows
+### How to Identify Real Event Models
 
 **Ask these questions:**
 
-1. **Does the user RECORD a decision?** (Yes → workflow | No → just a query)
-2. **What persistent state changes?** (Events that survive restart)
-3. **What's the END-TO-END journey?** (Not just one CRUD operation)
-4. **Where does the journey split?** (Different outcomes = separate workflows)
+1. **Does the user RECORD decisions?** (Yes → event model | No → just queries)
+2. **What persistent state changes occur?** (Events that survive restart)
+3. **What's the END-TO-END journey?** (From trigger to completion)
+4. **What events mark progress?** (Each meaningful state change is an event within the model)
+5. **Where does the journey split?** (Different outcomes = separate models or alternative paths)
 
-**Examples of proper workflow identification:**
+**Examples of proper event model identification:**
 
 **Resource Planning functional area:**
 - ❌ NOT: "View resource forecast", "View availability", "Simulate allocation"
 - ✅ YES: "Model resource scenario", "Flag planning risk", "Commit resource plan"
 
 **Customer Management functional area:**
-- ❌ NOT: "Create template", "Customize template", "Complete task", "View roster"
-- ✅ YES: "Onboard new customer", "Offboard customer", "Publish status report"
+- ❌ NOT: Individual event models for "Create template", "Customize template", "Complete task"
+- ✅ YES: "Onboard new customer" (containing template creation, task completion, onboarding completion events)
 
 **System Configuration functional area:**
-- ❌ NOT: "Create entity", "Rename entity", "Move entity", "Monitor health"
-- ✅ YES: "Deploy and license system", "Establish organizational structure", "Configure authentication"
+- ❌ NOT: Separate models for "Create entity", "Rename entity", "Move entity"
+- ✅ YES: "Establish organizational structure" (containing all entity lifecycle events)
 
-### Functional Areas Without Workflows
+### Functional Areas Without Event Models
 
-**Some functional areas may have NO workflows** - they only provide projections/queries built from events in other areas.
+**Some functional areas may have NO event models** - they only provide projections/queries built from events in other areas.
 
-Example: "Analytics and Reporting" might have zero state-changing workflows if all data comes from transactions, approvals, and state changes happening in other functional areas.
+Example: "Analytics and Reporting" might have zero state-changing event models if all data comes from transactions, approvals, and state changes happening in other functional areas.
 
-**This is perfectly valid.** Not every functional area needs workflows. Some areas exist purely to provide decision-support views.
+**This is perfectly valid.** Not every functional area needs event models. Some areas exist purely to provide decision-support views.
 
 ## CRITICAL: Process Execution Strategy
 
 **BREADTH-FIRST for Step 0, then DEPTH-FIRST for Steps 1-12**
 
-- **Step 0 (Breadth-First)**: Identify ALL workflows across all functional areas
-- **Steps 1-12 (Depth-First)**: Complete ALL 12 steps for ONE workflow before moving to the next workflow
-  - This keeps agent context focused on a single workflow
+- **Step 0 (Breadth-First)**: Identify ALL event models across all functional areas
+- **Steps 1-12 (Depth-First)**: Complete ALL 12 steps for ONE event model before moving to the next
+  - This keeps agent context focused on a single event model
   - Reduces cognitive load and improves quality
-  - Easier to maintain coherence across all aspects of one workflow
+  - Easier to maintain coherence across all aspects of one model
+  - Each event within the model is documented, but they're all part of the same journey
 
 **CRITICAL: Understanding Event Modeling**
 
@@ -182,15 +227,16 @@ The event model is organized as a hierarchical documentation system:
 
 ### Functional Area Index Documents
 
-**docs/event_model/functional-areas/*.md** - Index files listing workflows within each functional area (authentication, engagement management, etc.)
+**docs/event_model/functional-areas/*.md** - Index files listing event models within each functional area (authentication, engagement management, etc.)
 
-### Individual Workflow Documents
+### Individual Event Model Documents
 
-**docs/event_model/workflows/[functional-area]/[workflow-name].md** - One file per workflow containing:
-- Workflow overview and goal
-- Mermaid diagram (updated incrementally through Steps 1-12)
-- Complete workflow definition with all 12 steps
+**docs/event_model/workflows/[functional-area]/[model-name].md** - One file per event model containing:
+- Event model overview and goal
+- Mermaid diagram showing all events in the journey (updated incrementally through Steps 1-12)
+- Complete event model definition with all 12 steps
 - Links to all component definitions (events, commands, UI screens, projections, queries)
+- Multiple events within the model, each representing a state change in the journey
 
 ### Component Documents
 
@@ -239,42 +285,46 @@ Multiple smaller documents make it easier for:
 
 ## Expected Event Counts
 
-Event counts vary widely based on workflow types:
+Event counts vary widely based on event model complexity:
 
-**Simple Systems (CRUD, basic user interactions)**:
-- 1-2 events per workflow
-- 108 workflows → ~150-200 total events
+**Simple Event Models (single-action journeys)**:
+- 1-2 events per model
+- Example: Assign squad member (1 event), Create engagement (1 event)
 
-**Complex Systems (multi-step workflows, async integrations)**:
-- 3-8 events per workflow (user progression steps or async boundaries)
-- 108 workflows → ~300-800+ total events
+**Complex Event Models (multi-step journeys, async integrations)**:
+- 3-8+ events per model (user progression steps or async boundaries)
+- Example: Manage engagement onboarding (initiation + N task completions + completion)
+- Example: Process document (upload + extraction + chunking + embedding + indexed)
 
 **Warning Signs**:
 - ❌ Events for every UI click without persistent state (too many)
 - ❌ Events for internal validation steps (not business facts)
-- ❌ Only 1 event per multi-step or async workflow (too few - missing coordination points)
+- ❌ Only 1 event per multi-step journey (too few - missing coordination points)
+- ❌ Treating each event as a separate model instead of part of a journey (wrong granularity)
 
-## 12-Step Workflow Process
+## 12-Step Event Model Process
 
-**DEPTH-FIRST EXECUTION: Complete ALL 12 steps for ONE workflow before moving to the next workflow.**
+**DEPTH-FIRST EXECUTION: Complete ALL 12 steps for ONE event model before moving to the next model.**
 
-Apply this process to EACH workflow sequentially. This process defines WHAT each step produces, not HOW agents coordinate:
+Apply this process to EACH event model sequentially. This process defines WHAT each step produces, not HOW agents coordinate:
 
 ### CRITICAL: Incremental Mermaid Diagram Updates
 
-**Each step agent MUST update the workflow's Mermaid diagram** as new components are identified:
+**Each step agent MUST update the event model's Mermaid diagram** as new components are identified:
 
-**Workflow File Location:** `docs/event_model/workflows/[functional-area]/[workflow-name].md`
+**Event Model File Location:** `docs/event_model/workflows/[functional-area]/[model-name].md`
 
 **Diagram Evolution Through Steps:**
 
 1. **Step 1 (Terminal Event)**: Create initial diagram with terminal event placeholder
-2. **Step 2 (Event Sequence)**: Update diagram with all events in sequence
-3. **Step 3 (Commands)**: Add commands connected to events
+2. **Step 2 (Event Sequence)**: Update diagram with all events in sequence (may be multiple)
+3. **Step 3 (Commands)**: Add commands connected to events (one command per event typically)
 4. **Step 4 (Triggers)**: Add UI screens or automations triggering commands
 5. **Step 5 (Final UI)**: Add final UI screen displaying results
 6. **Step 6 (Queries/Projections)**: Add projections and queries between events and UI
 7. **Steps 7-12**: Refine diagram as cross-links and data lineage are completed
+
+**Note**: An event model diagram may show multiple events in sequence representing the complete journey.
 
 **Diagram Update Protocol:**
 - Read existing workflow file
@@ -580,15 +630,16 @@ Each vertical slice MUST follow this LINEAR, UNIDIRECTIONAL format:
 4. **Complete Journey**: Show full flow from trigger to result
 5. **UI Context**: Include layout context (panes, panels, sections) in wireframes
 
-## Workflow Documents with Mermaid Diagrams
+## Event Model Documents with Mermaid Diagrams
 
-Each workflow file (**docs/event_model/functional-areas/*.md**) should contain:
+Each event model file (**docs/event_model/workflows/[functional-area]/[model-name].md**) should contain:
 
 ### Structure
 
-1. **Workflow Overview**: Goal and context
-2. **Vertical Slices**: One section per slice
-3. **Component Links**: References to all component definitions
+1. **Event Model Overview**: Goal and complete journey context
+2. **Event Sequence**: All events in the model listed in order
+3. **Vertical Slices**: One section per slice showing event flow
+4. **Component Links**: References to all component definitions (events, commands, UI, projections, queries)
 
 ### Mermaid Diagram Format
 

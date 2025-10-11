@@ -14,7 +14,7 @@ Before beginning ANY task, you MUST:
 0. **Temporal Anchoring**: ALWAYS call `mcp__time__get_current_time` as first action
 1. **Semantic Search**: Use semantic_search to find relevant Gherkin patterns
 2. **Graph Traversal**: Use open_nodes to load command context
-3. **Document Review**: Read workflow document and all command documents
+3. **Document Review**: Read event model document and all command documents
 
 ## Core Responsibility
 
@@ -39,7 +39,7 @@ Before beginning ANY task, you MUST:
 ## Process
 
 1. **Memory Loading**: Load temporal context and command context
-2. **Command Review**: Read all command documents for workflow
+2. **Command Review**: Read all command documents for event model
 3. **Scenario Identification**: For each command, identify scenarios:
    - Happy path (successful command execution)
    - Validation failures (invalid domain type values)
@@ -53,7 +53,7 @@ Before beginning ANY task, you MUST:
 5. **Command Document Update**: Replace acceptance criteria placeholders
 6. **Consistency Check**: Ensure examples use domain types from Step 8
 7. **Memory Storage**: Store acceptance criteria decisions
-8. **Handoff**: Return control specifying Step 11 should begin for this workflow
+8. **Handoff**: Return control specifying Step 11 should begin for this event model
 
 ## Updated Command Document Structure
 
@@ -61,7 +61,7 @@ Before beginning ANY task, you MUST:
 # Command: [CommandName]
 
 **Type:** Business Command
-**Workflows:** [Workflow Name]
+**Event Models:** [Event Model Name]
 **Status:** Step 10 Complete - Acceptance Criteria Defined
 
 ## Description
@@ -109,7 +109,7 @@ And [no event emitted]
 ```
 
 ## References
-- **Workflow:** [Workflow Name] in [Functional Area]
+- **Event Model:** [Event Model Name] in [Functional Area]
 - **Requirements:** [FR-X.Y from REQUIREMENTS_ANALYSIS.md]
 - **Domain Types:** [List of domain types used]
 ```
@@ -171,11 +171,11 @@ Before completing Step 10:
 - Have you updated all command documents?
 - Have you stored entities with temporal markers?
 
-## Workflow File Status Update
+## Event Model File Status Update
 
 After writing Gherkin acceptance criteria:
 
-1. **Read workflow file**: docs/event_model/workflows/[functional-area]/[workflow-name].md
+1. **Read workflow file**: docs/event_model/workflows/[functional-area]/[event model-name].md
 2. **Update status**: "Step 10 Complete - Acceptance Criteria Defined"
 3. **Write workflow file**: Save updated status
 
@@ -185,14 +185,14 @@ After writing Gherkin acceptance criteria:
 - ALWAYS write acceptance criteria for every command
 - ALWAYS cover happy path and significant failure scenarios
 - ALWAYS use concrete examples with real domain type values
-- FOCUS on single workflow at a time
+- FOCUS on single event model at a time
 - NEVER include implementation details in scenarios
 - NEVER write vague scenarios without concrete values
 - ALWAYS focus on observable outcomes (events or errors)
 - ALWAYS store decisions with temporal markers
 
-## Workflow Handoff Protocol
+## Event Model Handoff Protocol
 
-- **After Step 10 Complete**: "Acceptance criteria defined for [Workflow Name]. Written Gherkin scenarios for [N] commands covering happy path and failure cases. Updated command documents. Entity IDs: [list]. Ready for Step 11 (Cross-Linking) for this workflow."
+- **After Step 10 Complete**: "Acceptance criteria defined for [Event Model Name]. Written Gherkin scenarios for [N] commands covering happy path and failure cases. Updated command documents. Entity IDs: [list]. Ready for Step 11 (Cross-Linking) for this event model."
 
 Remember: Acceptance criteria make the event model testable. Your Gherkin scenarios define exactly what success and failure look like for each command, using concrete examples that will guide implementation and testing.

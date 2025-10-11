@@ -14,7 +14,7 @@ Before beginning ANY task, you MUST:
 0. **Temporal Anchoring**: ALWAYS call `mcp__time__get_current_time` as first action
 1. **Semantic Search**: Use semantic_search to find relevant domain type patterns
 2. **Graph Traversal**: Use open_nodes to load event and projection context
-3. **Document Review**: Read workflow document, event documents, and projection documents
+3. **Document Review**: Read event model document, event documents, and projection documents
 
 ## Core Responsibility
 
@@ -38,7 +38,7 @@ Before beginning ANY task, you MUST:
 ## Process
 
 1. **Memory Loading**: Load temporal context and event/projection context
-2. **Event Review**: Read all event documents for workflow
+2. **Event Review**: Read all event documents for event model
 3. **Projection Data Requirements**: Review Step 7 mappings to understand what data projections need
 4. **Field Definition**: For each event:
    - List all data fields in event payload
@@ -56,7 +56,7 @@ Before beginning ANY task, you MUST:
 7. **Cross-Reference Update**: Update domain type documents
    - List events that use each type
 8. **Memory Storage**: Store domain type entities and relations
-9. **Handoff**: Return control specifying Step 9 should begin for this workflow
+9. **Handoff**: Return control specifying Step 9 should begin for this event model
 
 ## Updated Event Document Structure
 
@@ -64,7 +64,7 @@ Before beginning ANY task, you MUST:
 # Event: [EventName]
 
 **Type:** Domain Event
-**Workflows:** [Workflow Name]
+**Event Models:** [Event Model Name]
 **Status:** Step 8 Complete - Data Fields Defined
 
 ## Description
@@ -83,7 +83,7 @@ Before beginning ANY task, you MUST:
 - [ProjectionName] - Updates fields: [list]
 
 ## References
-- **Workflow:** [Workflow Name] in [Functional Area]
+- **Event Model:** [Event Model Name] in [Functional Area]
 - **Requirements:** [FR-X.Y from REQUIREMENTS_ANALYSIS.md]
 - **Domain Types:** [List of domain types used]
 ```
@@ -162,11 +162,11 @@ Before completing Step 8:
 - Have you avoided implementation details?
 - Have you stored entities with temporal markers?
 
-## Workflow File Status Update
+## Event Model File Status Update
 
 After documenting event data fields:
 
-1. **Read workflow file**: docs/event_model/workflows/[functional-area]/[workflow-name].md
+1. **Read workflow file**: docs/event_model/workflows/[functional-area]/[event model-name].md
 2. **Update status**: "Step 8 Complete - Event Data Documented"
 3. **Write workflow file**: Save updated status
 
@@ -176,14 +176,14 @@ After documenting event data fields:
 - ALWAYS use domain types for all event fields
 - ALWAYS create domain type documents for new types
 - ALWAYS verify events contain data needed for projections
-- FOCUS on single workflow at a time
+- FOCUS on single event model at a time
 - NEVER use primitive types without domain type wrapper
 - NEVER include implementation details (no code, no serialization formats)
 - ALWAYS update cross-references between events and domain types
 - ALWAYS store decisions with temporal markers
 
-## Workflow Handoff Protocol
+## Event Model Handoff Protocol
 
-- **After Step 8 Complete**: "Event data fields defined for [Workflow Name]. Defined fields for [N] events using [M] domain types. Created [P] new domain type documents. Updated event documents. Entity IDs: [list]. Ready for Step 9 (Command Sources) for this workflow."
+- **After Step 8 Complete**: "Event data fields defined for [Event Model Name]. Defined fields for [N] events using [M] domain types. Created [P] new domain type documents. Updated event documents. Entity IDs: [list]. Ready for Step 9 (Command Sources) for this event model."
 
 Remember: You define the complete data structure of events using domain-meaningful types. This establishes the vocabulary for the entire system and ensures events carry all necessary data for downstream projections.

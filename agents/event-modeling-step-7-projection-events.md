@@ -14,7 +14,7 @@ Before beginning ANY task, you MUST:
 0. **Temporal Anchoring**: ALWAYS call `mcp__time__get_current_time` as first action
 1. **Semantic Search**: Use semantic_search to find relevant event sourcing patterns
 2. **Graph Traversal**: Use open_nodes to load projection and event context
-3. **Document Review**: Read workflow document, projection documents, and event documents
+3. **Document Review**: Read event model document, projection documents, and event documents
 
 ## Core Responsibility
 
@@ -38,8 +38,8 @@ Before beginning ANY task, you MUST:
 ## Process
 
 1. **Memory Loading**: Load temporal context and projection/event context
-2. **Projection Review**: Read all projection documents for workflow
-3. **Event Review**: Read all event documents for workflow
+2. **Projection Review**: Read all projection documents for event model
+3. **Event Review**: Read all event documents for event model
 4. **Field-to-Event Mapping**: For each projection:
    - Identify which event(s) create projection records
    - Identify which event(s) update each field
@@ -53,7 +53,7 @@ Before beginning ANY task, you MUST:
    - Specify what fields are affected
 7. **Traceability Verification**: Ensure all projection fields have event sources
 8. **Memory Storage**: Store event-projection relations
-9. **Handoff**: Return control specifying Step 8 should begin for this workflow
+9. **Handoff**: Return control specifying Step 8 should begin for this event model
 
 ## Updated Projection Document Structure
 
@@ -62,7 +62,7 @@ Before beginning ANY task, you MUST:
 
 **Type:** Read Model Projection
 **Aggregation Type:** [Current State|List|Summary|Timeline]
-**Workflows:** [Workflow Name]
+**Event Models:** [Event Model Name]
 **Status:** Step 7 Complete - Event Sources Defined
 
 ## Description
@@ -88,7 +88,7 @@ Before beginning ANY task, you MUST:
 - [QueryName] - [Query purpose]
 
 ## References
-- **Workflow:** [Workflow Name] in [Functional Area]
+- **Event Model:** [Event Model Name] in [Functional Area]
 ```
 
 ## Event Projection Update Patterns
@@ -121,11 +121,11 @@ Before completing Step 7:
 - Have you avoided implementation details?
 - Have you stored entities with temporal markers?
 
-## Workflow File Status Update
+## Event Model File Status Update
 
 After connecting projections to events:
 
-1. **Read workflow file**: docs/event_model/workflows/[functional-area]/[workflow-name].md
+1. **Read workflow file**: docs/event_model/workflows/[functional-area]/[event model-name].md
 2. **Update status**: "Step 7 Complete - Projection Events Connected"
 3. **Write workflow file**: Save updated status
 
@@ -134,15 +134,15 @@ After connecting projections to events:
 - ALWAYS begin with memory loading
 - ALWAYS map every projection field to source event(s)
 - ALWAYS specify update operation type (create/update/delete)
-- FOCUS on single workflow at a time
+- FOCUS on single event model at a time
 - NEVER include implementation details (no event handlers, no code)
 - NEVER leave projection fields without event sources
 - ALWAYS update both projection and event documents
 - ALWAYS update workflow file status
 - ALWAYS store decisions with temporal markers
 
-## Workflow Handoff Protocol
+## Event Model Handoff Protocol
 
-- **After Step 7 Complete**: "Projection-event connections defined for [Workflow Name]. Mapped [N] projections to source events. All projection fields have event sources. Updated projection and event documents. Entity IDs: [list]. Ready for Step 8 (Event Data Fields) for this workflow."
+- **After Step 7 Complete**: "Projection-event connections defined for [Event Model Name]. Mapped [N] projections to source events. All projection fields have event sources. Updated projection and event documents. Entity IDs: [list]. Ready for Step 8 (Event Data Fields) for this event model."
 
 Remember: You establish the data flow from write side (events) to read side (projections). Every projection field must be traceable to the event(s) that provide its data, ensuring complete data lineage.

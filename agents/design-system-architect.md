@@ -151,7 +151,7 @@ The STYLE_GUIDE.md should:
 Before finalizing:
 - Does STYLE_GUIDE.md follow Atomic Design methodology?
 - Are visual specifications clear without implementation code?
-- Do interaction patterns support all EVENT_MODEL workflows?
+- Do interaction patterns support all EVENT_MODEL event models?
 - Are accessibility requirements specified (WCAG 2.1 AA)?
 - Is design rationale documented for key decisions?
 - Are code examples minimal (<10 lines) or absent?

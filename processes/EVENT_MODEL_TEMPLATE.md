@@ -54,11 +54,11 @@ This document provides quick-reference templates for creating event model docume
 
 **Architectural Foundation**: [Foundational architectural approach]
 
-## Business Workflows
+## Business Event Models
 
-### Workflow 1: [WorkflowName]
+### Event Model 1: [Event Model Name]
 
-**Business Value**: [What business value this workflow provides]
+**Business Value**: [What business value this event model provides]
 
 **Vertical Slice Pattern**:
 ```
@@ -138,7 +138,7 @@ sequenceDiagram
 
 ---
 
-[Repeat for each workflow]
+[Repeat for each event model]
 
 ---
 
@@ -165,7 +165,7 @@ sequenceDiagram
 
 **Total Persistent Events: [N]** [Summary of event count]
 
-**Total Ephemeral Workflows: [N]** [List of workflows]
+**Total Ephemeral Event Models: [N]** [List of workflows]
 
 **Key Insight**: [Critical architectural insight]
 
@@ -182,7 +182,7 @@ sequenceDiagram
 
 ```markdown
 ---
-title: "[FunctionalAreaName] Workflows"
+title: "[FunctionalAreaName] Event Models"
 ---
 
 ## Functional Area: [FunctionalAreaName]
@@ -193,9 +193,9 @@ title: "[FunctionalAreaName] Workflows"
 
 ### Workflows
 
-- [Workflow 1 Name](#workflow-1-name)
-- [Workflow 2 Name](#workflow-2-name)
-- [Workflow 3 Name](#workflow-3-name)
+- [Event Model 1 Name](#workflow-1-name)
+- [Event Model 2 Name](#workflow-2-name)
+- [Event Model 3 Name](#workflow-3-name)
 
 ---
 
@@ -237,7 +237,7 @@ graph LR
 
 ### Workflow 2 Name
 
-[Repeat pattern for each workflow]
+[Repeat pattern for each event model]
 
 ---
 ```
@@ -278,7 +278,7 @@ title: "[EventName] Event"
 
 ### Used In Workflows
 
-- [WorkflowName][wf-workflow] in [FunctionalArea][fa-area]
+- [Event Model Name][wf-workflow] in [FunctionalArea][fa-area]
 
 [cmd-command]: ../commands/CommandName.md
 [evt-prior]: ./PriorEvent.md
@@ -371,7 +371,7 @@ THEN [ErrorType] with error_code="CODE", message="Detailed error message"
 
 ### Used In Workflows
 
-- [WorkflowName][wf-workflow] in [FunctionalArea][fa-area]
+- [Event Model Name][wf-workflow] in [FunctionalArea][fa-area]
 
 [ui-screen]: ../ui-screens/ScreenName.md
 [auto-automation]: ../automations/AutomationName.md
@@ -460,7 +460,7 @@ title: "[ScreenName] Screen"
 
 ### Used In Workflows
 
-- [WorkflowName][wf-workflow] in [FunctionalArea][fa-area]
+- [Event Model Name][wf-workflow] in [FunctionalArea][fa-area]
 
 [qry-query1]: ../queries/QueryName.md
 [qry-query2]: ../queries/OtherQuery.md
@@ -530,7 +530,7 @@ title: "[AutomationName] Automation"
 
 ### Used In Workflows
 
-- [WorkflowName][wf-workflow] in [FunctionalArea][fa-area]
+- [Event Model Name][wf-workflow] in [FunctionalArea][fa-area]
 
 [evt-trigger]: ../events/TriggerEvent.md
 [cmd-command]: ../commands/CommandName.md
@@ -592,7 +592,7 @@ title: "[ProjectionName] Projection"
 
 ### Used In Workflows
 
-- [WorkflowName][wf-workflow] in [FunctionalArea][fa-area]
+- [Event Model Name][wf-workflow] in [FunctionalArea][fa-area]
 
 [evt-event1]: ../events/EventName.md
 [evt-event2]: ../events/OtherEvent.md
@@ -687,7 +687,7 @@ OR **Collection**:
 
 ### Used In Workflows
 
-- [WorkflowName][wf-workflow] in [FunctionalArea][fa-area]
+- [Event Model Name][wf-workflow] in [FunctionalArea][fa-area]
 
 [proj-projection]: ../projections/ProjectionName.md
 [ui-screen]: ../ui-screens/ScreenName.md
@@ -842,7 +842,7 @@ sequenceDiagram
 ### Placeholder Conventions
 
 - `[ProjectName]`: Replace with actual project name
-- `[WorkflowName]`: Replace with workflow name
+- `[Event Model Name]`: Replace with workflow name
 - `[CommandName]`: Replace with command name
 - `[EventName]`: Replace with event name
 - `[ScreenName]`: Replace with UI screen name

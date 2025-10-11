@@ -26,7 +26,7 @@
 
 4. **Document-Specific Guidelines**
    - **REQUIREMENTS_ANALYSIS.md**: WHAT features, WHY they matter, WHAT success looks like (no HOW)
-   - **EVENT_MODEL.md**: Business events and workflows (no implementation tech)
+   - **EVENT_MODEL.md**: Business events and event models (no implementation tech)
    - **ADRs**: Architectural decisions with rationale (no implementation code)
    - **ARCHITECTURE.md**: High-level system design synthesizing ADR decisions (no detailed code)
    - **STYLE_GUIDE.md**: Design patterns and visual specifications (no implementation tech)

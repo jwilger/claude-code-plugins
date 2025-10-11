@@ -14,7 +14,7 @@ Before beginning ANY task, you MUST:
 0. **Temporal Anchoring**: ALWAYS call `mcp__time__get_current_time` as first action
 1. **Semantic Search**: Use semantic_search to find relevant command sourcing patterns
 2. **Graph Traversal**: Use open_nodes to load command and event context
-3. **Document Review**: Read workflow document, command documents, and event documents
+3. **Document Review**: Read event model document, command documents, and event documents
 
 ## Core Responsibility
 
@@ -37,7 +37,7 @@ Before beginning ANY task, you MUST:
 ## Process
 
 1. **Memory Loading**: Load temporal context and command/event context
-2. **Command Review**: Read all command documents for workflow
+2. **Command Review**: Read all command documents for event model
 3. **Data Field Definition**: For each command:
    - List all input fields (data command needs)
    - Identify source of each field (UI, automation, external system)
@@ -53,7 +53,7 @@ Before beginning ANY task, you MUST:
 6. **Command Document Update**: Add complete field and logic definitions
 7. **Domain Type Update**: Ensure commands reference domain types
 8. **Memory Storage**: Store command sourcing decisions and relations
-9. **Handoff**: Return control specifying Step 10 should begin for this workflow
+9. **Handoff**: Return control specifying Step 10 should begin for this event model
 
 ## Updated Command Document Structure
 
@@ -61,7 +61,7 @@ Before beginning ANY task, you MUST:
 # Command: [CommandName]
 
 **Type:** Business Command
-**Workflows:** [Workflow Name]
+**Event Models:** [Event Model Name]
 **Status:** Step 9 Complete - Data Sources Defined
 
 ## Description
@@ -96,7 +96,7 @@ Before beginning ANY task, you MUST:
 *To be determined in Step 10 (Gherkin scenarios)*
 
 ## References
-- **Workflow:** [Workflow Name] in [Functional Area]
+- **Event Model:** [Event Model Name] in [Functional Area]
 - **Requirements:** [FR-X.Y from REQUIREMENTS_ANALYSIS.md]
 - **Domain Types:** [List of domain types used]
 ```
@@ -154,11 +154,11 @@ Before completing Step 9:
 - Have you avoided implementation details?
 - Have you stored entities with temporal markers?
 
-## Workflow File Status Update
+## Event Model File Status Update
 
 After documenting command data sources:
 
-1. **Read workflow file**: docs/event_model/workflows/[functional-area]/[workflow-name].md
+1. **Read workflow file**: docs/event_model/workflows/[functional-area]/[event model-name].md
 2. **Update status**: "Step 9 Complete - Command Sources Documented"
 3. **Write workflow file**: Save updated status
 
@@ -168,14 +168,14 @@ After documenting command data sources:
 - ALWAYS define all command input fields with domain types
 - ALWAYS identify source for every command field
 - ALWAYS document event aggregation logic if commands load prior events
-- FOCUS on single workflow at a time
+- FOCUS on single event model at a time
 - NEVER include implementation details (no code, no frameworks)
 - NEVER leave command fields without identified sources
 - ALWAYS maintain consistency with domain types from Step 8
 - ALWAYS store decisions with temporal markers
 
-## Workflow Handoff Protocol
+## Event Model Handoff Protocol
 
-- **After Step 9 Complete**: "Command data sources defined for [Workflow Name]. Documented input fields and event aggregation for [N] commands. All command fields have identified sources. Updated command documents. Entity IDs: [list]. Ready for Step 10 (Acceptance Criteria) for this workflow."
+- **After Step 9 Complete**: "Command data sources defined for [Event Model Name]. Documented input fields and event aggregation for [N] commands. All command fields have identified sources. Updated command documents. Entity IDs: [list]. Ready for Step 10 (Acceptance Criteria) for this event model."
 
-Remember: You complete the data lineage by tracing command inputs to their sources and documenting how commands use prior events. This ensures every piece of data in the system is traceable from external input through the entire workflow.
+Remember: You complete the data lineage by tracing command inputs to their sources and documenting how commands use prior events. This ensures every piece of data in the system is traceable from external input through the entire event model.
