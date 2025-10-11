@@ -17,5 +17,62 @@
     "sequential-workflow",
     "domain-driven-design",
     "type-first"
-  ]
+  ],
+  "agents": [
+    "./agents/acceptance-validator.md",
+    "./agents/adr-writer.md",
+    "./agents/architecture-synthesizer.md",
+    "./agents/cognitive-load-analyzer.md",
+    "./agents/dependency-management.md",
+    "./agents/design-system-architect.md",
+    "./agents/devops.md",
+    "./agents/event-modeling-architect.md",
+    "./agents/event-modeling-pm.md",
+    "./agents/event-modeling-step-1-goal-event.md",
+    "./agents/event-modeling-step-10-acceptance.md",
+    "./agents/event-modeling-step-11-cross-linking.md",
+    "./agents/event-modeling-step-12-completeness.md",
+    "./agents/event-modeling-step-2-event-sequence.md",
+    "./agents/event-modeling-step-3-commands.md",
+    "./agents/event-modeling-step-4-triggers.md",
+    "./agents/event-modeling-step-5-final-ui.md",
+    "./agents/event-modeling-step-6-queries-projections.md",
+    "./agents/event-modeling-step-7-projection-events.md",
+    "./agents/event-modeling-step-8-event-data.md",
+    "./agents/event-modeling-step-9-command-sources.md",
+    "./agents/file-editor.md",
+    "./agents/green-implementer.md",
+    "./agents/red-tdd-tester.md",
+    "./agents/requirements-analyst.md",
+    "./agents/research-specialist.md",
+    "./agents/story-architect.md",
+    "./agents/story-planner.md",
+    "./agents/technical-documentation-writer.md",
+    "./agents/ux-consultant.md"
+  ],
+  "commands": [
+    "./commands/adr-template.md",
+    "./commands/dependency-management-process.md",
+    "./commands/design-system-process.md",
+    "./commands/documentation-philosophy.md",
+    "./commands/domain-modeling-process.md",
+    "./commands/event-model-template.md",
+    "./commands/event-modeling-process.md",
+    "./commands/github-pr-management.md",
+    "./commands/integration-validation.md",
+    "./commands/sdlc-workflow.md",
+    "./commands/setup-sdlc-alias.md",
+    "./commands/story-planning-process.md",
+    "./commands/tdd-workflow-process.md"
+  ],
+  "mcpServers": {
+    "time": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-time"]
+    },
+    "memento": {
+      "command": "npx",
+      "args": ["-y", "@gannonh/memento-mcp"]
+    }
+  }
 }

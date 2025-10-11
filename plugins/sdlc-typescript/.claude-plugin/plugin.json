@@ -15,5 +15,6 @@
     "branded-types",
     "discriminated-unions",
     "type-first"
-  ]
+  ],
+  "agents": ["./agents/typescript-domain-model-expert.md"]
 }

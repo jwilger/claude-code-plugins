@@ -17,5 +17,13 @@
     "nutype",
     "type-first",
     "parse-dont-validate"
-  ]
+  ],
+  "agents": ["./agents/rust-domain-model-expert.md"],
+  "commands": ["./commands/setup-cargo-mcp.md"],
+  "mcpServers": {
+    "cargo-mcp": {
+      "command": "cargo-mcp",
+      "args": ["serve"]
+    }
+  }
 }
