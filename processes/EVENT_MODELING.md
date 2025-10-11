@@ -20,6 +20,104 @@ Event Modeling is a collaborative design methodology that captures system behavi
 - ✅ "Reject invalid uploaded document" (S3 upload → document rejected with reason)
 - ❌ "Validate document" (too narrow - just one stage, not end-to-end)
 
+## CRITICAL: Workflows Must Represent State Changes
+
+**Event modeling represents how state changes affect views. A workflow exists ONLY when users record decisions in the system.**
+
+### The Core Question
+
+**"If X happens, what affect does that have on view Y?"**
+
+- If no effect → Not a workflow, just a query
+- If view changes → Need workflow with event → projection → updated view
+
+### What IS a Workflow (State Changes)
+
+✅ **User records a decision or creates persistent state:**
+- "Deploy and configure system" → SystemActivated, ConfigurationApplied
+- "Establish organizational hierarchy" → UnitCreated (multiple), LeaderAssigned
+- "Model resource scenario" → ScenarioCreated, ScenarioCommittedToPlan
+- "Onboard new customer" → OnboardingInitiated, TaskCompleted, OnboardingFinished
+- "Flag operational risk" → RiskFlagged, RiskMitigated
+- "Request and approve leave" → LeaveRequested, LeaveApproved
+
+### What is NOT a Workflow (Read-Only)
+
+❌ **User only views information without changing it:**
+- "View resource availability" - just a query against projections
+- "View team roster" - just a query against projections
+- "Monitor system health" - just reading metrics/logs
+- "Review audit trail" - just reading event history
+- "View schedule calendar" - just a query against projections
+- "Detect capacity issue" - automated alert (no user decision recorded)
+
+**If a user logs in, views information, and logs out without changing anything → NO WORKFLOW EXISTS**
+
+### Anti-Pattern: CRUD Thinking
+
+❌ **Avoid modeling individual CRUD operations as separate workflows:**
+
+**WRONG (CRUD operations):**
+- "Create organizational unit"
+- "Rename organizational unit"
+- "Move organizational unit"
+- "Archive organizational unit"
+
+**RIGHT (Business journey):**
+- "Establish organizational hierarchy" - END-TO-END journey from no structure → complete hierarchy with leaders assigned
+
+**WRONG (Configuration steps):**
+- "Define category types"
+- "Define levels within category"
+- "Apply template configuration"
+- "Customize category settings"
+
+**RIGHT (Business journey):**
+- "Configure classification framework" - END-TO-END journey from no framework → complete system ready for operational use
+
+### Anti-Pattern: View-Only "Workflows"
+
+❌ **Avoid creating workflows for read-only activities:**
+
+**NOT workflows (just queries):**
+- "View quarterly forecast"
+- "View team schedule"
+- "View report history"
+- "Track process progress"
+
+These are **projections and queries**, not workflows. They appear on UI screens but don't generate events.
+
+### How to Identify Real Workflows
+
+**Ask these questions:**
+
+1. **Does the user RECORD a decision?** (Yes → workflow | No → just a query)
+2. **What persistent state changes?** (Events that survive restart)
+3. **What's the END-TO-END journey?** (Not just one CRUD operation)
+4. **Where does the journey split?** (Different outcomes = separate workflows)
+
+**Examples of proper workflow identification:**
+
+**Resource Planning functional area:**
+- ❌ NOT: "View resource forecast", "View availability", "Simulate allocation"
+- ✅ YES: "Model resource scenario", "Flag planning risk", "Commit resource plan"
+
+**Customer Management functional area:**
+- ❌ NOT: "Create template", "Customize template", "Complete task", "View roster"
+- ✅ YES: "Onboard new customer", "Offboard customer", "Publish status report"
+
+**System Configuration functional area:**
+- ❌ NOT: "Create entity", "Rename entity", "Move entity", "Monitor health"
+- ✅ YES: "Deploy and license system", "Establish organizational structure", "Configure authentication"
+
+### Functional Areas Without Workflows
+
+**Some functional areas may have NO workflows** - they only provide projections/queries built from events in other areas.
+
+Example: "Analytics and Reporting" might have zero state-changing workflows if all data comes from transactions, approvals, and state changes happening in other functional areas.
+
+**This is perfectly valid.** Not every functional area needs workflows. Some areas exist purely to provide decision-support views.
+
 ## CRITICAL: Process Execution Strategy
 
 **BREADTH-FIRST for Step 0, then DEPTH-FIRST for Steps 1-12**
