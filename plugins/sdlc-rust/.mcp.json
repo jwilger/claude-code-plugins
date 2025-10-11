@@ -1,0 +1,9 @@
+{
+  "cargo-mcp": {
+    "command": "cargo-mcp",
+    "args": ["serve"],
+    "env": {
+      "CARGO_MCP_DEFAULT_TOOLCHAIN": "stable"
+    }
+  }
+}

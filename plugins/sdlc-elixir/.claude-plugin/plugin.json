@@ -1,0 +1,22 @@
+{
+  "name": "sdlc-elixir",
+  "description": "Elixir domain modeling agent using structs with enforced keys and pattern matching. Implements type-first TDD leveraging Elixir's powerful pattern matching for compile-time safety.",
+  "version": "1.0.0",
+  "author": {
+    "name": "John Wilger",
+    "email": "john@johnwilger.com"
+  },
+  "homepage": "https://github.com/jwilger/claude-code-setup",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jwilger/claude-code-setup.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "elixir",
+    "domain-modeling",
+    "pattern-matching",
+    "structs",
+    "type-first"
+  ]
+}
