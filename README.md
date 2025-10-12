@@ -27,20 +27,66 @@ This plugin marketplace provides a complete 8-phase sequential development workf
 
 ## Available Plugins
 
-### Application Workflow: `sdlc-app`
+### Workflow Plugins
 
-Event Modeling-based application development workflow containing:
+Choose the workflow that matches your project type:
 
+#### Application Workflow: `sdlc-app`
+
+**For:** Web/mobile/desktop applications, line-of-business apps, projects with end-user interfaces
+
+Event Modeling-based application development workflow:
 - **31 Core Agents**: Requirements analysis, event modeling (15 agents), architecture, planning, TDD, validation
-- **13 Slash Commands**: Process methodologies, workflow activation, setup automation
+- **14 Slash Commands**: Process methodologies, workflow activation, project initialization
 - **2 MCP Servers**: Time (temporal anchoring) and Memento (knowledge graph memory)
 
+**8-Phase Workflow:**
+1. Requirements Analysis
+2. **Event Modeling** (12-step process)
+3. Architectural Decision Records
+4. Architecture Synthesis
+5. **Design System** (Atomic Design)
+6. Story Planning (user stories)
+7. Story-by-Story Implementation
+8. Acceptance Validation
+
 **Key Features:**
-- Complete 8-phase workflow coordination
-- Event Modeling 12-step process with hierarchical documentation
+- Event Modeling with hierarchical documentation
+- UX consultant involvement throughout
+- User-facing acceptance criteria
+- UI/UX design patterns
+
+#### Infrastructure Workflow: `sdlc-infrastructure`
+
+**For:** Libraries, frameworks, developer tools, APIs, SDKs, system utilities
+
+Technical architecture-based infrastructure development workflow:
+- **3 Core Agents**: Technical requirements analyst, technical increment planner, story architect
+- **3 Slash Commands**: Technical increment planning, workflow activation, project initialization
+- **2 MCP Servers**: Time (temporal anchoring) and Memento (knowledge graph memory)
+
+**6-Phase Workflow:**
+1. Technical Requirements Analysis
+2. ~~Event Modeling~~ (Skipped)
+3. Architectural Decision Records
+4. Architecture Synthesis
+5. ~~Design System~~ (Skipped)
+6. Technical Increment Planning (dependency-ordered)
+7. Increment-by-Increment Implementation
+8. Acceptance Validation
+
+**Key Features:**
+- Technical requirements focus (API contracts, performance, compatibility)
+- Dependency-based prioritization
+- Technical acceptance criteria
+- Public API integration points
+- Usage examples for consumers
+
+**Both Workflows Share:**
 - Outside-In TDD with hierarchical chained PRs
 - Memory intelligence with semantic search and graph traversal
 - Mutation testing (≥80% score) and cognitive load analysis (TRACE framework)
+- Type-first domain modeling approach
 
 ### Language-Specific Plugins
 
@@ -103,82 +149,62 @@ Choose the language plugin for your project:
 /plugin install sdlc-elixir@jwilger-sdlc
 ```
 
-## Usage
+## Getting Started
 
-You can activate the SDLC workflow using **two different approaches** - choose the one that works best for you:
+### Initialize a New Project
 
-### Approach 1: System Prompt Append (Recommended)
+The first step is to initialize your project with the appropriate workflow:
 
-This method adds the workflow to Claude Code's system prompt, ensuring all agents follow the rules at all times.
-
-#### Automatic Setup (Intelligent)
-
-Use the intelligent setup command that adapts to your specific environment:
+#### For Application Projects
 
 ```bash
-# In Claude Code
-/setup-sdlc-alias
+# In Claude Code, in your project directory
+/initialize-app-project
 ```
 
-This command will:
-1. Detect your platform (Linux, macOS, Windows)
-2. Identify your shell (bash, zsh, fish)
-3. Check for NixOS, direnv, or project-specific configurations
-4. Generate exact configuration commands for your setup
-5. Guide you through the installation
+This will:
+1. Run standard `/init` to create CLAUDE.md
+2. Append workflow configuration to CLAUDE.md
+3. Create `./scripts/claude` launcher configured for application workflow
+4. Store workflow choice in memory for verification
 
-#### Manual Setup Examples
-
-**For Bash:**
-```bash
-# Add to ~/.bashrc
-alias claude-sdlc='claude-code --append-system-prompt "sdlc-app@jwilger-sdlc"'
-```
-
-**For Zsh:**
-```bash
-# Add to ~/.zshrc
-alias claude-sdlc='claude-code --append-system-prompt "sdlc-app@jwilger-sdlc"'
-```
-
-**For Fish:**
-```fish
-# Add to ~/.config/fish/config.fish
-alias claude-sdlc='claude-code --append-system-prompt "sdlc-app@jwilger-sdlc"'
-```
-
-**For NixOS (home-manager):**
-```nix
-# Add to home.nix
-programs.bash.shellAliases = {
-  claude-sdlc = ''claude-code --append-system-prompt "sdlc-app@jwilger-sdlc"'';
-};
-```
-
-**For direnv (.envrc):**
-```bash
-# Add to .envrc
-export CLAUDE_ALIAS="claude-code --append-system-prompt \"sdlc-app@jwilger-sdlc\""
-alias claude-sdlc="$CLAUDE_ALIAS"
-```
-
-Then launch Claude Code with:
-```bash
-claude-sdlc
-```
-
-### Approach 2: Slash Command Activation
-
-Activate the workflow on-demand using a slash command:
+#### For Infrastructure/Library Projects
 
 ```bash
-# In Claude Code
-/sdlc-workflow
+# In Claude Code, in your project directory
+/initialize-infrastructure-project
 ```
 
-This loads the complete workflow rules into the current conversation context.
+This will:
+1. Run standard `/init` to create CLAUDE.md
+2. Append workflow configuration to CLAUDE.md
+3. Create `./scripts/claude` launcher configured for infrastructure workflow
+4. Store workflow choice in memory for verification
 
-**Note:** This approach requires invoking the command in each new conversation, but provides more flexibility for switching between different workflows.
+### Daily Usage
+
+After initialization, **always** launch Claude Code using the project-local launcher:
+
+```bash
+./scripts/claude
+```
+
+This ensures the correct workflow context is loaded automatically.
+
+**Benefits of project-local launcher:**
+- No system-wide aliases needed
+- Correct workflow always loaded
+- Portable across team members
+- Visible in version control (team sees workflow choice)
+- Prevents accidentally using wrong workflow
+
+### Workflow Verification
+
+The plugins automatically verify workflow compatibility:
+- Checks CLAUDE.md for "## SDLC Workflow" section
+- Validates "Workflow Type: Application" or "Workflow Type: Infrastructure"
+- **Blocks all operations** if wrong workflow detected
+- Provides clear error message with recovery options
 
 ## MCP Server Configuration
 
