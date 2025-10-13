@@ -67,8 +67,8 @@
   ],
   "mcpServers": {
     "time": {
-      "command": "uvx",
-      "args": ["mcp-server-time"]
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-time"]
     },
     "memento": {
       "command": "npx",
