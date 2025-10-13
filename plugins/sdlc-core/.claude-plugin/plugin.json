@@ -1,6 +1,6 @@
 {
-  "name": "sdlc-app",
-  "description": "Event Modeling-based application development workflow with TDD, Architecture synthesis, and Type-First Design. Provides 8-phase sequential workflow from requirements to deployment with 31 specialized agents and comprehensive process methodologies.",
+  "name": "sdlc-core",
+  "description": "Core SDLC workflow with Event Modeling, TDD, Architecture synthesis, and Type-First Design. Provides 8-phase sequential workflow from requirements to deployment with 31 specialized agents and comprehensive process methodologies.",
   "version": "1.0.0",
   "author": {
     "name": "John Wilger",
@@ -59,7 +59,6 @@
     "./commands/event-model-template.md",
     "./commands/event-modeling-process.md",
     "./commands/github-pr-management.md",
-    "./commands/initialize-app-project.md",
     "./commands/integration-validation.md",
     "./commands/sdlc-workflow.md",
     "./commands/setup-sdlc-alias.md",

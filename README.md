@@ -27,9 +27,9 @@ This plugin marketplace provides a complete 8-phase sequential development workf
 
 ## Available Plugins
 
-### Application Workflow: `sdlc-app`
+### Core Plugin: `sdlc-core`
 
-Event Modeling-based application development workflow containing:
+The foundation of the SDLC workflow containing:
 
 - **31 Core Agents**: Requirements analysis, event modeling (15 agents), architecture, planning, TDD, validation
 - **13 Slash Commands**: Process methodologies, workflow activation, setup automation
@@ -82,7 +82,7 @@ Each language plugin provides domain modeling expertise using language-specific 
 
 ```bash
 # Install the core SDLC workflow
-/plugin install sdlc-app@jwilger-sdlc
+/plugin install sdlc-core@jwilger-sdlc
 ```
 
 ### Install Language Plugin (Optional)
@@ -132,33 +132,33 @@ This command will:
 **For Bash:**
 ```bash
 # Add to ~/.bashrc
-alias claude-sdlc='claude-code --append-system-prompt "sdlc-app@jwilger-sdlc"'
+alias claude-sdlc='claude --append-system-prompt "$(cat ~/.claude/plugins/sdlc-core/system-prompt.md)"'
 ```
 
 **For Zsh:**
 ```bash
 # Add to ~/.zshrc
-alias claude-sdlc='claude-code --append-system-prompt "sdlc-app@jwilger-sdlc"'
+alias claude-sdlc='claude --append-system-prompt "$(cat ~/.claude/plugins/sdlc-core/system-prompt.md)"'
 ```
 
 **For Fish:**
 ```fish
 # Add to ~/.config/fish/config.fish
-alias claude-sdlc='claude-code --append-system-prompt "sdlc-app@jwilger-sdlc"'
+alias claude-sdlc='claude --append-system-prompt (cat ~/.claude/plugins/sdlc-core/system-prompt.md)'
 ```
 
 **For NixOS (home-manager):**
 ```nix
 # Add to home.nix
 programs.bash.shellAliases = {
-  claude-sdlc = ''claude-code --append-system-prompt "sdlc-app@jwilger-sdlc"'';
+  claude-sdlc = ''claude --append-system-prompt "$(cat ~/.claude/plugins/sdlc-core/system-prompt.md)"'';
 };
 ```
 
 **For direnv (.envrc):**
 ```bash
 # Add to .envrc
-export CLAUDE_ALIAS="claude-code --append-system-prompt \"sdlc-app@jwilger-sdlc\""
+export CLAUDE_ALIAS="claude --append-system-prompt \"$(cat ~/.claude/plugins/sdlc-core/system-prompt.md)\""
 alias claude-sdlc="$CLAUDE_ALIAS"
 ```
 
@@ -371,14 +371,14 @@ docs/
 
 - **Symptom**: Agents reference process files instead of slash commands
 - **Cause**: Outdated agent definitions
-- **Fix**: Reinstall plugin: `/plugin uninstall sdlc-app@jwilger-sdlc` then `/plugin install sdlc-app@jwilger-sdlc`
+- **Fix**: Reinstall plugin: `/plugin uninstall sdlc-core@jwilger-sdlc` then `/plugin install sdlc-core@jwilger-sdlc`
 
 ## Contributing
 
 This plugin marketplace is designed to be extensible:
 
 1. **Add new language plugins**: Follow the pattern in existing language plugins
-2. **Customize process files**: Edit commands in `plugins/sdlc-app/commands/`
+2. **Customize process files**: Edit commands in `plugins/sdlc-core/commands/`
 3. **Add specialized agents**: Create new agents in appropriate plugin's `agents/` directory
 4. **Extend workflows**: Modify system-prompt.md for new phases or gates
 

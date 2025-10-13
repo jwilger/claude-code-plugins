@@ -5,7 +5,7 @@ disable-model-invocation: false
 
 # SDLC Workflow Activation
 
-This command activates the complete sequential SDLC workflow system for Event Modeling-based application development. For the full system prompt with all details, see `plugins/sdlc-app/system-prompt.md`.
+This command activates the complete sequential SDLC workflow system. For the full system prompt with all details, see `plugins/sdlc-core/system-prompt.md`.
 
 ## Sequential Development Workflow (8 Phases)
 
