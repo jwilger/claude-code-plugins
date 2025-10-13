@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# SDLC Infrastructure Workflow Launcher
+# Generated: 2025-10-12
+# DO NOT EDIT - Regenerate with /initialize-infrastructure-project
+
+exec claude --append-system-prompt "sdlc-infrastructure@jwilger-sdlc" "$@"

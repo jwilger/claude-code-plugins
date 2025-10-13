@@ -4,7 +4,7 @@ A comprehensive Software Development Lifecycle (SDLC) workflow system for Claude
 
 ## Overview
 
-This plugin marketplace provides a complete 8-phase sequential development workflow with 35+ specialized agents, 13 slash commands, and integration with MCP servers for persistent memory and tooling.
+This plugin marketplace provides complete sequential development workflows with 34 specialized agents (31 for applications, 3 for infrastructure), up to 14 slash commands per workflow, and integration with MCP servers for persistent memory and tooling.
 
 ### Core Philosophy
 
@@ -113,7 +113,7 @@ Each language plugin provides domain modeling expertise using language-specific 
 
 ### Prerequisites
 
-- Claude Code CLI installed
+- Claude Code CLI installed (`claude` command available)
 - Node.js (for MCP servers)
 - Git
 
@@ -188,6 +188,8 @@ After initialization, **always** launch Claude Code using the project-local laun
 ```bash
 ./scripts/claude
 ```
+
+**Important:** The launcher script uses `claude --append-system-prompt` to automatically load the workflow context. Do NOT use the plain `claude` command directly, as it won't load the workflow system prompt.
 
 This ensures the correct workflow context is loaded automatically.
 
@@ -383,9 +385,9 @@ docs/
 
 ### Agents Not Following Workflow
 
-- **If using Approach 1**: Ensure you launched with `claude-sdlc` alias
-- **If using Approach 2**: Ensure you ran `/sdlc-workflow` in the conversation
-- **Check**: Verify plugin installed: `/plugin list`
+- **Check project launcher**: Ensure you launched with `./scripts/claude` (not plain `claude` command)
+- **Verify workflow loaded**: Check that your conversation includes the workflow system prompt
+- **Check plugin installed**: Run `/plugin list` to verify the plugin is installed
 
 ### Memory Not Persisting
 
