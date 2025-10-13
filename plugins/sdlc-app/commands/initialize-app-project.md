@@ -78,7 +78,7 @@ Create `./scripts/claude` with the following content:
 # Generated: [current date]
 # DO NOT EDIT - Regenerate with /initialize-app-project
 
-exec claude --append-system-prompt "sdlc-app@jwilger-sdlc" "$@"
+exec claude-code --append-system-prompt "sdlc-app@jwilger-sdlc" "$@"
 ```
 
 Make it executable:
@@ -122,7 +122,7 @@ Project configured for Event Modeling-based application development.
 3. Follow 8-phase sequential workflow
 
 **Important:**
-- Use ./scripts/claude (not plain claude command) for all work
+- Use ./scripts/claude (not plain claude-code) for all work
 - This ensures correct workflow context is loaded
 - CLAUDE.md documents your workflow choice
 

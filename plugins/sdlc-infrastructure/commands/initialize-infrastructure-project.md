@@ -78,7 +78,7 @@ Create `./scripts/claude` with the following content:
 # Generated: [current date]
 # DO NOT EDIT - Regenerate with /initialize-infrastructure-project
 
-exec claude --append-system-prompt "sdlc-infrastructure@jwilger-sdlc" "$@"
+exec claude-code --append-system-prompt "sdlc-infrastructure@jwilger-sdlc" "$@"
 ```
 
 Make it executable:
@@ -122,7 +122,7 @@ Project configured for infrastructure/library development.
 3. Follow 6-phase sequential workflow (skips Event Modeling and Design System)
 
 **Important:**
-- Use ./scripts/claude (not plain claude command) for all work
+- Use ./scripts/claude (not plain claude-code) for all work
 - This ensures correct workflow context is loaded
 - CLAUDE.md documents your workflow choice
 
