@@ -6,12 +6,8 @@
   },
   "plugins": [
     {
-      "name": "sdlc-app",
-      "source": "./plugins/sdlc-app"
-    },
-    {
-      "name": "sdlc-infrastructure",
-      "source": "./plugins/sdlc-infrastructure"
+      "name": "sdlc-core",
+      "source": "./plugins/sdlc-core"
     },
     {
       "name": "sdlc-rust",
