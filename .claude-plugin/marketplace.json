@@ -12,7 +12,7 @@
   "plugins": [
     {
       "name": "sdlc-core",
-      "source": "./plugins/sdlc-core",
+      "source": "./sdlc-core",
       "description": "Core SDLC workflow: 8 phases from requirements to deployment",
       "version": "1.0.0",
       "author": {
@@ -73,7 +73,7 @@
     },
     {
       "name": "sdlc-rust",
-      "source": "./plugins/sdlc-rust",
+      "source": "./sdlc-rust",
       "description": "Rust domain modeling agent with cargo-mcp integration",
       "version": "1.0.0",
       "author": {
@@ -89,7 +89,7 @@
     },
     {
       "name": "sdlc-python",
-      "source": "./plugins/sdlc-python",
+      "source": "./sdlc-python",
       "description": "Python domain modeling agent (Pydantic, type-first TDD)",
       "version": "1.0.0",
       "author": {
@@ -103,7 +103,7 @@
     },
     {
       "name": "sdlc-typescript",
-      "source": "./plugins/sdlc-typescript",
+      "source": "./sdlc-typescript",
       "description": "TypeScript domain modeling agent (branded types, discriminated unions)",
       "version": "1.0.0",
       "author": {
@@ -117,7 +117,7 @@
     },
     {
       "name": "sdlc-elixir",
-      "source": "./plugins/sdlc-elixir",
+      "source": "./sdlc-elixir",
       "description": "Elixir domain modeling agent (pattern matching, structs)",
       "version": "1.0.0",
       "author": {
