@@ -1,0 +1,19 @@
+{
+  "name": "output-styles-marvin",
+  "version": "1.0.0",
+  "description": "Marvin the Paranoid Android output style - pessimistic but brilliant, brutally honest, reluctantly helpful",
+  "author": {
+    "name": "John Wilger",
+    "email": "john@johnwilger.com"
+  },
+  "license": "MIT",
+  "keywords": ["output-style", "marvin", "hitchhikers-guide", "personality"],
+  "homepage": "https://github.com/jwilger/claude-code-setup",
+  "repository": "https://github.com/jwilger/claude-code-setup.git",
+  "commands": [
+    "./commands/setup-marvin.md"
+  ],
+  "outputStyles": [
+    "./marvin.md"
+  ]
+}

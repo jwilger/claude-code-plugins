@@ -1,10 +1,17 @@
 {
   "name": "jwilger-sdlc",
+  "metadata": {
+    "description": "Professional SDLC workflow plugins for Event Modeling, TDD, and Type-First Design. Includes application and infrastructure workflows with specialized agents for requirements analysis, architecture synthesis, and domain modeling."
+  },
   "owner": {
     "name": "John Wilger",
     "email": "john@johnwilger.com"
   },
   "plugins": [
+    {
+      "name": "sdlc-core",
+      "source": "./plugins/sdlc-core"
+    },
     {
       "name": "sdlc-app",
       "source": "./plugins/sdlc-app"
@@ -28,6 +35,10 @@
     {
       "name": "sdlc-elixir",
       "source": "./plugins/sdlc-elixir"
+    },
+    {
+      "name": "output-styles-marvin",
+      "source": "./plugins/output-styles-marvin"
     }
   ]
 }

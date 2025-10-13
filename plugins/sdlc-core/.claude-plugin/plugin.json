@@ -1,0 +1,52 @@
+{
+  "name": "sdlc-core",
+  "description": "Shared agents and commands for SDLC workflows. Provides TDD, architecture synthesis, dependency management, DevOps, and validation agents used by both application and infrastructure workflows.",
+  "version": "1.0.0",
+  "author": {
+    "name": "John Wilger",
+    "email": "john@johnwilger.com"
+  },
+  "homepage": "https://github.com/jwilger/claude-code-setup",
+  "repository": "https://github.com/jwilger/claude-code-setup.git",
+  "license": "MIT",
+  "keywords": [
+    "sdlc",
+    "tdd",
+    "architecture",
+    "devops",
+    "shared",
+    "core"
+  ],
+  "agents": [
+    "./agents/acceptance-validator.md",
+    "./agents/adr-writer.md",
+    "./agents/architecture-synthesizer.md",
+    "./agents/cognitive-load-analyzer.md",
+    "./agents/dependency-management.md",
+    "./agents/devops.md",
+    "./agents/file-editor.md",
+    "./agents/green-implementer.md",
+    "./agents/red-tdd-tester.md",
+    "./agents/research-specialist.md",
+    "./agents/technical-documentation-writer.md"
+  ],
+  "commands": [
+    "./commands/adr-template.md",
+    "./commands/dependency-management-process.md",
+    "./commands/documentation-philosophy.md",
+    "./commands/domain-modeling-process.md",
+    "./commands/github-pr-management.md",
+    "./commands/integration-validation.md",
+    "./commands/tdd-workflow-process.md"
+  ],
+  "mcpServers": {
+    "time": {
+      "command": "uvx",
+      "args": ["mcp-server-time"]
+    },
+    "memento": {
+      "command": "npx",
+      "args": ["-y", "@gannonh/memento-mcp"]
+    }
+  }
+}
