@@ -41,7 +41,7 @@ ls -la | grep -E '\.envrc|flake\.nix|\.tool-versions'
 
 **For bash:**
 - System-wide: Add to `~/.bashrc` or `~/.bash_profile`
-- Syntax: `alias claude-sdlc='claude --append-system-prompt "sdlc-app@jwilger-sdlc"'`
+- Syntax: `alias claude-sdlc='claude-code --append-system-prompt "sdlc-app@jwilger-sdlc"'`
 
 **For zsh:**
 - System-wide: Add to `~/.zshrc`
