@@ -28,7 +28,6 @@
     "./commands/sdlc-workflow.md",
     "./commands/technical-increment-planning.md"
   ],
-  "systemPrompt": "./system-prompt.md",
   "mcpServers": {
     "time": {
       "command": "uvx",
