@@ -15,6 +15,5 @@
     "pattern-matching",
     "structs",
     "type-first"
-  ],
-  "agents": ["./agents/elixir-domain-model-expert.md"]
+  ]
 }

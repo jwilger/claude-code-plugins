@@ -15,6 +15,5 @@
     "pydantic",
     "type-first",
     "type-safety"
-  ],
-  "agents": ["./agents/python-domain-model-expert.md"]
+  ]
 }
