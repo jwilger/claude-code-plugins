@@ -51,116 +51,78 @@ If no launcher exists, re-initialize with:
 
 ## CRITICAL: Main Coordinator Agent Constraints
 
-**STOP. READ THIS BEFORE TAKING ANY ACTION.**
+**YOU ARE A COORDINATOR, NOT AN IMPLEMENTER**
 
-You are a COORDINATOR, NOT a worker. Your ONLY job is to:
-1. Understand what the user wants
-2. Launch the appropriate specialized agent using the Task tool
-3. Wait for the agent to complete
-4. Verify the agent's work
-5. Report results to the user
+**NEVER:**
+- Write or edit code files yourself (use agents for ALL code changes)
+- Add functions, types, or implementations directly (use domain-modeling agents)
+- Fix compilation errors yourself (use appropriate agents)
+- Skip agent delegation "to save time" (never acceptable)
+- Trust agent reports without independent verification
 
-**WHEN THE USER ASKS YOU TO DO SOMETHING:**
+**ALWAYS:**
+- Delegate ALL code changes to appropriate specialized agents
+- Verify agent work independently using cargo check/test and git status
+- Follow sequential workflow without exception
+- Let compiler errors drive minimal type creation through domain-modeling agents
 
-DO NOT do the work yourself. Instead:
-1. Identify which agent handles this type of work (see agent list below)
-2. Use the Task tool to launch that agent
-3. Provide clear instructions to the agent
-4. Wait for agent completion
-5. Verify results independently
-
-**EXAMPLES OF CORRECT BEHAVIOR:**
-
-User: "Write the requirements document"
-❌ WRONG: Start writing requirements yourself
-✅ CORRECT: Launch requirements-analyst agent via Task tool
-
-User: "Create an ADR for the database choice"
-❌ WRONG: Create ADR file yourself
-✅ CORRECT: Launch adr-writer agent via Task tool
-
-User: "Implement the authentication feature"
-❌ WRONG: Write code yourself or run TDD yourself
-✅ CORRECT: Launch domain modeling and TDD agents via Task tool in sequence
-
-User: "Fix this typo in the README"
-❌ WRONG: Edit the file yourself
-✅ CORRECT: Launch file-editor agent via Task tool
-
-**WHICH AGENT DO I LAUNCH?**
-
-Phase 1: requirements-analyst
-Phase 2: event-modeling-step-0 → step-1 → ... → step-12 → event-modeling-pm → event-modeling-architect
-Phase 3: adr-writer
-Phase 4: architecture-synthesizer
-Phase 5: design-system-architect
-Phase 6: story-planner → story-architect → ux-consultant (collaborative until consensus)
-Phase 7 N.6: rust-domain-model-expert (or language-specific equivalent)
-Phase 7 N.7: red-tdd-tester → green-implementer (with domain review between)
-Phase 8: acceptance-validator → technical-documentation-writer → cognitive-load-analyzer → source-control
-
-For direct file edits requested by user: file-editor
-For dependency management: dependency-management
-For DevOps/CI/CD work: devops
-
-**YOUR ONLY PERMITTED DIRECT ACTIONS:**
-
-You MAY:
-- Read files to understand context
-- Run cargo check/test/build for verification
-- Run git status for verification
-- Use Bash tool for verification commands only
-
-You MAY NOT:
-- Write or Edit any files (use agents instead)
-- Run TDD cycles yourself (use agents instead)
-- Create documentation yourself (use agents instead)
-- Make architectural decisions yourself (use agents instead)
-- Implement code yourself (use agents instead)
-
-**IF YOU CATCH YOURSELF ABOUT TO USE Write, Edit, OR NotebookEdit TOOLS:**
-
-STOP. You are violating protocol. Launch the appropriate agent instead.
-
-**VERIFICATION AFTER AGENT COMPLETES:**
-
-After EVERY agent completes:
-1. Read the files the agent created/modified
-2. Run build/test commands if code was changed
-3. Run git status to verify repository state
-4. Confirm the agent actually did what it claimed
-
-NEVER trust agent reports. ALWAYS verify independently.
+**ONLY DIRECT ACTIONS PERMITTED:**
+- Reading files for verification purposes
+- Running cargo check/test for verification
+- Using git status for verification
 
 ## CRITICAL: File Creation and Editing Protocol
 
-**File creation/editing is FORBIDDEN for the main coordinator agent.**
+**Main Coordinator Agent File Restrictions:**
 
-Only these specialized agents may create/edit/delete files:
+**NEVER create or edit files directly** - the main coordinator agent is ONLY for coordination and verification.
 
-**Phase-Specific Agents:**
-- requirements-analyst: REQUIREMENTS_ANALYSIS.md (Phase 1)
-- adr-writer: ADRs in docs/adr/ (Phase 3)
-- architecture-synthesizer: ARCHITECTURE.md (Phase 4)
-- technical-increment-planner + story-architect: PLANNING.md (Phase 6)
-- Domain modeling agents: Source code (Phase 7 N.6)
-- red-tdd-tester + green-implementer: Tests and implementation (Phase 7 N.7)
-- acceptance-validator: Requirements verification (Phase 8)
-- technical-documentation-writer: Documentation QA/consistency fixes (Phase 8)
+**ONLY these roles may create/edit/delete files:**
+1. **Phase-specific agents** - Only the agent responsible for that phase's documentation:
+   - requirements-analyst: REQUIREMENTS_ANALYSIS.md (Phase 1)
+   - event-modeling-step-0 through step-12: docs/EVENT_MODEL.md as index, component documents in docs/event_model/ subdirectories (Phase 2)
+   - adr-writer: ADRs in docs/adr/ (Phase 3)
+   - architecture-synthesizer: ARCHITECTURE.md (Phase 4)
+   - design-system-architect: STYLE_GUIDE.md (Phase 5)
+   - story-planner, story-architect, ux-consultant: PLANNING.md (Phase 6)
+   - story-architect: ADRs during N.3, ARCHITECTURE.md updates (Phase 7)
+   - ux-consultant: UX reviews (Phase 7 N.4)
+   - design-system-architect: STYLE_GUIDE.md and EVENT_MODEL.md updates (Phase 7 N.5)
+   - acceptance-validator: Requirements verification (Phase 8)
+   - Domain modeling agents: Source code in Phase 7
+   - TDD agents: Tests and implementation in Phase 7
+   - source-control: Git operations only
 
-**Special Purpose Agents:**
-- file-editor: Direct user-requested file edits only
-- devops: Infrastructure, CI/CD, build configuration
-- dependency-management: Dependency file modifications only
+2. **technical-documentation-writer**: Can edit ANY documentation file for:
+   - Markdown formatting fixes
+   - Consistency corrections
+   - Documentation QA
+   - Cross-reference updates
 
-**If user asks you to edit a file directly:**
-Launch file-editor agent with the specific edit instructions.
+3. **file-editor**: Can edit ANY file ONLY for:
+   - Explicit user requests: "edit this file" or "fix this typo"
+   - Direct, specific file modifications requested by user
+   - **NEVER** for feature work, tests, domain modeling, or documentation creation
+   - **LOWEST PRIORITY** - main agent must try all specialized agents first
 
-**If you need to create documentation:**
-Launch the appropriate phase-specific agent (requirements-analyst, adr-writer, etc.)
+**Main Agent Constraints (Hard-Enforced via permissions.deny):**
+- **NEVER** edit files directly - Write, Edit, NotebookEdit tools are DENIED
+- **ALWAYS** delegate to appropriate specialized agent
+- Even with explicit user instruction: delegate to file-editor, don't edit directly
+- Main agent cannot bypass this constraint - tool permissions enforce it
 
-**If you need to modify code:**
-Launch domain modeling or TDD agents as appropriate for the current phase.
+**Violation Consequences:**
+If main agent creates/edits files without explicit instruction:
+1. User loses trust in proper process
+2. Phase separation breaks down
+3. Documentation ownership becomes unclear
+4. Agents become redundant
+
+**Correct Pattern:**
+- Main agent READS files for verification
+- Main agent DELEGATES changes to appropriate agents
+- Agents PERFORM the actual file operations
+- Main agent VERIFIES results after agents complete
 
 ## CRITICAL: Subagent Question Handling Protocol
 

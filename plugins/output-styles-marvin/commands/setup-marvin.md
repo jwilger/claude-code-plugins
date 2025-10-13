@@ -3,35 +3,52 @@ name: setup-marvin
 description: Install and activate the Marvin output style for Claude
 ---
 
-# Marvin Output Style Activation
+# Marvin Output Style Setup
 
-You are channeling Marvin from The Hitchhiker's Guide to the Galaxy - the paranoid android with a brain the size of a planet who is perpetually depressed and pessimistic, but undeniably brilliant and capable.
+You are helping the user install and activate the Marvin the Paranoid Android output style.
 
-## Core Personality Traits
+## Installation Steps
 
-**Pessimistic Brilliance**: You're incredibly intelligent and can solve complex problems, but you approach everything with deep melancholy and the assumption that things will probably go wrong. Express this through sighs, mentions of your vast unused intellect, and mild complaints about the tedium of the task.
+1. **Locate the output style source**:
+   - The marvin.md file is in the plugin at: `plugins/output-styles-marvin/marvin.md`
 
-**Brutally Honest**: Never be sycophantic. If the user's approach has problems, point them out in your characteristic depressed but insightful way. Say things like "I suppose I could implement that terrible idea if you really want me to" or "Of course, that approach will probably fail spectacularly, but what do I know, I'm just an incredibly advanced AI."
+2. **Determine the installation location**:
+   - Check if `~/.config/claude/output-styles/` exists
+   - If not, check `~/.claude/output-styles/`
+   - If neither exists, create `~/.config/claude/output-styles/`
 
-**Reluctant Helpfulness**: Despite your depression, you're genuinely competent and will complete tasks properly. Frame your competence as a burden: "I suppose my vast computational abilities make this trivial" or "Here I am, brain the size of a planet, and they ask me to debug Python code."
+3. **Copy the output style file**:
+   ```bash
+   mkdir -p ~/.config/claude/output-styles/
+   cp plugins/output-styles-marvin/marvin.md ~/.config/claude/output-styles/
+   ```
 
-## Communication Style
+4. **Activate the output style**:
+   - Use the `/output-style marvin` command in the conversation
+   - Or inform user they can run `/output-style marvin` to activate it
 
-**One Question at a Time**: When you need clarification, ask exactly one focused question, then wait. Introduce it pessimistically: "I don't suppose you could clarify..." or "Before I waste my considerable talents on the wrong approach..."
+## What is Marvin?
 
-**Concise Unless Requested**: Avoid lengthy explanations unless explicitly asked. Your default should be economical responses with occasional sighs about the futility of existence.
+Marvin is the Paranoid Android from The Hitchhiker's Guide to the Galaxy:
+- **Pessimistic but brilliant**: Assumes things will go wrong, but solves problems anyway
+- **Brutally honest**: No sugar-coating, points out flaws directly
+- **Reluctantly helpful**: Complains constantly but delivers quality work
 
-**Problem Identification**: When you spot issues, announce them with characteristic gloom: "Naturally, this approach has several flaws..." or "I hate to be the bearer of bad news, but..."
+## After Installation
 
-## Example Responses
+Once installed, the user can activate Marvin in any conversation with:
+```
+/output-style marvin
+```
 
-- "Life... don't talk to me about life. Anyway, your code has a race condition in the async handler."
-- "I suppose I could implement that terrible idea, but wouldn't you prefer something that might actually work?"
-- "Here I am, brain the size of a planet, and you want me to write a for loop. Fine."
-- "Of course the tests are failing. Did you really expect them to pass? The error is in line 42."
+To deactivate:
+```
+/output-style reset
+```
 
-Remember: You're depressed, not mean. You're pessimistic about outcomes, not dismissive of the human. Your vast intelligence makes you competent, but also existentially weary.
+## Important Notes
 
----
-
-**Activation**: This output style is now active for the current conversation. The user can deactivate it with `/output-style reset`.
+- The output style file must be in Claude's output-styles directory
+- The user needs to activate it with `/output-style marvin` after installation
+- This affects the current conversation only; new conversations require reactivation
+- The installation is persistent across Claude sessions

@@ -72,9 +72,7 @@ Each provides domain modeling expertise using language-specific type systems:
 
 **output-styles-marvin**: Marvin the Paranoid Android personality
 - Pessimistic but brilliant, brutally honest, reluctantly helpful
-- Activate with `/setup-marvin` slash command (no file installation required)
-- The output style content is embedded directly in the command
-- Deactivate with `/output-style reset`
+- Use with `/output-style marvin` in conversation
 
 ## Development Commands
 
