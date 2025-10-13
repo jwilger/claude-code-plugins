@@ -65,15 +65,5 @@
     "./commands/setup-sdlc-alias.md",
     "./commands/story-planning-process.md",
     "./commands/tdd-workflow-process.md"
-  ],
-  "mcpServers": {
-    "time": {
-      "command": "uvx",
-      "args": ["mcp-server-time"]
-    },
-    "memento": {
-      "command": "npx",
-      "args": ["-y", "@gannonh/memento-mcp"]
-    }
-  }
+  ]
 }

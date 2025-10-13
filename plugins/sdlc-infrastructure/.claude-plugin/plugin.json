@@ -28,15 +28,5 @@
     "./commands/sdlc-workflow.md",
     "./commands/technical-increment-planning.md"
   ],
-  "systemPrompt": "./system-prompt.md",
-  "mcpServers": {
-    "time": {
-      "command": "uvx",
-      "args": ["mcp-server-time"]
-    },
-    "memento": {
-      "command": "npx",
-      "args": ["-y", "@gannonh/memento-mcp"]
-    }
-  }
+  "systemPrompt": "./system-prompt.md"
 }
