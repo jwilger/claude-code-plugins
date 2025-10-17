@@ -313,7 +313,6 @@ Several detailed methodologies have been extracted to separate process files in 
 - **STORY_PLANNING.md**: Story format, Gherkin acceptance criteria, prioritization protocol
 - **ADR_TEMPLATE.md**: ADR structure, status lifecycle, ARCHITECTURE.md update requirements
 - **DESIGN_SYSTEM.md**: Atomic Design methodology for STYLE_GUIDE.md creation
-- **GITHUB_PR_MANAGEMENT.md**: GitHub PR review comment protocol, threaded replies via gh API, helper script usage
 
 Agents automatically load their required process files when activated. This keeps the main system prompt focused on coordination and workflow, while detailed methodologies remain accessible on-demand.
 
@@ -495,7 +494,7 @@ Assertion Failure? → Is fix OBVIOUS?
 See TDD_WORKFLOW.md for complete Outside-In TDD process with hierarchical chained PRs.
 
 ### Phase 8: Acceptance Validation and Documentation QA
-**Agents**: acceptance-validator → technical-documentation-writer → cognitive-load-analyzer → source-control
+**Agents**: acceptance-validator → technical-documentation-writer → source-control (calls trace-analysis skill)
 **Process**:
 1. **acceptance-validator**: MANDATORY requirements and integration verification
    - Verify all requirements from REQUIREMENTS_ANALYSIS.md met
@@ -512,12 +511,10 @@ See TDD_WORKFLOW.md for complete Outside-In TDD process with hierarchical chaine
    - If resolvable formatting/consistency issues: Fix directly
    - NO requirement to create missing documentation - only QA existing docs
 
-3. **cognitive-load-analyzer**: MANDATORY Quality Gates
-   - Mutation Testing Gate: Verify mutation score ≥80% for new code
-   - Cognitive Load Gate: TRACE analysis (≥70% score required)
-   - BLOCK PR if any quality gate fails
-
-4. **source-control**: PR Management
+3. **source-control**: PR Management
+   - Calls trace-analysis skill for TRACE analysis (≥70% score required)
+   - Calls mutation-testing skill to verify mutation score ≥80% for new code
+   - BLOCKS PR if quality gates fail
    - If PR-based workflow: MUST actually create pull request using `gh pr create` command
    - If trunk-based workflow: MUST actually merge to main branch directly
    - MUST include feature completion details, mutation score, TRACE score in PR description
