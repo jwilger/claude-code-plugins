@@ -63,10 +63,34 @@ Use hexagonal architecture with ports and adapters.
 [20 lines showing exact test setup]
 ```
 
+## API Documentation (Doc Comments on Code)
+
+**During Development (Pre-1.0.0):**
+- **NO code examples in doc comments**
+  - Examples reference fictional domains that won't compile
+  - Examples add untested, potentially wrong code when API is unstable
+  - Examples make code review harder and clutter documentation
+- **ONLY include**:
+  - **WHAT**: Concise description of type/function purpose
+  - **WHY**: Rationale for key design decisions
+  - Keep brief - implementation should be self-documenting
+
+**Before Release (1.0.0+):**
+- Add working, tested examples to PUBLIC API only
+- Verify all examples compile and pass tests
+- Only document public API (not internal types/functions)
+
+**Visibility Best Practices:**
+- Keep visibility to "need-to-know" basis throughout codebase
+- Internal types should be module-private or crate-private
+- Only expose what consumers actually need in public API
+- This clarifies which functions are public vs internal
+- Only document what's actually public
+
 ## Agent Responsibilities
 
 - **product-manager**: NO implementation details in requirements
 - **technical-architect**: Decision rationale, not implementation guides
 - **ux-ui-design-expert**: Design patterns, not implementation code
-- **domain-modeling agents**: Create actual implementation (informed by ADRs)
+- **domain-modeling agents**: Create actual implementation (informed by ADRs), NO examples in doc comments during development
 - **TDD agents**: Drive implementation details through tests
