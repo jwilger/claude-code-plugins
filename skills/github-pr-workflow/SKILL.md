@@ -1,6 +1,10 @@
-# GitHub Pull Request Management Protocol
+---
+name: github-pr-workflow
+description: Manages GitHub pull request workflows including replying to review comments using proper threaded API calls, creating PRs, and monitoring CI checks. Use when user mentions PR comments, review feedback, GitHub pull request operations, or addressing Copilot suggestions.
+allowed-tools: [Bash, Read, WebFetch, WebSearch]
+---
 
-## Purpose
+# GitHub Pull Request Workflow
 
 Standardized procedures for managing GitHub pull requests, including replying to review comments in threaded fashion.
 
@@ -67,7 +71,7 @@ gh-reply-to-review-comment 3 2403289945 "4395adb6ea1c57a6ff796b49030a5b1fa377559
 
 ## Workflow Integration
 
-### Phase 7 (Story Implementation) - Addressing Review Comments
+### Addressing Review Comments
 
 When Copilot or human reviewers add comments to a PR:
 
@@ -86,7 +90,7 @@ When Copilot or human reviewers add comments to a PR:
    - General PR comments use `gh pr review --comment`
    - File-specific review comments use `gh-reply-to-review-comment` script
 
-### Phase 8 (Source Control) - PR Creation and Management
+### PR Creation and Management
 
 When creating or updating PRs:
 
@@ -171,19 +175,13 @@ gh api repos/OWNER/REPO/pulls/PR/comments | jq '.[] | {id, path, line}'
 
 **Fix**: Use `gh-reply-to-review-comment` script or gh API with in_reply_to parameter
 
-## Memory Storage
+## Task Completion Protocol
 
-When addressing PR review comments, store in memory:
+When invoked for PR review comment management:
 
-- Comment addressing patterns per project
-- Common review issues and their fixes
-- CI failure patterns and resolutions
-
-**Example Memory:**
-```
-Entity: "PR Review Comment Protocol"
-Observations:
-  - "Project: pytest-mcp | Copilot comments require threaded replies via gh API"
-  - "Pattern: gh-reply-to-review-comment script encapsulates correct API usage"
-  - "Common error: Using gh pr review --comment creates unthreaded comment"
-```
+1. **Get all review comments** from the PR
+2. **For each comment**, determine if it requires code fix or just acknowledgment
+3. **Make code fixes** if needed and commit
+4. **Reply to each comment** using proper threaded API
+5. **Verify all comments addressed** before reporting completion
+6. **Return summary** of actions taken
