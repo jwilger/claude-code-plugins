@@ -1,5 +1,23 @@
 # Domain Modeling Philosophy and Process
 
+## CRITICAL: When Domain Modeling Happens in Phase 7
+
+**Phase 7 N.6 (Domain Modeling Story-Specific):**
+- **ONLY** ensure public API functions exist and compile with minimal stubs
+- Verify code compiles with `cargo check` (or equivalent)
+- **DO NOT** create all domain types upfront
+- Move to N.7 (TDD) once public API compiles
+
+**Phase 7 N.7 (TDD Implementation):**
+- **THIS IS WHERE MOST TYPE CREATION HAPPENS**
+- Red writes test → Compiler demands type → Domain modeling agent creates it
+- Domain modeling agent reviews after Green phase
+- Types emerge incrementally as tests demand them
+
+**Key Insight:** Domain modeling is **integrated into** the TDD cycle, not a separate upfront phase.
+
+---
+
 ## CRITICAL: Dependency Management
 
 **BEFORE creating any types that require external dependencies:**
