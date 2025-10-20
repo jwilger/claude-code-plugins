@@ -43,6 +43,32 @@ main
 
 ## Outside-In TDD Process
 
+### CRITICAL: Red Agent Constraints
+
+**Red-TDD-Tester ONLY writes test code:**
+- Reference type names in test (e.g., `Deposit`, `AccountDeposited`, `StreamId`)
+- DO NOT create type definitions
+- DO NOT stub types
+- Let compilation fail
+- Domain modeling agent handles compiler errors
+
+**Example of Correct Red Phase:**
+```rust
+// Red agent writes THIS (references types, doesn't define them):
+#[test]
+fn test_deposit_command() {
+    let store = InMemoryEventStore::new();
+    let cmd = Deposit {
+        account_id: StreamId::new("account-123").unwrap(),
+        amount: 100
+    };
+    let result = execute(cmd, &store).await;
+    assert!(result.is_ok());
+}
+// Compiler fails: "StreamId not found", "Deposit not found", etc.
+// Domain modeler creates minimal stubs to make it compile
+```
+
 ### The 5-Whys Decision Tree: When to Drill Down vs Implement
 
 When a test fails, apply this decision tree:
@@ -51,7 +77,9 @@ When a test fails, apply this decision tree:
 Test Fails
   ↓
 What type of failure?
-  ├─ Compiler Error → Domain modeling agent creates minimal types
+  ├─ Compiler Error → Domain modeling agent reviews and either:
+  │                   1. Creates minimal stub types (just enough to compile), OR
+  │                   2. Points Red agent to existing types that should be used
   └─ Assertion/Runtime Failure
        ↓
   Is it OBVIOUS what code needs to change?
@@ -73,10 +101,11 @@ What type of failure?
 
 **Key Distinctions:**
 
-**Compiler Errors Always Drive Type Creation:**
+**Compiler Errors Always Drive Type Creation (by Domain Modeler):**
 - Missing type/function: Domain agent creates minimal structure
 - Missing field: Domain agent adds field
-- Type mismatch: Domain agent refines types
+- Type mismatch: Domain agent refines types OR tells Red to use existing types
+- **Red agent NEVER creates types** - only references them in tests
 - **NEVER speculate** - only create what compiler demands
 
 **Assertion Failures Often Need Drill-Down:**
