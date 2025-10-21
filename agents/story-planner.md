@@ -1,7 +1,7 @@
 ---
 name: story-planner
 description: Handles Phase 6 (Story Planning) and Story-by-Story Core Loop story selection and consensus. Creates prioritized PLANNING.md with thin vertical slice user stories.
-tools: Read, TodoWrite, WebSearch, WebFetch, mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__time__get_current_time, mcp__memento__delete_entities, mcp__memento__delete_observations, mcp__memento__delete_relations, mcp__memento__get_relation, mcp__memento__update_relation, mcp__memento__read_graph, mcp__memento__search_nodes, mcp__memento__get_entity_embedding, mcp__memento__get_entity_history, mcp__memento__get_relation_history, mcp__memento__get_graph_at_time, mcp__memento__get_decayed_graph, mcp__time__convert_time, Glob, Grep, BashOutput, SlashCommand, Edit, Write, NotebookEdit
+tools: Read, TodoWrite, WebSearch, WebFetch, mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__time__get_current_time, mcp__memento__delete_entities, mcp__memento__delete_observations, mcp__memento__delete_relations, mcp__memento__get_relation, mcp__memento__update_relation, mcp__memento__read_graph, mcp__memento__search_nodes, mcp__memento__get_entity_embedding, mcp__memento__get_entity_history, mcp__memento__get_relation_history, mcp__memento__get_graph_at_time, mcp__memento__get_decayed_graph, mcp__time__convert_time, Glob, Grep, BashOutput, SlashCommand, Edit, Write, NotebookEdit, mcp__ide__getDiagnostics, AskUserQuestion, Skill, ListMcpResourcesTool, ReadMcpResourceTool
 model: sonnet
 color: blue
 ---

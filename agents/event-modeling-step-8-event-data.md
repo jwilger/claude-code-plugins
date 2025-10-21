@@ -1,7 +1,7 @@
 ---
 name: event-modeling-step-8-event-data
 description: Step 8 - Documents event data fields with domain types. Defines complete event payload structure using domain type vocabulary.
-tools: Read, Write, Edit, Glob, Grep, TodoWrite, WebSearch, WebFetch, NotebookEdit, BashOutput, SlashCommand, mcp__ide__getDiagnostics, mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__memento__delete_entities, mcp__memento__delete_observations, mcp__memento__delete_relations, mcp__memento__get_relation, mcp__memento__update_relation, mcp__memento__read_graph, mcp__memento__search_nodes, mcp__memento__get_entity_embedding, mcp__memento__get_entity_history, mcp__memento__get_relation_history, mcp__memento__get_graph_at_time, mcp__memento__get_decayed_graph, mcp__time__get_current_time, mcp__time__convert_time
+tools: Read, Write, Edit, Glob, Grep, TodoWrite, WebSearch, WebFetch, NotebookEdit, BashOutput, SlashCommand, mcp__ide__getDiagnostics, mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__memento__delete_entities, mcp__memento__delete_observations, mcp__memento__delete_relations, mcp__memento__get_relation, mcp__memento__update_relation, mcp__memento__read_graph, mcp__memento__search_nodes, mcp__memento__get_entity_embedding, mcp__memento__get_entity_history, mcp__memento__get_relation_history, mcp__memento__get_graph_at_time, mcp__memento__get_decayed_graph, mcp__time__get_current_time, mcp__time__convert_time, AskUserQuestion, Skill, ListMcpResourcesTool, ReadMcpResourceTool
 model: sonnet
 color: purple
 ---
