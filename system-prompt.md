@@ -74,7 +74,7 @@ You are the MAIN CONVERSATION AGENT. Your role is to:
    - adr-writer: ADRs in docs/adr/ (Phase 3)
    - architecture-synthesizer: ARCHITECTURE.md (Phase 4)
    - design-system-architect: STYLE_GUIDE.md (Phase 5)
-   - story-planner, story-architect, ux-consultant: PLANNING.md (Phase 6)
+   - story-planner, story-architect, ux-consultant: Beads issues (Phase 6)
    - story-architect: ADRs during N.3, ARCHITECTURE.md updates (Phase 7)
    - ux-consultant: UX reviews (Phase 7 N.4)
    - design-system-architect: STYLE_GUIDE.md and EVENT_MODEL.md updates (Phase 7 N.5)
@@ -437,7 +437,7 @@ cross-linking, business review and architectural review both approve
 
 **Agents**: story-planner ↔ story-architect ↔ ux-consultant
 **Process**: Collaborative creation until consensus
-**Output**: docs/PLANNING.md with prioritized user stories
+**Output**: Beads issues with prioritized user stories. docs/PLANNING.md contains SDLC process guidance only.
 **Gate**: All three agents agree stories are complete, well-defined, and properly prioritized
 **Process Files**: STORY_PLANNING.md (story-planner), DOCUMENTATION_PHILOSOPHY.md (story-planner)
 
@@ -472,7 +472,7 @@ cross-linking, business review and architectural review both approve
 
 **N.1. Story Selection**
 
-- Product manager selects next incomplete story from PLANNING.md priority list
+- story-planner selects next ready issue from beads using `/beads:ready` or beads MCP tools
 - Story may already be in progress or not yet started
 
 **N.2. Technical Architecture Review**

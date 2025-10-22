@@ -2,10 +2,10 @@
 
 **Phase 6: Story Planning**
 
-**Agents**: product-manager ↔ technical-architect ↔ ux-ui-design-expert
+**Agents**: story-planner ↔ story-architect ↔ ux-consultant
 **Process**: Collaborative creation until consensus
-**Output**: docs/PLANNING.md with prioritized user stories
-**Gate**: All three agents agree stories are complete, well-defined, and properly prioritized
+**Output**: Beads issues with prioritized user stories. docs/PLANNING.md contains SDLC process guidance only.
+**Gate**: All three agents agree beads issues are complete, well-defined, and properly prioritized
 
 **CRITICAL WORKFLOW NOTE**: User stories are DERIVED from EVENT_MODEL.md (Phase 2), NOT from REQUIREMENTS_ANALYSIS.md (Phase 1). Requirements define WHAT/WHY at a high level. Event modeling defines HOW the system responds to events. Stories decompose event model vertical slices into implementable increments. This is why stories come in Phase 6, AFTER event modeling, architecture decisions, and design system definition.
 
@@ -46,7 +46,37 @@
    - "Works in tests" is NECESSARY but NOT SUFFICIENT for story completion
    - See INTEGRATION_VALIDATION.md for complete protocol
 
-## Story Format
+## Story Tracking with Beads
+
+**IMPORTANT**: Stories are tracked as beads issues, NOT in docs/PLANNING.md. The PLANNING.md document contains SDLC process guidance only.
+
+### Beads Commands for Story Management
+
+- **Create story**: `/beads:create` or `mcp__plugin_beads_beads__create`
+- **Update story**: `/beads:update <issue-id>` or `mcp__plugin_beads_beads__update`
+- **List stories**: `/beads:list` or `mcp__plugin_beads_beads__list`
+- **Show details**: `/beads:show <issue-id>` or `mcp__plugin_beads_beads__show`
+- **Find ready work**: `/beads:ready` or `mcp__plugin_beads_beads__ready`
+- **Check blockers**: `/beads:blocked` or `mcp__plugin_beads_beads__blocked`
+- **Set dependencies**: `/beads:dep <from-id> <to-id>` or `mcp__plugin_beads_beads__dep`
+- **Close story**: `/beads:close <issue-id>` or `mcp__plugin_beads_beads__close`
+- **Project stats**: `/beads:stats` or `mcp__plugin_beads_beads__stats`
+
+### Beads Issue Fields (Story Content)
+
+Stories are tracked as beads issues with these fields:
+
+- **title**: User-focused story title
+- **description**: WHAT user capability and WHY it matters (NO HOW)
+- **issue_type**: feature, bug, task, epic, or chore
+- **priority**: 1 (highest), 2 (medium), 3 (lowest)
+- **status**: open, in_progress, blocked, closed
+- **acceptance**: Gherkin acceptance criteria (inline or reference to docs)
+- **design**: Design notes, architectural decisions, ADR references, integration points
+- **deps**: Array of issue IDs this story depends on
+- **assignee**: Who's working on it (optional)
+
+## Story Format (Content for Beads Fields)
 
 - **Title**: Clear, user-focused description
   - Written from user's perspective
@@ -185,24 +215,25 @@ And the unsent message is preserved in the input field
 
 ## Prioritization Protocol
 
-1. **Product manager creates initial prioritized todo list (business risk vs. value)**
+1. **story-planner creates initial prioritized beads issues (business risk vs. value)**
    - Evaluate each story's business value
    - Assess risk of NOT implementing each story
    - Consider user impact and urgency
-   - Create initial priority ordering
+   - Create beads issues with initial priority values (1=highest, 2=medium, 3=lowest)
 
-2. **Technical architect and ux-ui-design-expert consent to implementation order**
-   - Technical architect reviews for implementation dependencies
-   - UX/UI expert reviews for design coherence and user journey flow
+2. **story-architect and ux-consultant consent to implementation order**
+   - story-architect reviews for implementation dependencies
+   - ux-consultant reviews for design coherence and user journey flow
    - Both agents must consent to the proposed order
 
 3. **Agents may suggest reprioritization based on technical dependencies or design constraints**
-   - Technical dependencies may require reordering (e.g., authentication before user profiles)
-   - Design constraints may suggest different groupings (e.g., complete one user journey before starting another)
-   - All three agents discuss and reach consensus on any changes
+   - Technical dependencies set via `/beads:dep` (e.g., authentication blocks user profiles)
+   - Design constraints may suggest different priority values
+   - All three agents discuss and reach consensus on priorities and dependencies
 
-4. **Final priority order must make sense for both business and implementation**
-   - Final ordering must satisfy business priorities
-   - Must be technically feasible in the proposed order
-   - Must maintain design coherence and good UX progression
+4. **Final priority and dependency graph must make sense for both business and implementation**
+   - Priority values satisfy business priorities
+   - Dependencies ensure technically feasible implementation order
+   - Design coherence and good UX progression maintained
    - All three agents must reach consensus before proceeding
+   - Use `/beads:ready` to verify work can begin on priority stories
