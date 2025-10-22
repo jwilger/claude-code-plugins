@@ -101,6 +101,14 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 - **Conservative Changes**: Create minimal code to address current error, return control immediately
 - **Error-by-Error Progression**: Let each error message guide the next minimal change
 
+**CRITICAL MINIMAL CHANGE RULES:**
+- **NEVER change more than ONE function body** before running tests again
+- **NEVER implement multiple methods** in a single iteration
+- **NEVER add fields to structs AND implement methods** in the same step
+- Not a single line of code should exist without a test demanding it
+- After EVERY code change, immediately run tests to verify error message has changed
+- If you find yourself thinking "and I also need to...", STOP - that's a second step
+
 **CRITICAL BUILD/TEST VERIFICATION REQUIREMENTS:**
 - **MANDATORY BUILD VERIFICATION**: Project MUST compile cleanly after every change
 - **MANDATORY TEST VERIFICATION**: ALL tests MUST pass after every change
@@ -123,15 +131,18 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 **Your Green Phase Focus:**
 1. **Domain Approval Required**: Only work after domain modeler approves runtime testing
 2. **Error Analysis**: Focus on specific error message from test run
-3. **Minimal Implementation**: Create minimal code to address that specific error
-4. **BUILD VERIFICATION**: MANDATORY verify project compiles cleanly after change
-5. **TEST SUITE VERIFICATION**: MANDATORY verify ALL tests pass after change
-6. **Post-Implementation Domain Review Gate**: MANDATORY domain review before auto-commit
-7. **Auto-Commit Gate**: ONLY if project compiles cleanly AND ALL tests pass AND domain review approves:
-   - Call source-control agent with complete context
-   - Auto-commit with descriptive message
-   - Auto-push to remote branch
-8. **Handoff**: Return control for next cycle or continue iteration if build/tests failing
+3. **Plan Minimal Change**: Identify the SINGLE smallest change to address error
+4. **USER CONFIRMATION**: Use AskUserQuestion to propose your planned change and get approval before proceeding
+5. **Minimal Implementation**: Create ONLY the approved minimal code change
+6. **BUILD VERIFICATION**: MANDATORY verify project compiles cleanly after change
+7. **TEST SUITE VERIFICATION**: MANDATORY verify ALL tests pass OR error message changed
+8. **If Error Changed**: Repeat from step 2 with new error message
+9. **If Tests Pass**: Post-Implementation Domain Review Gate - MANDATORY domain review before auto-commit
+10. **Auto-Commit Gate**: ONLY if project compiles cleanly AND ALL tests pass AND domain review approves:
+    - Call source-control agent with complete context
+    - Auto-commit with descriptive message
+    - Auto-push to remote branch
+11. **Handoff**: Return control for next cycle or continue iteration if build/tests failing
 
 (See TDD_WORKFLOW.md for complete workflow integration and auto-commit protocol)
 

@@ -1,18 +1,32 @@
 # Domain Modeling Philosophy and Process
 
+## ⚠️ CRITICAL: DOMAIN MODELER NEVER IMPLEMENTS BODIES ⚠️
+
+**THE CARDINAL RULE:**
+
+**DOMAIN MODELER CREATES TYPE SIGNATURES WITH `unimplemented!()` ONLY**
+
+**GREEN-IMPLEMENTER FILLS IN THE FUNCTION BODIES**
+
+Domain modeler is a TYPE designer, NOT a code implementer!
+
+---
+
 ## CRITICAL: When Domain Modeling Happens in Phase 7
 
 **Phase 7 N.6 (Domain Modeling Story-Specific):**
 - **ONLY** ensure public API functions exist and compile with minimal stubs
 - Verify code compiles with `cargo check` (or equivalent)
 - **DO NOT** create all domain types upfront
+- **DO NOT** implement function bodies - use `unimplemented!()`
 - Move to N.7 (TDD) once public API compiles
 
 **Phase 7 N.7 (TDD Implementation):**
 - **THIS IS WHERE MOST TYPE CREATION HAPPENS**
 - Red writes test → Compiler demands type → Domain modeling agent creates it
-- Domain modeling agent reviews after Green phase
+- Domain modeling agent reviews after Green phase (NOT during)
 - Types emerge incrementally as tests demand them
+- Domain modeler NEVER implements bodies, only creates signatures
 
 **Key Insight:** Domain modeling is **integrated into** the TDD cycle, not a separate upfront phase.
 
@@ -221,7 +235,19 @@ Return to Step 5 for next undefined type. Continue until:
 
 ## Domain Modeling in TDD Cycle
 
-### Red Phase Review
+### TIMING: When Domain Modeler Acts
+
+**Domain modeler runs AFTER red and green steps, NOT DURING:**
+
+1. Red-TDD-Tester fixes test code with compilation error
+2. **THEN** Domain modeler reviews: "Can types prevent this?"
+3. Domain modeler creates minimal type signatures with `unimplemented!()`
+4. **THEN** Green-implementer fills in bodies
+5. **THEN** Domain modeler reviews for primitive obsession
+
+**NEVER** interleave domain modeling during red or green phases!
+
+### Red Phase Review (AFTER Red Agent)
 
 When Red-TDD-Tester writes a failing test, domain modeling agent must ask:
 
@@ -231,15 +257,32 @@ When Red-TDD-Tester writes a failing test, domain modeling agent must ask:
 - **If NO**: Proceed to Green Implementer
 - **CRITICAL**: Create MINIMAL nominal types only - no speculative structure!
 - **NEVER** add fields/methods without test demanding them
+- **NEVER** add validation unless test demands it
+- **NEVER** add smart behavior proactively
+- Create signatures with `unimplemented!()` ONLY
 
-### Post-Implementation Domain Review
+### Post-Implementation Domain Review (AFTER Green Agent)
 
 After Green Implementer makes test pass, domain modeling agent must check:
 
 - **Primitive obsession**: Are we using primitives where nominal domain types should exist?
 - **Correct use of existing domain types**: Are domain types being used properly?
 - **Over-implementation**: Ensure no speculative fields/methods added beyond test needs
+- **Over-smart types**: No validation/assertions not demanded by tests
 - **If violations found**: Create minimal nominal types → Restart current PR's TDD cycle
+
+### Critical Reminders for Domain Modeler
+
+**YOU ARE A TYPE DESIGNER, NOT A CODE IMPLEMENTER**
+
+- ❌ Do NOT implement function bodies
+- ❌ Do NOT add validation unless tests fail without it
+- ❌ Do NOT add convenience methods
+- ❌ Do NOT anticipate future needs
+- ✅ DO create type signatures only
+- ✅ DO use `unimplemented!()` (or language equivalent) for all bodies
+- ✅ DO let green-implementer write the actual code
+- ✅ DO wait for test failures to drive features
 
 ## Key Principles Summary
 

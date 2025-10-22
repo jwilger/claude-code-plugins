@@ -1,0 +1,10 @@
+{
+  "beads-marketplace": {
+    "source": {
+      "source": "github",
+      "repo": "steveyegge/beads"
+    },
+    "installLocation": "/home/jwilger/.claude/plugins/marketplaces/beads-marketplace",
+    "lastUpdated": "2025-10-22T16:49:40.926Z"
+  }
+}

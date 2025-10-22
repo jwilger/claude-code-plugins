@@ -35,5 +35,9 @@
       "Bash(git commit:*)"
     ]
   },
-  "alwaysThinkingEnabled": true
+  "model": "sonnet",
+  "alwaysThinkingEnabled": true,
+  "enabledPlugins": {
+    "beads@beads-marketplace": true
+  }
 }

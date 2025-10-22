@@ -1,5 +1,76 @@
 # TDD Workflow Process
 
+## ⚠️ CRITICAL: ONLY ADDRESS EXACT ERROR MESSAGES ⚠️
+
+**THE GOLDEN RULE OF TDD:**
+
+**ONLY IMPLEMENT WHAT IS CALLED FOR BY THE ACTUAL TEST FAILURE MESSAGE!**
+
+Nothing—absolutely nothing—should ever address more than the **exact test
+failure message** and no more!
+
+### Agent Boundaries (NON-NEGOTIABLE)
+
+**Red-TDD-Tester:**
+- Fixes **TEST CODE ONLY**
+- Responds to compilation errors **IN TEST FILES**
+- Never touches production code
+- **ONLY** addresses the exact compiler error in the test file
+- If test needs production code, delegates to green-implementer
+
+**Green Implementer:**
+- Fixes **PRODUCTION CODE ONLY**
+- Responds to test assertion failures
+- Never touches test code
+- **ONLY** addresses the exact test failure message or runtime error
+- No validation/assertions unless tests demand them
+- No "convenience methods" or extra API beyond what test calls
+
+**Domain Modeler:**
+- Runs **AFTER** each red and green step (NOT during)
+- Reviews types for possible improvements
+- Creates type signatures with `unimplemented!()` **ONLY**
+- **NEVER IMPLEMENTS FUNCTION BODIES** - green-implementer does that
+- **NEVER** adds validation/assertions unless tests demand them
+- **NEVER** adds smart behavior proactively
+- Only suggests type changes, does not anticipate future needs
+
+### Dead Code Policy (ABSOLUTE)
+
+**IF NOTHING IS USING IT, REMOVE IT!**
+
+**DEAD CODE = DELETE, NOT IMPLEMENT**
+
+- Unused fields? **DELETE THEM**
+- Unused methods? **DELETE THEM**
+- Unused structs/types? **DELETE THEM**
+- Compiler warns about dead code? **DELETE IT, DON'T IMPLEMENT IT**
+- Dead code means the test doesn't need it yet
+- When tests need it, they will fail and demand it
+- **NEVER** implement something just to make warnings go away
+- **NEVER** add usage just to justify keeping it
+
+### No Anticipatory Implementation
+
+**ONLY IMPLEMENT WHAT THE TEST ERROR DEMANDS - NOTHING MORE!**
+
+**FORBIDDEN:**
+- ❌ Adding "convenience methods" not called by tests
+- ❌ Implementing validation not required by failing tests
+- ❌ Adding fields/methods because "we might need them"
+- ❌ Any API that tests don't actually call
+- ❌ Extra helper functions not demanded by test
+- ❌ Smart behavior beyond exact test requirements
+- ❌ Anticipating future needs based on domain knowledge
+
+**REQUIRED:**
+- ✅ Only respond to actual compiler errors
+- ✅ Only respond to actual test failures
+- ✅ Delete unused code immediately
+- ✅ Let tests drive every single feature
+- ✅ Implement ONLY what makes THIS test pass
+- ✅ Stop immediately after test passes
+
 ## CRITICAL: Dependency Management
 
 **BEFORE writing tests that require external dependencies:**
