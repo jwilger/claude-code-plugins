@@ -1,5 +1,60 @@
 # Architectural Decision Record (ADR) Template and Guidelines
 
+## CRITICAL: Collaboration-First ADR Creation
+
+**ALL ADR work happens collaboratively in the main conversation with active user participation.**
+
+### How ADR Collaboration Works
+
+**Advisory Agent (adr-writer):**
+- Analyzes requirements and existing architecture
+- Recommends architectural decisions with rationale
+- Returns ADR draft recommendations to main conversation (NO file editing)
+- See `~/.claude/processes/COLLABORATION_PROTOCOLS.md` for complete protocols
+
+**Main Conversation Facilitates:**
+- Pair-programming with user on ADR creation and refinement
+- IDE diff modification flow where user can edit ADR proposals
+- QUESTION: comment mechanism for inline queries in ADRs
+- Acknowledgment of user changes with rationale or counterarguments
+- User has final authority on all architectural decisions
+- User is decision-maker, not rubber-stamp approver
+
+**User Participates:**
+- Reviews all ADR recommendations
+- Modifies proposed ADRs directly in IDE
+- Adds `QUESTION:` comments inline for clarification
+- Makes final decisions on architectural approaches
+- Approves/rejects decisions (changes status to accepted/rejected)
+- Collaborates iteratively on ADR refinement
+
+### QUESTION: Comment Mechanism in ADRs
+
+During ADR creation, user can add inline questions:
+
+```markdown
+## Decision
+
+Use hexagonal architecture with ports and adapters.
+
+QUESTION: Should we use dependency injection or service locator for adapter wiring?
+
+## Rationale
+...
+```
+
+Main conversation answers questions inline and removes QUESTION: prefix once resolved.
+
+### IDE Diff Modification Flow
+
+1. Main conversation proposes ADR content
+2. User sees IDE diff, can modify directly
+3. Main conversation acknowledges modifications: "I see you chose X approach. That simplifies..." or "I understand you prefer X, but consider trade-off Y..."
+4. Iterate until ADR accurately reflects architectural decision
+5. User changes status to "accepted" to approve decision
+
+**See `COLLABORATION_PROTOCOLS.md` for complete pair-programming model.**
+
 ## ADR Structure
 
 Each ADR should follow this structure:

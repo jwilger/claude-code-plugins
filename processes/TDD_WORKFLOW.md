@@ -1,5 +1,54 @@
 # TDD Workflow Process
 
+## CRITICAL: Collaboration-First TDD
+
+**ALL TDD work happens collaboratively in the main conversation with active user participation.**
+
+### How TDD Collaboration Works
+
+**Advisory Agents (red-tdd-tester, green-implementer):**
+- Analyze test failures and recommend approaches
+- Return test/implementation recommendations to main conversation (NO file editing)
+- See `~/.claude/processes/COLLABORATION_PROTOCOLS.md` for complete protocols
+
+**Main Conversation Facilitates:**
+- Pair-programming with user on test and implementation code
+- IDE diff modification flow where user can edit proposals
+- QUESTION: comment mechanism for inline queries in code
+- Acknowledgment of user changes with rationale or counterarguments
+- User is co-creator, not rubber-stamp approver
+
+**User Participates:**
+- Reviews all test and implementation recommendations
+- Modifies proposed code directly in IDE
+- Adds `QUESTION:` comments inline for clarification
+- Makes final decisions on test structure and implementation approach
+- Collaborates iteratively on refinement
+
+### QUESTION: Comment Mechanism in Code
+
+During TDD, user can add inline questions in code:
+
+```rust
+#[test]
+fn test_payment_capture() {
+    let amount = MonetaryAmount::new(100, Currency::USD);
+    // QUESTION: Should we also test negative amounts here or in a separate test?
+    assert_eq!(amount.value(), 100);
+}
+```
+
+Main conversation answers the question inline and removes comment once resolved.
+
+### IDE Diff Modification Flow
+
+1. Main conversation proposes test or implementation code change
+2. User sees IDE diff, can modify directly
+3. Main conversation acknowledges modifications: "I see you changed the assertion to X. That's clearer because..." or "I understand you want X, but the test demands Y..."
+4. Iterate until code is correct
+
+**See `COLLABORATION_PROTOCOLS.md` for complete pair-programming model.**
+
 ## ⚠️ CRITICAL: ONLY ADDRESS EXACT ERROR MESSAGES ⚠️
 
 **THE GOLDEN RULE OF TDD:**

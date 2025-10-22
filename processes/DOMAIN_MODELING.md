@@ -1,5 +1,54 @@
 # Domain Modeling Philosophy and Process
 
+## CRITICAL: Collaboration-First Domain Modeling
+
+**ALL domain modeling work happens collaboratively in the main conversation with active user participation.**
+
+### How Domain Modeling Collaboration Works
+
+**Advisory Agents (rust/python/typescript/elixir-domain-model-expert):**
+- Analyze code for primitive obsession and type misuse
+- Recommend domain type improvements
+- Return type design recommendations to main conversation (NO file editing)
+- See `~/.claude/processes/COLLABORATION_PROTOCOLS.md` for complete protocols
+
+**Main Conversation Facilitates:**
+- Pair-programming with user on domain type design
+- IDE diff modification flow where user can edit type proposals
+- QUESTION: comment mechanism for inline queries in type definitions
+- Acknowledgment of user changes with rationale or counterarguments
+- User is co-creator, not rubber-stamp approver
+
+**User Participates:**
+- Reviews all type design recommendations
+- Modifies proposed types directly in IDE
+- Adds `QUESTION:` comments inline for clarification
+- Makes final decisions on type structure and constraints
+- Collaborates iteratively on type refinement
+
+### QUESTION: Comment Mechanism in Types
+
+During domain modeling, user can add inline questions:
+
+```rust
+pub struct MonetaryAmount {
+    value: u64,
+    currency: Currency,
+    // QUESTION: Should we enforce minimum transaction amounts at the type level?
+}
+```
+
+Main conversation answers the question inline and removes comment once resolved.
+
+### IDE Diff Modification Flow
+
+1. Main conversation proposes domain type definition
+2. User sees IDE diff, can modify directly
+3. Main conversation acknowledges modifications: "I see you added X constraint. That prevents..." or "I understand you want X, but consider that Y..."
+4. Iterate until types are correct
+
+**See `COLLABORATION_PROTOCOLS.md` for complete pair-programming model.**
+
 ## ⚠️ CRITICAL: DOMAIN MODELER NEVER IMPLEMENTS BODIES ⚠️
 
 **THE CARDINAL RULE:**

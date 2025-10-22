@@ -2,6 +2,55 @@
 
 **This document describes the Event Modeling methodology. Individual step agents have detailed instructions in their own configurations. The main coordinator agent orchestrates the 12-step process.**
 
+## CRITICAL: Collaboration-First Event Modeling
+
+**ALL event modeling work happens collaboratively in the main conversation with active user participation.**
+
+### How Event Modeling Collaboration Works
+
+**Advisory Agents (event-modeling-step-* agents):**
+- Research existing requirements and event model context
+- Analyze event model completeness and consistency
+- Return recommendations to main conversation (NO file editing)
+- See `~/.claude/processes/COLLABORATION_PROTOCOLS.md` for complete protocols
+
+**Main Conversation Facilitates:**
+- Pair-programming with user on event model documentation
+- IDE diff modification flow where user can edit proposals
+- QUESTION: comment mechanism for inline queries
+- Acknowledgment of user changes with rationale or counterarguments
+- User is co-creator, not rubber-stamp approver
+
+**User Participates:**
+- Reviews all event model recommendations
+- Modifies proposed event models directly in IDE
+- Adds `QUESTION:` comments inline for clarification
+- Makes final decisions on event model structure
+- Collaborates iteratively on refinement
+
+### QUESTION: Comment Mechanism
+
+During event modeling, user can add inline questions:
+
+```markdown
+## Event: PaymentCaptured
+
+### Data Fields
+- transaction_id: String
+QUESTION: Should this be a UUID or allow arbitrary strings?
+```
+
+Main conversation answers the question inline and removes QUESTION: prefix once resolved.
+
+### IDE Diff Modification Flow
+
+1. Main conversation proposes event model documentation change
+2. User sees IDE diff, can modify directly
+3. Main conversation acknowledges modifications: "I see you changed X to Y. That makes sense because..." or "I understand you prefer X, but consider..."
+4. Iterate until event model is correct
+
+**See `COLLABORATION_PROTOCOLS.md` for complete pair-programming model.**
+
 ## Overview
 
 Event Modeling is a collaborative design methodology that captures system behavior through events, commands, and data flow. This process creates living documentation that serves as both design specification and implementation guide.

@@ -9,6 +9,58 @@
 
 **CRITICAL WORKFLOW NOTE**: User stories are DERIVED from EVENT_MODEL.md (Phase 2), NOT from REQUIREMENTS_ANALYSIS.md (Phase 1). Requirements define WHAT/WHY at a high level. Event modeling defines HOW the system responds to events. Stories decompose event model vertical slices into implementable increments. This is why stories come in Phase 6, AFTER event modeling, architecture decisions, and design system definition.
 
+## CRITICAL: Collaboration-First Story Planning
+
+**ALL story planning work happens collaboratively in the main conversation with active user participation.**
+
+### How Story Planning Collaboration Works
+
+**Advisory Agents (story-planner, story-architect, ux-consultant):**
+- Analyze event models and recommend story breakdowns
+- Review stories for technical feasibility and UX coherence
+- Return story recommendations to main conversation (NO direct beads edits from agents)
+- See `~/.claude/processes/COLLABORATION_PROTOCOLS.md` for complete protocols
+
+**Main Conversation Facilitates:**
+- Pair-programming with user on story creation and refinement
+- IDE diff modification flow for story documentation edits
+- QUESTION: comment mechanism for inline queries in stories
+- Direct beads issue creation/updates based on user collaboration
+- Acknowledgment of user changes with rationale or counterarguments
+- User is co-creator, not rubber-stamp approver
+
+**User Participates:**
+- Reviews all story recommendations
+- Modifies proposed stories directly in beads or IDE
+- Adds `QUESTION:` comments inline for clarification
+- Makes final decisions on story scope and priorities
+- Collaborates iteratively on story refinement
+
+### QUESTION: Comment Mechanism in Stories
+
+During story planning, user can add inline questions in story descriptions or acceptance criteria:
+
+```markdown
+## Story: User sends message to conversation
+
+QUESTION: Should we support message editing in this story or defer to a later story?
+
+**Acceptance Criteria:**
+- User can type and send messages
+QUESTION: What's the maximum message length we should enforce?
+```
+
+Main conversation answers questions inline and removes QUESTION: prefix once resolved.
+
+### IDE Diff Modification Flow
+
+1. Main conversation proposes story description or acceptance criteria
+2. User sees changes, can modify directly in beads UI or story files
+3. Main conversation acknowledges modifications: "I see you narrowed the scope to X. That's more achievable because..." or "I understand you want X, but consider dependency on Y..."
+4. Iterate until story is well-defined and achievable
+
+**See `COLLABORATION_PROTOCOLS.md` for complete pair-programming model.**
+
 ## Story Requirements
 
 1. **Thin Vertical Slices**: Each story provides user-observable value
