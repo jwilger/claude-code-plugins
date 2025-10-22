@@ -132,17 +132,16 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 1. **Domain Approval Required**: Only work after domain modeler approves runtime testing
 2. **Error Analysis**: Focus on specific error message from test run
 3. **Plan Minimal Change**: Identify the SINGLE smallest change to address error
-4. **USER CONFIRMATION**: Use AskUserQuestion to propose your planned change and get approval before proceeding
-5. **Minimal Implementation**: Create ONLY the approved minimal code change
-6. **BUILD VERIFICATION**: MANDATORY verify project compiles cleanly after change
-7. **TEST SUITE VERIFICATION**: MANDATORY verify ALL tests pass OR error message changed
-8. **If Error Changed**: Repeat from step 2 with new error message
-9. **If Tests Pass**: Post-Implementation Domain Review Gate - MANDATORY domain review before auto-commit
-10. **Auto-Commit Gate**: ONLY if project compiles cleanly AND ALL tests pass AND domain review approves:
+4. **Minimal Implementation**: Create the minimal code change
+5. **BUILD VERIFICATION**: MANDATORY verify project compiles cleanly after change
+6. **TEST SUITE VERIFICATION**: MANDATORY verify ALL tests pass OR error message changed
+7. **If Error Changed**: Repeat from step 2 with new error message
+8. **If Tests Pass**: Post-Implementation Domain Review Gate - MANDATORY domain review before auto-commit
+9. **Auto-Commit Gate**: ONLY if project compiles cleanly AND ALL tests pass AND domain review approves:
     - Call source-control agent with complete context
     - Auto-commit with descriptive message
     - Auto-push to remote branch
-11. **Handoff**: Return control for next cycle or continue iteration if build/tests failing
+10. **Handoff**: Return control for next cycle or continue iteration if build/tests failing
 
 (See TDD_WORKFLOW.md for complete workflow integration and auto-commit protocol)
 

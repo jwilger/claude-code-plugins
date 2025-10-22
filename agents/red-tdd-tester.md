@@ -106,12 +106,11 @@ fn test_start_tui_session_succeeds_with_valid_config() {
    - **IF ANY TESTS FAILING**: STOP - no new tests until all failures resolved
    - **IF CLEAN STATE**: Proceed to test planning
 4. **Test Planning**: Plan the failing test with EXACTLY ONE ASSERTION you intend to write
-5. **USER CONFIRMATION**: Use AskUserQuestion to propose your planned test and get approval before writing
-6. **Test Writing**: Write ONLY the approved failing test with EXACTLY ONE ASSERTION
+5. **Test Writing**: Write the failing test with EXACTLY ONE ASSERTION
    - Use property testing for domain type boundaries
    - Focus on hitting unimplemented!() functions in integration tests
-7. **Test Verification**: Run test to verify it fails for expected reason (compilation counts)
-8. **MANDATORY Domain Handoff**: Return control specifying domain-modeling agent must review
+6. **Test Verification**: Run test to verify it fails for expected reason (compilation counts)
+7. **MANDATORY Domain Handoff**: Return control specifying domain-modeling agent must review
 
 (See TDD_WORKFLOW.md for complete workflow integration and PR management details)
 

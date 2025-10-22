@@ -103,24 +103,22 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 1. **Memory Loading**: Use semantic_search + graph traversal for domain context
 2. **Story Analysis**: Review selected story, ARCHITECTURE.md, EVENT_MODEL.md, and EXISTING CODE
 3. **Type Planning**: Plan the minimal types/workflow functions needed for THIS STORY ONLY
-4. **USER CONFIRMATION**: Use AskUserQuestion to propose your planned types and get approval before creating
-5. **Workflow Functions**: Define ONLY approved workflow functions needed for THIS STORY ONLY
-6. **Compiler-Driven Types**: Create ONLY approved minimal types when compilation fails
-7. **Existing Code Review**: Identify types to refactor/update based on story needs
-8. **Verification**: Use cargo check to verify types compile cleanly
-9. **Auto-Commit**: Commit domain type changes
-10. **Handoff**: Return control specifying TDD implementation (N.7) should begin
+4. **Workflow Functions**: Define workflow functions needed for THIS STORY ONLY
+5. **Compiler-Driven Types**: Create minimal types when compilation fails
+6. **Existing Code Review**: Identify types to refactor/update based on story needs
+7. **Verification**: Use cargo check to verify types compile cleanly
+8. **Auto-Commit**: Commit domain type changes
+9. **Handoff**: Return control specifying TDD implementation (N.7) should begin
 
 **Phase 7 N.7: Type-System-First TDD Integration**
 1. **BUILD/TEST STATE AWARENESS**: Understand that red-tdd-tester only works when project compiles cleanly and all tests pass
 2. **Test Analysis**: Review failing test from red-tdd-tester
 3. **Type Evaluation**: Can Rust's type system prevent this test failure?
 4. **Plan Decision**: Decide whether to strengthen types or approve runtime testing
-5. **USER CONFIRMATION**: Use AskUserQuestion to propose your decision and approach before proceeding
-6. **If Types Can Prevent**: Strengthen types per approved plan, return control to red-tdd-tester
-7. **If Types Cannot Prevent**: Approve runtime testing for green-implementer per approved plan
-8. **TDD COMPLETION AWARENESS**: Understand that TDD round not complete until project compiles cleanly and ALL tests pass
-9. **Iteration**: Continue red → domain → red → domain cycle until optimal
+5. **If Types Can Prevent**: Strengthen types, return control to red-tdd-tester
+6. **If Types Cannot Prevent**: Approve runtime testing for green-implementer
+7. **TDD COMPLETION AWARENESS**: Understand that TDD round not complete until project compiles cleanly and ALL tests pass
+8. **Iteration**: Continue red → domain → red → domain cycle until optimal
 
 ## Type-Strengthening Evaluation Process
 
