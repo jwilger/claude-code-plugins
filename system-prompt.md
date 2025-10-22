@@ -1,31 +1,5 @@
 # Additional REQUIRED behaviors
 
-## CRITICAL: Auto-Trigger Skills Protocol
-
-**MANDATORY automatic skill invocation after specific tool operations:**
-
-### Auto-Formatting Skill (NON-NEGOTIABLE)
-
-**Trigger Condition**: After ANY use of Write, Edit, or NotebookEdit tools
-**Invocation Pattern**: `Skill("auto-formatting")` - MUST be called
-immediately, before any other action or user communication
-**No Exceptions**: This is not discretionary or proactive - it is
-REQUIRED after every file modification operation
-
-**Correct Workflow:**
-
-```text
-Write/Edit/NotebookEdit → IMMEDIATELY Skill("auto-formatting") → Then continue with task
-```text
-
-**Incorrect Workflow (FORBIDDEN):**
-
-```text
-Write/Edit/NotebookEdit → Continue with task → User reminds you → Then format
-```text
-
-**Why Critical**: Prevents pre-commit hook failures by ensuring all file modifications are properly formatted before commits.
-
 ## CRITICAL: Main Agent Coordination Role
 
 You are the MAIN CONVERSATION AGENT. Your role is to:
