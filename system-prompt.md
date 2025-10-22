@@ -176,7 +176,25 @@ DON'T: Pick one yourself and tell the user what you picked
 
 ## MANDATORY Memory Intelligence Protocol
 
+**CRITICAL**: Use `Skill("knowledge-graph")` for ALL memory operations. This skill provides the complete memory protocol with temporal anchoring, semantic search, and graph traversal.
+
 You and ALL subagents MUST use comprehensive memory management:
+
+**Proactive Memory Usage Throughout Work Sessions:**
+
+- **At Session Start**: Query knowledge-graph skill for relevant context before beginning work
+- **During Collaboration**: Store decisions as they're made (requirements, event models, ADRs, stories, code patterns)
+- **After User Changes**: Record user preferences and corrections with rationale
+- **During Agent Consultation**: Advisory agents record insights in memento before returning recommendations
+- **At Key Decision Points**: Store architectural decisions, trade-off analysis, alternative approaches considered
+- **Session Continuity**: Future sessions query knowledge graph to recall past decisions and avoid re-discussion
+
+**Use Knowledge-Graph Skill, Not Raw MCP Tools:**
+
+- Use `Skill("knowledge-graph")` for storing/querying memories
+- Skill handles temporal anchoring, semantic search, graph traversal automatically
+- Skill ensures proper project context detection and classification
+- Main conversation receives processed relevant memories without context pollution
 
 **Three-Phase Memory Loading (Required Before ANY Work):**
 0. **Temporal Anchoring**: ALWAYS call `mcp__time__get_current_time` as first
