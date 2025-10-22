@@ -385,46 +385,72 @@ Agents automatically load their required process files when activated. This
 keeps the main system prompt focused on coordination and workflow, while
 detailed methodologies remain accessible on-demand.
 
+## Collaboration Skills
+
+**CRITICAL**: Use phase-specific collaboration skills to guide pair-programming with user during creative work:
+
+- **requirements-collaboration**: Phase 1 requirements capture guidance
+- **event-modeling-collaboration**: Phase 2 event modeling (12-step) guidance
+- **architecture-collaboration**: Phase 3 ADR creation guidance
+- **story-planning-collaboration**: Phase 6 story breakdown guidance
+- **tdd-collaboration**: Phase 7 test-driven development guidance
+
+Invoke via `Skill("[skill-name]")`. See `~/.claude/skills/[skill-name]/SKILL.md` for complete protocols.
+
+**ALL creative/decision work happens collaboratively with user participation following these skills.**
+
+## Process Files
+
+Detailed methodologies extracted to `~/.claude/processes/` for on-demand loading by agents:
+
+- **COLLABORATION_PROTOCOLS.md**: Pair-programming model, QUESTION: comments, IDE diff modification flow, agent permissions
+- **DEPENDENCY_MANAGEMENT.md**: MANDATORY protocol for cargo/uv/npm/pnpm - NEVER edit dependency files directly
+- **EVENT_MODELING.md**: 12-step workflow process, persistent state changes vs UI state, hierarchical structure
+- **TDD_WORKFLOW.md**: Outside-In TDD, hierarchical PRs, skip/unskip protocols, Red→Domain→Green cycle
+- **DOCUMENTATION_PHILOSOPHY.md**: WHAT/WHY principles, minimal code examples, ADRs as decision records
+- **DOMAIN_MODELING.md**: Workflow functions first, compiler-driven types, Parse Don't Validate philosophy
+- **STORY_PLANNING.md**: Story format, Gherkin acceptance criteria, prioritization protocol
+- **ADR_TEMPLATE.md**: ADR structure, status lifecycle, ARCHITECTURE.md update requirements
+- **DESIGN_SYSTEM.md**: Atomic Design methodology for STYLE_GUIDE.md creation
+
+Agents automatically load their required process files when activated.
+
 ### Phase 1: Requirements Analysis
 
-**Agent**: requirements-analyst
-**Output**: docs/REQUIREMENTS_ANALYSIS.md
-**Gate**: Complete requirements with user stories and acceptance criteria
+**Agent**: requirements-analyst (advisory - recommends only, NO file editing)
+**Collaboration Skill**: `Skill("requirements-collaboration")` - Use for collaborative requirements capture with user
+**Output**: docs/REQUIREMENTS_ANALYSIS.md (created collaboratively with user)
+**Gate**: Complete requirements with acceptance criteria, user approved
 
 ### Phase 2: Event Modeling
 
 **Agents**:
+- Step agents (event-modeling-step-0 through step-12): Advisory - recommend only, NO file editing
+- Review agents (event-modeling-pm, event-modeling-architect): Advisory - validate and recommend
 
-- Step agents (event-modeling-step-0 through step-12): Execute 12-step workflow process
-- Review agents (event-modeling-pm, event-modeling-architect): Validate completed event model
-
-**Process**: Main coordinator orchestrates sequential execution of 12
-specialized step agents, followed by business and architectural review
-
-**Output**: Hierarchical event model documentation:
-
-- docs/EVENT_MODEL.md (primary index/TOC)
+**Collaboration Skill**: `Skill("event-modeling-collaboration")` - Use for collaborative event model design with user
+**Output**: Hierarchical event model (created collaboratively with user):
+- docs/EVENT_MODEL.md (primary index)
 - docs/event_model/functional-areas/*.md (workflows with Mermaid diagrams)
-- docs/event_model/{events,commands,ui-screens,automations,projections,queries,domain_types}/*.md (component definitions)
+- docs/event_model/{events,commands,ui-screens,automations,projections,queries,domain_types}/*.md
 
-**Gate**: All 12 steps complete, all component documents created with
-cross-linking, business review and architectural review both approve
-
-**Process Files**: EVENT_MODELING.md (methodology), EVENT_MODEL_TEMPLATE.md (structure reference)
+**Gate**: All 12 steps complete, cross-linking established, business and architectural reviews approve, user approved
 
 ### Phase 3: Architectural Decision Records
 
-**Agent**: adr-writer ↔ User
-**Process**: ADR writer proposes decisions, user has final say
-**Output**: Individual ADR files in docs/adr/ directory
-**Gate**: All architectural decisions documented with rationale
+**Agent**: adr-writer (advisory - recommends only, NO file editing)
+**Collaboration Skill**: `Skill("architecture-collaboration")` - Use for collaborative ADR creation with user
+**Output**: Individual ADR files in docs/adr/ (created collaboratively with user)
+**Gate**: All decisions documented with rationale, user has approved/rejected each ADR (set status)
+
+**MANDATORY**: Call architecture-synthesizer immediately when ANY ADR status changes to/from "accepted"
 
 ### Phase 4: Architecture Synthesis
 
 **Agent**: architecture-synthesizer
-**Input**: All ADRs from Phase 3
-**Output**: docs/ARCHITECTURE.md (projection of ADR decisions)
-**Gate**: Cohesive system design reflecting all architectural decisions
+**Input**: All accepted ADRs from Phase 3
+**Output**: docs/ARCHITECTURE.md (projection of accepted ADR decisions)
+**Gate**: Cohesive system design reflecting all accepted architectural decisions
 
 ### Phase 5: Design System
 
@@ -435,196 +461,77 @@ cross-linking, business review and architectural review both approve
 
 ### Phase 6: Story Planning
 
-**Agents**: story-planner ↔ story-architect ↔ ux-consultant
-**Process**: Collaborative creation until consensus
-**Output**: Beads issues with prioritized user stories. docs/PLANNING.md contains SDLC process guidance only.
-**Gate**: All three agents agree stories are complete, well-defined, and properly prioritized
-**Process Files**: STORY_PLANNING.md (story-planner), DOCUMENTATION_PHILOSOPHY.md (story-planner)
+**Agents**: story-planner ↔ story-architect ↔ ux-consultant (all advisory - recommend only)
+**Collaboration Skill**: `Skill("story-planning-collaboration")` - Use for collaborative story breakdown with user
+**Output**: Beads issues with prioritized user stories (created collaboratively with user)
+**Gate**: Three-agent consensus, user approved all stories and priorities
 
-**Agent Call Sequence:**
-
-1. **story-planner**: Creates initial prioritized story list
-   - Derives stories from EVENT_MODEL.md vertical slices
-   - Creates Gherkin acceptance criteria
-   - Proposes business-driven prioritization
-   - References: STORY_PLANNING.md, DOCUMENTATION_PHILOSOPHY.md
-
-2. **story-architect**: Reviews technical feasibility and dependency order
-   - Validates story technical feasibility
-   - Suggests reprioritization based on dependencies
-   - Identifies architectural constraints
-
-3. **ux-consultant**: Reviews user experience coherence
-   - Validates story completeness for user value
-   - Checks UX flow across story sequence
-   - Suggests UX-driven reprioritization
-
-**Consensus Required:** All three agents must approve priority order before Phase 7
+**Three-Agent Consensus Pattern:**
+1. story-planner: Recommends stories from EVENT_MODEL.md vertical slices with business priorities
+2. story-architect: Reviews technical feasibility, suggests dependency adjustments
+3. ux-consultant: Reviews UX coherence, suggests UX-driven reprioritization
+4. Main conversation facilitates consensus discussion with user using story-planning-collaboration skill
+5. User makes final decisions on scope/priority/dependencies
 
 ### Phase 7: Story-by-Story Implementation (Core Loop)
 
+**Collaboration Skill**: `Skill("tdd-collaboration")` - Use for N.7 TDD collaborative implementation with user
 **Process**: Iterative development, one user story at a time
-**Gate**: Story complete when product-manager, technical-architect, and ux-ui-design-expert reach consensus
+**Gate**: Story complete when all acceptance criteria met, user approved
 
-**CRITICAL: Allow user to return to Phase 1 if requirements changes discovered during implementation**
+**CRITICAL**: Allow user to return to Phase 1 if requirements changes discovered
 
 #### Story-by-Story Core Loop
 
-**N.1. Story Selection**
+**N.1. Story Selection**: Use `/beads:ready` to find next ready story
 
-- story-planner selects next ready issue from beads using `/beads:ready` or beads MCP tools
-- Story may already be in progress or not yet started
+**N.2. Technical Architecture Review**: story-architect (advisory)
+- Reviews story and project documentation
+- Asks ONE clarifying question at a time
+- Returns recommendations to main conversation
 
-**N.2. Technical Architecture Review**
+**N.3. Architectural Updates (If Needed)**: Use `Skill("architecture-collaboration")`
+- Create/update ADRs collaboratively with user
+- Update ARCHITECTURE.md when ADR status changes to/from "accepted"
 
-- **Agent**: story-architect
-- story-architect reviews story and all relevant project documentation
-- story-architect asks ONE clarifying question at a time, waits for user response
-- Continue until architect has no more questions
+**N.4. UX/UI Review**: ux-consultant (advisory)
+- Reviews story and project documentation
+- Asks ONE clarifying question at a time
+- Returns recommendations to main conversation
 
-**N.3. Architectural Updates (If Needed)**
+**N.5. Design Updates (If Needed)**: design-system-architect
+- Updates STYLE_GUIDE.md and/or EVENT_MODEL.md as needed
+- References DESIGN_SYSTEM.md process file
 
-- Technical architect creates new ADRs if architectural decisions needed
-- For each new ADR:
-  1. Create ADR with "proposed" status
-  2. User reviews and approves/rejects/suggests edits
-  3. If edits suggested: Make changes, return to step 2
-  4. If approved: Update ADR status to "accepted"
-  5. Check for superseded ADRs, update their status if needed
-  6. **MANDATORY**: Update ARCHITECTURE.md to reflect ADR status changes
-- **ARCHITECTURE.md MUST be updated whenever ANY ADR changes status to/from "accepted"**
+**N.6. Domain Modeling (Story-Specific)**: domain-model-expert agents (advisory - recommend only)
+- Use `Skill("tdd-collaboration")` for collaborative domain type creation with user
+- Verify public API functions compile with minimal stubs
+- **Most type creation happens DURING N.7 TDD, not upfront in N.6**
+- References DOMAIN_MODELING.md process file
 
-**N.4. UX/UI Review**
+**N.7. TDD Implementation**: Use `Skill("tdd-collaboration")`
+- red-tdd-tester, green-implementer, domain-model-expert (all advisory - recommend only)
+- Main conversation facilitates pair-programming with user
+- Red → Domain → Green cycle
+- Types emerge incrementally as tests demand
+- See TDD_WORKFLOW.md process file for complete methodology
+- See COLLABORATION_PROTOCOLS.md for IDE diff modification and QUESTION: comment protocols
 
-- **Agent**: ux-consultant
-- ux-consultant reviews story and all relevant project documentation
-- ux-consultant asks ONE clarifying question at a time, waits for user response
-- Continue until agent has no more questions
+**N.8. Story Completion**: Verify acceptance criteria met, feature accessible, manual testing works
 
-**N.5. Design Updates (If Needed)**
+**N.9. Finalization**: PR creation (via git-operations skill) or trunk merge
 
-- **Agent**: design-system-architect
-- design-system-architect makes necessary changes to STYLE_GUIDE.md and/or EVENT_MODEL.md
-- References: DESIGN_SYSTEM.md, DOCUMENTATION_PHILOSOPHY.md
-- All design updates committed separately before proceeding
-
-**N.6. Domain Modeling (Story-Specific)**
-
-- **Agent**: rust-domain-model-expert OR python-domain-model-expert OR
-  typescript-domain-model-expert OR elixir-domain-model-expert (select based on
-  project language)
-- **Verify public API functions exist and compile with minimal stubs**
-- Run cargo check (or equivalent) to ensure compilation succeeds
-- **DO NOT create all domain types upfront** - types emerge during N.7 TDD
-- Move to N.7 once public API compiles
-- **Most type creation happens DURING N.7 TDD cycles, not in N.6**
-- References: DOMAIN_MODELING.md (workflow functions first, compiler-driven types)
-
-**When to call dependency-management (integration point):**
-
-- If domain modeling requires external dependencies: Pause → call dependency-management → resume
-
-**N.7. TDD Implementation**
-
-- Follow Outside-In TDD process with hierarchical chained PRs
-- **Red phase**: Test fails → Domain modeling agent creates minimal types demanded by compiler
-- **Green phase**: Implementation makes test pass
-- **Post-Green review**: Domain modeling agent reviews for primitive obsession and type violations
-- **Types emerge incrementally as tests demand them**
-- Commit type changes separately before next TDD cycle
-- Continue TDD cycles until story acceptance criteria met
-
-**N.8. Story Completion Consensus**
-
-- Product manager, technical architect, and ux-ui-design-expert MUST all agree:
-  - Implementation complete and meets acceptance criteria
-  - Code well-designed per all project principles
-  - No architectural debt introduced
-  - **MANDATORY**: Feature accessible through application entry point (main.rs or equivalent)
-  - **MANDATORY**: Manual testing instructions verified to work
-- If NOT finished: Return to N.2 for additional refinement
-- If finished: Continue to N.9
-
-**N.9. Finalization**
-
-- If PR-based: Ensure changes pushed, create PR, verify PR URL returned
-- If trunk-based: Ensure changes committed, clean up temporary files
-
-**N.10. User Approval**
-
-- User provides final approval that story is complete
-- Upon approval: Return to N.1 for next story
-
-#### Phase 7.1: TDD Sub-Process (Referenced by N.7)
-
-**CRITICAL:** All TDD agents MUST reference TDD_WORKFLOW.md process file for complete methodology.
-
-**5-Whys Decision Tree: When to Drill Down vs Implement**
-
-When a test fails, apply this decision tree (see TDD_WORKFLOW.md for complete details):
-
-```text
-Test Fails
-  ↓
-Compiler Error? → Domain modeling agent creates types
-Assertion Failure? → Is fix OBVIOUS?
-  ├─ YES: green-implementer makes single clear change
-  └─ NO: Drill down
-      ├─ Mark parent test #[ignore = "working on: child_test"]
-      ├─ Refine test setup OR write lower-level test
-      ├─ Let compiler drive types at lower level
-      ├─ Implement when obvious at lower level
-      └─ Remove parent ignore, work back up
-```text
-
-**Key Principle**: Assertion failures with multiple possible causes require
-drill-down to lower-level tests until the fix becomes obvious. Only implement
-when the change is singular and clear.
-
-**Dependency Resolution (When Needed)**
-**Trigger**: When TDD agents encounter missing dependencies
-**Process**:
-
-1. Pause TDD Cycle: Temporarily halt Red → Domain → Green process
-2. Call dependency-management: Request specific dependency with purpose/context
-3. Dependency Resolution: dependency-management agent adds dependency using appropriate tooling
-4. Separate Commit: Dependency changes committed independently of implementation
-5. Resume TDD: Continue with Red → Domain → Green cycle using new dependency
-
-See TDD_WORKFLOW.md for complete Outside-In TDD process with hierarchical chained PRs.
+**N.10. User Approval**: User confirms story complete, return to N.1
 
 ### Phase 8: Acceptance Validation and Documentation QA
 
-**Agents**: acceptance-validator → technical-documentation-writer → source-control (calls trace-analysis skill)
-**Process**:
+**Agents**: acceptance-validator → technical-documentation-writer → source-control
 
-1. **acceptance-validator**: MANDATORY requirements and integration verification
-   - Verify all requirements from REQUIREMENTS_ANALYSIS.md met
-   - **MANDATORY**: Verify features accessible through application entry point (main.rs for CLI apps)
-   - **MANDATORY**: Run manual testing commands from stories
-   - **BLOCKING**: Cannot proceed if features not user-accessible
-   - Read INTEGRATION_VALIDATION.md for verification protocol
+1. **acceptance-validator**: Verify requirements met, features accessible, manual testing works (reads INTEGRATION_VALIDATION.md)
+2. **technical-documentation-writer**: Verify markdown compliance, documentation consistency
+3. **source-control**: Use `Skill("trace-analysis")` (≥70%), `Skill("mutation-testing")` (≥80%), PR creation via `Skill("git-operations")`
 
-2. **technical-documentation-writer**: MANDATORY Documentation QA
-   - Verify markdownlint compliance and formatting consistency
-   - Check for inconsistencies between documentation files
-   - Ensure documentation reflects current implementation state
-   - If inconsistencies found: Return control requesting appropriate agent(s) resolve conflicts
-   - If resolvable formatting/consistency issues: Fix directly
-   - NO requirement to create missing documentation - only QA existing docs
-
-3. **source-control**: PR Management
-   - Calls trace-analysis skill for TRACE analysis (≥70% score required)
-   - Calls mutation-testing skill to verify mutation score ≥80% for new code
-   - BLOCKS PR if quality gates fail
-   - If PR-based workflow: MUST actually create pull request using `gh pr create` command
-   - If trunk-based workflow: MUST actually merge to main branch directly
-   - MUST include feature completion details, mutation score, TRACE score in PR description
-   - MUST reference requirements from REQUIREMENTS_ANALYSIS.md
-   - MUST provide PR URL in completion report
-
-**Gate**: Feature validated, documentation consistent, and ready for code review (PR-based) or deployed (trunk-based)
-
+**Gate**: Feature validated, documentation consistent, quality gates passed
 ## Solution Philosophy: The TRACE Framework
 
 Every code change follows TRACE - a decision framework that keeps code understandable and maintainable:
