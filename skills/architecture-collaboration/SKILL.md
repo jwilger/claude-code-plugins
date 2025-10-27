@@ -1,7 +1,7 @@
 ---
 name: architecture-collaboration
 description: Guides collaborative ADR creation with user during Phase 3. Facilitates pair-programming on architectural decision records using IDE diff modification flow and QUESTION: comments. User has final authority on all architectural decisions.
-allowed-tools: [Read, Edit, Write, Glob, Grep, WebSearch, WebFetch, mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__time__get_current_time, AskUserQuestion]
+allowed-tools: [Read, Glob, Grep, WebSearch, WebFetch, mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__time__get_current_time, AskUserQuestion]
 ---
 
 # Architecture Collaboration Skill

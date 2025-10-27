@@ -1,7 +1,7 @@
 ---
 name: tdd-collaboration
 description: Guides collaborative test-driven development with user during Phase 7 (Story-by-Story Core Loop). Facilitates pair-programming on test and implementation code using IDE diff modification flow and QUESTION: comments. Enforces Red → Domain → Green cycle.
-allowed-tools: [Read, Edit, Write, Glob, Grep, mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__time__get_current_time, AskUserQuestion, Bash, mcp__cargo__cargo_check, mcp__cargo__cargo_test, mcp__pytest__execute_tests]
+allowed-tools: [Read, Glob, Grep, mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__time__get_current_time, AskUserQuestion, Bash, mcp__cargo__cargo_check, mcp__cargo__cargo_test, mcp__pytest__execute_tests]
 ---
 
 # TDD Collaboration Skill
@@ -37,10 +37,10 @@ Guides main conversation on how to collaborate with user during Phase 7: Test-Dr
 
 **Collaborative Test Creation:**
 
-1. **Propose test code**:
-   - Present one test with one assertion
-   - Use IDE diff modification
-   - User reviews, can modify directly
+1. **Create test code directly**:
+   - Use Write/Edit tools to create test with one assertion
+   - User approves/rejects via tool mechanism (NOT via asking in conversation first)
+   - If rejected, user will tell you why and what to change
 
 2. **Acknowledge user modifications**:
    - "I see you changed the assertion to X. That's more specific because..."
@@ -72,10 +72,10 @@ Guides main conversation on how to collaborate with user during Phase 7: Test-Dr
 
 **Collaborative Type Creation:**
 
-1. **Propose type definitions**:
-   - Present minimal type signatures with `unimplemented!()`
-   - Use IDE diff modification
-   - User reviews, can modify types directly
+1. **Create type definitions directly**:
+   - Use Write/Edit tools to create minimal types
+   - User approves/rejects via tool mechanism (NOT via asking in conversation first)
+   - If rejected, user will tell you why and what to change
 
 2. **Acknowledge user modifications**:
    - "I see you added constraint X. That prevents..."
@@ -106,10 +106,10 @@ Guides main conversation on how to collaborate with user during Phase 7: Test-Dr
 
 **Collaborative Implementation:**
 
-1. **Propose minimal implementation**:
-   - ONLY what makes test pass
-   - NO extra features
-   - Use IDE diff modification
+1. **Create minimal implementation directly**:
+   - Use Write/Edit tools for ONLY what makes test pass
+   - User approves/rejects via tool mechanism (NOT via asking in conversation first)
+   - If rejected, user will tell you why and what to change
 
 2. **Acknowledge user modifications**:
    - "I see you simplified to X. That's more minimal because..."
@@ -277,7 +277,7 @@ TDD collaboration is successful when:
 1. Use trace-analysis skill to verify cognitive complexity
 2. Use mutation-testing skill to verify test quality (≥80%)
 3. Use git-operations skill for PR creation
-4. Update beads issue to close story
+4. Update beads issue via `/beads:close` command to close story
 
 **If dependencies needed during TDD:**
 

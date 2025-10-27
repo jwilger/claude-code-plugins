@@ -44,6 +44,31 @@ When the main conversation proposes file changes, you see diffs in your IDE. You
 
 ### Main Conversation Responsibilities
 
+**For Decision Points - Use AskUserQuestion Tool:**
+
+When main conversation needs user decision on implementation choices:
+
+1. **ALWAYS use AskUserQuestion tool** - Don't propose options in conversation text
+2. **Present 2-4 clear options** with descriptions of trade-offs
+3. **Wait for user selection** - Tool handles the UI interaction
+4. **Implement based on user choice** - User picks, you execute
+
+**Example:**
+```python
+# ❌ WRONG - Proposing in conversation:
+"Should we use Option A (faster) or Option B (more maintainable)?"
+
+# ✅ CORRECT - Using tool:
+AskUserQuestion(questions=[{
+  "question": "Which approach should we use for the checkpoint filter?",
+  "header": "Approach",
+  "options": [
+    {"label": "Inline (Option A)", "description": "Faster but duplicated code"},
+    {"label": "Helper (Option B)", "description": "DRY but adds indirection"}
+  ]
+}])
+```
+
 **When user modifies a proposal:**
 
 1. **Acknowledge the modification explicitly**

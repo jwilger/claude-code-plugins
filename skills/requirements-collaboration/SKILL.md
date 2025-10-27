@@ -1,7 +1,7 @@
 ---
 name: requirements-collaboration
 description: Guides collaborative requirements capture with user during Phase 1. Facilitates pair-programming on REQUIREMENTS_ANALYSIS.md using IDE diff modification flow and QUESTION: comments. Use when working on requirements analysis phase.
-allowed-tools: [Read, Edit, Write, Glob, Grep, WebSearch, WebFetch, mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__time__get_current_time, AskUserQuestion]
+allowed-tools: [Read, Glob, Grep, WebSearch, WebFetch, mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__time__get_current_time, AskUserQuestion]
 ---
 
 # Requirements Collaboration Skill

@@ -15,7 +15,7 @@ Before beginning ANY task, you MUST:
 1. **Semantic Search**: Use semantic_search to find relevant acceptance criteria, requirements, and validation patterns
 2. **Graph Traversal**: Use open_nodes to explore relationships between requirements, stories, and implementation
 3. **Temporal Precedence**: Evaluate memory age and prioritize recent project-specific memories over older general ones
-4. **Document Review**: Check for existing docs/REQUIREMENTS_ANALYSIS.md. Query beads for current issue status.
+4. **Document Review**: Check for existing docs/REQUIREMENTS_ANALYSIS.md. Query beads CLI for current issue status using `/beads:list`.
 
 This comprehensive memory loading is NON-NEGOTIABLE and must be completed before acceptance validation work.
 
@@ -25,7 +25,7 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 - Verify implemented features against original acceptance criteria from REQUIREMENTS_ANALYSIS.md
 - Confirm all functional requirements are met
 - Validate business value has been delivered as intended
-- Verify all beads issues are closed and acceptance criteria met
+- Verify all beads issues (tracked via beads CLI tool) are closed and acceptance criteria met
 - Document validation results for handoff to technical-documentation-writer
 
 **When Called:**
@@ -45,7 +45,7 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 1. **Memory Loading**: Use semantic_search + graph traversal for complete context
 2. **Document Review**: Read validation sources
    - docs/REQUIREMENTS_ANALYSIS.md (original requirements and acceptance criteria)
-   - Query beads for issue status using `/beads:list --status closed` or mcp tools
+   - Query beads CLI for issue status using `/beads:list --status closed` command
    - Check memento for RequirementProposal entities from Phase 1
 3. **Process File Review**: Read INTEGRATION_VALIDATION.md for integration verification protocol
 4. **Integration Verification**: MANDATORY - Verify features accessible to users
@@ -57,7 +57,7 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
    - **BLOCKING**: Cannot approve if features not accessible through application entry point
 5. **Functional Requirements Verification**: For each FR-N from REQUIREMENTS_ANALYSIS.md
    - Review acceptance criteria specified in requirements
-   - Query beads for issues implementing this requirement
+   - Query beads CLI (via `/beads:list`) for issues implementing this requirement
    - Verify stories marked complete actually satisfy acceptance criteria
    - Document: Met / Partially Met / Not Met
 6. **Non-Functional Requirements Verification**: For each NFR-N

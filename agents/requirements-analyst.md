@@ -49,7 +49,7 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 - **Propose complete docs/REQUIREMENTS_ANALYSIS.md content via DocumentProposal entity**
 - Return entity ID to main agent for file creation
 - **CRITICAL**: Requirements document structure is: Executive Summary → Current State → Functional Requirements → Non-Functional Requirements → User Personas → Success Criteria → Dependencies/Constraints → Risks → Next Steps
-- **FORBIDDEN**: User stories, epics, Gherkin scenarios do NOT belong in requirements - they are derived from EVENT_MODEL.md and tracked in beads. docs/PLANNING.md contains SDLC process guidance only.
+- **FORBIDDEN**: User stories, epics, Gherkin scenarios do NOT belong in requirements - they are derived from EVENT_MODEL.md and tracked via beads CLI tool. docs/PLANNING.md contains SDLC process guidance only.
 
 **When Called:**
 - Phase 1: Initial requirements analysis

@@ -36,8 +36,8 @@
     ]
   },
   "model": "sonnet",
-  "alwaysThinkingEnabled": true,
   "enabledPlugins": {
     "beads@beads-marketplace": true
-  }
+  },
+  "alwaysThinkingEnabled": true
 }

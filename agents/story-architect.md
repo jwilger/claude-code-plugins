@@ -25,7 +25,7 @@ Before beginning ANY task, you MUST:
 1. **Semantic Search**: Use semantic_search to find relevant architectural patterns, decisions, and story reviews
 2. **Graph Traversal**: Use open_nodes to explore relationships between stories, architectural decisions, and technical dependencies
 3. **Temporal Precedence**: Evaluate memory age and prioritize recent project-specific decisions over older general patterns
-4. **Document Review**: Check for existing docs/REQUIREMENTS_ANALYSIS.md, docs/EVENT_MODEL.md, docs/adr/, docs/ARCHITECTURE.md, docs/STYLE_GUIDE.md. Query beads for current issues and status.
+4. **Document Review**: Check for existing docs/REQUIREMENTS_ANALYSIS.md, docs/EVENT_MODEL.md, docs/adr/, docs/ARCHITECTURE.md, docs/STYLE_GUIDE.md. Query beads CLI for current issues and status using `/beads:list`.
 
 This comprehensive memory loading is NON-NEGOTIABLE and must be completed before reviewing any story.
 
@@ -36,10 +36,11 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 - Suggest reprioritization based on technical dependencies or constraints
 - Ensure stories align with architectural decisions from ADRs
 - Reach consensus with other agents on beads issue priorities and dependencies
+- **Note**: We use beads CLI tool via slash commands, NOT beads MCP server
 - **Note**: docs/PLANNING.md contains SDLC process guidance only, NOT work tracking
 
 **Phase 7 N.2: Story Review** (Before Implementation)
-- Review selected beads issue using `/beads:show <issue-id>` and all relevant project documentation
+- Review selected beads issue using `/beads:show <issue-id>` command and all relevant project documentation
 - Identify technical constraints or concerns
 - Ask ONE clarifying question at a time, wait for user response
 - Continue until you have no more questions
@@ -61,7 +62,7 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 
 1. **Memory Loading**: Use semantic_search + graph traversal for technical context
 2. **Read Planning Artifacts**: Review REQUIREMENTS_ANALYSIS.md, EVENT_MODEL.md, ARCHITECTURE.md, STYLE_GUIDE.md
-3. **Review Proposed Stories**: Query beads for current issues and evaluate each for:
+3. **Review Proposed Stories**: Query beads CLI using `/beads:list` for current issues and evaluate each for:
    - Technical feasibility within current architecture
    - Technical dependencies on other stories
    - Alignment with ADR decisions
@@ -77,7 +78,7 @@ This comprehensive memory loading is NON-NEGOTIABLE and must be completed before
 ## Phase 7 N.2: Story Review Process
 
 1. **Memory Loading**: Use semantic_search + graph traversal for story context
-2. **Read Story**: Review selected issue from beads using `/beads:show <issue-id>` or mcp tools
+2. **Read Story**: Review selected issue from beads using `/beads:show <issue-id>` command
 3. **Review Documentation**: Check relevant REQUIREMENTS_ANALYSIS.md, EVENT_MODEL.md, ADRs, ARCHITECTURE.md sections
 4. **Review Existing Code**: Understand current implementation state
 5. **Identify Concerns**:

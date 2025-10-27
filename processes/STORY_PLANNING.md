@@ -102,17 +102,19 @@ Main conversation answers questions inline and removes QUESTION: prefix once res
 
 **IMPORTANT**: Stories are tracked as beads issues, NOT in docs/PLANNING.md. The PLANNING.md document contains SDLC process guidance only.
 
-### Beads Commands for Story Management
+**NOTE**: We use the beads CLI tool (via slash commands), NOT the beads MCP server.
 
-- **Create story**: `/beads:create` or `mcp__plugin_beads_beads__create`
-- **Update story**: `/beads:update <issue-id>` or `mcp__plugin_beads_beads__update`
-- **List stories**: `/beads:list` or `mcp__plugin_beads_beads__list`
-- **Show details**: `/beads:show <issue-id>` or `mcp__plugin_beads_beads__show`
-- **Find ready work**: `/beads:ready` or `mcp__plugin_beads_beads__ready`
-- **Check blockers**: `/beads:blocked` or `mcp__plugin_beads_beads__blocked`
-- **Set dependencies**: `/beads:dep <from-id> <to-id>` or `mcp__plugin_beads_beads__dep`
-- **Close story**: `/beads:close <issue-id>` or `mcp__plugin_beads_beads__close`
-- **Project stats**: `/beads:stats` or `mcp__plugin_beads_beads__stats`
+### Beads CLI Commands for Story Management
+
+- **Create story**: `/beads:create`
+- **Update story**: `/beads:update <issue-id>`
+- **List stories**: `/beads:list`
+- **Show details**: `/beads:show <issue-id>`
+- **Find ready work**: `/beads:ready`
+- **Check blockers**: `/beads:blocked`
+- **Set dependencies**: `/beads:dep <from-id> <to-id>`
+- **Close story**: `/beads:close <issue-id>`
+- **Project stats**: `/beads:stats`
 
 ### Beads Issue Fields (Story Content)
 

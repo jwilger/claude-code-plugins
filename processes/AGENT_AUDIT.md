@@ -35,9 +35,9 @@
 
 **story-planner.md**
 - **Category:** Advisory
-- **Current tools:** Read, TodoWrite, WebSearch, WebFetch, memento, beads tools, Edit, Write, NotebookEdit
+- **Current tools:** Read, TodoWrite, WebSearch, WebFetch, memento, SlashCommand (for beads CLI), Edit, Write, NotebookEdit
 - **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Should help plan stories collaboratively, not create beads issues autonomously (beads tools OK for issue management)
+- **Rationale:** Should help plan stories collaboratively using beads CLI tool via slash commands for issue management
 
 **adr-writer.md**
 - **Category:** Advisory

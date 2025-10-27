@@ -1,7 +1,7 @@
 ---
 name: event-modeling-collaboration
 description: Guides collaborative event model design with user during Phase 2. Facilitates pair-programming on event model documentation using IDE diff modification flow and QUESTION: comments. Use when working on event modeling (12-step process).
-allowed-tools: [Read, Edit, Write, Glob, Grep, WebSearch, WebFetch, mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__time__get_current_time, AskUserQuestion]
+allowed-tools: [Read, Glob, Grep, WebSearch, WebFetch, mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__time__get_current_time, AskUserQuestion]
 ---
 
 # Event Modeling Collaboration Skill

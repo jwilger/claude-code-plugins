@@ -38,7 +38,7 @@ fn test_payment_capture() {
 }
 ```
 
-Main conversation answers the question inline and removes comment once resolved.
+**CRITICAL:** Main conversation answers the question inline and **ALWAYS removes the QUESTION comment** after addressing it. Never leave QUESTION comments in committed code.
 
 ### IDE Diff Modification Flow
 
@@ -260,6 +260,37 @@ What type of failure?
 - Provides metadata trail showing dependency hierarchy
 - Enables commits even with parent test incomplete
 - **MANDATORY**: Remove ignore before considering parent test complete
+
+## Red-Green-Refactor Cycle
+
+**CRITICAL: Always Commit Before Refactoring**
+
+The TDD cycle is **Red → Green → Refactor**, not just Red → Green:
+
+1. **Red**: Write failing test
+2. **Green**: Make test pass with minimal implementation
+3. **✅ COMMIT working green state** ← MANDATORY before refactoring
+4. **Refactor**: Extract duplication, improve design
+5. **✅ COMMIT refactored code** after verifying tests still pass
+
+**Why Commit First:**
+- Creates safe rollback point if refactoring goes wrong
+- Separates "make it work" from "make it better" in git history
+- Allows easy revert to working state without losing progress
+- Follows Kent Beck's original TDD methodology
+
+**Example:**
+```bash
+# After test passes
+git commit -m "Implement checkpoint resumption - test passes"
+
+# Now safe to refactor
+# Extract repeated logic, improve names, etc.
+
+# After refactoring
+pytest  # Verify tests still pass
+git commit -m "Refactor checkpoint filter into helper function"
+```
 
 ### 1. Integration Test PR
 

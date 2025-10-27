@@ -1,7 +1,7 @@
 ---
 name: story-planning-collaboration
-description: Guides collaborative story breakdown with user during Phase 6. Facilitates pair-programming on beads story creation using QUESTION: comments and iterative refinement. Stories are thin vertical slices derived from event models.
-allowed-tools: [Read, Glob, Grep, WebSearch, WebFetch, mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__time__get_current_time, AskUserQuestion, mcp__plugin_beads_beads__create, mcp__plugin_beads_beads__update, mcp__plugin_beads_beads__list, mcp__plugin_beads_beads__show, mcp__plugin_beads_beads__dep]
+description: Guides collaborative story breakdown with user during Phase 6. Facilitates pair-programming on beads story creation using QUESTION: comments and iterative refinement. Stories are thin vertical slices derived from event models. Uses beads CLI tool via slash commands.
+allowed-tools: [Read, Glob, Grep, WebSearch, WebFetch, mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__time__get_current_time, AskUserQuestion, SlashCommand]
 ---
 
 # Story Planning Collaboration Skill
@@ -35,7 +35,7 @@ All three agents return recommendations (NO direct beads edits). Main conversati
 
 2. **Create beads issue collaboratively**:
    - After user approves story content
-   - Main conversation creates beads issue with agreed-upon details
+   - Main conversation creates beads issue via `/beads:create` command with agreed-upon details
    - User can modify beads issue fields directly
 
 3. **Acknowledge user modifications**:
@@ -86,12 +86,12 @@ All three agents return recommendations (NO direct beads edits). Main conversati
 **Initial Priority (story-planner):**
 
 - Business risk vs value analysis
-- Creates beads issues with priority 1/2/3
+- Creates beads issues with priority 1/2/3 via `/beads:create`
 
 **Technical Review (story-architect):**
 
 - May suggest reprioritization based on dependencies
-- Sets technical dependencies via beads deps
+- Sets technical dependencies via `/beads:dep` command
 
 **UX Review (ux-consultant):**
 
