@@ -1,3 +1,0 @@
-[submodule "plugins/marketplaces/beads-marketplace"]
-	path = plugins/marketplaces/beads-marketplace
-	url = git@github.com:steveyegge/beads.git
