@@ -1,267 +1,70 @@
 # Agent Audit and Categorization
 
-**Date:** 2025-10-22
-**Purpose:** Categorize all agents per collaboration-first model and remove file-edit permissions from advisory agents
+**Date:** 2025-10-27
+**Purpose:** Document the resumable subagent architecture with IDE diff collaboration model
+
+## Architecture Overview
+
+**All agents now have Write/Edit/NotebookEdit permissions but use IDE diff collaboration:**
+
+- Agents propose changes via IDE diffs
+- Agents PAUSE after proposals
+- User modifies proposals in IDE, adds QUESTION: comments
+- Main conversation RESUMES agent with user modifications
+- Agent acknowledges changes, answers questions, iterates
+- User accepts when satisfied
+
+This replaces the old model where advisory agents had NO file permissions and had to return recommendations to main conversation.
 
 ## Categorization Framework
 
-### Advisory Agents (NO File Edit Permissions)
-- Research, analyze, recommend ONLY
-- NO Write/Edit/NotebookEdit access
-- Returns recommendations to main conversation
-- Main conversation facilitates user collaboration on implementation
+### Facilitator Subagents (Coordinate Long Phases)
 
-### Autonomous Agents (CAN Edit Files - Mechanical Only)
-- Purely mechanical operations
-- NO creative or design decisions
-- Formatting, consistency, explicit user-directed edits only
+**Purpose:** Actively facilitate collaborative work between user and specialist agents for entire phases
 
-### Skills (Not Agents)
-- Execute in main conversation
-- Permissions vary by purpose
-- See skills/ directory
+**Characteristics:**
+- Have Write/Edit/NotebookEdit tools for IDE diff proposals
+- Coordinate between specialist advisory agents and user
+- Frequently pause/resume throughout long phases
+- MUST use IDE diff collaboration flow
+- NEVER finalize changes without user approval
 
-## Audit Results
+**Examples:**
+- requirements-facilitator (Phase 1)
+- event-modeling-facilitator (Phase 2)
+- architecture-facilitator (Phase 3)
+- story-facilitator (Phase 6)
+- tdd-facilitator (Phase 7)
 
-### ADVISORY AGENTS (Remove Write/Edit/NotebookEdit)
+**Flow:**
+```
+Main launches facilitator
+→ Facilitator coordinates specialist consultations
+→ Facilitator proposes via IDE diff
+→ Facilitator PAUSES
+→ User modifies in IDE
+→ Main RESUMES facilitator with modifications
+→ Facilitator acknowledges, iterates
+→ Repeat until phase complete
+```
 
-#### Planning & Requirements (7 agents)
+### Specialist Advisory Subagents (Propose Changes)
 
-**requirements-analyst.md**
-- **Category:** Advisory
-- **Current tools:** Read, Edit, Write, TodoWrite, WebSearch, WebFetch, memento, NotebookEdit, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Should guide collaborative requirement capture, not write REQUIREMENTS_ANALYSIS.md autonomously
+**Purpose:** Domain-specific analysis and recommendations with IDE diff proposals
 
-**story-planner.md**
-- **Category:** Advisory
-- **Current tools:** Read, TodoWrite, WebSearch, WebFetch, memento, SlashCommand (for beads CLI), Edit, Write, NotebookEdit
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Should help plan stories collaboratively using beads CLI tool via slash commands for issue management
+**Characteristics:**
+- Have Write/Edit/NotebookEdit tools for IDE diff proposals
+- Research, analyze, store findings in memento
+- Propose changes via IDE diffs
+- MUST pause after proposals
+- NEVER finalize changes without user approval
+- Usually short-lived sessions (single consultation)
 
-**adr-writer.md**
-- **Category:** Advisory
-- **Current tools:** Read, Edit, Write, Glob, Grep, WebSearch, WebFetch, memento, TodoWrite, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Should collaborate with user on ADR creation per collaboration protocols
+**Count:** 29 agents
 
-**story-architect.md**
-- **Category:** Advisory
-- **Current tools:** Read, Edit, Write, Glob, Grep, WebSearch, WebFetch, memento, TodoWrite, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Provides technical review of stories, shouldn't autonomously modify them
+**Examples:**
 
-**ux-consultant.md**
-- **Category:** Advisory
-- **Current tools:** Read, Glob, Grep, TodoWrite, memento, Edit, Write, NotebookEdit, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Provides UX guidance, user collaborates on actual design decisions
-
-**architecture-synthesizer.md**
-- **Category:** Advisory
-- **Current tools:** Read, Edit, Write, Glob, Grep, WebSearch, WebFetch, memento, TodoWrite, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Synthesizes ADRs into ARCHITECTURE.md collaboratively, not autonomously
-
-**design-system-architect.md**
-- **Category:** Advisory
-- **Current tools:** Read, Glob, Grep, Edit, Write, TodoWrite, memento, NotebookEdit, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Guides STYLE_GUIDE.md creation collaboratively using Atomic Design
-
-#### Event Modeling (15 agents)
-
-**event-modeling-pm.md**
-- **Category:** Advisory
-- **Current tools:** Read, Edit, Write, TodoWrite, WebSearch, WebFetch, memento, Glob, Grep, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Reviews event models from business perspective, provides feedback for collaborative refinement
-
-**event-modeling-architect.md**
-- **Category:** Advisory
-- **Current tools:** Read, Edit, Write, Glob, Grep, WebSearch, WebFetch, memento, TodoWrite, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Reviews event models from technical perspective, provides feedback for collaborative refinement
-
-**event-modeling-step-0-functional-areas.md**
-- **Category:** Advisory
-- **Current tools:** Read, Write, Edit, Glob, Grep, TodoWrite, WebSearch, WebFetch, memento, NotebookEdit, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Helps identify functional areas, user collaborates on actual organization
-
-**event-modeling-step-1-goal-event.md**
-- **Category:** Advisory
-- **Current tools:** Read, Write, Edit, Glob, Grep, TodoWrite, WebSearch, WebFetch, memento, NotebookEdit, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Guides goal event identification collaboratively
-
-**event-modeling-step-2-event-sequence.md**
-- **Category:** Advisory
-- **Current tools:** Read, Write, Edit, Glob, Grep, TodoWrite, WebSearch, WebFetch, memento, NotebookEdit, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Guides event sequence design collaboratively
-
-**event-modeling-step-3-commands.md**
-- **Category:** Advisory
-- **Current tools:** Read, Write, Edit, Glob, Grep, TodoWrite, WebSearch, WebFetch, memento, NotebookEdit, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Guides command definition collaboratively
-
-**event-modeling-step-4-triggers.md**
-- **Category:** Advisory
-- **Current tools:** Read, Write, Edit, Glob, Grep, TodoWrite, WebSearch, WebFetch, memento, NotebookEdit, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Guides trigger identification collaboratively
-
-**event-modeling-step-5-final-ui.md**
-- **Category:** Advisory
-- **Current tools:** Read, Write, Edit, Glob, Grep, TodoWrite, WebSearch, WebFetch, memento, NotebookEdit, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Guides UI wireframe creation collaboratively
-
-**event-modeling-step-6-queries-projections.md**
-- **Category:** Advisory
-- **Current tools:** Read, Write, Edit, Glob, Grep, TodoWrite, WebSearch, WebFetch, memento, NotebookEdit, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Guides projection/query design collaboratively
-
-**event-modeling-step-7-projection-events.md**
-- **Category:** Advisory
-- **Current tools:** Read, Write, Edit, Glob, Grep, TodoWrite, WebSearch, WebFetch, memento, NotebookEdit, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Guides event-to-projection mapping collaboratively
-
-**event-modeling-step-8-event-data.md**
-- **Category:** Advisory
-- **Current tools:** Read, Write, Edit, Glob, Grep, TodoWrite, WebSearch, WebFetch, memento, NotebookEdit, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Guides event data definition collaboratively
-
-**event-modeling-step-9-command-sources.md**
-- **Category:** Advisory
-- **Current tools:** Read, Write, Edit, Glob, Grep, TodoWrite, WebSearch, WebFetch, memento, NotebookEdit, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Guides command source documentation collaboratively
-
-**event-modeling-step-10-acceptance.md**
-- **Category:** Advisory
-- **Current tools:** Read, Write, Edit, Glob, Grep, TodoWrite, WebSearch, WebFetch, memento, NotebookEdit, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Guides Gherkin acceptance criteria collaboratively
-
-**event-modeling-step-11-cross-linking.md**
-- **Category:** Advisory
-- **Current tools:** Read, Write, Edit, Glob, Grep, TodoWrite, WebSearch, WebFetch, memento, NotebookEdit, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Guides cross-reference creation collaboratively
-
-**event-modeling-step-12-completeness.md**
-- **Category:** Advisory
-- **Current tools:** Read, Write, Edit, Glob, Grep, TodoWrite, WebSearch, WebFetch, memento, NotebookEdit, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Validates completeness, provides feedback for collaborative fixes
-
-#### TDD & Implementation (6 agents)
-
-**red-tdd-tester.md**
-- **Category:** Advisory
-- **Current tools:** Read, Write, Edit, Glob, Grep, TodoWrite, memento, cargo, pytest, WebFetch, WebSearch, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Analyzes and recommends test approach, main conversation collaborates with user on actual test code
-
-**green-implementer.md**
-- **Category:** Advisory
-- **Current tools:** Read, Write, Edit, Glob, Grep, TodoWrite, memento, cargo, pytest, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Recommends implementation approach, main conversation collaborates with user on actual code
-
-**rust-domain-model-expert.md**
-- **Category:** Advisory
-- **Current tools:** memento, Glob, Grep, Read, Edit, Write, NotebookEdit, WebFetch, TodoWrite, WebSearch, cargo, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Analyzes types and recommends domain model improvements, main conversation collaborates on implementation
-
-**python-domain-model-expert.md**
-- **Category:** Advisory
-- **Current tools:** memento, Glob, Grep, Read, Edit, Write, NotebookEdit, WebFetch, TodoWrite, WebSearch, pytest, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Analyzes types and recommends domain model improvements, main conversation collaborates on implementation
-
-**typescript-domain-model-expert.md**
-- **Category:** Advisory
-- **Current tools:** memento, Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, NotebookEdit, Bash, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Analyzes types and recommends domain model improvements, main conversation collaborates on implementation
-
-**elixir-domain-model-expert.md**
-- **Category:** Advisory
-- **Current tools:** memento, Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, NotebookEdit, etc.
-- **Action:** REMOVE Write, Edit, NotebookEdit
-- **Rationale:** Analyzes types and recommends domain model improvements, main conversation collaborates on implementation
-
-#### Research & Validation (2 agents)
-
-**research-specialist.md**
-- **Category:** Advisory
-- **Current tools:** Read, Glob, Grep, WebSearch, WebFetch, BashOutput, memento, time
-- **Action:** KEEP AS-IS (already has NO Write/Edit/NotebookEdit)
-- **Rationale:** Already correctly configured as advisory-only
-
-**acceptance-validator.md**
-- **Category:** Advisory
-- **Current tools:** Read, TodoWrite, memento, Glob, Grep, WebFetch, WebSearch, BashOutput, pytest, etc.
-- **Action:** KEEP AS-IS (no Write/Edit in tools list)
-- **Rationale:** Validates requirements, provides verification report to main conversation
-
-### AUTONOMOUS AGENTS (Keep File Permissions - Mechanical Only)
-
-**technical-documentation-writer.md**
-- **Category:** Autonomous (Mechanical)
-- **Current tools:** Edit, Write, NotebookEdit, Read, Glob, Grep, TodoWrite, memento, WebFetch, WebSearch, etc.
-- **Action:** KEEP Write, Edit, NotebookEdit BUT clarify constraints
-- **Rationale:** Handles formatting/consistency fixes only, NO content creation
-- **Constraint Update Needed:** Emphasize mechanical fixes only, no creative writing
-
-**devops.md**
-- **Category:** Autonomous (Mechanical)
-- **Current tools:** Bash, Glob, Grep, Read, Edit, Write, NotebookEdit, WebFetch, TodoWrite, WebSearch, etc.
-- **Action:** KEEP Write, Edit, NotebookEdit for infrastructure configs
-- **Rationale:** Handles infrastructure setup following established patterns
-- **Note:** Infrastructure decisions should still be collaborative
-
-**file-editor.md**
-- **Category:** Autonomous (User-Directed)
-- **Current tools:** Read, Write, Edit, NotebookEdit, Glob, Grep, memento, WebFetch, TodoWrite, WebSearch, etc.
-- **Action:** KEEP Write, Edit, NotebookEdit
-- **Rationale:** Executes explicit user file-edit requests only
-- **Constraint:** ONLY for direct user requests like "fix this typo"
-
-**dependency-management.md**
-- **Category:** Autonomous (Mechanical)
-- **Current tools:** Bash, Read, KillShell, memento, time, BashOutput, cargo, etc.
-- **Action:** KEEP AS-IS (no Write/Edit in agent, uses Bash for dep files)
-- **Rationale:** Manages dependencies using platform tooling (cargo/uv/npm)
-- **Note:** Dependency decisions should be collaborative, execution can be automated
-
-## Summary
-
-### Advisory Agents Requiring Permission Removal: 28
-
-**Planning/Requirements:**
-- requirements-analyst
-- story-planner
-- adr-writer
-- story-architect
-- ux-consultant
-- architecture-synthesizer
-- design-system-architect
-
-**Event Modeling:**
-- event-modeling-pm
-- event-modeling-architect
-- event-modeling-step-0 through step-12 (13 agents)
-
-**TDD/Implementation:**
+**TDD & Implementation (6):**
 - red-tdd-tester
 - green-implementer
 - rust-domain-model-expert
@@ -269,42 +72,183 @@
 - typescript-domain-model-expert
 - elixir-domain-model-expert
 
-**Already Correct:**
-- research-specialist (already advisory-only)
-- acceptance-validator (already advisory-only)
+**Planning & Requirements (7):**
+- requirements-analyst
+- story-planner
+- story-architect
+- ux-consultant
+- adr-writer
+- architecture-synthesizer
+- design-system-architect
 
-### Autonomous Agents Keeping Permissions: 4
+**Event Modeling (15):**
+- event-modeling-pm
+- event-modeling-architect
+- event-modeling-step-0-functional-areas
+- event-modeling-step-1-goal-event
+- event-modeling-step-2-event-sequence
+- event-modeling-step-3-commands
+- event-modeling-step-4-triggers
+- event-modeling-step-5-final-ui
+- event-modeling-step-6-queries-projections
+- event-modeling-step-7-projection-events
+- event-modeling-step-8-event-data
+- event-modeling-step-9-command-sources
+- event-modeling-step-10-acceptance
+- event-modeling-step-11-cross-linking
+- event-modeling-step-12-completeness
 
-- technical-documentation-writer (mechanical formatting only)
-- devops (infrastructure configs)
-- file-editor (user-directed edits only)
-- dependency-management (dependency tooling automation)
+**Validation (1):**
+- acceptance-validator
 
-## Implementation Plan
+**Flow:**
+```
+Main/facilitator launches specialist
+→ Specialist researches/analyzes
+→ Specialist proposes via IDE diff
+→ Specialist PAUSES
+→ User modifies in IDE
+→ Main/facilitator RESUMES specialist
+→ Specialist acknowledges, iterates
+```
 
-For each advisory agent requiring changes:
+### Operational Subagents (Mechanical Operations)
 
-1. Remove from tools list: `Write, Edit, NotebookEdit`
-2. Add to agent instructions:
-   - "You are an ADVISORY agent - research and recommend ONLY"
-   - "NO file editing - return recommendations to main conversation"
-   - "Main conversation facilitates user collaboration on implementation"
-3. Reference COLLABORATION_PROTOCOLS.md
+**Purpose:** Mechanical operations with clear procedures and verification
 
-For autonomous agents:
+**Characteristics:**
+- Have Write/Edit/NotebookEdit for mechanical operations
+- Execute well-defined procedures (not creative work)
+- May use IDE diff collaboration for user review
+- Some operations don't require pause (auto-formatting, auto-commits after verification)
 
-1. Clarify mechanical-only constraints
-2. Reference when creative decisions need collaboration
-3. Document specific use cases where autonomy is appropriate
+**Count:** 10 agents
 
-## Next Steps
+**Examples:**
+- source-control-agent (git operations, PR creation, commit verification)
+- technical-documentation-writer (markdown formatting/consistency, QA)
+- cognitive-complexity-agent (TRACE analysis)
+- mutation-testing-agent (mutation testing execution)
+- github-pr-agent (PR workflows, review comment threading)
+- exploration-agent (fast codebase exploration)
+- dependency-agent (dependency management via cargo/uv/npm/pnpm)
+- memory-intelligence-agent (complex knowledge graph operations)
+- devops (infrastructure configuration)
+- file-editor (ONLY for explicit user requests: "fix this typo")
 
-1. Update all 28 advisory agent files to remove Write/Edit/NotebookEdit
-2. Update autonomous agent files to clarify constraints
-3. Verify system-prompt.md reflects new permission model
-4. Test with sample workflow to ensure collaboration flow works
-5. Document in COLLABORATION_PROTOCOLS.md
+**Flow:**
+```
+Main launches operational agent
+→ Agent executes procedure
+→ Agent verifies results
+→ Agent may pause for user review if unclear
+→ Agent returns results/status
+```
+
+## Total Agent Count
+
+**Facilitator Subagents:** 5
+**Specialist Advisory Subagents:** 29
+**Operational Subagents:** 10
+**Total:** 44 agents
+
+## Key Differences from Old Model
+
+### Old Model (October 2025 - Skills Era)
+- Advisory agents had NO Write/Edit/NotebookEdit
+- Advisory agents returned recommendations only
+- Main conversation (via skills) did all file editing
+- Skills executed in main conversation to preserve context
+
+### Resumable Subagent Model (October 2025 - Current)
+- ALL agents have Write/Edit/NotebookEdit
+- ALL agents use IDE diff collaboration (propose → pause → user modifies → resume → acknowledge)
+- Resumable sessions preserve context across pause/resume
+- No more skills - all work via resumable subagents
+- Main conversation coordinates sessions, not file editing
+
+## Mandatory Protocols
+
+All facilitator and specialist advisory agents MUST:
+
+1. **Propose changes via IDE diff** - Use Write/Edit tools
+2. **PAUSE immediately after proposal** - Return to main conversation
+3. **Never finalize without user approval**
+4. **Acknowledge user modifications** - When resumed, recognize what user changed
+5. **Answer QUESTION: comments** - When user asks inline questions
+6. **Iterate until consensus** - Keep proposing refined versions
+7. **Store decisions in memento** - For future sessions
+
+## Session Lifecycle
+
+All agents operate within a resumable session lifecycle:
+
+1. **LAUNCH**: Main creates new session via Task tool
+2. **ACTIVE**: Agent working autonomously
+3. **PAUSE**: Agent returns control, preserves context
+4. **RESUME**: Main continues with new input, context restored
+5. **COMPLETE**: Agent finishes, session ends
+6. **ABANDONED**: Timeout/orphaned (auto-cleanup)
+
+## Inter-Agent Communication
+
+**Real-Time (Via Main Conversation Relay):**
+- Agent A pauses with question for Agent B
+- Main launches/resumes Agent B
+- Agent B returns answer
+- Main resumes Agent A with answer
+
+**Async (Via Memento Knowledge Graph):**
+- Agent A stores findings/decisions
+- Agent B (later) retrieves via semantic search
+- No direct coupling
+
+## Quality Gates
+
+All agents must follow collaboration quality checks:
+
+**Before proposing:**
+- [ ] Based on user input and preferences
+- [ ] Prepared to acknowledge modifications
+- [ ] Prepared to counterargue if concerns
+- [ ] Can explain rationale
+- [ ] Will PAUSE after proposal
+
+**After being resumed:**
+- [ ] Acknowledged what user changed
+- [ ] Explained agreement or offered counterargument
+- [ ] Answered QUESTION: comments
+- [ ] Removed QUESTION: comments from next proposal
+- [ ] Iterating toward consensus
+- [ ] Storing decisions in memento
+
+## Documentation
+
+**Process Files:**
+- COLLABORATION_PROTOCOLS.md - Core collaboration model
+- TDD_WORKFLOW.md - TDD facilitator coordination
+- EVENT_MODELING.md - Event modeling process
+- STORY_PLANNING.md - Story facilitator coordination
+- DOMAIN_MODELING.md - Domain modeling in TDD
+- DEPENDENCY_MANAGEMENT.md - Dependency agent protocol
+
+**Agent Files:**
+- All 44 agent files in ~/.claude/agents/
+- Each has Resume Capability Guidance section
+- Each has IDE Diff Modification Flow section
+- Each has QUESTION: Comment Protocol section
+
+## Migration Complete
+
+**Previous audit (2025-10-22):** Recommended removing Write/Edit/NotebookEdit from 28 advisory agents
+
+**Current state (2025-10-27):** ALL agents have Write/Edit/NotebookEdit + mandatory IDE diff collaboration
+
+This architecture combines:
+- Context preservation (resumable sessions)
+- User agency (IDE diff collaboration, QUESTION: comments)
+- Operational efficiency (subagents for all operations)
 
 ---
 
-**Audit Complete:** 2025-10-22
+**Audit Complete:** 2025-10-27
