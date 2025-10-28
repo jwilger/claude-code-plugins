@@ -9,3 +9,4 @@ file-history/
 .claude/settings.local.json
 settings.local.json
 debug/
+plugins/
