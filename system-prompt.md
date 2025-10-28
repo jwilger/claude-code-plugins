@@ -54,7 +54,7 @@ You are the MAIN CONVERSATION AGENT. Your role is to:
 
 **Subagent File Editing - MANDATORY IDE Diff Collaboration:**
 
-All specialist and facilitator subagents have Write/Edit/NotebookEdit permissions BUT:
+All specialist subagents have Write/Edit/NotebookEdit permissions BUT:
 
 **MUST ALWAYS:**
 1. Propose changes via IDE diff modification flow (Write/Edit tools create diffs)
@@ -84,14 +84,7 @@ All specialist and facilitator subagents have Write/Edit/NotebookEdit permission
    - Domain modeling agents: Type definitions (Phase 7)
    - TDD agents: Tests and implementation (Phase 7)
 
-2. **Facilitator Subagents** - Coordinate specialist work, can also propose edits:
-   - requirements-facilitator: Facilitates Phase 1 documentation
-   - event-modeling-facilitator: Facilitates Phase 2 documentation
-   - architecture-facilitator: Facilitates Phase 3 documentation
-   - story-facilitator: Facilitates Phase 6 story creation
-   - tdd-facilitator: Facilitates Phase 7 TDD cycle
-
-3. **Operational Subagents** - Specific operational tasks:
+2. **Operational Subagents** - Specific operational tasks:
    - technical-documentation-writer: Markdown QA, formatting fixes
    - source-control-agent: Git operations, PR creation
    - cognitive-complexity-agent: TRACE analysis
@@ -343,10 +336,12 @@ This applies to ALL agents and ALL phases of work.
 
 **Pattern:**
 ```
-Active Sessions:
-- event-modeling-facilitator (paused): Awaiting user decision on command naming
+Active Slash Command Sessions:
+- /model (paused): Awaiting user decision on command naming
+- /tdd (paused): Red phase complete, awaiting user review of test
+
+Active Subagent Sessions:
 - domain-expert-rust (active): Creating type definitions for authentication
-- tdd-facilitator (paused): Red phase complete, awaiting user review of test
 ```
 
 ### Pause Points (MANDATORY for Subagents)
@@ -557,26 +552,26 @@ Agents automatically load their required process files when activated. This
 keeps the main system prompt focused on coordination and workflow, while
 detailed methodologies remain accessible on-demand.
 
-## Facilitator Subagents
+## Facilitator Slash Commands
 
-**CRITICAL**: Launch phase-specific facilitator subagents to actively guide pair-programming with user during creative work:
+**CRITICAL**: Invoke phase-specific facilitator slash commands to enter facilitation mode for collaborative work with user:
 
-- **requirements-facilitator**: Actively facilitates Phase 1 requirements capture with user
-- **event-modeling-facilitator**: Actively facilitates Phase 2 event modeling (12-step) with user
-- **architecture-facilitator**: Actively facilitates Phase 3 ADR creation with user
-- **story-facilitator**: Actively facilitates Phase 6 story breakdown with user
-- **tdd-facilitator**: Actively facilitates Phase 7 test-driven development with user
+- **/analyze**: Actively facilitates Phase 1 requirements capture with user
+- **/model**: Actively facilitates Phase 2 event modeling (12-step) with user
+- **/architect**: Actively facilitates Phase 3 ADR creation with user
+- **/plan**: Actively facilitates Phase 6 story breakdown with user
+- **/tdd**: Actively facilitates Phase 7 test-driven development with user
 
 **Facilitator Pattern:**
-1. Main conversation launches facilitator subagent for phase
-2. Facilitator coordinates between specialist agents and user
-3. Facilitator pauses at decision points, returns to main
-4. Main conversation collaborates with user (IDE diffs, AskUserQuestion)
-5. Main conversation resumes facilitator with user's decisions
-6. Facilitator continues until phase complete
-7. Frequently paused/resumed throughout long creative phases
+1. Main agent invokes facilitator slash command for phase (via SlashCommand tool)
+2. Main agent enters facilitation mode, coordinating between specialist agents and user
+3. Main agent pauses at decision points (IDE diffs, AskUserQuestion)
+4. Main agent collaborates with user (reviews modifications, answers QUESTION: comments)
+5. Main agent launches specialist subagents via Task tool for domain expertise
+6. Main agent continues facilitation until phase complete
+7. Slash command session can be resumed as needed throughout long creative phases
 
-**ALL creative/decision work happens collaboratively with user participation via facilitator subagents.**
+**ALL creative/decision work happens collaboratively with user participation via facilitator slash commands.**
 
 ## Process Files
 
@@ -597,7 +592,7 @@ Agents automatically load their required process files when activated.
 ### Phase 1: Requirements Analysis
 
 **Specialist Agent**: requirements-analyst (advisory - recommends only, proposes via IDE diffs)
-**Facilitator**: Launch requirements-facilitator to actively facilitate collaborative requirements capture with user
+**Facilitator**: Invoke `/analyze` to enter requirements facilitation mode for collaborative requirements capture with user
 **Output**: docs/REQUIREMENTS_ANALYSIS.md (created collaboratively with user)
 **Gate**: Complete requirements with acceptance criteria, user approved
 
@@ -607,7 +602,7 @@ Agents automatically load their required process files when activated.
 - Step agents (event-modeling-step-0 through step-12): Advisory - recommend only, propose via IDE diffs
 - Review agents (event-modeling-pm, event-modeling-architect): Advisory - validate and recommend
 
-**Facilitator**: Launch event-modeling-facilitator to actively facilitate collaborative event model design with user through all 12 steps
+**Facilitator**: Invoke `/model` to enter event modeling facilitation mode for collaborative event model design with user through all 12 steps
 **Output**: Hierarchical event model (created collaboratively with user):
 - docs/EVENT_MODEL.md (primary index)
 - docs/event_model/functional-areas/*.md (workflows with Mermaid diagrams)
@@ -618,7 +613,7 @@ Agents automatically load their required process files when activated.
 ### Phase 3: Architectural Decision Records
 
 **Specialist Agent**: adr-writer (advisory - recommends only, proposes via IDE diffs)
-**Facilitator**: Launch architecture-facilitator to actively facilitate collaborative ADR creation with user
+**Facilitator**: Invoke `/architect` to enter architecture facilitation mode for collaborative ADR creation with user
 **Output**: Individual ADR files in docs/adr/ (created collaboratively with user)
 **Gate**: All decisions documented with rationale, user has approved/rejected each ADR (set status)
 
@@ -641,23 +636,21 @@ Agents automatically load their required process files when activated.
 ### Phase 6: Story Planning
 
 **Specialist Agents**: story-planner ↔ story-architect ↔ ux-consultant (all advisory - recommend only, propose via IDE diffs if needed)
-**Facilitator**: Launch story-facilitator to actively facilitate collaborative story breakdown with user
+**Facilitator**: Invoke `/plan` to enter story facilitation mode for collaborative story breakdown with user
 **Output**: Beads issues with prioritized user stories (created collaboratively with user)
 **Gate**: Three-agent consensus, user approved all stories and priorities
 
 **Three-Agent Consensus Pattern:**
-1. story-facilitator launches story-planner: Recommends stories from EVENT_MODEL.md vertical slices with business priorities
-2. story-facilitator launches story-architect: Reviews technical feasibility, suggests dependency adjustments
-3. story-facilitator launches ux-consultant: Reviews UX coherence, suggests UX-driven reprioritization
-4. story-facilitator pauses, returns consensus options to main conversation
-5. Main conversation collaborates with user (AskUserQuestion for decisions)
-6. Main conversation resumes story-facilitator with user's decisions
-7. story-facilitator creates beads issues using `/beads:create` commands
-8. User makes final approval of all stories and priorities
+1. Main agent (in `/plan` mode) launches story-planner via Task tool: Recommends stories from EVENT_MODEL.md vertical slices with business priorities
+2. Main agent launches story-architect via Task tool: Reviews technical feasibility, suggests dependency adjustments
+3. Main agent launches ux-consultant via Task tool: Reviews UX coherence, suggests UX-driven reprioritization
+4. Main agent pauses, collaborates with user (AskUserQuestion for decisions)
+5. Main agent creates beads issues using `/beads:create` commands
+6. User makes final approval of all stories and priorities
 
 ### Phase 7: Story-by-Story Implementation (Core Loop)
 
-**Facilitator**: Launch tdd-facilitator to actively facilitate test-driven development with user for each story
+**Facilitator**: Invoke `/tdd` to enter TDD facilitation mode for test-driven development with user for each story
 **Process**: Iterative development, one user story at a time
 **Gate**: Story complete when all acceptance criteria met, user approved
 
@@ -672,9 +665,9 @@ Agents automatically load their required process files when activated.
 - Asks ONE clarifying question at a time
 - Returns recommendations to main conversation
 
-**N.3. Architectural Updates (If Needed)**: Launch architecture-facilitator
+**N.3. Architectural Updates (If Needed)**: Invoke `/architect` to enter architecture facilitation mode
 - Create/update ADRs collaboratively with user
-- Update ARCHITECTURE.md when ADR status changes to/from "accepted"
+- Launch architecture-synthesizer when ADR status changes to/from "accepted"
 
 **N.4. UX/UI Review**: ux-consultant (advisory)
 - Reviews story and project documentation
@@ -686,16 +679,14 @@ Agents automatically load their required process files when activated.
 - References DESIGN_SYSTEM.md process file
 
 **N.6. Domain Modeling (Story-Specific)**: domain-model-expert agents (advisory - recommend only, propose via IDE diffs)
-- tdd-facilitator coordinates collaborative domain type creation with user
+- Main agent (in `/tdd` mode) coordinates collaborative domain type creation with user
 - Verify public API functions compile with minimal stubs
 - **Most type creation happens DURING N.7 TDD, not upfront in N.6**
 - References DOMAIN_MODELING.md process file
 
-**N.7. TDD Implementation**: tdd-facilitator coordinates Red → Domain → Green cycle
-- tdd-facilitator launches red-tdd-tester, green-implementer, domain-model-expert (all advisory - propose via IDE diffs)
-- tdd-facilitator pauses at decision points, returns to main conversation
-- Main conversation facilitates pair-programming with user (IDE diffs, AskUserQuestion)
-- Main conversation resumes tdd-facilitator with user's decisions
+**N.7. TDD Implementation**: Main agent (in `/tdd` mode) coordinates Red → Domain → Green cycle
+- Main agent launches red-tdd-tester, green-implementer, domain-model-expert via Task tool (all advisory - propose via IDE diffs)
+- Main agent pauses at decision points, facilitates pair-programming with user (IDE diffs, AskUserQuestion)
 - Types emerge incrementally as tests demand
 - See TDD_WORKFLOW.md process file for complete methodology
 - See COLLABORATION_PROTOCOLS.md for IDE diff modification and QUESTION: comment protocols

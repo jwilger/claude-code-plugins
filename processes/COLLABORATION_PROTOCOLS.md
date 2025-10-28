@@ -20,7 +20,7 @@ User: [approve/reject] ← Rubber stamp
 ### Collaboration-First (Correct) Flow
 ```
 User: "Implement feature X"
-Main: *launches facilitator or advisory agent*
+Main: *invokes facilitator slash command or launches advisory agent*
 Agent: *researches, analyzes, stores findings in memento*
 Agent: *proposes changes via IDE diff*
 Agent: *PAUSES and returns to main conversation*
@@ -201,32 +201,33 @@ pub fn process(data: String) -> Result<Output, Error> {
 
 ## Agent Types and Permissions
 
-### Facilitator Subagents (Coordinate Collaboration)
+### Facilitator Slash Commands (Coordinate Collaboration)
 
-**Purpose:** Actively facilitate collaborative work between user and specialist agents for entire phases
+**Purpose:** Put main agent into facilitation mode to actively coordinate collaborative work between user and specialist agents for entire phases
 
 **Characteristics:**
-- Have Write/Edit/NotebookEdit tools for IDE diff proposals
-- Coordinate between specialist advisory agents and user
-- Frequently pause/resume throughout long phases
+- Main agent invokes slash command (e.g., `/analyze`, `/model`, `/architect`, `/plan`, `/tdd`)
+- Main agent gains facilitation-specific instructions and context
+- Main agent coordinates between specialist advisory agents (via Task tool) and user
+- Main agent pauses at decision points throughout long phases
 - MUST use IDE diff collaboration flow
-- NEVER finalize changes without user approval
+- NEVER finalizes changes without user approval
 
-**Examples:**
-- requirements-facilitator (Phase 1)
-- event-modeling-facilitator (Phase 2)
-- architecture-facilitator (Phase 3)
-- story-facilitator (Phase 6)
-- tdd-facilitator (Phase 7)
+**Available Commands:**
+- `/analyze` - Requirements facilitation (Phase 1)
+- `/model` - Event modeling facilitation (Phase 2)
+- `/architect` - Architecture/ADR facilitation (Phase 3)
+- `/plan` - Story planning facilitation (Phase 6)
+- `/tdd` - TDD implementation facilitation (Phase 7)
 
 **Flow:**
-1. Main conversation launches facilitator for phase
-2. Facilitator coordinates specialist agent consultations
-3. Facilitator proposes changes via IDE diff
-4. Facilitator PAUSES for user collaboration
-5. Main conversation relays user modifications/decisions
-6. Main conversation RESUMES facilitator with feedback
-7. Facilitator acknowledges, iterates
+1. Main agent invokes facilitator slash command for phase (via SlashCommand tool)
+2. Main agent (in facilitation mode) launches specialist agents via Task tool for consultation
+3. Main agent proposes changes via IDE diff
+4. Main agent PAUSES for user collaboration (waits for IDE diff acceptance/modification)
+5. User modifies proposal in IDE, adds QUESTION: comments
+6. Main agent acknowledges modifications, answers questions
+7. Main agent iterates with user until consensus
 8. Repeat until phase complete
 
 ### Specialist Advisory Subagents (Propose Changes)
@@ -250,14 +251,14 @@ pub fn process(data: String) -> Result<Output, Error> {
 - acceptance-validator
 
 **Flow:**
-1. Main/facilitator launches specialist agent
+1. Main agent (possibly in facilitation mode) launches specialist agent via Task tool
 2. Agent researches/analyzes
 3. Agent stores findings in memento
 4. Agent proposes changes via IDE diff
-5. Agent PAUSES and returns to main/facilitator
-6. Main/facilitator presents to user
+5. Agent PAUSES and returns to main agent
+6. Main agent presents to user
 7. User modifies proposal in IDE
-8. Main/facilitator RESUMES agent with modifications
+8. Main agent RESUMES agent with modifications (via Task tool with resume parameter)
 9. Agent acknowledges and iterates
 
 ### Operational Subagents (Mechanical Operations)
@@ -308,11 +309,11 @@ When agents need to coordinate in real-time:
 
 **Example:**
 ```
-tdd-facilitator (paused): "Need domain-model-expert to review this test for type opportunities"
-→ Main launches rust-domain-model-expert
+Main (in /tdd mode, paused): "Need domain-model-expert to review this test for type opportunities"
+→ Main launches rust-domain-model-expert via Task tool
 rust-domain-model-expert: "Types can prevent this - recommend strengthening"
-→ Main resumes tdd-facilitator with recommendation
-tdd-facilitator: "Acknowledged. Updating test approach..."
+→ Recommendation returned to main agent
+Main (in /tdd mode): "Acknowledged. Updating test approach..."
 ```
 
 ### Async Communication (Via Memento Knowledge Graph)
@@ -332,35 +333,28 @@ When agents need to share knowledge across sessions:
 
 **Example:**
 ```
-architecture-facilitator: Stores ADR decision in memento
+Main (in /architect mode): Stores ADR decision in memento
 → (later session)
-tdd-facilitator: Retrieves ADR via semantic search during implementation
+Main (in /tdd mode): Retrieves ADR via semantic search during implementation
 ```
 
 ## Facilitator-Coordinated Phases
 
-### Pattern: Facilitator Orchestrates Collaboration
+### Pattern: Facilitation Mode Orchestrates Collaboration
 
-For phases requiring extensive user participation (Phases 1, 2, 3, 6, 7), facilitator agents coordinate the work:
+For phases requiring extensive user participation (Phases 1, 2, 3, 6, 7), main agent enters facilitation mode via slash commands:
 
-**Facilitator Responsibilities:**
-1. Launch specialist agents for domain expertise
+**Main Agent Responsibilities (in Facilitation Mode):**
+1. Launch specialist agents via Task tool for domain expertise
 2. Synthesize specialist recommendations
 3. Propose changes via IDE diff
-4. Pause for user collaboration
-5. When resumed: acknowledge modifications
+4. Pause for user collaboration (wait for IDE acceptance)
+5. Acknowledge user modifications
 6. Answer QUESTION: comments
-7. Iterate until section/phase complete
-
-**Main Conversation Responsibilities:**
-1. Launch facilitator for phase
-2. Relay user modifications to facilitator
-3. Use AskUserQuestion for structured decisions
-4. Resume facilitator with user feedback
-5. Track facilitator session state
+7. Iterate with user until section/phase complete
 
 **User Responsibilities:**
-1. Review facilitator proposals in IDE
+1. Review proposals in IDE
 2. Modify directly in IDE diffs
 3. Add QUESTION: comments for clarifications
 4. Make final decisions on trade-offs
@@ -370,115 +364,102 @@ For phases requiring extensive user participation (Phases 1, 2, 3, 6, 7), facili
 
 ### Phase 1: Requirements Analysis
 
-**Facilitator:** requirements-facilitator
+**Facilitator:** `/analyze` slash command
 
 **Flow:**
 ```
-Main: Launches requirements-facilitator
-Facilitator: Launches requirements-analyst for research
+Main: Invokes /analyze via SlashCommand tool
+Main (in /analyze mode): Launches requirements-analyst via Task tool for research
 requirements-analyst: Returns recommendations
-Facilitator: Proposes REQUIREMENTS_ANALYSIS.md section via IDE diff
-Facilitator: PAUSES
-Main: Presents diff to user
+Main (in /analyze mode): Proposes REQUIREMENTS_ANALYSIS.md section via IDE diff
+Main (in /analyze mode): PAUSES (waits for user to accept/modify)
 User: Modifies section, adds "QUESTION: Should we include OAuth?"
-Main: Resumes facilitator with modifications
-Facilitator: "I see you added multi-factor auth requirement. Good addition given security concerns. QUESTION: Should we include OAuth? Yes, modern apps expect this. Proposing updated version..."
-Facilitator: Proposes refined section
+Main (in /analyze mode): "I see you added multi-factor auth requirement. Good addition given security concerns. QUESTION: Should we include OAuth? Yes, modern apps expect this. Proposing updated version..."
+Main (in /analyze mode): Proposes refined section
 [Iterate until section complete, repeat for all sections]
 ```
 
 ### Phase 2: Event Modeling
 
-**Facilitator:** event-modeling-facilitator
+**Facilitator:** `/model` slash command
 
 **Flow:**
 ```
-Main: Launches event-modeling-facilitator
-Facilitator: Works through 12-step process
-Facilitator: For each step, launches step-specific agent
+Main: Invokes /model via SlashCommand tool
+Main (in /model mode): Works through 12-step process
+Main (in /model mode): For each step, launches step-specific agent via Task tool
 event-modeling-step-1: Returns goal event recommendations
-Facilitator: Proposes event model component via IDE diff
-Facilitator: PAUSES
-Main: Presents diff to user
+Main (in /model mode): Proposes event model component via IDE diff
+Main (in /model mode): PAUSES (waits for user to accept/modify)
 User: Refines event sequence, adds questions
-Main: Resumes facilitator with changes
-Facilitator: Acknowledges, answers questions
+Main (in /model mode): Acknowledges, answers questions
 [Iterate through all 12 steps]
-Facilitator: Launches review agents (pm, architect)
+Main (in /model mode): Launches review agents (pm, architect) via Task tool
 [Final consensus and user approval]
 ```
 
 ### Phase 3: Architecture (ADRs)
 
-**Facilitator:** architecture-facilitator
+**Facilitator:** `/architect` slash command
 
 **Flow:**
 ```
-Main: Launches architecture-facilitator
-Facilitator: Launches adr-writer for analysis
+Main: Invokes /architect via SlashCommand tool
+Main (in /architect mode): Launches adr-writer via Task tool for analysis
 adr-writer: Returns ADR recommendations with alternatives
-Facilitator: Proposes ADR section via IDE diff
-Facilitator: PAUSES
-Main: Presents diff to user
+Main (in /architect mode): Proposes ADR section via IDE diff
+Main (in /architect mode): PAUSES (waits for user to accept/modify)
 User: Modifies decision rationale, adds context question
-Main: Resumes facilitator with modifications
-Facilitator: Acknowledges changes, answers question
+Main (in /architect mode): Acknowledges changes, answers question
 [Iterate until ADR complete]
-Facilitator: User sets status to accepted/rejected
-Facilitator: If accepted, PAUSES to trigger architecture-synthesizer
-Main: Launches architecture-synthesizer to update ARCHITECTURE.md
+Main (in /architect mode): User sets status to accepted/rejected
+Main (in /architect mode): If accepted, launches architecture-synthesizer via Task tool to update ARCHITECTURE.md
 ```
 
 ### Phase 6: Story Planning
 
-**Facilitator:** story-facilitator
+**Facilitator:** `/plan` slash command
 
 **Flow:**
 ```
-Main: Launches story-facilitator
-Facilitator: Launches story-planner for business perspective
-Facilitator: Launches story-architect for technical perspective
-Facilitator: Launches ux-consultant for UX perspective
-Facilitator: Synthesizes three-agent consensus
-Facilitator: Proposes story content via IDE diff (or beads fields)
-Facilitator: PAUSES
-Main: Presents to user
+Main: Invokes /plan via SlashCommand tool
+Main (in /plan mode): Launches story-planner via Task tool for business perspective
+Main (in /plan mode): Launches story-architect via Task tool for technical perspective
+Main (in /plan mode): Launches ux-consultant via Task tool for UX perspective
+Main (in /plan mode): Synthesizes three-agent consensus
+Main (in /plan mode): Proposes story content via IDE diff (or beads fields)
+Main (in /plan mode): PAUSES (waits for user to accept/modify)
 User: Adjusts scope, priority, acceptance criteria
-Main: Resumes facilitator with decisions
-Facilitator: Creates beads issue with `/beads:create`
+Main (in /plan mode): Creates beads issue with `/beads:create`
 [Repeat for each story]
 ```
 
 ### Phase 7: TDD Implementation (Core Loop)
 
-**Facilitator:** tdd-facilitator
+**Facilitator:** `/tdd` slash command
 
 **Flow:**
 ```
-Main: Launches tdd-facilitator for story
-Facilitator: Launches red-tdd-tester for test approach
+Main: Invokes /tdd via SlashCommand tool for story
+Main (in /tdd mode): Launches red-tdd-tester via Task tool for test approach
 red-tdd-tester: Returns test recommendation
-Facilitator: Proposes test via IDE diff
-Facilitator: PAUSES
-Main: Presents diff to user
+Main (in /tdd mode): Proposes test via IDE diff
+Main (in /tdd mode): PAUSES (waits for user to accept/modify)
 User: Refines test assertion, adds question about setup
-Main: Resumes facilitator with modifications
-Facilitator: Acknowledges changes, answers setup question
-Facilitator: Proposes refined test
+Main (in /tdd mode): Acknowledges changes, answers setup question
+Main (in /tdd mode): Proposes refined test
 User: Accepts
-Facilitator: Runs test, sees failure
-Facilitator: Launches rust-domain-model-expert for type review
+Main (in /tdd mode): Runs test, sees failure
+Main (in /tdd mode): Launches rust-domain-model-expert via Task tool for type review
 domain-expert: "Types cannot prevent this - approve runtime test"
-Facilitator: Launches green-implementer for minimal implementation
+Main (in /tdd mode): Launches green-implementer via Task tool for minimal implementation
 green-implementer: Returns implementation recommendation
-Facilitator: Proposes implementation via IDE diff
-Facilitator: PAUSES
-Main: Presents diff to user
+Main (in /tdd mode): Proposes implementation via IDE diff
+Main (in /tdd mode): PAUSES (waits for user to accept/modify)
 User: Refines implementation, adds QUESTION: about edge case
-Main: Resumes facilitator with modifications
-Facilitator: Answers edge case question, proposes final version
+Main (in /tdd mode): Answers edge case question, proposes final version
 User: Accepts
-Facilitator: Verifies tests pass, stores TDD decision in memento
+Main (in /tdd mode): Verifies tests pass, stores TDD decision in memento
 [Repeat TDD cycle until story complete]
 ```
 
@@ -504,9 +485,9 @@ Facilitator: Verifies tests pass, stores TDD decision in memento
 
 ## Mandatory Pause Points
 
-All facilitator and specialist advisory agents MUST pause at these points:
+Main agent (in facilitation mode) and specialist advisory agents MUST pause at these points:
 
-### Facilitator Agents
+### Main Agent (in Facilitation Mode via Slash Commands)
 - After proposing any file changes via IDE diff
 - When user adds QUESTION: comments
 - After completing each major section/step
@@ -591,10 +572,9 @@ Agent: *proposes cleaned code without answering question*
 
 **Why wrong:** User's question ignored, no learning or collaboration
 
-### ❌ Facilitator Creates Complete Artifacts
+### ❌ Main Agent Creates Complete Artifacts
 ```
-Facilitator: *creates entire EVENT_MODEL.md in one proposal*
-Main: "Review this event model"
+Main (in /model mode): *creates entire EVENT_MODEL.md in one proposal*
 ```
 
 **Why wrong:** User didn't participate in design, can only approve/reject whole thing
@@ -604,47 +584,45 @@ Main: "Review this event model"
 ### ✅ Acknowledge Modifications Explicitly
 ```
 User: *changes from Vec to HashMap*
-Facilitator (when resumed): "I see you switched from Vec to HashMap for storage. Smart—that gives us O(1) lookups instead of O(n). Continuing with HashMap approach..."
+Main (in facilitation mode): "I see you switched from Vec to HashMap for storage. Smart—that gives us O(1) lookups instead of O(n). Continuing with HashMap approach..."
 ```
 
 ### ✅ Thoughtful Counterargument
 ```
 User: *changes to simpler error handling*
-Facilitator (when resumed): "I see you simplified to Option. That works for happy paths, but we'll lose visibility into why parsing failed. For debugging, Result<T, ParseError> might be better. However, if you prefer simplicity here, we can add detailed logging instead. Which direction feels right?"
+Main (in facilitation mode): "I see you simplified to Option. That works for happy paths, but we'll lose visibility into why parsing failed. For debugging, Result<T, ParseError> might be better. However, if you prefer simplicity here, we can add detailed logging instead. Which direction feels right?"
 ```
 
 ### ✅ Answer QUESTION: Comments Thoroughly
 ```
 User: // QUESTION: Why Arc<Mutex<T>> instead of RefCell?
-Facilitator (when resumed): "Great question! We need Arc<Mutex<T>> here because we're sharing this state across threads. RefCell is single-threaded only—it would panic at runtime if accessed from multiple threads. Since our server uses tokio's multithreaded runtime, Arc<Mutex<T>> gives us thread-safe interior mutability. Here's the cleaned version..."
+Main (in /tdd mode): "Great question! We need Arc<Mutex<T>> here because we're sharing this state across threads. RefCell is single-threaded only—it would panic at runtime if accessed from multiple threads. Since our server uses tokio's multithreaded runtime, Arc<Mutex<T>> gives us thread-safe interior mutability. Here's the cleaned version..."
 ```
 
 ### ✅ Pause Frequently for Long Phases
 ```
-Event-modeling-facilitator: "I've completed Step 3 (Commands) for the authentication workflow. Here's the proposal... [proposes via IDE diff] [PAUSES]"
-Main: Presents to user
+Main (in /model mode): "I've completed Step 3 (Commands) for the authentication workflow. Here's the proposal... [proposes via IDE diff] [PAUSES - waits for user]"
 User: Modifies, approves
-Main: Resumes facilitator
-Event-modeling-facilitator: "Acknowledged. Moving to Step 4 (Triggers)..."
+Main (in /model mode): "Acknowledged. Moving to Step 4 (Triggers)..."
 ```
 
 ### ✅ Iterative Section-by-Section Collaboration
 ```
-Requirements-facilitator: "Let's start with Functional Requirements section FR-1... [proposes via IDE diff] [PAUSES]"
-Main: Presents to user
+Main (in /analyze mode): "Let's start with Functional Requirements section FR-1... [proposes via IDE diff] [PAUSES - waits for user]"
 User: Modifies FR-1, adds FR-1.1
-Main: Resumes facilitator
-Requirements-facilitator: "I see you added FR-1.1 for OAuth. Makes sense given modern security expectations. Moving to FR-2... [proposes] [PAUSES]"
+Main (in /analyze mode): "I see you added FR-1.1 for OAuth. Makes sense given modern security expectations. Moving to FR-2... [proposes] [PAUSES - waits for user]"
 ```
 
 ## Session Management
 
 **Main Conversation Responsibilities:**
 
-Track all active agent sessions:
+Track all active sessions:
 ```
-Active Sessions:
-- event-modeling-facilitator (paused): Awaiting user decision on command naming
+Active Slash Command Sessions:
+- /model (paused): Awaiting user decision on command naming
+
+Active Subagent Sessions:
 - rust-domain-model-expert (paused): Awaiting user review of type strengthening proposal
 - source-control-agent (active): Running quality gates before commit
 ```
@@ -667,9 +645,9 @@ Launch fresh session when:
 
 This collaboration model integrates with existing processes:
 
-- **TDD_WORKFLOW.md:** TDD facilitator coordinates Red → Domain → Green cycle collaboratively
-- **DOMAIN_MODELING.md:** Type design happens via tdd-facilitator coordination
-- **EVENT_MODELING.md:** Each of 12 steps involves event-modeling-facilitator + user
+- **TDD_WORKFLOW.md:** Main agent (in `/tdd` mode) coordinates Red → Domain → Green cycle collaboratively
+- **DOMAIN_MODELING.md:** Type design happens via main agent (in `/tdd` mode) coordination
+- **EVENT_MODELING.md:** Each of 12 steps involves main agent (in `/model` mode) + user
 - **DEPENDENCY_MANAGEMENT.md:** Dependency decisions via dependency-agent with verification
 - **Git operations:** source-control-agent handles commits/PRs with quality gate verification
 
@@ -684,19 +662,20 @@ See specific process files for phase-specific collaboration details.
 
 **Three-Way Collaboration:**
 
-1. **Facilitator/Specialist Agents:** Research, propose, acknowledge, iterate
-2. **Main Conversation:** Coordinate sessions, relay modifications, track state
+1. **Main Agent:** In facilitation mode (via slash commands) or launching specialist agents—researches, proposes, acknowledges, iterates
+2. **Specialist Agents:** Provide domain expertise, return recommendations to main agent
 3. **User:** Modify proposals, ask questions, make final decisions
 
 **The user is not a reviewer. The user is a co-creator.**
 
-Every design decision, architectural choice, and implementation approach should involve the user as an active participant. Agents facilitate this collaboration using:
+Every design decision, architectural choice, and implementation approach should involve the user as an active participant. Main agent facilitates this collaboration using:
 
-- Resumable sessions (preserve context across pause/resume)
+- Facilitation slash commands (enter focused mode for collaborative phases)
+- Specialist agent coordination (launch experts via Task tool for domain guidance)
 - IDE diff modification flow (user modifies proposals directly)
-- QUESTION: comment protocol (user asks, agent answers)
+- QUESTION: comment protocol (user asks, main agent answers)
 - Mandatory pause points (never finalize without user approval)
-- Explicit acknowledgment (agent recognizes and responds to user changes)
+- Explicit acknowledgment (main agent recognizes and responds to user changes)
 
 ---
 
