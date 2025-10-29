@@ -1,33 +1,34 @@
 # TDD Workflow Process
 
-## CRITICAL: Collaboration-First TDD
+## CRITICAL: Direct Code Writing with User Collaboration
 
-**ALL TDD work happens collaboratively in the main conversation with active user participation.**
+**TDD agents write code directly, and main conversation coordinates the workflow.**
 
 ### How TDD Collaboration Works
 
-**Advisory Agents (red-tdd-tester, green-implementer):**
-- Analyze test failures and recommend approaches
-- Return test/implementation recommendations to main conversation (NO file editing)
-- See `~/.claude/processes/COLLABORATION_PROTOCOLS.md` for complete protocols
+**TDD Agents (red-tdd-tester, green-implementer):**
+- Write test and implementation code directly using Write/Edit tools
+- After user approval, RE-READ files to see actual final state (user may modify before accepting)
+- Answer any QUESTION: comments user added
+- Remove QUESTION: comments and continue
+- Main conversation coordinates between agents
 
-**Main Conversation Facilitates:**
-- Pair-programming with user on test and implementation code
-- IDE diff modification flow where user can edit proposals
-- QUESTION: comment mechanism for inline queries in code
-- Acknowledgment of user changes with rationale or counterarguments
-- User is co-creator, not rubber-stamp approver
+**Main Conversation Coordinates:**
+- Launches appropriate TDD agent for Red/Green phase
+- Monitors build and test state
+- Ensures proper handoff between Red → Domain → Green
+- Verifies quality gates before auto-commit
+- User is involved via Claude Code's built-in approval for file changes
 
 **User Participates:**
-- Reviews all test and implementation recommendations
-- Modifies proposed code directly in IDE
+- Reviews file changes via Claude Code's built-in approval
+- Can modify proposed code directly in IDE before accepting
 - Adds `QUESTION:` comments inline for clarification
-- Makes final decisions on test structure and implementation approach
-- Collaborates iteratively on refinement
+- Agent sees modifications when it re-reads file post-approval
 
 ### QUESTION: Comment Mechanism in Code
 
-During TDD, user can add inline questions in code:
+During TDD, user can add inline questions while reviewing file changes:
 
 ```rust
 #[test]
@@ -38,16 +39,7 @@ fn test_payment_capture() {
 }
 ```
 
-**CRITICAL:** Main conversation answers the question inline and **ALWAYS removes the QUESTION comment** after addressing it. Never leave QUESTION comments in committed code.
-
-### IDE Diff Modification Flow
-
-1. Main conversation proposes test or implementation code change
-2. User sees IDE diff, can modify directly
-3. Main conversation acknowledges modifications: "I see you changed the assertion to X. That's clearer because..." or "I understand you want X, but the test demands Y..."
-4. Iterate until code is correct
-
-**See `COLLABORATION_PROTOCOLS.md` for complete pair-programming model.**
+**CRITICAL:** After approval, agent RE-READS the file, sees the QUESTION comment, answers it, updates code accordingly, and removes the comment. Never leave QUESTION comments in committed code.
 
 ## ⚠️ CRITICAL: ONLY ADDRESS EXACT ERROR MESSAGES ⚠️
 

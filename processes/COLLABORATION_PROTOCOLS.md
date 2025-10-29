@@ -243,8 +243,6 @@ pub fn process(data: String) -> Result<Output, Error> {
 - Usually short-lived sessions (single consultation)
 
 **Examples:**
-- TDD agents (red-tdd-tester, green-implementer)
-- Domain modeling agents (rust/python/typescript/elixir-domain-model-expert)
 - Planning agents (requirements-analyst, story-planner, adr-writer, story-architect, ux-consultant)
 - Event modeling agents (all 13 step agents + pm + architect)
 - design-system-architect, architecture-synthesizer
@@ -260,6 +258,33 @@ pub fn process(data: String) -> Result<Output, Error> {
 7. User modifies proposal in IDE
 8. Main agent RESUMES agent with modifications (via Task tool with resume parameter)
 9. Agent acknowledges and iterates
+
+### TDD Workflow Agents (Direct Code Writing)
+
+**Purpose:** Write test and implementation code directly within TDD cycle coordination
+
+**Characteristics:**
+- Have Write/Edit tools to write code directly
+- Write code, then RE-READ after approval to see user modifications
+- Answer QUESTION: comments user adds before accepting
+- Short-lived sessions (single Red or Green phase)
+- Main conversation coordinates workflow between agents
+
+**Examples:**
+- red-tdd-tester (Red phase: write failing tests)
+- green-implementer (Green phase: write minimal implementation)
+- Domain modeling agents (rust/python/typescript/elixir-domain-model-expert) when in TDD cycle
+
+**Flow:**
+1. Main conversation launches TDD agent for specific phase (Red/Green)
+2. Agent writes code using Write/Edit tools
+3. Claude Code's built-in approval shows diff to user
+4. User can modify code before accepting
+5. After approval, agent RE-READS file to see actual final state
+6. Agent acknowledges modifications, answers QUESTION: comments
+7. Agent removes QUESTION: comments and continues
+8. Agent returns status to main conversation
+9. Main conversation coordinates next phase
 
 ### Operational Subagents (Mechanical Operations)
 
