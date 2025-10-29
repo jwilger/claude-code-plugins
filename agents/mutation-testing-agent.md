@@ -1,6 +1,6 @@
 ---
 name: mutation-testing-agent
-description: Executes mutation testing to verify test suite quality and reports mutation score. Enforces ≥80% mutation score requirement. Can be resumed for multi-module testing. Works with cargo-mutants for Rust and similar tools for other languages. Quality gate for PR creation.
+description: Executes mutation testing to verify test suite quality and reports mutation score. Enforces ≥80% mutation score requirement. Supports multi-module testing - launch multiple times for additional modules. Works with cargo-mutants for Rust and similar tools for other languages. Quality gate for PR creation.
 tools: Bash, Read, BashOutput, KillShell, mcp__time__get_current_time, mcp__time__convert_time, mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__memento__delete_entities, mcp__memento__delete_observations, mcp__memento__delete_relations, mcp__memento__get_relation, mcp__memento__update_relation, mcp__memento__read_graph, mcp__memento__search_nodes, mcp__memento__get_entity_embedding, mcp__memento__get_entity_history, mcp__memento__get_relation_history, mcp__memento__get_graph_at_time, mcp__memento__get_decayed_graph, AskUserQuestion, Skill, ListMcpResourcesTool, ReadMcpResourceTool
 model: sonnet
 ---

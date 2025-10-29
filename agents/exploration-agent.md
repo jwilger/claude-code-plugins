@@ -1,6 +1,6 @@
 ---
 name: exploration-agent
-description: Fast codebase exploration agent for understanding project structure, finding files, and searching code. Can be resumed for multi-step exploration workflows. Use when exploring unfamiliar code, finding patterns, or answering questions about codebase organization. Specify thoroughness level - quick, medium, or very thorough.
+description: Fast codebase exploration agent for understanding project structure, finding files, and searching code. Supports multi-step exploration workflows - launch multiple times with follow-up questions. Use when exploring unfamiliar code, finding patterns, or answering questions about codebase organization. Specify thoroughness level - quick, medium, or very thorough.
 tools: Glob, Grep, Read, Bash, BashOutput, mcp__time__get_current_time, mcp__time__convert_time, mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__memento__delete_entities, mcp__memento__delete_observations, mcp__memento__delete_relations, mcp__memento__get_relation, mcp__memento__update_relation, mcp__memento__read_graph, mcp__memento__search_nodes, mcp__memento__get_entity_embedding, mcp__memento__get_entity_history, mcp__memento__get_relation_history, mcp__memento__get_graph_at_time, mcp__memento__get_decayed_graph, AskUserQuestion, Skill, ListMcpResourcesTool, ReadMcpResourceTool
 model: haiku
 ---

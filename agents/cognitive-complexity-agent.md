@@ -1,6 +1,6 @@
 ---
 name: cognitive-complexity-agent
-description: Analyzes code cognitive complexity using TRACE framework (Type-first, Readability, Atomic scope, Cognitive budget, Essential only). Enforces ≥70% overall score and ≥50% per dimension thresholds. Can be resumed for multi-file analysis. Quality gate for PR creation.
+description: Analyzes code cognitive complexity using TRACE framework (Type-first, Readability, Atomic scope, Cognitive budget, Essential only). Enforces ≥70% overall score and ≥50% per dimension thresholds. Supports multi-file analysis - launch multiple times for additional files. Quality gate for PR creation.
 tools: Read, Grep, Glob, Bash, BashOutput, mcp__time__get_current_time, mcp__time__convert_time, mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__memento__delete_entities, mcp__memento__delete_observations, mcp__memento__delete_relations, mcp__memento__get_relation, mcp__memento__update_relation, mcp__memento__read_graph, mcp__memento__search_nodes, mcp__memento__get_entity_embedding, mcp__memento__get_entity_history, mcp__memento__get_relation_history, mcp__memento__get_graph_at_time, mcp__memento__get_decayed_graph, WebFetch, WebSearch, AskUserQuestion, Skill, ListMcpResourcesTool, ReadMcpResourceTool
 model: sonnet
 ---

@@ -285,40 +285,41 @@ This applies to ALL agents and ALL phases of work.
 - Returns recommendations/questions
 - Stores interim state in memento if needed
 - Main conversation facilitates user collaboration
-- Session context preserved for resume
+- Context available in conversation for follow-up
 
-**4. RESUME**: Continue subagent with new input
-- Use `resume` parameter with prior session ID
-- Provide user's answers/decisions
-- Full prior context automatically restored
-- Subagent continues from where it paused
+**4. CONTINUE**: Follow-up with subagent
+- Launch same subagent_type with new prompt
+- Agent has access to conversation history
+- Provide user's answers/decisions/context in the prompt
+- Agent can reference prior work from conversation
 
 **5. COMPLETE**: Subagent finishes work
 - Returns final deliverables
 - Stores knowledge in memento
 - Session ends, context can be freed
 
-**6. ABANDONED**: Session timeout/orphaned
-- Auto-cleanup after configurable timeout
-- Main conversation should track active sessions
-- Explicitly close sessions when switching context
+**6. COMPLETE/ABANDONED**: Work ends
+- Agent completes task and returns
+- Main conversation continues with next step
+- Context preserved in conversation history
 
-### Session Tracking (Main Conversation Responsibility)
+### Agent Activity Tracking (Main Conversation Responsibility)
 
-**Main conversation MUST track:**
-- Which subagents have active sessions
-- What each session is working on
-- When sessions were last active
-- Which sessions are paused awaiting user input
+**Main conversation SHOULD track conceptually:**
+- Which subagent types are being used for current work
+- What each agent is working on
+- When agents are awaiting user decisions
+- What context needs to be provided for follow-up
 
 **Pattern:**
 ```
-Active Slash Command Sessions:
-- /model (paused): Awaiting user decision on command naming
-- /tdd (paused): Red phase complete, awaiting user review of test
+Current Work:
+- /tdd facilitator: Red phase complete, awaiting user review of test
+- Waiting for: User to review test before continuing to green phase
 
-Active Subagent Sessions:
-- domain-expert-rust (active): Creating type definitions for authentication
+Recent Agent Work:
+- exploration-agent: Found 5 command files, largest is tdd.md
+- red-tdd-tester: Wrote failing test for authentication
 ```
 
 ### Pause Points (MANDATORY for Subagents)
@@ -363,9 +364,9 @@ Active Subagent Sessions:
 
 **Via Main Conversation Relay (Real-time):**
 - Agent A pauses with message for Agent B
-- Main conversation launches/resumes Agent B
+- Main conversation launches Agent B with the question and context
 - Agent B processes and returns response
-- Main conversation resumes Agent A with answer
+- Main conversation launches Agent A again with Agent B's answer
 - **Use for:** Immediate questions, quick consultations, synchronous work
 
 **Via Memento Knowledge Graph (Async):**

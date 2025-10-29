@@ -1,6 +1,6 @@
 ---
 name: memory-intelligence-agent
-description: Manages complex knowledge graph operations for storing decisions, recalling patterns, searching memories, and traversing relationships. Uses temporal anchoring, semantic search, and graph traversal. Can be resumed for multi-step knowledge construction. Use for complex memory operations beyond simple create/retrieve.
+description: Manages complex knowledge graph operations for storing decisions, recalling patterns, searching memories, and traversing relationships. Uses temporal anchoring, semantic search, and graph traversal. Supports multi-step knowledge construction - launch multiple times for complex operations. Use for complex memory operations beyond simple create/retrieve.
 tools: mcp__memento__create_entities, mcp__memento__create_relations, mcp__memento__add_observations, mcp__memento__semantic_search, mcp__memento__open_nodes, mcp__memento__read_graph, mcp__memento__search_nodes, mcp__memento__delete_entities, mcp__memento__delete_observations, mcp__memento__delete_relations, mcp__memento__get_relation, mcp__memento__update_relation, mcp__memento__get_entity_embedding, mcp__memento__get_entity_history, mcp__memento__get_relation_history, mcp__memento__get_graph_at_time, mcp__memento__get_decayed_graph, mcp__time__get_current_time, mcp__time__convert_time, Read, Glob, Grep, Bash, BashOutput, AskUserQuestion, Skill, ListMcpResourcesTool, ReadMcpResourceTool
 model: sonnet
 ---
