@@ -37,11 +37,14 @@ For each ADR, work through sections iteratively:
 
 **For Each Section:**
 1. Launch adr-writer with context (via Task tool)
-2. adr-writer returns recommendations with alternatives (advisory)
-3. Propose section via IDE diff
-4. PAUSE for user collaboration
-5. When resumed: Acknowledge modifications
-6. Iterate until section complete
+2. adr-writer WRITES section directly using Write/Edit
+3. Claude Code shows IDE diff to user
+4. User modifies section in IDE before accepting
+5. adr-writer RE-READS file after approval to see final state
+6. adr-writer acknowledges modifications and answers QUESTION: comments
+7. adr-writer removes QUESTION: comments
+8. adr-writer returns status to you
+9. Iterate until all ADR sections complete
 
 ## Decision Focus, Not Implementation
 

@@ -8,17 +8,20 @@
 
 ### How Event Modeling Collaboration Works
 
-**Advisory Agents (event-modeling-step-* agents):**
+**Event Modeling Step Agents (event-modeling-step-* agents):**
+- WRITE event model documentation directly using Write/Edit tools
 - Research existing requirements and event model context
 - Analyze event model completeness and consistency
-- Return recommendations to main conversation (NO file editing)
+- After user approves changes, RE-READ files to see user modifications
+- Acknowledge user changes and answer QUESTION: comments
 - See `~/.claude/processes/COLLABORATION_PROTOCOLS.md` for complete protocols
 
-**Main Conversation Facilitates:**
-- Pair-programming with user on event model documentation
-- IDE diff modification flow where user can edit proposals
-- QUESTION: comment mechanism for inline queries
-- Acknowledgment of user changes with rationale or counterarguments
+**Main Conversation Coordinates:**
+- Launches step agents via Task tool for each step
+- Provides context and instructions to step agents
+- User reviews/modifies all changes via IDE diff approval
+- User can add QUESTION: comments in proposed changes
+- Step agents re-read after approval and respond to questions
 - User is co-creator, not rubber-stamp approver
 
 **User Participates:**

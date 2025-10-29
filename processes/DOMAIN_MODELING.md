@@ -6,17 +6,20 @@
 
 ### How Domain Modeling Collaboration Works
 
-**Advisory Agents (rust/python/typescript/elixir-domain-model-expert):**
+**Domain Model Expert Agents (rust/python/typescript/elixir-domain-model-expert):**
+- WRITE domain type code directly using Write/Edit tools
 - Analyze code for primitive obsession and type misuse
 - Recommend domain type improvements
-- Return type design recommendations to main conversation (NO file editing)
+- After user approves changes, RE-READ files to see user modifications
+- Acknowledge user changes and answer QUESTION: comments
 - See `~/.claude/processes/COLLABORATION_PROTOCOLS.md` for complete protocols
 
-**Main Conversation Facilitates:**
-- Pair-programming with user on domain type design
-- IDE diff modification flow where user can edit type proposals
-- QUESTION: comment mechanism for inline queries in type definitions
-- Acknowledgment of user changes with rationale or counterarguments
+**Main Conversation Coordinates:**
+- Launches domain-model-expert agents via Task tool for type creation
+- Provides context about types needed
+- User reviews/modifies all changes via IDE diff approval
+- User can add QUESTION: comments in proposed type code
+- Domain agents re-read after approval and respond to questions
 - User is co-creator, not rubber-stamp approver
 
 **User Participates:**

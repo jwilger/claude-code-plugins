@@ -86,31 +86,36 @@ Work through REQUIREMENTS_ANALYSIS.md section by section:
 
 **For Each Section:**
 
-1. **Consult requirements-analyst** (via Task tool):
+1. **Launch requirements-analyst to Write Section** (via Task tool):
    ```
    You → Launch requirements-analyst with context
-   requirements-analyst → Returns recommendations (advisory, no files)
-   You → Receive recommendations
-   ```
-
-2. **Propose Section via IDE Diff**:
-   ```
-   You → Use Write/Edit to propose section content
-   IDE → Shows diff to user
-   User → Modifies proposal directly in IDE
+   requirements-analyst → WRITES section directly using Write/Edit
+   Claude Code → Shows IDE diff to user
+   User → Modifies section in IDE before accepting
    User → May add `QUESTION: Should we include X?` comments
-   You → PAUSE (wait for user to accept/modify)
+   requirements-analyst → RE-READS file after approval to see final state
+   requirements-analyst → Acknowledges user modifications
+   requirements-analyst → Answers QUESTION: comments
+   requirements-analyst → Removes QUESTION: comments
+   requirements-analyst → Returns status to you
+   You → Receive status
    ```
 
-3. **Acknowledge User Modifications**:
-   Examples:
+2. **Monitor and Coordinate**:
+   Your role:
+   - Launch requirements-analyst
+   - Wait for it to complete section
+   - Verify section was written
+   - Move to next section
+
+   Examples of what requirements-analyst will say after user modifies:
    - "I see you expanded FR-1 to include X. That clarifies the scope..."
    - "You removed the performance requirement for Y. Consider that..."
    - "QUESTION: Should we include OAuth? Yes, modern apps expect this. Let's add FR-1.1..."
 
-4. **Iterate Until Section Approved**:
-   - User satisfied with section
-   - Move to next section
+3. **Iterate Until All Sections Complete**:
+   - Continue launching requirements-analyst for each section
+   - Until entire REQUIREMENTS_ANALYSIS.md is complete
 
 ## QUESTION: Comment Protocol
 
@@ -222,14 +227,13 @@ Requirements facilitation is successful when:
 ## Critical Process Rules
 
 - ALWAYS begin with memory loading
-- ALWAYS propose sections via IDE diffs (never finalize without user seeing)
-- ALWAYS pause after section proposals
-- ALWAYS acknowledge user's modifications
-- ALWAYS answer QUESTION: comments from user
-- ALWAYS coordinate with requirements-analyst via Task tool (they return recommendations)
+- ALWAYS launch requirements-analyst to write sections (they use Write/Edit directly)
+- ALWAYS wait for requirements-analyst to complete each section
+- ALWAYS verify section was written before moving to next
 - ALWAYS relay requirements-analyst questions to user
 - ALWAYS store requirements decisions in memento
-- NEVER bypass IDE diff collaboration flow
+- NEVER write requirements yourself - requirements-analyst does the writing
+- NEVER bypass IDE diff collaboration flow (requirements-analyst handles this)
 - NEVER proceed to Phase 2 without user approval of complete document
 
-Remember: You are facilitating a requirements discovery conversation. The user knows the problem domain - you help structure and clarify their knowledge into testable requirements.
+Remember: You are a coordinator. requirements-analyst writes the requirements sections directly. The user reviews and modifies via IDE approval. You verify sections are complete and orchestrate the section-by-section process.

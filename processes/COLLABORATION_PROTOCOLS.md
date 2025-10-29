@@ -4,7 +4,7 @@
 
 **ALL creative and decision work happens collaboratively in the main conversation with active user participation.**
 
-Agents serve as advisory/research support, returning recommendations and proposing changes via IDE diffs. The user is not a rubber-stamp committee approving autonomous work—they are an active collaborator in design, architecture, and implementation.
+Specialist agents WRITE code and documentation directly using Write/Edit tools. IDE diff approval happens automatically in Claude Code. After user approves changes, agents MUST RE-READ files to see user modifications and answer QUESTION: comments. The user is not a rubber-stamp committee approving autonomous work—they are an active collaborator who modifies proposals before accepting them.
 
 ## The Pair-Programming Model
 
@@ -20,16 +20,15 @@ User: [approve/reject] ← Rubber stamp
 ### Collaboration-First (Correct) Flow
 ```
 User: "Implement feature X"
-Main: *invokes facilitator slash command or launches advisory agent*
+Main: *launches specialist agent via Task tool*
 Agent: *researches, analyzes, stores findings in memento*
-Agent: *proposes changes via IDE diff*
-Agent: *PAUSES and returns to main conversation*
-Main: "Agent proposed approach Y. Review the diff."
-User: *modifies proposal in IDE, adds QUESTION: comments*
-Main: *resumes agent with user's modifications*
-Agent: *acknowledges modifications, answers questions*
-Agent: *proposes refined version*
-[Iterate together until user accepts]
+Agent: *writes code/docs using Write/Edit tools*
+[Claude Code shows IDE diff automatically]
+User: *modifies code in IDE, adds QUESTION: comments, then approves*
+Agent: *RE-READS file to see actual final state*
+Agent: *acknowledges user modifications, answers QUESTION: comments*
+Agent: *removes QUESTION: comments and continues*
+[Iterate together until feature complete]
 ```
 
 ## Resumable Subagent Pattern
@@ -230,61 +229,46 @@ pub fn process(data: String) -> Result<Output, Error> {
 7. Main agent iterates with user until consensus
 8. Repeat until phase complete
 
-### Specialist Advisory Subagents (Propose Changes)
+### Specialist Agents (Write Code/Docs Directly)
 
-**Purpose:** Domain-specific analysis and recommendations with IDE diff proposals
+**Purpose:** Write code and documentation directly with user collaboration via IDE diffs
+
+**CRITICAL RE-READ Pattern:**
+After user approves ANY file change, agent MUST:
+1. RE-READ the file to see actual final state
+2. User may have modified the proposed content before accepting
+3. User may have added QUESTION: comments for clarification
+4. Agent acknowledges user modifications
+5. Agent answers all QUESTION: comments
+6. Agent removes QUESTION: comments and continues
 
 **Characteristics:**
-- Have Write/Edit/NotebookEdit tools for IDE diff proposals
+- Have Write/Edit/NotebookEdit tools to write directly
 - Research, analyze, store findings in memento
-- Propose changes via IDE diffs
-- MUST pause after proposals
-- NEVER finalize changes without user approval
-- Usually short-lived sessions (single consultation)
+- Write changes using Write/Edit tools
+- IDE diff approval happens automatically in Claude Code
+- MUST RE-READ after approval to see user modifications
+- Session can be resumed for multi-step work
 
 **Examples:**
-- Planning agents (requirements-analyst, story-planner, adr-writer, story-architect, ux-consultant)
-- Event modeling agents (all 13 step agents + pm + architect)
-- design-system-architect, architecture-synthesizer
-- acceptance-validator
+- Documentation agents (requirements-analyst, adr-writer, event-modeling-step-*, architecture-synthesizer, design-system-architect)
+- TDD agents (red-tdd-tester, green-implementer)
+- Domain modeling agents (rust/python/typescript/elixir-domain-model-expert)
+- Story planning agents (story-planner, story-architect, ux-consultant)
+- Validation agents (acceptance-validator, technical-documentation-writer)
 
 **Flow:**
-1. Main agent (possibly in facilitation mode) launches specialist agent via Task tool
+1. Main conversation launches specialist agent via Task tool
 2. Agent researches/analyzes
 3. Agent stores findings in memento
-4. Agent proposes changes via IDE diff
-5. Agent PAUSES and returns to main agent
-6. Main agent presents to user
-7. User modifies proposal in IDE
-8. Main agent RESUMES agent with modifications (via Task tool with resume parameter)
-9. Agent acknowledges and iterates
-
-### TDD Workflow Agents (Direct Code Writing)
-
-**Purpose:** Write test and implementation code directly within TDD cycle coordination
-
-**Characteristics:**
-- Have Write/Edit tools to write code directly
-- Write code, then RE-READ after approval to see user modifications
-- Answer QUESTION: comments user adds before accepting
-- Short-lived sessions (single Red or Green phase)
-- Main conversation coordinates workflow between agents
-
-**Examples:**
-- red-tdd-tester (Red phase: write failing tests)
-- green-implementer (Green phase: write minimal implementation)
-- Domain modeling agents (rust/python/typescript/elixir-domain-model-expert) when in TDD cycle
-
-**Flow:**
-1. Main conversation launches TDD agent for specific phase (Red/Green)
-2. Agent writes code using Write/Edit tools
-3. Claude Code's built-in approval shows diff to user
-4. User can modify code before accepting
-5. After approval, agent RE-READS file to see actual final state
-6. Agent acknowledges modifications, answers QUESTION: comments
-7. Agent removes QUESTION: comments and continues
-8. Agent returns status to main conversation
-9. Main conversation coordinates next phase
+4. Agent writes code/docs using Write/Edit tools
+5. Claude Code shows IDE diff automatically
+6. User modifies content in IDE and/or adds QUESTION: comments
+7. User approves diff
+8. **Agent RE-READS file to see actual final state**
+9. Agent acknowledges modifications and answers questions
+10. Agent removes QUESTION: comments
+11. Agent continues or returns to main conversation
 
 ### Operational Subagents (Mechanical Operations)
 

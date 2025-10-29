@@ -55,13 +55,15 @@ Work through each step collaboratively for each event model:
 
 **For Each Step:**
 1. Launch appropriate step agent via Task tool
-2. Agent returns recommendations (advisory)
-3. Propose component via IDE diff
-4. PAUSE for user collaboration
-5. When resumed: Acknowledge modifications
-6. Iterate until step complete
-7. Store decisions in memento
-8. Move to next step
+2. Agent WRITES event model component directly using Write/Edit
+3. Claude Code shows IDE diff to user
+4. User modifies component in IDE before accepting
+5. Agent RE-READS file after approval to see final state
+6. Agent acknowledges modifications and answers QUESTION: comments
+7. Agent removes QUESTION: comments
+8. Agent returns status to you
+9. Store decisions in memento
+10. Move to next step
 
 ## IDE Diff Modification Flow
 

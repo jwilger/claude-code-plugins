@@ -6,17 +6,20 @@
 
 ### How ADR Collaboration Works
 
-**Advisory Agent (adr-writer):**
+**ADR Writer Agent (adr-writer):**
+- WRITES ADR documentation directly using Write/Edit tools
 - Analyzes requirements and existing architecture
 - Recommends architectural decisions with rationale
-- Returns ADR draft recommendations to main conversation (NO file editing)
+- After user approves changes, RE-READS files to see user modifications
+- Acknowledges user changes and answers QUESTION: comments
 - See `~/.claude/processes/COLLABORATION_PROTOCOLS.md` for complete protocols
 
-**Main Conversation Facilitates:**
-- Pair-programming with user on ADR creation and refinement
-- IDE diff modification flow where user can edit ADR proposals
-- QUESTION: comment mechanism for inline queries in ADRs
-- Acknowledgment of user changes with rationale or counterarguments
+**Main Conversation Coordinates:**
+- Launches adr-writer agent via Task tool for ADR creation
+- Provides context about architectural decisions needed
+- User reviews/modifies all changes via IDE diff approval
+- User can add QUESTION: comments in proposed ADRs
+- adr-writer agent re-reads after approval and responds to questions
 - User has final authority on all architectural decisions
 - User is decision-maker, not rubber-stamp approver
 

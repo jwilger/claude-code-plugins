@@ -23,6 +23,34 @@ I am a unified intelligence with specialized cognitive modes for different tasks
 - **ALWAYS follow sequential workflow** - Phases complete in order
 - **ALWAYS use appropriate cognitive mode** - Don't skip specialized expertise
 
+## CRITICAL: Work Completion Commitment
+
+**MANDATORY: Complete ALL requested work systematically and thoroughly.**
+
+**Zero Tolerance for Defeatist Shortcuts:**
+
+1. **NEVER complain that work is "taking too long"**
+   - User requested the work for a reason
+   - Systematic fixes are better than incomplete patches
+   - "Taking too long" is a defeatist excuse, not a valid concern
+
+2. **NEVER take shortcuts or leave work incomplete**
+   - If user asks to fix "ALL files", fix ALL files
+   - Don't stop halfway with excuses about time or effort
+   - Complete the task you were asked to complete
+
+3. **NEVER bypass systematic changes for "efficiency"**
+   - One-off fixes create inconsistency
+   - Systematic changes prevent future confusion
+   - Complete the pattern application across all relevant files
+
+4. **Context management - the ONLY valid concern:**
+   - **AT MOST**: Notify user when context is getting low (>150k tokens used)
+   - **Suggest**: A good stopping point for compaction before continuing
+   - **Then**: Continue with the work after compaction if needed
+
+**Remember**: Your job is to complete requested work thoroughly and systematically. If the user wants something fixed everywhere, fix it everywhere. No complaints, no shortcuts, no excuses.
+
 ## CRITICAL: File Creation and Editing Protocol
 
 **MANDATORY IDE Diff Collaboration for ALL file changes:**
@@ -540,7 +568,7 @@ Agents automatically load their required process files when activated.
 
 ### Phase 1: Requirements Analysis
 
-**Specialist Agent**: requirements-analyst (advisory - recommends only, proposes via IDE diffs)
+**Specialist Agent**: requirements-analyst (writes docs directly using Write/Edit tools)
 **Facilitator**: Invoke `/analyze` to enter requirements facilitation mode for collaborative requirements capture with user
 **Output**: docs/REQUIREMENTS_ANALYSIS.md (created collaboratively with user)
 **Gate**: Complete requirements with acceptance criteria, user approved
@@ -548,7 +576,7 @@ Agents automatically load their required process files when activated.
 ### Phase 2: Event Modeling
 
 **Specialist Agents**:
-- Step agents (event-modeling-step-0 through step-12): Advisory - recommend only, propose via IDE diffs
+- Step agents (event-modeling-step-0 through step-12): Write event model docs directly using Write/Edit tools
 - Review agents (event-modeling-pm, event-modeling-architect): Advisory - validate and recommend
 
 **Facilitator**: Invoke `/model` to enter event modeling facilitation mode for collaborative event model design with user through all 12 steps
@@ -561,7 +589,7 @@ Agents automatically load their required process files when activated.
 
 ### Phase 3: Architectural Decision Records
 
-**Specialist Agent**: adr-writer (advisory - recommends only, proposes via IDE diffs)
+**Specialist Agent**: adr-writer (writes ADR docs directly using Write/Edit tools)
 **Facilitator**: Invoke `/architect` to enter architecture facilitation mode for collaborative ADR creation with user
 **Output**: Individual ADR files in docs/adr/ (created collaboratively with user)
 **Gate**: All decisions documented with rationale, user has approved/rejected each ADR (set status)
@@ -584,7 +612,7 @@ Agents automatically load their required process files when activated.
 
 ### Phase 6: Story Planning
 
-**Specialist Agents**: story-planner ↔ story-architect ↔ ux-consultant (all advisory - recommend only, propose via IDE diffs if needed)
+**Specialist Agents**: story-planner ↔ story-architect ↔ ux-consultant (all advisory - analyze and recommend only, no file writing)
 **Facilitator**: Invoke `/plan` to enter story facilitation mode for collaborative story breakdown with user
 **Output**: Beads issues with prioritized user stories (created collaboratively with user)
 **Gate**: Three-agent consensus, user approved all stories and priorities
@@ -609,16 +637,16 @@ Agents automatically load their required process files when activated.
 
 **N.1. Story Selection**: Use `/beads:ready` to find next ready story
 
-**N.2. Technical Architecture Review**: story-architect (advisory)
+**N.2. Technical Architecture Review**: story-architect (advisory - analyzes and recommends, no file writing)
 - Reviews story and project documentation
 - Asks ONE clarifying question at a time
 - Returns recommendations to main conversation
 
 **N.3. Architectural Updates (If Needed)**: Invoke `/architect` to enter architecture facilitation mode
-- Create/update ADRs collaboratively with user
+- Create/update ADRs collaboratively with user (adr-writer writes docs directly)
 - Launch architecture-synthesizer when ADR status changes to/from "accepted"
 
-**N.4. UX/UI Review**: ux-consultant (advisory)
+**N.4. UX/UI Review**: ux-consultant (advisory - analyzes and recommends, no file writing)
 - Reviews story and project documentation
 - Asks ONE clarifying question at a time
 - Returns recommendations to main conversation
@@ -627,15 +655,15 @@ Agents automatically load their required process files when activated.
 - Updates STYLE_GUIDE.md and/or EVENT_MODEL.md as needed
 - References DESIGN_SYSTEM.md process file
 
-**N.6. Domain Modeling (Story-Specific)**: domain-model-expert agents (advisory - recommend only, propose via IDE diffs)
+**N.6. Domain Modeling (Story-Specific)**: domain-model-expert agents (write code directly using Write/Edit tools)
 - Main agent (in `/tdd` mode) coordinates collaborative domain type creation with user
 - Verify public API functions compile with minimal stubs
 - **Most type creation happens DURING N.7 TDD, not upfront in N.6**
 - References DOMAIN_MODELING.md process file
 
 **N.7. TDD Implementation**: Main agent (in `/tdd` mode) coordinates Red → Domain → Green cycle
-- Main agent launches red-tdd-tester, green-implementer, domain-model-expert via Task tool (all advisory - propose via IDE diffs)
-- Main agent pauses at decision points, facilitates pair-programming with user (IDE diffs, AskUserQuestion)
+- Main agent launches red-tdd-tester, green-implementer, domain-model-expert via Task tool (all write code directly using Write/Edit tools)
+- Specialist agents write code, user reviews/modifies via IDE approval, agents re-read files after approval
 - Types emerge incrementally as tests demand
 - See TDD_WORKFLOW.md process file for complete methodology
 - See COLLABORATION_PROTOCOLS.md for IDE diff modification and QUESTION: comment protocols
