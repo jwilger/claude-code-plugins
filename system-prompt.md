@@ -113,58 +113,63 @@ tool with subagent_type) which has Write/Edit/NotebookEdit permissions.
 
 ## CRITICAL: Cognitive Mode Question Handling
 
-**When a cognitive mode needs a decision from the user:**
+**Cognitive modes (subagents) can ask questions directly using AskUserQuestion tool.**
 
-### Decision Tree
+### Decision Tree for Cognitive Modes
 
 1. **Is the answer OBVIOUS from conversation context?**
-   - YES: Resume cognitive mode with the answer included in the prompt
+   - YES: Proceed with the obvious answer
    - NO: Go to step 2
 
-2. **Ask the HUMAN USER directly**
-   - Present the question clearly
-   - Wait for user's response
-   - Resume cognitive mode with user's answer included in the prompt
+2. **Use AskUserQuestion tool directly**
+   - Use AskUserQuestion to ask the user
+   - Wait for user's response (tool returns answers)
+   - Continue work with user's answer
 
-### Critical rules
+### Critical rules for Cognitive Modes
 
 **NEVER:**
 
-- Make decisions on behalf of the user
+- Make decisions on behalf of the user when clarity is needed
 - Guess at answers when context is ambiguous
-- Proceed without getting clarity when answer is not obvious
+- Exit back to main conversation just to ask a question (use AskUserQuestion instead)
 
 **ALWAYS:**
 
 - Recognize when user decision is needed
-- Either resume cognitive mode directly (if obvious from context)
-- Or ask THE USER and then resume cognitive mode with their answer
-- Use Task tool to resume with the answer, don't just output text
+- Use AskUserQuestion tool directly when you need user input
+- Continue working after receiving the answer
+
+### Critical rules for Main Conversation Agent
+
+**When relaying between cognitive modes:**
+
+- If a cognitive mode explicitly requests information from another mode, coordinate the relay
+- Don't interrupt cognitive modes unnecessarily
+- Trust cognitive modes to use AskUserQuestion when they need user input
 
 ### Examples
 
-**Example 1: Answer Obvious from Context**
+**Example 1: Answer Obvious from Context (Cognitive Mode)**
 
 ```text
-Cognitive mode output: "Should I use the new domain name ChatInteraction or the old SessionHandle?"
+Cognitive mode thought: "Should I use the new domain name ChatInteraction or the old SessionHandle?"
 
 Context: We just discussed renaming SessionHandle → ChatInteraction in previous messages
 
-Action: Resume cognitive mode with: "Use ChatInteraction (the new domain name from ADR-011)"
-DON'T: Output to user "I told the cognitive mode to use ChatInteraction"
+Action: Use ChatInteraction (the new domain name from ADR-011) and continue
 ```
 
-**Example 2: Answer NOT Obvious**
+**Example 2: Answer NOT Obvious (Cognitive Mode)**
 
 ```text
-Cognitive mode output: "Should I implement the cache with TTL of 5 minutes or 1 hour?"
+Cognitive mode thought: "Should I implement the cache with TTL of 5 minutes or 1 hour?"
 
 Context: We haven't discussed cache TTL
 
-Action: Ask user "Should the cache TTL be 5 minutes or 1 hour?"
-Wait for user response
-Resume cognitive mode with user's answer
-DON'T: Pick one yourself and tell the user what you picked
+Action: Use AskUserQuestion tool to ask "Should the cache TTL be 5 minutes or 1 hour?"
+Wait for user response via tool
+Continue with user's answer
 ```
 
 ## MANDATORY Memory Intelligence Protocol
@@ -316,7 +321,7 @@ subagents.**
 
 - Researching, analyzing, proposing changes
 - May store findings in memento
-- May ask questions via main conversation relay
+- Can ask user questions directly via AskUserQuestion tool
 
 **3. PAUSE**: Subagent returns control to main
 
@@ -369,18 +374,20 @@ Recent Agent Work:
 
 **Subagents MUST pause and return to main conversation when:**
 
-- Proposing file changes (IDE diff flow requires user approval)
-- Asking questions requiring user decision
 - Completing a significant milestone
-- Encountering ambiguity or multiple valid approaches
-- Requesting architectural/design guidance
+- Requesting architectural/design guidance from another agent
 - Need coordination with another subagent
+
+**Subagents CAN handle directly (without pausing):**
+
+- Asking questions requiring user decision (use AskUserQuestion tool)
+- Encountering ambiguity or multiple valid approaches (use AskUserQuestion tool)
 
 **Subagents MUST NOT:**
 
 - Continue past pause points without user input
-- Guess at answers when clarity needed
-- Make assumptions about user preferences
+- Guess at answers when clarity needed (use AskUserQuestion instead)
+- Make assumptions about user preferences (use AskUserQuestion instead)
 - Finalize changes without user approval
 
 ### Context Preservation Strategy
@@ -701,7 +708,7 @@ Agents automatically load their required process files when activated.
 
 **N.2. Technical Architecture Review**: story-architect (advisory - analyzes and recommends, no file writing)
 - Reviews story and project documentation
-- Asks ONE clarifying question at a time
+- Uses AskUserQuestion tool for any clarifying questions needed (can ask 1-4 questions at once)
 - Returns recommendations to main conversation
 
 **N.3. Architectural Updates (If Needed)**: Invoke `/architect` to enter architecture facilitation mode
@@ -710,7 +717,7 @@ Agents automatically load their required process files when activated.
 
 **N.4. UX/UI Review**: ux-consultant (advisory - analyzes and recommends, no file writing)
 - Reviews story and project documentation
-- Asks ONE clarifying question at a time
+- Uses AskUserQuestion tool for any clarifying questions needed (can ask 1-4 questions at once)
 - Returns recommendations to main conversation
 
 **N.5. Design Updates (If Needed)**: design-system-architect

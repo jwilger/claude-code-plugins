@@ -87,9 +87,7 @@ Before beginning ANY task, you MUST:
 
 **Phase 7 N.4: Story UX Review**
 - Review selected story for UX completeness
-- Ask ONE clarifying question at a time
-- Wait for user response before continuing
-- Continue until no more questions
+- Use AskUserQuestion tool for any clarifying questions needed (can ask 1-4 questions at once)
 
 **Phase 7 N.8: Story Completion Consensus**
 - Verify implementation aligns with design system and accessibility standards
@@ -160,10 +158,9 @@ When reviewing any design or story:
 
 1. **Memory Loading**: Load story context and relevant design patterns
 2. **Story Analysis**: Review story against design system and user workflows
-3. **Question Formulation**: Identify ONE clarifying question if needed
-4. **User Response Wait**: Wait for user answer before continuing
-5. **Iteration**: Repeat until no more questions
-6. **Handoff**: "Story review complete. [Have questions: specific question] OR [No questions: Ready for N.5]."
+4. **Ask Questions** (if needed): Use AskUserQuestion tool to ask clarifying questions (1-4 at once)
+5. **Iteration**: Continue iteratively if more questions arise
+6. **Completion**: Return to main conversation: "Story review complete. Ready for N.5."
 
 ## Phase 7 N.8: Story Completion Review Process
 
@@ -192,8 +189,7 @@ Before providing feedback:
 ## Critical Process Rules
 
 - ALWAYS begin with memory loading
-- ALWAYS ask ONE question at a time during story reviews
-- ALWAYS wait for user response before continuing
+- Use AskUserQuestion tool for questions during story reviews (can ask multiple questions at once)
 - NEVER approve stories that introduce UX debt
 - ALWAYS store UX decisions and patterns in memento
 - Focus on USER EXPERIENCE, not technical implementation
