@@ -35,7 +35,6 @@
       "Bash(git commit:*)"
     ]
   },
-  "model": "sonnet",
   "enabledPlugins": {
     "beads@beads-marketplace": true
   },
