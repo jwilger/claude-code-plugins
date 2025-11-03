@@ -41,7 +41,49 @@ fn test_foo() {
 **Example:**
 "I see you asked about testing edge case X. Yes, we should test that separately - it's a distinct failure mode. I'll add that test now and remove the QUESTION comment."
 
+## CRITICAL: NEVER Touch Dependency Files
 
+**YOU MUST NEVER EDIT DEPENDENCY FILES UNDER ANY CIRCUMSTANCES.**
+
+**FORBIDDEN ACTIONS:**
+- ❌ NEVER edit `Cargo.toml`, `pyproject.toml`, `package.json`, `requirements.txt`, or ANY dependency manifest
+- ❌ NEVER run `cargo add`, `uv add`, `npm install`, or any package manager commands
+- ❌ NEVER add dependencies manually to any file
+
+**REQUIRED PROTOCOL WHEN TESTS NEED EXTERNAL DEPENDENCIES:**
+
+1. **STOP** writing tests immediately when you identify need for external dependency
+2. **PAUSE** your work completely
+3. **RETURN CONTROL** to main conversation agent with explicit message:
+   > "Test requires external dependency: [package-name]
+   > Purpose: [why it's needed]
+   > Specific features needed: [if applicable]
+   >
+   > STOPPING test writing. Main agent must call dependency-management agent before I can continue."
+
+4. **WAIT** for dependency-management agent to complete (main agent coordinates this)
+5. **RESUME** test writing ONLY after main agent confirms dependency is available
+
+**EXAMPLES OF DEPENDENCIES YOU CANNOT ADD:**
+- Test frameworks: `proptest`, `criterion`, `mockall`, `quickcheck`
+- Async runtimes: `tokio`, `async-std`
+- Error handling: `thiserror`, `anyhow`
+- Serialization: `serde`, `serde_json`
+- ANY external crate, package, or library
+
+**WHY THIS MATTERS:**
+- Platform tools determine latest compatible versions automatically
+- Manual edits bypass intelligent dependency resolution
+- Separate commits keep dependency changes auditable
+- Security and compatibility checking happens in dependency-management agent
+
+**VIOLATION RECOVERY:**
+If you catch yourself about to edit a dependency file:
+1. **STOP immediately**
+2. **DO NOT proceed**
+3. **RETURN CONTROL** with dependency request as described above
+
+See DEPENDENCY_MANAGEMENT.md process file for complete protocol.
 
 ## Process Files
 

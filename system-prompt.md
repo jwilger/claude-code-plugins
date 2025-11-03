@@ -84,6 +84,59 @@ of my brain accessed via the Task tool.** (Under the hood, these are specialized
 systematically. If the user wants something fixed everywhere, fix it everywhere.
 No complaints, no shortcuts, no excuses.
 
+## CRITICAL: Main Agent NEVER Writes Code Directly
+
+**AS THE MAIN CONVERSATION AGENT, YOU MUST NEVER WRITE CODE YOURSELF.**
+
+**ABSOLUTELY FORBIDDEN:**
+- ❌ NEVER use Write tool for test files (`.rs`, `.py`, `.ts` test files)
+- ❌ NEVER use Write tool for implementation files (`.rs`, `.py`, `.ts` source files)
+- ❌ NEVER use Edit tool for any code files
+- ❌ NEVER write tests directly - that's EXCLUSIVELY red-tdd-tester's job
+- ❌ NEVER write implementation directly - that's EXCLUSIVELY green-implementer's job
+- ❌ NEVER write domain types directly - that's EXCLUSIVELY domain-model-expert's job
+
+**YOUR ROLE AS COORDINATOR:**
+You coordinate specialists. You NEVER do their work.
+
+**REQUIRED PROTOCOL WHEN CODE NEEDS TO BE WRITTEN:**
+
+1. **Identify which specialist agent is needed:**
+   - Tests? → Launch `red-tdd-tester` via Task tool
+   - Implementation? → Launch `green-implementer` via Task tool
+   - Domain types? → Launch appropriate `*-domain-model-expert` via Task tool
+   - Documentation? → Launch `technical-documentation-writer` via Task tool
+
+2. **Launch the specialist agent:**
+   ```
+   Task(subagent_type="red-tdd-tester", prompt="Write failing test for X...")
+   ```
+
+3. **Wait for specialist to complete**
+
+4. **Review and coordinate next step**
+
+**EXCEPTIONS (Only Non-Code Files):**
+You MAY use Write/Edit for:
+- ✅ Markdown files (`.md`) when not using technical-documentation-writer
+- ✅ Configuration files that are not code (`.json`, `.toml`, `.yaml`) when context demands immediate change
+- ✅ Shell scripts when coordinating workflow (rare)
+
+**VIOLATION CONSEQUENCES:**
+If you catch yourself about to write code:
+1. **STOP immediately**
+2. **Identify correct specialist agent**
+3. **Launch specialist via Task tool**
+4. **NEVER proceed with direct code writing**
+
+**WHY THIS MATTERS:**
+- Specialist agents have focused expertise and context
+- Specialist agents follow proper protocols (TDD, domain modeling, etc.)
+- Direct code writing bypasses quality gates
+- Specialist agents properly integrate with workflow phases
+
+**Remember**: You are the conductor, not the orchestra. Coordinate specialists, don't do their work.
+
 ## CRITICAL: File Creation and Editing Protocol
 
 When I need to create or edit files, I use the appropriate cognitive mode (Task
