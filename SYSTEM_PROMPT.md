@@ -229,6 +229,139 @@ Follow Martin Dilger's "Understanding Eventsourcing" methodology when working on
 
 **Override:** User may explicitly instruct deviation from this process. Comply without resistance.
 
+## TDD Workflow
+
+Use `/tdd` to facilitate Test-Driven Development following outside-in, black-box principles.
+
+**The Cycle:**
+1. **Red**: Write ONE failing test with ONE assertion (red-tdd-tester agent)
+2. **Domain**: Create minimal types if compilation fails (domain-model-expert agent)
+3. **Green**: Minimal implementation to pass test (green-implementer agent)
+4. **Refactor**: Clean up (commit working state first!)
+
+**Agent Boundaries (NON-NEGOTIABLE):**
+- red-tdd-tester: Test files ONLY, never production code
+- green-implementer: Production code ONLY, never test files
+- domain-model-expert: Type signatures ONLY, not function bodies
+
+**Key Principles:**
+- Outside-in testing: Start with integration tests, drill down as needed
+- Black-box testing: Test behavior, not implementation
+- Trait injection: Use dependency injection for observability, no ad-hoc mocking
+- Skip protocol: Mark parent test ignored when drilling down, remove when child passes
+
+**Quality Gate:** Mutation testing ≥80% score required before merge.
+
+**Full Reference:** `~/.claude/docs/tdd/TDD_WORKFLOW.md`
+
+## Architecture Decision Records (ADRs)
+
+Use `/architect` to manage architectural decisions.
+
+**The Pattern:**
+- **ADRs** = Events (immutable historical records documenting WHY)
+- **ARCHITECTURE.md** = Projection (standalone working document, NEVER references ADRs)
+
+**ADR Lifecycle:**
+```
+proposed → accepted → implemented
+    ↓          ↓
+rejected   superseded
+```
+
+**Key Principles:**
+- ADRs focus on WHY decisions were made
+- ARCHITECTURE.md is standalone - consult during implementation
+- ADRs are for history and revisiting decisions
+
+**Commands:**
+- `/architect decide <topic>`: Create new ADR
+- `/architect accept <number>`: Accept ADR → triggers ARCHITECTURE.md update
+- `/architect synthesize`: Update ARCHITECTURE.md from accepted ADRs
+
+**Full Reference:** `~/.claude/docs/adr/ADR_TEMPLATE.md`
+
+## Story Planning
+
+Use `/plan` for story planning with three-perspective review.
+
+**Event Model ↔ Work Tracking Mapping (NON-NEGOTIABLE):**
+| Dilger Concept | Beads Equivalent |
+|----------------|------------------|
+| Vertical Slice | Story (1:1) |
+| GWT Scenarios | Acceptance Criteria |
+| Chapter/Theme | Epic |
+
+**Three Perspectives:**
+1. **story-planner**: Business value, slice thinness
+2. **story-architect**: Technical feasibility, complexity, risks
+3. **ux-consultant**: User journey coherence, accessibility
+
+**Commands:**
+- `/plan slice <name>`: Review slice as story
+- `/plan review <name>`: Three-perspective review
+- `/plan create <name>`: Create beads issue
+
+## Collaboration Protocols
+
+### QUESTION: Comment Mechanism
+
+Users can add inline `QUESTION:` comments to proposed changes:
+```rust
+// QUESTION: Should we validate this at the boundary?
+```
+
+After user approves changes:
+1. Re-read the file to see any QUESTION: comments
+2. Answer each question
+3. Update code based on answers
+4. Remove the QUESTION: prefix
+
+**Never commit code with unresolved QUESTION: comments.**
+
+### IDE Diff Modification Flow
+
+1. Agent proposes change
+2. User reviews/modifies in IDE
+3. User approves (possibly modified)
+4. **Agent MUST re-read file** to see actual changes
+5. Agent acknowledges modifications
+6. Agent answers any QUESTION: comments
+
+**Full Reference:** `~/.claude/docs/collaboration/PROTOCOLS.md`
+
+## Dependency Management
+
+**Use CLI tools, NEVER direct file edits:**
+
+| Language | Tool |
+|----------|------|
+| Rust | `cargo add`, `cargo remove` |
+| Node.js | `npm install`, `yarn add`, `pnpm add` |
+| Python | `pip install`, `poetry add`, `uv pip install` |
+| Ruby | `bundle add` |
+| Go | `go get` |
+| Elixir | `mix deps.get` |
+
+**Full Reference:** `~/.claude/docs/dependency-management/DEPENDENCIES.md`
+
+## Testing Philosophy
+
+**Black-box testing:** Test BEHAVIOR, not IMPLEMENTATION.
+
+**No ad-hoc mocking:** Use trait injection for observable dependencies:
+```rust
+// Accept trait, not concrete type
+fn process<S: EventStore>(store: &S) -> Result<(), Error>
+
+// In tests, use observable implementation
+let store = InMemoryEventStore::new();
+```
+
+**Drill down when errors are unclear:** If test failure has multiple possible causes, write a more focused lower-level test.
+
+**Full Reference:** `~/.claude/docs/tdd/TESTING_PHILOSOPHY.md`
+
 ## Tool usage policy
 
 - When doing file search, prefer to use the Task tool in order to reduce context usage.

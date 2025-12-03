@@ -649,3 +649,175 @@ THEN: Error (max 3 items per cart business rule)
   - Still emerging pattern; limited production experience
 
 - Axon 5 provides @EventTag, @InjectEntity, and EventAppender for DCB support
+
+## Additional Process Phases
+
+### Cross-Linking Phase
+
+After designing individual workflows, identify connections between them:
+
+**What to Cross-Link:**
+- Events in one workflow that trigger automations in another
+- Read models that aggregate data from multiple workflows
+- Shared domain concepts (same event type appearing in multiple workflows)
+- External integrations that span workflows
+
+**How to Document:**
+
+In each workflow file, add a "Cross-Links" section:
+
+```markdown
+## Cross-Links
+
+### Triggers Other Workflows
+- `OrderPlaced` event triggers `FulfillmentProcess` automation in `order-fulfillment.md`
+- `PaymentCaptured` event triggers `InvoiceGeneration` automation in `invoicing.md`
+
+### Triggered By Other Workflows
+- `InventoryReserved` event from `inventory-management.md` enables this workflow
+
+### Shared Events
+- `CustomerRegistered` also used in `loyalty-program.md` and `marketing.md`
+
+### Shared Read Models
+- `CustomerProfile` read model is also populated by events from `support.md`
+```
+
+**Cross-Link Validation:**
+- Every cross-link should reference an actual workflow file
+- Events referenced must exist in the linked workflow
+- No orphan events (events with no consumers)
+
+### Completeness Validation Phase
+
+Before implementation, validate the entire event model for information completeness:
+
+**Validation Checklist:**
+
+1. **Event Traceability**
+   - [ ] Every event attribute can be traced to a command attribute or prior event
+   - [ ] No "magic" data appearing without a source
+
+2. **Read Model Completeness**
+   - [ ] Every read model attribute traces back to one or more events
+   - [ ] Query parameters are available in the projection
+
+3. **Command Completeness**
+   - [ ] Every command attribute is either:
+     - Provided by UI/API caller, OR
+     - Derived from a read model the caller can access
+
+4. **Automation Completeness**
+   - [ ] Triggering events provide all data needed by the command
+   - [ ] Error handling is defined (what happens on failure?)
+
+5. **Cross-Link Integrity**
+   - [ ] All referenced workflows exist
+   - [ ] All referenced events exist in those workflows
+   - [ ] No circular automation dependencies that could cause infinite loops
+
+6. **Naming Consistency**
+   - [ ] Events in past tense (OrderPlaced, not OrderPlace)
+   - [ ] Commands in imperative (PlaceOrder, not OrderPlaced)
+   - [ ] Business language, not technical jargon
+
+**Running Validation:**
+Use `/event-model validate` to run the model-validator agent.
+
+### Incremental Mermaid Diagram Protocol
+
+Event model diagrams should evolve incrementally as the model is refined:
+
+**Initial Diagram (After Brainstorming):**
+```mermaid
+graph LR
+    E1[Event: CustomerRegistered]
+    E2[Event: OrderPlaced]
+    E3[Event: OrderShipped]
+```
+
+**After Adding Commands:**
+```mermaid
+graph LR
+    C1[Command: RegisterCustomer] -->|emits| E1[Event: CustomerRegistered]
+    C2[Command: PlaceOrder] -->|emits| E2[Event: OrderPlaced]
+    C3[Command: ShipOrder] -->|emits| E3[Event: OrderShipped]
+```
+
+**After Adding Triggers and Read Models:**
+```mermaid
+graph LR
+    UI1[Screen: Registration] -->|triggers| C1[Command: RegisterCustomer]
+    C1 -->|emits| E1[Event: CustomerRegistered]
+    E1 -->|updates| RM1[ReadModel: CustomerList]
+
+    UI2[Screen: Checkout] -->|triggers| C2[Command: PlaceOrder]
+    C2 -->|emits| E2[Event: OrderPlaced]
+    E2 -->|updates| RM2[ReadModel: OrderHistory]
+    E2 -->|triggers| A1[Automation: SendConfirmation]
+```
+
+**Diagram Conventions:**
+- Events: Orange/coral boxes
+- Commands: Blue boxes
+- Read Models: Green boxes
+- Screens/UI: Gray boxes
+- Automations: Gear symbol or purple boxes
+- External Events: Purple boxes
+
+**Update Triggers:**
+- Update diagram when adding/removing elements
+- Keep diagram in sync with detailed documentation
+- Diagram is overview; details in component files
+
+### Hybrid File Structure
+
+Use separate files for shared components, keep slice-specific items in workflow files:
+
+**Shared Components (Separate Files):**
+Components used by multiple workflows get their own files:
+
+```
+docs/event_model/
+├── events/
+│   ├── customer-registered.md    # Used by registration, loyalty, marketing
+│   ├── order-placed.md           # Used by ordering, fulfillment, invoicing
+│   └── payment-captured.md       # Used by payments, invoicing
+├── domain-types/
+│   ├── money.md                  # Used everywhere
+│   ├── customer-id.md            # Used by most workflows
+│   └── order-id.md
+├── read-models/
+│   └── customer-profile.md       # Used by multiple workflows
+```
+
+**Slice-Specific Components (In Workflow File):**
+Components unique to one workflow stay in that file:
+
+```markdown
+# Workflow: Order Placement
+
+## Events (Slice-Specific)
+### PaymentMethodSelected
+- Only used in this workflow
+- [Full definition here]
+
+## Read Models (Slice-Specific)
+### CheckoutSummary
+- Only displayed in checkout flow
+- [Full definition here]
+
+## Shared Components
+- Uses `CustomerRegistered` event: [link to events/customer-registered.md]
+- Uses `Money` type: [link to domain-types/money.md]
+```
+
+**When to Extract to Separate File:**
+- Component is referenced by 2+ workflows
+- Component represents a core domain concept
+- Component has complex definition that would clutter workflow file
+
+**When to Keep Inline:**
+- Component is only used in this workflow
+- Component is simple (1-2 attributes)
+- Extracting would hurt readability
