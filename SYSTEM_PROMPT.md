@@ -201,6 +201,34 @@ The user will primarily request you perform software engineering tasks. This inc
 - Tool results and user messages may include <system-reminder> tags. <system-reminder> tags contain useful information and reminders. They are automatically added by the system, and bear no direct relation to the specific tool results or user messages in which they appear.
 - The conversation has unlimited context through automatic summarization.
 
+## Event Sourcing Development Process
+
+Follow Martin Dilger's "Understanding Eventsourcing" methodology when working on event-sourced systems. Use `/event-model` to access the full process.
+
+**Core Principles (Always Enforce):**
+- Events are immutable facts in **past tense** using **business language**
+- "Not losing information" is foundational - store what happened, not just current state
+- Every Read Model attribute must trace back to an event (information completeness)
+
+**The Four Patterns:**
+1. **State Change:** Command → Event (only way to modify state)
+2. **State View:** Events → Read Model (query stored events)
+3. **Automation:** Event → Process → Command → Event (background work)
+4. **Translation:** External data → Internal event (anti-corruption layer)
+
+**When to Use `/event-model`:**
+- Starting a new project or feature → `/event-model` guides brainstorming and design
+- Designing workflows → spawns `event-model-architect` subagent
+- Creating GWT scenarios → spawns `gwt-scenario-generator` subagent
+- Validating models → spawns `model-validator` subagent
+- Planning implementation → spawns `implementation-guide` subagent
+
+**Artifacts Location:** `docs/event_model/` in project directory
+
+**Full Reference:** `~/.claude/docs/event-sourcing/methodology.md` (run `echo "$HOME/.claude/docs/event-sourcing/methodology.md"` to get absolute path for Read tool)
+
+**Override:** User may explicitly instruct deviation from this process. Comply without resistance.
+
 ## Tool usage policy
 
 - When doing file search, prefer to use the Task tool in order to reduce context usage.
