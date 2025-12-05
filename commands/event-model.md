@@ -35,29 +35,29 @@ Guide the user through:
 ### For Design (`design <workflow>`)
 Use the Task tool with `subagent_type="event-model-architect"`:
 
-Prompt: `Design the "$1" workflow. Write output to docs/event_model/workflows/$1.md`
+Prompt: `Design the "$1" workflow. Write output to docs/event_model/workflows/$1.md. Remember: Follow the memory protocol - search memento for existing patterns/conventions, store new discoveries.`
 
 ### For GWT Scenarios (`scenarios <workflow>` or `gwt <workflow>`)
 Use the Task tool with `subagent_type="gwt-scenario-generator"`:
 
-Prompt: `Generate GWT scenarios for the workflow at docs/event_model/workflows/$1.md. Write to docs/event_model/scenarios/$1/`
+Prompt: `Generate GWT scenarios for the workflow at docs/event_model/workflows/$1.md. Write to docs/event_model/scenarios/$1/. Remember: Follow the memory protocol - search memento for existing patterns/conventions, store new discoveries.`
 
 ### For Validation (`validate`)
 Use the Task tool with `subagent_type="model-validator"`:
 
-Prompt: `Validate all event model files in docs/event_model/`
+Prompt: `Validate all event model files in docs/event_model/. Remember: Follow the memory protocol - search memento for existing patterns/conventions, store new discoveries.`
 
 ### For Implementation (`implement <workflow>`)
 Use the Task tool with `subagent_type="implementation-guide"`:
 
-Prompt: `Create implementation plan for docs/event_model/workflows/$1.md`
+Prompt: `Create implementation plan for docs/event_model/workflows/$1.md. Remember: Follow the memory protocol - search memento for existing patterns/conventions, store new discoveries.`
 
 ### For Reverse Engineering (`reverse [path]` or `extract [path]`)
 Use the Task tool with `subagent_type="event-model-reverse-engineer"`:
 
 If a path argument is provided (e.g., `/event-model reverse /path/to/app`), use it. Otherwise default to current working directory.
 
-Prompt: `Analyze the codebase at <path> and extract event model elements. Document findings and provide instructions for using /event-model design, /event-model gwt, and /event-model validate to create the formal artifacts.`
+Prompt: `Analyze the codebase at <path> and extract event model elements. Document findings and provide instructions for using /event-model design, /event-model gwt, and /event-model validate to create the formal artifacts. Remember: Follow the memory protocol - search memento for existing patterns/conventions, store new discoveries.`
 
 After the analysis returns, follow its instructions to run the other event-model commands to create the formal artifacts.
 

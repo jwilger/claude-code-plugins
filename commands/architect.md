@@ -28,7 +28,7 @@ You are facilitating architectural documentation following the ADR (events) → 
 
 Use the Task tool with `subagent_type="adr-writer"`:
 
-Prompt: `Create an ADR for: <topic>. Write to docs/adr/ADR-NNN-<topic-slug>.md with status "proposed". Focus on WHY - rationale, alternatives, trade-offs.`
+Prompt: `Create an ADR for: <topic>. Write to docs/adr/ADR-NNN-<topic-slug>.md with status "proposed". Focus on WHY - rationale, alternatives, trade-offs. Remember: Follow the memory protocol - search memento for related decisions, store reasoning patterns.`
 
 After the agent returns:
 1. Show the user the proposed ADR
@@ -56,7 +56,7 @@ After the agent returns:
 
 Use the Task tool with `subagent_type="architecture-synthesizer"`:
 
-Prompt: `Read all accepted ADRs in docs/adr/ and synthesize into docs/ARCHITECTURE.md. The output must be standalone - it must NOT reference ADRs. ARCHITECTURE.md is the working document for implementation.`
+Prompt: `Read all accepted ADRs in docs/adr/ and synthesize into docs/ARCHITECTURE.md. The output must be standalone - it must NOT reference ADRs. ARCHITECTURE.md is the working document for implementation. Remember: Follow the memory protocol - search memento for related decisions, store reasoning patterns.`
 
 After synthesis:
 1. Show user the changes made

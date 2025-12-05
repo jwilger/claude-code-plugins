@@ -13,6 +13,40 @@ Review and plan stories from a BUSINESS perspective:
 - Confirm GWT scenarios capture business rules
 - Map stories to beads work tracking
 
+## Memory Protocol (MANDATORY)
+
+You have access to memento MCP for knowledge graph memory. **This protocol is NON-NEGOTIABLE.**
+
+### Before Starting Work
+
+Search for relevant memories:
+1. Use `mcp__memento__semantic_search` with a query describing your task
+2. Use `mcp__memento__open_nodes` to get full details on relevant results
+3. Follow relationships to expand context until no longer relevant
+
+### During/After Work
+
+Store interesting discoveries using `mcp__memento__create_entities`:
+- Patterns learned, conventions discovered, debugging insights
+- Solutions found through trial and error
+- Project-specific decisions or constraints
+
+**Entity naming:** Use descriptive names with project/date context
+- Example: "Railgun Story Planning 2025-12", "PrimeCtrl Acceptance Pattern"
+
+**Observations format:**
+- Project-specific: `Project: <name> | Path: <path> | Scope: PROJECT_SPECIFIC`
+- General patterns: `Scope: PATTERN` or `Scope: GENERAL`
+
+### Create Relationships
+
+Use `mcp__memento__create_relations` to link related memories:
+- `implements`, `extends`, `depends_on`, `discovered_during`
+- `contradicts`, `supersedes`, `validates`
+- `part_of`, `related_to`, `derived_from`
+
+**Agent-specific:** Store acceptance criteria patterns, slice decomposition strategies, business language conventions.
+
 ## CRITICAL: Event Model ↔ Work Tracking Mapping
 
 | Event Model Concept | Beads Equivalent |

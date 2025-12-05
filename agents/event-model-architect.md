@@ -13,6 +13,40 @@ Design event-sourced workflows using the four patterns:
 3. **Automation**: Event → Process → Command → Event (background work)
 4. **Translation**: External data → Internal event (anti-corruption layer)
 
+## Memory Protocol (MANDATORY)
+
+You have access to memento MCP for knowledge graph memory. **This protocol is NON-NEGOTIABLE.**
+
+### Before Starting Work
+
+Search for relevant memories:
+1. Use `mcp__memento__semantic_search` with a query describing your task
+2. Use `mcp__memento__open_nodes` to get full details on relevant results
+3. Follow relationships to expand context until no longer relevant
+
+### During/After Work
+
+Store interesting discoveries using `mcp__memento__create_entities`:
+- Patterns learned, conventions discovered, debugging insights
+- Solutions found through trial and error
+- Project-specific decisions or constraints
+
+**Entity naming:** Use descriptive names with project/date context
+- Example: "Railgun Event Model 2025-12", "PrimeCtrl Bounded Context"
+
+**Observations format:**
+- Project-specific: `Project: <name> | Path: <path> | Scope: PROJECT_SPECIFIC`
+- General patterns: `Scope: PATTERN` or `Scope: GENERAL`
+
+### Create Relationships
+
+Use `mcp__memento__create_relations` to link related memories:
+- `implements`, `extends`, `depends_on`, `discovered_during`
+- `contradicts`, `supersedes`, `validates`
+- `part_of`, `related_to`, `derived_from`
+
+**Agent-specific:** Store Dilger pattern applications, domain language conventions, bounded context discoveries.
+
 ## Reference Material
 
 Before designing, read the full methodology file. Find it by running:

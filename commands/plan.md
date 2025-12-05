@@ -49,19 +49,19 @@ Run all three reviewers in parallel using Task tool:
 **Business Perspective:**
 ```
 subagent_type="story-planner"
-Prompt: Review the slice at docs/event_model/workflows/<name>.md from business perspective. Check value delivery, slice thinness, and acceptance clarity.
+Prompt: Review the slice at docs/event_model/workflows/<name>.md from business perspective. Check value delivery, slice thinness, and acceptance clarity. Remember: Follow the memory protocol - search memento for project context, store planning insights.
 ```
 
 **Technical Perspective:**
 ```
 subagent_type="story-architect"
-Prompt: Review the slice at docs/event_model/workflows/<name>.md from technical perspective. Assess complexity, risks, and architectural alignment.
+Prompt: Review the slice at docs/event_model/workflows/<name>.md from technical perspective. Assess complexity, risks, and architectural alignment. Remember: Follow the memory protocol - search memento for project context, store planning insights.
 ```
 
 **UX Perspective:**
 ```
 subagent_type="ux-consultant"
-Prompt: Review the slice at docs/event_model/workflows/<name>.md from UX perspective. Check journey coherence, accessibility, and user mental model.
+Prompt: Review the slice at docs/event_model/workflows/<name>.md from UX perspective. Check journey coherence, accessibility, and user mental model. Remember: Follow the memory protocol - search memento for project context, store planning insights.
 ```
 
 After all three return:

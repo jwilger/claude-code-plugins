@@ -33,7 +33,7 @@ Begin a new TDD cycle:
 
 Use the Task tool with `subagent_type="red-tdd-tester"`:
 
-Prompt: `Write a failing test for: <user's requested behavior>. Follow the skip protocol if drilling down from a higher-level test.`
+Prompt: `Write a failing test for: <user's requested behavior>. Follow the skip protocol if drilling down from a higher-level test. Remember: Follow the memory protocol - search memento before starting, store discoveries after.`
 
 After the agent returns:
 1. Run the test to confirm it fails
@@ -44,7 +44,7 @@ After the agent returns:
 
 When red phase produces compilation errors, use Task tool with `subagent_type="domain-model-expert"`:
 
-Prompt: `Review the compilation errors from the test and create minimal type stubs to make it compile. Do not implement function bodies.`
+Prompt: `Review the compilation errors from the test and create minimal type stubs to make it compile. Do not implement function bodies. Remember: Follow the memory protocol - search memento before starting, store discoveries after.`
 
 After types are created, re-run tests to confirm compilation, then proceed to green.
 
@@ -52,7 +52,7 @@ After types are created, re-run tests to confirm compilation, then proceed to gr
 
 Use the Task tool with `subagent_type="green-implementer"`:
 
-Prompt: `Make the failing test pass with minimal implementation. Only address the exact test failure.`
+Prompt: `Make the failing test pass with minimal implementation. Only address the exact test failure. Remember: Follow the memory protocol - search memento before starting, store discoveries after.`
 
 After the agent returns:
 1. Run tests to confirm they pass
@@ -111,5 +111,5 @@ Docs: ~/.claude/docs/tdd/TDD_WORKFLOW.md
 
 After green phase completes successfully:
 1. Run mutation testing: Use Task tool with `subagent_type="mutation-tester"`
-2. Prompt: `Run mutation testing on the recently changed code. Enforce ≥80% threshold.`
+2. Prompt: `Run mutation testing on the recently changed code. Enforce ≥80% threshold. Remember: Follow the memory protocol - search memento before starting, store discoveries after.`
 3. If below threshold, guide user to improve tests before proceeding

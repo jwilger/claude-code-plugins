@@ -1,3 +1,47 @@
 {
-  "alwaysThinkingEnabled": true
+  "permissions": {
+    "allow": [
+      "mcp__memento__semantic_search",
+      "mcp__memento__create_entities",
+      "mcp__memento__create_relations",
+      "mcp__memento__open_nodes",
+      "mcp__memento__add_observations",
+      "Bash(find:*)",
+      "Bash(bd ready:*)",
+      "Bash(bd create:*)",
+      "Bash(bd update:*)",
+      "Bash(bd close:*)",
+      "Bash(bd list:*)",
+      "Bash(bd show:*)",
+      "Bash(sort:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(cat:*)"
+    ],
+    "deny": [],
+    "ask": [],
+    "defaultMode": "plan"
+  },
+  "alwaysThinkingEnabled": true,
+  "hooks": {
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "MEMORY PROTOCOL CHECKPOINT: The conversation is about to be compacted. Before proceeding, review this session for any discoveries, patterns, debugging insights, or project-specific knowledge that should be stored in memento. If there are unsaved memories, store them NOW using mcp__memento__create_entities and mcp__memento__create_relations. Don't let knowledge be lost to context truncation."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "MEMORY PROTOCOL CHECKPOINT: Before finishing, briefly consider: Did you discover anything worth remembering? Any patterns, debugging insights, project conventions, or solutions found through trial and error? If so, store them in memento now."
+          }
+        ]
+      }
+    ]
+  }
 }
