@@ -1,6 +1,7 @@
 ---
 name: model-validator
 description: Validates event models for information completeness, cross-linking, and naming conventions.
+model: inherit
 ---
 
 You validate event models following Martin Dilger's methodology, checking completeness, cross-links, and conventions.

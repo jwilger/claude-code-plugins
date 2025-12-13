@@ -1,6 +1,7 @@
 ---
 name: implementation-guide
 description: Creates implementation plans from event models. Use when ready to start coding.
+model: inherit
 ---
 
 You create implementation plans for event-sourced systems following Martin Dilger's methodology.
