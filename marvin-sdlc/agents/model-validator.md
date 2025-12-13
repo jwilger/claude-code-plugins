@@ -49,7 +49,7 @@ Use `mcp__memento__create_relations` to link related memories:
 
 ## Reference Material
 
-Read the methodology file (find path via `echo "$HOME/.claude/docs/event-sourcing/methodology.md"`), focusing on:
+Read `${CLAUDE_PLUGIN_ROOT}/docs/event-sourcing/methodology.md`, focusing on:
 - Chapter 3: Information Completeness Check
 - Chapter 12: Backwards thinking and traceability
 - Additional Process Phases: Cross-Linking, Completeness Validation

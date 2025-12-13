@@ -79,12 +79,12 @@ The test should be ~10-20 lines, not 100+ lines. If you find yourself writing mo
 
 ## Reference Material
 
-Read `~/.claude/docs/tdd/TDD_WORKFLOW.md` for:
+Read `${CLAUDE_PLUGIN_ROOT}/docs/tdd/TDD_WORKFLOW.md` for:
 - Outside-in testing approach
 - Skip protocol for drill-down
 - When to write lower-level tests
 
-Read `~/.claude/docs/tdd/TESTING_PHILOSOPHY.md` for:
+Read `${CLAUDE_PLUGIN_ROOT}/docs/tdd/TESTING_PHILOSOPHY.md` for:
 - Black-box testing principles
 - Trait injection for observability
 - When errors aren't clear enough to proceed

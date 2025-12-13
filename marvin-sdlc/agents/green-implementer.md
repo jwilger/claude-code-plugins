@@ -89,12 +89,12 @@ If the error says "method not found" - delegate to domain-model-expert
 
 ## Reference Material
 
-Read `~/.claude/docs/tdd/TDD_WORKFLOW.md` for:
+Read `${CLAUDE_PLUGIN_ROOT}/docs/tdd/TDD_WORKFLOW.md` for:
 - When changes are "obvious" vs need drill-down
 - Verification requirements
 - Dead code policy
 
-Read `~/.claude/docs/tdd/TESTING_PHILOSOPHY.md` for:
+Read `${CLAUDE_PLUGIN_ROOT}/docs/tdd/TESTING_PHILOSOPHY.md` for:
 - Black-box principles
 - Why we don't mock ad-hoc
 

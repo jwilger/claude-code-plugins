@@ -104,7 +104,7 @@ Key Principles:
   - Skip protocol: Mark parent test ignored when drilling down
 
 Agents: red-tdd-tester, green-implementer, domain-model-expert, mutation-tester
-Docs: ~/.claude/docs/tdd/TDD_WORKFLOW.md
+Docs: ${CLAUDE_PLUGIN_ROOT}/docs/tdd/TDD_WORKFLOW.md
 ```
 
 ## Verification After Each Phase

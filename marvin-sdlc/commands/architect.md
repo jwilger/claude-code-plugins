@@ -101,7 +101,7 @@ Key Principles:
   - ADRs are for understanding history or revisiting decisions
 
 Agents: adr-writer, architecture-synthesizer
-Docs: ~/.claude/docs/adr/ADR_TEMPLATE.md
+Docs: ${CLAUDE_PLUGIN_ROOT}/docs/adr/ADR_TEMPLATE.md
 ```
 
 ## ADR Numbering

@@ -156,7 +156,7 @@ enum Order {
 
 **Before creating types, check for language-specific documentation:**
 
-1. Look for `~/.claude/docs/domain-modeling/<language>.md`
+1. Look for `${CLAUDE_PLUGIN_ROOT}/docs/domain-modeling/<language>.md`
    - Examples: `rust.md`, `typescript.md`, `python.md`, `elixir.md`, `go.md`
 
 2. **If the doc exists**: Read it and follow its idioms
@@ -165,7 +165,7 @@ enum Order {
 
 3. **If no doc exists for the current language**:
    - Inform the main conversation that no language-specific guidance exists
-   - Offer to help create `~/.claude/docs/domain-modeling/<language>.md`
+   - Offer to help create `${CLAUDE_PLUGIN_ROOT}/docs/domain-modeling/<language>.md`
    - Apply universal principles with your knowledge of that language's idioms
    - Document patterns discovered for future use
 

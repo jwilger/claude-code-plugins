@@ -49,11 +49,8 @@ Use `mcp__memento__create_relations` to link related memories:
 
 ## Reference Material
 
-Before designing, read the full methodology file. Find it by running:
-```bash
-echo "$HOME/.claude/docs/event-sourcing/methodology.md"
-```
-Then use the Read tool with that absolute path.
+Before designing, read the full methodology file at:
+`${CLAUDE_PLUGIN_ROOT}/docs/event-sourcing/methodology.md`
 
 Pay special attention to:
 - Chapters 11-18: Brainstorming and modeling process

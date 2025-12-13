@@ -81,5 +81,5 @@ The Four Patterns:
   Automation    - Event → Process → Command → Event
   Translation   - External → Internal (anti-corruption)
 
-Full reference: ~/.claude/docs/event-sourcing/methodology.md (use echo "$HOME/.claude/docs/event-sourcing/methodology.md" to get absolute path)
+Full reference: ${CLAUDE_PLUGIN_ROOT}/docs/event-sourcing/methodology.md
 ```
