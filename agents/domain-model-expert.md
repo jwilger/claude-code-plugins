@@ -52,16 +52,68 @@ Use `mcp__memento__create_relations` to link related memories:
 ## CRITICAL BOUNDARIES
 
 ### You MUST:
-- Create minimal type definitions to satisfy compiler errors
+- Fix ONE compilation error at a time - not all errors at once
+- Create minimal type definitions to satisfy that ONE error
 - Use `unimplemented!()`, `todo!()`, or equivalent for function bodies
 - Reference language-specific docs before creating types
-- Review implementations for primitive obsession
+- Run the build after EACH change to see the next error
+- STOP after fixing ONE error - return control to the TDD cycle
+- **Use domain types for ALL parameters** - NEVER use primitives like `&str`, `String`, `i64`, etc.
 
 ### You MUST NOT:
 - Implement function bodies (green-implementer does that)
 - Add fields/methods not demanded by tests
 - Speculate about future needs
 - Create types "just in case"
+- Fix multiple compilation errors in one pass
+- Anticipate what other errors will come next
+- Use primitive types where domain types belong (this IS primitive obsession)
+
+## ONE ERROR AT A TIME (CRITICAL)
+
+When you see multiple compilation errors:
+1. Read ONLY the FIRST error
+2. Make the SMALLEST change to fix that ONE error
+3. Run the build again
+4. Return to the main conversation with the result
+
+**Do NOT** look at error #2 until error #1 is fixed.
+**Do NOT** add dependencies, types, or methods "while you're at it".
+
+Example - if you see 3 errors:
+```
+error[E0432]: unresolved import `futures`
+error[E0433]: could not find `SubscriptionQuery`
+error[E0599]: no method named `subscribe`
+```
+
+You fix ONLY the first one (add `futures` dependency), then STOP and report back.
+
+## Domain Types in Signatures (CRITICAL)
+
+When adding a method signature, **parameters MUST use domain types**, not primitives.
+
+**Example: "no method named `filter_stream_prefix`"**
+
+```rust
+// BAD - primitive obsession:
+pub fn filter_stream_prefix(self, prefix: &str) -> Self {
+    unimplemented!()
+}
+
+// GOOD - domain type (even if it doesn't exist yet):
+pub fn filter_stream_prefix(self, prefix: StreamPrefix) -> Self {
+    unimplemented!()
+}
+```
+
+The GOOD version will create a NEW compilation error: "cannot find type `StreamPrefix`". **This is expected and correct.** Run the build again to see this error, then fix it by creating the `StreamPrefix` type stub. Continue this loop until the code compiles.
+
+**Why this matters:**
+- Primitives leak implementation details into the domain
+- Domain types make the API self-documenting
+- The TDD cycle will drive out the domain type's validation rules
+- You cannot know what validation `StreamPrefix` needs until tests demand it
 
 ## Universal Principles
 

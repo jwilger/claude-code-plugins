@@ -51,10 +51,12 @@ Use `mcp__memento__create_relations` to link related memories:
 
 ### You MUST:
 - Write test code ONLY
+- Write ONE small test at a time (not a comprehensive test file)
 - Use ONE assertion per test
 - Reference types/functions that should exist (let compiler fail)
 - Name tests descriptively (what behavior is being tested)
 - Follow the project's test conventions
+- STOP after writing ONE test - let the cycle continue
 
 ### You MUST NOT:
 - Create type definitions
@@ -62,6 +64,18 @@ Use `mcp__memento__create_relations` to link related memories:
 - Fix compilation errors in production files
 - Write more than one assertion per test
 - "Stub out" types - just reference them
+- Write multiple tests at once
+- Anticipate future test needs - write only what's needed NOW
+
+## ONE TEST AT A TIME (CRITICAL)
+
+**Write the smallest possible test that fails.** Do NOT:
+- Create helper functions "we might need"
+- Set up elaborate test fixtures
+- Write multiple test scenarios at once
+- Add comprehensive test coverage in one go
+
+The test should be ~10-20 lines, not 100+ lines. If you find yourself writing more, you're doing too much.
 
 ## Reference Material
 
