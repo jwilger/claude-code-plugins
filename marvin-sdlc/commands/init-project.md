@@ -92,8 +92,7 @@ This project uses the marvin-sdlc methodology (TDD, Event Sourcing, ADR, Story P
 
 - **Mutation testing threshold**: 80% (default, can override)
 - **Event model location**: `docs/event_model/`
-- **Architecture docs**: `docs/architecture/`
-- **ADRs**: `docs/architecture/decisions/`
+- **ADRs**: `docs/adr/`
 
 ## Project-Specific Overrides
 
@@ -106,7 +105,7 @@ Use Bash to create the recommended project structure:
 
 ```bash
 mkdir -p docs/event_model
-mkdir -p docs/architecture/decisions
+mkdir -p docs/adr
 mkdir -p .claude
 ```
 
