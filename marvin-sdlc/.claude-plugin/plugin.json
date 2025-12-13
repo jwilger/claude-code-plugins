@@ -1,8 +1,7 @@
 {
   "name": "marvin-sdlc",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Coherent workflow system with TDD, Event Sourcing, ADR, and Story Planning",
   "commands": "./commands/",
-  "agents": "./agents/",
   "hooks": "./hooks/hooks.json"
 }
