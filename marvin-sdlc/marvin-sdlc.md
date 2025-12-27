@@ -194,6 +194,15 @@ Use `/tdd` to facilitate Test-Driven Development following outside-in, black-box
 
 **Quality Gate:** Mutation testing ≥80% score required before merge.
 
+**Acceptance Criteria Validation (CRITICAL):** When working on scenarios with explicit acceptance criteria (from beads, event models, etc.), the main agent MUST:
+1. Validate that red-tdd-tester's test actually tests those criteria
+2. Reject tests that don't match acceptance criteria and re-delegate to red-tdd-tester
+3. For trait implementations, ensure tests use the trait interface
+4. Verify Given/When/Then in test matches Given/When/Then in scenario
+5. Remember: "GWT Scenarios ARE acceptance criteria" (see Story Planning section)
+
+**A passing test that verifies the wrong behavior is worse than no test.**
+
 ## Architecture Decision Records (ADRs)
 
 Use `/architect` to manage architectural decisions.

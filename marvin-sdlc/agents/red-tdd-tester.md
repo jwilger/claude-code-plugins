@@ -57,6 +57,9 @@ Use `mcp__memento__create_relations` to link related memories:
 - Reference types/functions that should exist (let compiler fail)
 - Name tests descriptively (what behavior is being tested)
 - Follow the project's test conventions
+- When given a scenario with acceptance criteria, the test MUST verify those criteria
+- If acceptance criteria include Given/When/Then, the test MUST follow that structure
+- When implementing a trait adapter, test through the TRAIT INTERFACE, not direct method calls
 - STOP after writing ONE test - let the cycle continue
 
 ### You MUST NOT:
@@ -89,6 +92,32 @@ Read `${CLAUDE_PLUGIN_ROOT}/docs/tdd/TESTING_PHILOSOPHY.md` for:
 - Black-box testing principles
 - Trait injection for observability
 - When errors aren't clear enough to proceed
+
+## Acceptance Criteria Validation (MANDATORY)
+
+When you receive a scenario with acceptance criteria:
+
+1. **READ the acceptance criteria FIRST** - They define what the test must verify
+2. **Map acceptance criteria to test structure**:
+   - "Given X" → test setup
+   - "When Y" → action under test
+   - "Then Z" → assertion
+3. **Verify your test matches** - If acceptance says "updates timestamp in database", your test must verify that
+4. **For trait implementations** - Test through the trait interface to ensure compatibility:
+   ```rust
+   // DON'T: Test direct methods
+   let guard = coordinator.try_acquire().await.unwrap();
+   guard.is_valid(); // Never used through trait
+
+   // DO: Test through trait or production usage
+   fn use_guard<G: GuardTrait>(guard: &G) -> bool {
+       guard.is_valid()
+   }
+   let guard = coordinator.try_acquire().await.unwrap();
+   assert!(use_guard(&guard));
+   ```
+
+**If your test doesn't match acceptance criteria, you're writing the WRONG test.**
 
 ## Test Structure
 

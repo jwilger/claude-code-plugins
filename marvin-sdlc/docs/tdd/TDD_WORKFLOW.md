@@ -26,6 +26,17 @@ Red → Domain → Green → Refactor → Commit
 
 **Boundaries are NON-NEGOTIABLE.**
 
+## Acceptance Criteria Checkpoint
+
+**BEFORE delegating from Red to Domain/Green:**
+
+1. Verify red-tdd-tester's test matches the acceptance criteria
+2. Check that Given/When/Then in test aligns with Given/When/Then in scenario
+3. For trait implementations, ensure test uses trait interface
+4. If test doesn't match criteria, reject and have red-tdd-tester rewrite
+
+**This checkpoint is NON-NEGOTIABLE.** A passing test that verifies the wrong thing is worse than no test.
+
 ## Outside-In Approach
 
 Start with integration/acceptance tests, drill down as needed:
@@ -82,6 +93,35 @@ Once child passes, remove parent's ignore annotation and verify parent progresse
 - "Something went wrong" → need to isolate
 
 **Rule of thumb:** If you have to guess, drill down.
+
+## Integration Testing for Interfaces
+
+When implementing an adapter/implementation of a trait/interface:
+
+**REQUIRED: Test through the interface, not concrete type**
+
+```rust
+// Given: Implementing GuardTrait for PostgresCoordinatorGuard
+
+// DON'T: Test only concrete methods
+let guard = PostgresCoordinatorGuard::new();
+guard.is_valid(); // Bypasses trait - mismatches won't be caught
+
+// DO: Test through trait to verify compatibility
+fn accepts_guard<G: GuardTrait>(g: &G) -> bool {
+    g.is_valid()
+}
+let guard = PostgresCoordinatorGuard::new();
+accepts_guard(&guard); // Ensures trait is actually implemented correctly
+```
+
+**Why this matters:**
+- Catches signature mismatches (async vs sync)
+- Verifies trait bounds are satisfied
+- Ensures the implementation actually works in production contexts
+- Direct method calls bypass trait constraints
+
+This catches type system violations at test time, not in production.
 
 ## Dead Code Policy
 
