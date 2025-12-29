@@ -2,5 +2,9 @@
   "name": "marvin-sdlc",
   "version": "1.0.7",
   "description": "Coherent workflow system with TDD, Event Sourcing, ADR, and Story Planning",
+  "author": {
+    "name": "John Wilger",
+    "email": "john@johnwilger.com"
+  },
   "commands": "./commands/"
 }
