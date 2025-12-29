@@ -90,8 +90,10 @@ gh issue-ext sub add <epic-number> <new-story-number>
 For chapters/themes:
 
 ```bash
-gh issue create --title "<Epic title from chapter>" --label epic --body "Epic description"
+gh issue create --title "<Epic title from chapter>" --body "Epic description"
 ```
+
+**Note:** For full GitHub integration including sub-issues, blocking relationships, and Kanban boards, install the `github-issues` and `github-projects` plugins from this marketplace.
 
 ### For Ready (`ready`)
 

@@ -98,6 +98,8 @@ If the compiler warns about unused code:
 - **DELETE IT** - don't implement it to justify keeping it
 - If tests need it later, they'll fail and demand it
 
+**IMPORTANT:** Do NOT use `_` prefix (e.g., `_unused_var`) to silence warnings as a workaround for keeping dead code. The `_` prefix has legitimate uses (e.g., trait method parameters you don't use), but using it solely to keep "placeholder" code is a code smell. If nothing uses it, delete it.
+
 ## Verification Before Completion
 
 Before reporting success:

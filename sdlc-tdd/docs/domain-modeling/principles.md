@@ -66,11 +66,34 @@ transfer(from, to, fee);     // Type error if fee is Fee, not Money
 
 ### What Should Be a Type?
 
+**Everything.** If it has meaning in your domain, it deserves a type.
+
 - IDs: `UserId`, `OrderId`, `ProductId`
 - Quantities: `Money`, `Weight`, `Distance`
 - Constrained strings: `Email`, `PhoneNumber`, `Slug`
 - Bounded numbers: `Percentage`, `Rating`, `Age`
 - Domain concepts: `OrderStatus`, `PaymentMethod`
+- Time durations: `SessionTimeout`, `RetryInterval`, `CacheTtl`
+
+### Type Distinctness is Critical
+
+**Even if two values have the same underlying type, they should have DIFFERENT domain types if they serve different purposes.**
+
+```
+// BAD - same type for different concepts:
+struct Config {
+    session_timeout: Duration,
+    retry_interval: Duration,  // Easy to swap accidentally!
+}
+
+// GOOD - distinct types prevent confusion:
+struct Config {
+    session_timeout: SessionTimeout,
+    retry_interval: RetryInterval,  // Compiler catches swaps!
+}
+```
+
+This applies everywhere: two `String` fields with different meanings should be two different types (`CustomerName` vs `ProductName`). Two `i64` fields representing different quantities should be distinct (`Quantity` vs `Price`).
 
 ## 3. Make Illegal States Unrepresentable
 

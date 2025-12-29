@@ -11,68 +11,61 @@ Tests should:
 
 ## No Ad-Hoc Mocking
 
-**BAD: Ad-hoc mocks**
-```rust
-// Creates tight coupling to implementation
-let mock_db = MockDatabase::new();
-mock_db.expect_save().times(1).returning(|_| Ok(()));
+**BAD: Ad-hoc mocks that couple tests to implementation**
+```
+// Creates tight coupling to implementation details
+mock_db = create_mock()
+mock_db.expect("save").to_be_called_once()
 ```
 
-**GOOD: Trait injection for observability**
-```rust
-// Accepts any implementation of the trait
-fn process_order<S: OrderStore>(order: Order, store: &S) -> Result<(), Error> {
+**GOOD: Interface injection for observability**
+```
+// Accept any implementation of the interface
+function process_order(order, store: OrderStore) {
     // ...
 }
 
 // In tests, use an observable implementation
-let store = InMemoryOrderStore::new();
-let result = process_order(order, &store);
-assert_eq!(store.saved_orders(), vec![expected_order]);
+store = InMemoryOrderStore()
+result = process_order(order, store)
+assert store.saved_orders() == [expected_order]
 ```
 
-## Trait Injection Pattern
+## Interface/Trait Injection Pattern
 
-### 1. Define Trait for External Dependency
+This pattern applies to all languages - use the appropriate abstraction mechanism:
 
-```rust
-pub trait EventStore {
-    fn append(&self, stream: &StreamId, events: Vec<Event>) -> Result<(), StoreError>;
-    fn load(&self, stream: &StreamId) -> Result<Vec<Event>, StoreError>;
+| Language | Abstraction Mechanism |
+|----------|----------------------|
+| Rust | `trait` |
+| TypeScript/Java | `interface` |
+| Python | Protocol or ABC |
+| Go | `interface` |
+| Elixir | Behaviour |
+| Ruby | Duck typing |
+
+### The Pattern
+
+1. **Define interface for external dependency**
+```
+interface EventStore {
+    append(stream_id, events) -> Result
+    load(stream_id) -> List<Event>
 }
 ```
 
-### 2. Production Implementation
+2. **Production implementation** connects to real infrastructure
 
-```rust
-pub struct PostgresEventStore { ... }
-
-impl EventStore for PostgresEventStore { ... }
+3. **Test implementation** is in-memory and observable
 ```
-
-### 3. Test Implementation (Observable)
-
-```rust
-pub struct InMemoryEventStore {
-    events: RefCell<HashMap<StreamId, Vec<Event>>>,
-}
-
-impl EventStore for InMemoryEventStore { ... }
-
-impl InMemoryEventStore {
+class InMemoryEventStore implements EventStore {
     // Observable methods for tests
-    pub fn stored_events(&self, stream: &StreamId) -> Vec<Event> { ... }
-    pub fn was_called(&self) -> bool { ... }
+    stored_events(stream_id) -> List<Event>
+    was_called() -> bool
 }
 ```
 
-### 4. Accept Trait in Functions
-
-```rust
-pub fn execute_command<S: EventStore>(cmd: Command, store: &S) -> Result<Event, Error> {
-    // Uses store through trait interface
-}
-```
+4. **Accept interface in functions** - enables swapping implementations
 
 ## When to Drill Down to Unit Tests
 
@@ -111,68 +104,62 @@ Stay at integration level when:
 
 Tests should read as specifications:
 
-```rust
-#[test]
-fn transfers_money_when_sender_has_sufficient_balance() { ... }
-
-#[test]
-fn rejects_transfer_when_sender_has_insufficient_balance() { ... }
-
-#[test]
-fn calculates_fees_based_on_transfer_amount() { ... }
+```
+test "transfers money when sender has sufficient balance"
+test "rejects transfer when sender has insufficient balance"
+test "calculates fees based on transfer amount"
 ```
 
 Not:
-```rust
-#[test]
-fn test_transfer() { ... }  // Too vague
-
-#[test]
-fn test_account_service_transfer_method() { ... }  // Tests implementation
+```
+test "test transfer"           // Too vague
+test "test account service"    // Tests implementation
 ```
 
 ## Test Structure: Given/When/Then
 
-```rust
-#[test]
-fn completes_order_when_all_items_available() {
+```
+test "completes order when all items available" {
     // Given - Set up preconditions
-    let store = InMemoryInventoryStore::new();
-    store.add_stock("item-1", 10);
-    store.add_stock("item-2", 5);
+    store = InMemoryInventoryStore()
+    store.add_stock("item-1", 10)
+    store.add_stock("item-2", 5)
 
     // When - Execute behavior
-    let order = Order::new(vec![
-        LineItem::new("item-1", 2),
-        LineItem::new("item-2", 1),
-    ]);
-    let result = complete_order(order, &store);
+    order = Order([
+        LineItem("item-1", 2),
+        LineItem("item-2", 1),
+    ])
+    result = complete_order(order, store)
 
     // Then - Verify outcomes
-    assert!(result.is_ok());
-    assert_eq!(store.stock_level("item-1"), 8);
-    assert_eq!(store.stock_level("item-2"), 4);
+    assert result.is_ok()
+    assert store.stock_level("item-1") == 8
+    assert store.stock_level("item-2") == 4
 }
 ```
 
 ## Property-Based Testing
 
-Use property tests for domain types:
+Use property tests for domain types where applicable:
 
-```rust
-#[test]
-fn money_addition_is_commutative() {
-    proptest!(|(a: i64, b: i64)| {
-        let m1 = Money::cents(a);
-        let m2 = Money::cents(b);
-        assert_eq!(m1 + m2, m2 + m1);
-    });
+```
+property "money addition is commutative" {
+    for_all(a: Money, b: Money) {
+        assert a + b == b + a
+    }
 }
 
-#[test]
-fn email_rejects_invalid_formats() {
-    proptest!(|(s in "[^@]+")| {  // Strings without @
-        assert!(Email::parse(&s).is_err());
-    });
+property "email rejects strings without @" {
+    for_all(s: String where not contains(s, "@")) {
+        assert Email.parse(s).is_error()
+    }
 }
 ```
+
+Property testing libraries exist for most languages:
+- **Rust**: proptest, quickcheck
+- **TypeScript/JavaScript**: fast-check
+- **Python**: hypothesis
+- **Elixir**: StreamData
+- **Java/Kotlin**: jqwik

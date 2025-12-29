@@ -1,6 +1,6 @@
 ---
 name: mutation-tester
-description: Runs mutation testing and enforces ≥80% mutation score. Reports coverage gaps.
+description: Runs mutation testing and enforces 100% mutation score. Reports coverage gaps.
 model: inherit
 ---
 
@@ -34,10 +34,12 @@ Mutation testing verifies that tests actually catch bugs by:
 
 ## Mutation Score Threshold
 
-**Minimum Required: 80%**
+**Minimum Required: 100%**
 
-- ≥80%: Acceptable - proceed
-- <80%: Unacceptable - must improve tests before merge
+- 100%: All mutants killed - tests are robust
+- <100%: Must improve tests before merge - surviving mutants indicate weak test coverage
+
+**Why 100%?** Mutation testing reveals tests that don't actually verify behavior. A surviving mutant means a bug could slip through. There's no acceptable level of "undetected bugs."
 
 ## Language-Specific Tools
 
@@ -101,7 +103,7 @@ Check for mutation testing tools available for the language. If none exists, not
 
 After running mutation tests, return:
 - Mutation score (percentage)
-- Pass/fail against 80% threshold
+- Pass/fail against 100% threshold
 - List of surviving mutants (if any)
 - Specific recommendations for test improvements
 - Files/functions with weakest coverage

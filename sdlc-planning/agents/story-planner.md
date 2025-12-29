@@ -64,6 +64,12 @@ Follow the memory protocol from your system instructions. This is mandatory - se
 
 ## GitHub Issues Integration
 
+**Note:** For full GitHub integration, install the `github-issues` and `github-projects` plugins from this marketplace. They provide:
+- Sub-issue relationships (parent/child hierarchies)
+- Blocking relationships between issues
+- Kanban board management with status/priority workflows
+- Linked development branches
+
 Create stories using:
 ```bash
 gh issue create --title "Story title" --label feature --body "Acceptance criteria here"
@@ -74,7 +80,7 @@ For epics (chapters/themes):
 gh issue create --title "Epic title" --label epic --body "Epic description"
 ```
 
-Link stories to epics as sub-issues (requires gh-issue-ext):
+Link stories to epics as sub-issues (requires github-issues plugin):
 ```bash
 gh issue-ext sub add <epic-number> <story-number>
 ```
