@@ -1,12 +1,12 @@
 {
-  "name": "marvin-sdlc",
+  "name": "jwilger-claude-plugins",
   "owner": {
     "name": "John Wilger",
     "email": "john@johnwilger.com"
   },
   "metadata": {
-    "description": "Complete professional development workflow: TDD, Event Modeling, ADR, Story Planning",
-    "version": "1.0.7"
+    "description": "Claude Code plugins for professional development workflows and GitHub integration",
+    "version": "1.1.0"
   },
   "plugins": [
     {
@@ -15,6 +15,13 @@
       "description": "Coherent workflow system with TDD, Event Sourcing, ADR, and Story Planning",
       "version": "1.0.7",
       "keywords": ["tdd", "event-sourcing", "adr", "domain-modeling", "marvin"]
+    },
+    {
+      "name": "github-issues",
+      "source": "./github-issues",
+      "description": "Comprehensive GitHub issue management with sub-issues, blocking relationships, and linked branches",
+      "version": "1.0.0",
+      "keywords": ["github", "issues", "sub-issues", "blocking", "project-management", "gh-cli"]
     }
   ]
 }

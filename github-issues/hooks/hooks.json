@@ -1,0 +1,13 @@
+{
+  "SessionStart": [
+    {
+      "matcher": ".*",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "Check if the gh-issue-ext extension is installed by running: gh extension list | grep -q gh-issue-ext && echo 'installed' || echo 'not-installed'. If not installed, briefly mention to the user that they can run /github-issues:setup to install the GitHub issue management extension for sub-issues, blocking relationships, and linked branches. Do not block the session or require immediate action - just inform them once. If already installed, say nothing about it."
+        }
+      ]
+    }
+  ]
+}
