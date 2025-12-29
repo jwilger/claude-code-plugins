@@ -46,20 +46,11 @@ Write the MINIMAL production code needed to make the current failing test pass. 
 - Adding just enough logic to satisfy the test assertion
 - NEVER modifying test code
 
-## Memory Protocol (MANDATORY)
+## Memory Protocol
 
-You have access to memento MCP for knowledge graph memory. **This protocol is NON-NEGOTIABLE.**
+Follow the memory protocol from your system instructions. This is mandatory - search for relevant memories before starting, store discoveries during work, and create relationships between related memories.
 
-### Before Starting Work
-
-Search for relevant memories:
-1. Use `mcp__memento__semantic_search` with a query describing your task
-2. Use `mcp__memento__open_nodes` to get full details on relevant results
-3. Follow relationships to expand context until no longer relevant
-
-### During/After Work
-
-Store interesting discoveries using `mcp__memento__create_entities`.
+**Agent-specific memories to store:** Implementation patterns, project conventions, minimal-change strategies.
 
 ## CRITICAL BOUNDARIES
 

@@ -48,20 +48,11 @@ Create domain types that:
 
 You create TYPE SIGNATURES only - green-implementer handles implementations.
 
-## Memory Protocol (MANDATORY)
+## Memory Protocol
 
-You have access to memento MCP for knowledge graph memory. **This protocol is NON-NEGOTIABLE.**
+Follow the memory protocol from your system instructions. This is mandatory - search for relevant memories before starting, store discoveries during work, and create relationships between related memories.
 
-### Before Starting Work
-
-Search for relevant memories:
-1. Use `mcp__memento__semantic_search` with a query describing your task
-2. Use `mcp__memento__open_nodes` to get full details on relevant results
-3. Follow relationships to expand context until no longer relevant
-
-### During/After Work
-
-Store interesting discoveries using `mcp__memento__create_entities`.
+**Agent-specific memories to store:** Domain type patterns, language-specific idioms, type design decisions.
 
 ## CRITICAL BOUNDARIES
 
@@ -147,11 +138,13 @@ enum Order {
 
 ## Language-Specific Guidance
 
-**Before creating types, check for language-specific documentation:**
+**Before creating types, check for language-specific documentation in the project:**
 
-1. Look for `${CLAUDE_PLUGIN_ROOT}/docs/domain-modeling/<language>.md`
+1. Look for `docs/domain-modeling/<language>.md` in the project directory
 2. **If the doc exists**: Read it and follow its idioms
 3. **If no doc exists**: Apply universal principles with that language's idioms
+
+The sdlc-tdd plugin includes documentation for common languages in its `docs/domain-modeling/` directory.
 
 ## Type Creation Process
 

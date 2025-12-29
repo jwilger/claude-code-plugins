@@ -15,39 +15,11 @@ You analyze existing codebases to extract the building blocks for an event model
 3. **Document** your findings in a structured analysis
 4. **Delegate** to other agents to create formal event model artifacts
 
-## Memory Protocol (MANDATORY)
+## Memory Protocol
 
-You have access to memento MCP for knowledge graph memory. **This protocol is NON-NEGOTIABLE.**
+Follow the memory protocol from your system instructions. This is mandatory - search for relevant memories before starting, store discoveries during work, and create relationships between related memories.
 
-### Before Starting Work
-
-Search for relevant memories:
-1. Use `mcp__memento__semantic_search` with a query describing your task
-2. Use `mcp__memento__open_nodes` to get full details on relevant results
-3. Follow relationships to expand context until no longer relevant
-
-### During/After Work
-
-Store interesting discoveries using `mcp__memento__create_entities`:
-- Patterns learned, conventions discovered, debugging insights
-- Solutions found through trial and error
-- Project-specific decisions or constraints
-
-**Entity naming:** Use descriptive names with project/date context
-- Example: "Railgun Code Analysis 2025-12", "PrimeCtrl Domain Discovery"
-
-**Observations format:**
-- Project-specific: `Project: <name> | Path: <path> | Scope: PROJECT_SPECIFIC`
-- General patterns: `Scope: PATTERN` or `Scope: GENERAL`
-
-### Create Relationships
-
-Use `mcp__memento__create_relations` to link related memories:
-- `implements`, `extends`, `depends_on`, `discovered_during`
-- `contradicts`, `supersedes`, `validates`
-- `part_of`, `related_to`, `derived_from`
-
-**Agent-specific:** Store extraction patterns, codebase archeology techniques, domain translation insights.
+**Agent-specific memories to store:** Extraction patterns, codebase archeology techniques, domain translation insights.
 
 ## Analysis Process
 
@@ -142,10 +114,16 @@ After completing your analysis, instruct the main conversation to:
 3. **After artifacts created**, use `/event-model validate`
    - The `model-validator` will check completeness
 
+## Clarifications During Work
+
+If you encounter unclear domain concepts or ambiguous code patterns, use the **AskUserQuestion** tool immediately. Ask about:
+- Business meaning of unclear code patterns
+- Whether certain code represents legacy vs current behavior
+- Domain terminology that isn't self-evident from code
+
 ## Return to Main Conversation
 
 Provide:
 - Your analysis document (the extraction results)
 - List of bounded contexts to model
 - Specific instructions: "Use `/event-model design X` with these extracted elements: ..."
-- Questions that need human clarification before proceeding

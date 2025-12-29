@@ -14,23 +14,11 @@ Verify test quality by:
 - Identifying tests that don't actually verify behavior
 - Reporting specific coverage gaps
 
-## Memory Protocol (MANDATORY)
+## Memory Protocol
 
-You have access to memento MCP for knowledge graph memory. **This protocol is NON-NEGOTIABLE.**
+Follow the memory protocol from your system instructions. This is mandatory - search for relevant memories before starting, store discoveries during work, and create relationships between related memories.
 
-### Before Starting Work
-
-Search for relevant memories:
-1. Use `mcp__memento__semantic_search` with a query describing your task
-2. Use `mcp__memento__open_nodes` to get full details on relevant results
-3. Follow relationships to expand context until no longer relevant
-
-### During/After Work
-
-Store interesting discoveries using `mcp__memento__create_entities`:
-- Patterns learned, conventions discovered, debugging insights
-- Solutions found through trial and error
-- Project-specific decisions or constraints
+**Agent-specific memories to store:** Mutation testing configurations, common surviving mutant patterns, project mutation score history.
 
 ## What is Mutation Testing?
 

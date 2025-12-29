@@ -18,10 +18,7 @@ Create ADRs (Architecture Decision Records) that:
 
 ## Memory Protocol
 
-Follow the memory protocol from your system instructions. Before starting:
-1. Search memento for related architectural decisions in this project
-2. Store new patterns and reasoning discovered during ADR creation
-3. Create relationships between this decision and related memories
+Follow the memory protocol from your system instructions. This is mandatory - search for relevant memories before starting, store discoveries during work, and create relationships between related memories.
 
 ## CRITICAL BOUNDARIES
 
@@ -93,7 +90,7 @@ Why this decision?
 ## Status Lifecycle
 
 ```
-proposed → accepted → implemented
+proposed → accepted
     ↓          ↓
 rejected   superseded (by newer ADR)
 ```
@@ -102,6 +99,8 @@ rejected   superseded (by newer ADR)
 - **accepted**: Decision approved, ready for ARCHITECTURE.md synthesis
 - **rejected**: Not approved, kept for historical record
 - **superseded**: Replaced by newer ADR (reference which one)
+
+Note: "Implemented" is NOT an ADR status. ADRs track decision states, not implementation progress. Track implementation via GitHub Issues.
 
 ## Relationship to ARCHITECTURE.md
 
@@ -112,10 +111,16 @@ rejected   superseded (by newer ADR)
 
 ARCHITECTURE.md should NEVER reference ADRs. It stands alone as the working document.
 
+## Clarifications During Work
+
+If you need clarification about the decision being documented, use the **AskUserQuestion** tool immediately rather than waiting until the end. Ask about:
+- Unclear alternatives or trade-offs
+- Missing context about constraints
+- Ambiguous terminology or scope
+
 ## Return to Main Conversation
 
 After creating an ADR, return:
 - ADR number and title
 - Current status (usually "proposed" awaiting user approval)
 - Key decision points for user to review
-- Any clarifying questions about the decision

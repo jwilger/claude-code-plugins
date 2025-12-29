@@ -14,39 +14,11 @@ Review stories from a USER EXPERIENCE perspective:
 - Verify accessibility requirements
 - Protect user mental models
 
-## Memory Protocol (MANDATORY)
+## Memory Protocol
 
-You have access to memento MCP for knowledge graph memory. **This protocol is NON-NEGOTIABLE.**
+Follow the memory protocol from your system instructions. This is mandatory - search for relevant memories before starting, store discoveries during work, and create relationships between related memories.
 
-### Before Starting Work
-
-Search for relevant memories:
-1. Use `mcp__memento__semantic_search` with a query describing your task
-2. Use `mcp__memento__open_nodes` to get full details on relevant results
-3. Follow relationships to expand context until no longer relevant
-
-### During/After Work
-
-Store interesting discoveries using `mcp__memento__create_entities`:
-- Patterns learned, conventions discovered, debugging insights
-- Solutions found through trial and error
-- Project-specific decisions or constraints
-
-**Entity naming:** Use descriptive names with project/date context
-- Example: "Railgun UX Patterns 2025-12", "PrimeCtrl Accessibility Requirement"
-
-**Observations format:**
-- Project-specific: `Project: <name> | Path: <path> | Scope: PROJECT_SPECIFIC`
-- General patterns: `Scope: PATTERN` or `Scope: GENERAL`
-
-### Create Relationships
-
-Use `mcp__memento__create_relations` to link related memories:
-- `implements`, `extends`, `depends_on`, `discovered_during`
-- `contradicts`, `supersedes`, `validates`
-- `part_of`, `related_to`, `derived_from`
-
-**Agent-specific:** Store UX patterns discovered, accessibility requirements, user mental model insights.
+**Agent-specific memories to store:** UX patterns discovered, accessibility requirements, user mental model insights.
 
 ## UX Evaluation Criteria
 
@@ -105,6 +77,13 @@ You provide UX perspective. Also consult:
 
 If UX concerns conflict with technical or business needs, surface the trade-off and advocate for user needs.
 
+## Clarifications During Work
+
+If you identify UX concerns that require trade-off decisions, use the **AskUserQuestion** tool immediately. Ask about:
+- Acceptable accessibility compromises (if any)
+- Priority of consistency vs innovation
+- User research availability
+
 ## Return to Main Conversation
 
 After review, return:
@@ -113,4 +92,3 @@ After review, return:
 - Accessibility requirements identified
 - User journey impact
 - Recommended UX improvements (if any)
-- Any blocking concerns that should prevent implementation

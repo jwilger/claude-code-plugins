@@ -27,9 +27,9 @@
     {
       "name": "sdlc-event-modeling",
       "source": "./sdlc-event-modeling",
-      "description": "Event Sourcing development using Martin Dilger's methodology",
+      "description": "Event Modeling (Adam Dymitruk's methodology) for event-sourced systems. Based on Martin Dilger's book.",
       "version": "1.0.0",
-      "keywords": ["event-sourcing", "event-modeling", "dilger", "gwt", "cqrs", "ddd"],
+      "keywords": ["event-sourcing", "event-modeling", "adam-dymitruk", "dilger", "gwt", "cqrs", "ddd"],
       "dependencies": ["sdlc-core"]
     },
     {

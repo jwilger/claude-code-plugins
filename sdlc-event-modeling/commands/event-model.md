@@ -1,11 +1,11 @@
 ---
-description: Event sourcing development using Dilger's methodology
+description: Event sourcing development using Event Modeling methodology
 argument-hint: [action] [workflow-name]
 ---
 
 # Event Model Command
 
-You are helping with event-sourced system development following Martin Dilger's "Understanding Eventsourcing" methodology.
+You are helping with event-sourced system development following the Event Modeling methodology (created by Adam Dymitruk, documented in Martin Dilger's "Understanding Eventsourcing" book).
 
 **Arguments provided:** $ARGUMENTS
 
@@ -65,7 +65,7 @@ After the analysis returns, follow its instructions to run the other event-model
 Display:
 
 ```
-/event-model - Event Sourcing Development
+/event-model - Event Sourcing Development (Adam Dymitruk's Event Modeling)
 
 Actions:
   /event-model start              - Begin brainstorming session
@@ -80,6 +80,4 @@ The Four Patterns:
   State View    - Events → Read Model (query)
   Automation    - Event → Process → Command → Event
   Translation   - External → Internal (anti-corruption)
-
-Full reference: ${CLAUDE_PLUGIN_ROOT}/docs/event-sourcing/methodology.md
 ```
