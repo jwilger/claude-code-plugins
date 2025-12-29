@@ -6,6 +6,5 @@
     "name": "John Wilger",
     "email": "john@johnwilger.com"
   },
-  "keywords": ["github", "issues", "sub-issues", "blocking", "project-management"],
-  "hooks": "./hooks/hooks.json"
+  "keywords": ["github", "issues", "sub-issues", "blocking", "project-management"]
 }
