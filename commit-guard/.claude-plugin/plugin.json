@@ -1,0 +1,10 @@
+{
+  "name": "commit-guard",
+  "version": "1.0.0",
+  "description": "Prevents commits to protected branches, merged PR branches, and warns about stale branches",
+  "author": {
+    "name": "John Wilger",
+    "email": "john@johnwilger.com"
+  },
+  "keywords": ["git", "branch-protection", "commit", "safety", "workflow"]
+}
