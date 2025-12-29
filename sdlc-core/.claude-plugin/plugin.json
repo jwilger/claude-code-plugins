@@ -7,7 +7,6 @@
     "email": "john@johnwilger.com"
   },
   "keywords": ["sdlc", "memory", "memento", "conventions", "development"],
-  "hooks": "./hooks/hooks.json",
   "skills": "./skills/",
   "outputStyles": "./styles/"
 }

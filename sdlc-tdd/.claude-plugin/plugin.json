@@ -7,5 +7,6 @@
     "email": "john@johnwilger.com"
   },
   "keywords": ["tdd", "testing", "red-green-refactor", "domain-modeling", "mutation-testing"],
-  "commands": "./commands/"
+  "commands": "./commands/",
+  "agents": "./agents/"
 }
