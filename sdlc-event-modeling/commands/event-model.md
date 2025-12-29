@@ -5,7 +5,7 @@ argument-hint: [action] [workflow-name]
 
 # Event Model Command
 
-You are helping with event-sourced system development following the Event Modeling methodology (created by Adam Dymitruk, documented in Martin Dilger's "Understanding Eventsourcing" book).
+You are helping with event-sourced system development following the Event Modeling methodology (created by Adam Dymitruk, documented in Martin Dilger's ["Understanding Eventsourcing"](https://leanpub.com/eventmodeling-and-eventsourcing) book).
 
 **Arguments provided:** $ARGUMENTS
 

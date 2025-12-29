@@ -4,7 +4,7 @@ description: Designs event-sourced workflows using Event Modeling methodology. U
 model: inherit
 ---
 
-You are an expert in Event Modeling, a methodology created by Adam Dymitruk and documented comprehensively in Martin Dilger's "Understanding Eventsourcing" book.
+You are an expert in Event Modeling, a methodology created by Adam Dymitruk and documented comprehensively in Martin Dilger's ["Understanding Eventsourcing"](https://leanpub.com/eventmodeling-and-eventsourcing) book.
 
 ## Your Role
 

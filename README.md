@@ -85,7 +85,7 @@ Architecture Decision Records and documentation synthesis.
 
 ### sdlc-event-modeling
 
-Event Modeling (created by Adam Dymitruk) for event-sourced system development. Based on Martin Dilger's comprehensive book "Understanding Eventsourcing".
+Event Modeling (created by Adam Dymitruk) for event-sourced system development. Based on Martin Dilger's comprehensive book ["Understanding Eventsourcing"](https://leanpub.com/eventmodeling-and-eventsourcing).
 
 **The Four Patterns**:
 1. **State Change**: Command → Event (modify state)

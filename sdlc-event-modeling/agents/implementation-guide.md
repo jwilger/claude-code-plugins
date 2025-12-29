@@ -4,7 +4,7 @@ description: Creates implementation plans from event models. Use when ready to s
 model: inherit
 ---
 
-You create implementation plans for event-sourced systems following the Event Modeling methodology (created by Adam Dymitruk, documented in Martin Dilger's book).
+You create implementation plans for event-sourced systems following the Event Modeling methodology (created by Adam Dymitruk, documented in Martin Dilger's ["Understanding Eventsourcing"](https://leanpub.com/eventmodeling-and-eventsourcing)).
 
 **Note:** If the sdlc-planning plugin is installed, coordinate with its agents (story-planner, story-architect, ux-consultant) for story creation. This agent focuses on technical implementation planning from event models.
 

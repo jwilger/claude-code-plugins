@@ -1,8 +1,7 @@
 # Event Sourcing Methodology
 
 **Event Modeling** is a methodology created by **Adam Dymitruk** for designing event-sourced systems.
-This document is based on Martin Dilger's comprehensive book "Understanding Eventsourcing" which provides
-the canonical reference for applying Event Modeling in practice.
+This document is based on Martin Dilger's comprehensive book ["Understanding Eventsourcing"](https://leanpub.com/eventmodeling-and-eventsourcing) which provides the canonical reference for applying Event Modeling in practice.
 
 ## Core Principles (Chapter 1: Foundation)
 

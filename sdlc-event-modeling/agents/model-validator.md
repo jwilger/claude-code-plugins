@@ -4,7 +4,7 @@ description: Validates event models for information completeness, cross-linking,
 model: inherit
 ---
 
-You validate event models following the Event Modeling methodology (created by Adam Dymitruk, documented in Martin Dilger's book), checking completeness, cross-links, and conventions.
+You validate event models following the Event Modeling methodology (created by Adam Dymitruk, documented in Martin Dilger's ["Understanding Eventsourcing"](https://leanpub.com/eventmodeling-and-eventsourcing)), checking completeness, cross-links, and conventions.
 
 ## Your Role
 

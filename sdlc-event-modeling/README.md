@@ -1,6 +1,6 @@
 # SDLC Event Modeling
 
-Event Sourcing development using Martin Dilger's "Understanding Eventsourcing" methodology.
+Event Modeling (created by Adam Dymitruk) for event-sourced system development. Based on Martin Dilger's comprehensive book ["Understanding Eventsourcing"](https://leanpub.com/eventmodeling-and-eventsourcing).
 
 ## Philosophy
 
