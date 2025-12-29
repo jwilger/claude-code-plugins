@@ -1,0 +1,11 @@
+{
+  "name": "github-projects",
+  "version": "1.0.0",
+  "description": "GitHub Projects V2 Kanban board management with status/priority workflows",
+  "author": {
+    "name": "John Wilger",
+    "email": "john@johnwilger.com"
+  },
+  "keywords": ["github", "projects", "kanban", "board", "status", "priority", "workflow"],
+  "dependencies": ["github-issues"]
+}
