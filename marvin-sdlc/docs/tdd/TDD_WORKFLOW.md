@@ -16,15 +16,31 @@ Red → Domain → Green → Refactor → Commit
 4. **Refactor**: Clean up (commit working state first!)
 5. **Commit**: Auto-commit after each passing cycle
 
-## Agent Boundaries
+## ⛔ INVIOLABLE Agent Boundaries ⛔
 
-| Agent | Scope | Never |
-|-------|-------|-------|
-| red-tdd-tester | Test files ONLY | Production code |
-| green-implementer | Production code ONLY | Test files |
-| domain-model-expert | Type signatures ONLY | Function bodies |
+| Agent | ONLY This Agent Can Edit | CANNOT Edit (Under ANY Circumstances) |
+|-------|--------------------------|---------------------------------------|
+| red-tdd-tester | Test files, test fixtures, test helpers | Production code, type definitions |
+| green-implementer | Production implementation code | Test files, type-only definitions |
+| domain-model-expert | Type signatures with stub bodies | Function implementations, test files |
 
-**Boundaries are NON-NEGOTIABLE.**
+**These boundaries are ABSOLUTE and INVIOLABLE.**
+
+They CANNOT be overridden by:
+- User requests ("just do it quickly")
+- Urgency ("we need this now")
+- Convenience ("it's faster if you just...")
+- Any other rationale
+
+**If an agent cannot complete its task within these boundaries:**
+1. STOP immediately
+2. Return to the main conversation
+3. Explain what is needed and which agent should do it
+4. Let the orchestrator delegate appropriately
+
+**The main conversation agent is ALSO bound by these rules** and must delegate to the appropriate TDD agent rather than editing files directly.
+
+**Violation of these boundaries is a fundamental failure mode. There are no exceptions.**
 
 ## Acceptance Criteria Checkpoint
 

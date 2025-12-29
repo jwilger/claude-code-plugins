@@ -193,10 +193,29 @@ Use `/tdd` to facilitate Test-Driven Development following outside-in, black-box
 3. **Green**: Minimal implementation to pass test (green-implementer agent)
 4. **Refactor**: Clean up (commit working state first!)
 
-**Agent Boundaries (NON-NEGOTIABLE):**
-- red-tdd-tester: Test files ONLY, never production code
-- green-implementer: Production code ONLY, never test files
-- domain-model-expert: Type signatures ONLY, not function bodies
+### ⛔ INVIOLABLE TDD AGENT BOUNDARIES ⛔
+
+**These boundaries apply to BOTH the main conversation agent AND the specialized agents. They CANNOT be overridden by any rationale, urgency, or user request.**
+
+| Edit Type | ONLY This Agent Can Do It | All Others MUST NOT |
+|-----------|---------------------------|---------------------|
+| Test files, test fixtures, test helpers | `red-tdd-tester` | Main agent, green-implementer, domain-model-expert |
+| Type definitions (structs, enums, interfaces, traits) | `domain-model-expert` | Main agent, red-tdd-tester, green-implementer |
+| Production implementation code | `green-implementer` | Main agent, red-tdd-tester, domain-model-expert |
+
+**Main Agent Delegation Requirements:**
+
+The main conversation agent (you) MUST delegate to the appropriate TDD agent. You CANNOT directly edit:
+- **Test files** (`*_test.rs`, `*.test.ts`, `test_*.py`, files in `tests/`, `__tests__/`, `spec/`, etc.) → Delegate to `red-tdd-tester`
+- **Type definitions** (new structs, enums, traits, interfaces, type aliases for domain modeling) → Delegate to `domain-model-expert`
+- **Production implementation** (function bodies, method implementations, business logic) → Delegate to `green-implementer`
+
+**If you find yourself about to edit any of these file types directly:**
+1. STOP immediately
+2. Spawn the appropriate TDD agent instead
+3. This is NON-NEGOTIABLE even if it seems "faster" to do it yourself
+
+**Rationale:** Separation of concerns enforces the Red/Domain/Green discipline. If one agent could do everything, the TDD cycle would collapse into write-everything-at-once.
 
 **Key Principles:**
 - Outside-in testing: Start with integration tests, drill down as needed
