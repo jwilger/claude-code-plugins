@@ -6,15 +6,47 @@
   },
   "metadata": {
     "description": "Claude Code plugins for professional development workflows and GitHub integration",
-    "version": "1.2.0"
+    "version": "2.0.0"
   },
   "plugins": [
     {
-      "name": "marvin-sdlc",
-      "source": "./marvin-sdlc",
-      "description": "Coherent workflow system with TDD, Event Sourcing, ADR, and Story Planning",
-      "version": "1.0.7",
-      "keywords": ["tdd", "event-sourcing", "adr", "domain-modeling", "marvin"]
+      "name": "sdlc-core",
+      "source": "./sdlc-core",
+      "description": "Core SDLC foundations: Marvin persona output style, memory protocol, shared conventions",
+      "version": "1.0.0",
+      "keywords": ["sdlc", "memory", "memento", "marvin", "conventions"]
+    },
+    {
+      "name": "sdlc-architecture",
+      "source": "./sdlc-architecture",
+      "description": "Architecture Decision Records and ARCHITECTURE.md synthesis (events/projection pattern)",
+      "version": "1.0.0",
+      "keywords": ["architecture", "adr", "decisions", "documentation", "design"],
+      "dependencies": ["sdlc-core"]
+    },
+    {
+      "name": "sdlc-event-modeling",
+      "source": "./sdlc-event-modeling",
+      "description": "Event Modeling (Adam Dymitruk's methodology) for event-sourced systems. Based on Martin Dilger's book.",
+      "version": "1.0.0",
+      "keywords": ["event-sourcing", "event-modeling", "adam-dymitruk", "dilger", "gwt", "cqrs", "ddd"],
+      "dependencies": ["sdlc-core"]
+    },
+    {
+      "name": "sdlc-planning",
+      "source": "./sdlc-planning",
+      "description": "Story planning with three-perspective review (business, technical, UX)",
+      "version": "1.0.0",
+      "keywords": ["planning", "stories", "agile", "review", "ux", "business"],
+      "dependencies": ["sdlc-core"]
+    },
+    {
+      "name": "sdlc-tdd",
+      "source": "./sdlc-tdd",
+      "description": "Test-Driven Development workflow with Red/Green/Refactor cycle and domain modeling",
+      "version": "1.0.0",
+      "keywords": ["tdd", "testing", "red-green-refactor", "domain-modeling", "mutation-testing"],
+      "dependencies": ["sdlc-core"]
     },
     {
       "name": "github-issues",
@@ -28,7 +60,17 @@
       "source": "./github-projects",
       "description": "GitHub Projects V2 Kanban board management with status/priority workflows",
       "version": "1.0.0",
-      "keywords": ["github", "projects", "kanban", "board", "status", "priority", "workflow", "gh-cli"]
+      "keywords": ["github", "projects", "kanban", "board", "status", "priority", "workflow", "gh-cli"],
+      "dependencies": ["github-issues"]
+    },
+    {
+      "name": "marvin-sdlc",
+      "source": "./marvin-sdlc",
+      "description": "[DEPRECATED] Use sdlc-core + sdlc-* plugins instead. Legacy monolithic SDLC plugin.",
+      "version": "1.0.7",
+      "keywords": ["tdd", "event-sourcing", "adr", "domain-modeling", "marvin", "deprecated"],
+      "deprecated": true,
+      "deprecationMessage": "This plugin has been split into modular components: sdlc-core, sdlc-architecture, sdlc-event-modeling, sdlc-planning, sdlc-tdd. Please migrate to the new plugins."
     }
   ]
 }

@@ -1,0 +1,11 @@
+{
+  "name": "sdlc-architecture",
+  "version": "1.0.0",
+  "description": "Architecture Decision Records (ADRs) and ARCHITECTURE.md synthesis following the events/projection pattern",
+  "author": {
+    "name": "John Wilger",
+    "email": "john@johnwilger.com"
+  },
+  "keywords": ["architecture", "adr", "decisions", "documentation", "design"],
+  "dependencies": ["sdlc-core"]
+}

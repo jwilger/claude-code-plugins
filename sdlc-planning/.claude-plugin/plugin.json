@@ -1,0 +1,13 @@
+{
+  "name": "sdlc-planning",
+  "version": "1.0.0",
+  "description": "Story planning with three-perspective review (business, technical, UX) aligned with event models",
+  "author": {
+    "name": "John Wilger",
+    "email": "john@johnwilger.com"
+  },
+  "keywords": ["planning", "stories", "agile", "review", "ux", "business"],
+  "dependencies": ["sdlc-core"],
+  "commands": "./commands/",
+  "agents": "./agents/"
+}
