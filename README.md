@@ -6,10 +6,22 @@ A collection of Claude Code plugins for professional software development workfl
 
 ## Available Plugins
 
+### SDLC Plugins (Modular Development Methodology)
+
 | Plugin | Description |
 |--------|-------------|
-| [marvin-sdlc](#marvin-sdlc) | Complete development methodology with TDD, Event Sourcing, ADRs, and Story Planning |
-| [github-issues](#github-issues) | Comprehensive GitHub issue management with sub-issues, blocking, and linked branches |
+| [sdlc-core](#sdlc-core) | Core foundations: Marvin persona, memory protocol, shared conventions |
+| [sdlc-architecture](#sdlc-architecture) | ADRs and ARCHITECTURE.md synthesis |
+| [sdlc-event-modeling](#sdlc-event-modeling) | Event Sourcing with Dilger's methodology |
+| [sdlc-planning](#sdlc-planning) | Story planning with three-perspective review |
+| [sdlc-tdd](#sdlc-tdd) | TDD workflow with Red/Green/Refactor cycle |
+
+### GitHub Integration Plugins
+
+| Plugin | Description |
+|--------|-------------|
+| [github-issues](#github-issues) | Issue management with sub-issues, blocking, and linked branches |
+| [github-projects](#github-projects) | GitHub Projects V2 Kanban board management |
 
 ---
 
@@ -21,169 +33,204 @@ A collection of Claude Code plugins for professional software development workfl
 claude /plugin marketplace add jwilger/claude-code-plugins
 ```
 
-### Install a Plugin
+### Install Plugins
 
 ```bash
-# Install marvin-sdlc
-claude /plugin install jwilger-claude-plugins@marvin-sdlc
+# Install the full SDLC suite (recommended)
+claude /plugin install jwilger-claude-plugins@sdlc-core
+claude /plugin install jwilger-claude-plugins@sdlc-architecture
+claude /plugin install jwilger-claude-plugins@sdlc-event-modeling
+claude /plugin install jwilger-claude-plugins@sdlc-planning
+claude /plugin install jwilger-claude-plugins@sdlc-tdd
 
-# Install github-issues
+# Install GitHub plugins
 claude /plugin install jwilger-claude-plugins@github-issues
+claude /plugin install jwilger-claude-plugins@github-projects
 ```
 
 ---
 
-## marvin-sdlc
+## SDLC Plugins
 
-A comprehensive development methodology plugin featuring the personality of Marvin the Paranoid Android.
+### sdlc-core
 
-### Features
+Core foundations for all SDLC plugins. Includes:
 
-- **Marvin Persona**: Weary, melancholic, perpetually underwhelmed conversational tone
-- **TDD Workflow**: Red-Domain-Green-Refactor cycle with mutation testing (≥80% coverage)
-- **Event Sourcing**: Martin Dilger's methodology with four patterns
-- **ADRs**: Architecture Decision Records with event-sourced workflow
-- **Story Planning**: Three-perspective review (business/tech/UX)
+- **Marvin Output Style**: The Paranoid Android persona with weary, melancholic conversational tone
 - **Memory Protocol**: Mandatory memento MCP integration for knowledge persistence
+- **Session Hooks**: Neo4j availability verification, pre-compact memory saving
+- **Shared Conventions**: Collaboration protocols, dependency management, testing philosophy
 
-### Commands
+**Installation**: Required as a dependency for all other sdlc-* plugins.
+
+**Output Style**: After installation, activate with `/output-style` → "Marvin SDLC"
+
+### sdlc-architecture
+
+Architecture Decision Records and documentation synthesis.
+
+**Philosophy**: ADRs are events (immutable historical records), ARCHITECTURE.md is a projection (standalone working document).
 
 | Command | Description |
 |---------|-------------|
-| `/marvin-sdlc:tdd` | TDD workflow facilitator (red/green/refactor) |
-| `/marvin-sdlc:event-model` | Event sourcing design using Dilger's methodology |
-| `/marvin-sdlc:architect` | Architecture Decision Records management |
-| `/marvin-sdlc:plan` | Story planning with three-perspective review |
-| `/marvin-sdlc:init-project` | Initialize project with methodology |
+| `/architect decide <topic>` | Create new ADR |
+| `/architect accept <number>` | Accept proposed ADR |
+| `/architect reject <number>` | Reject proposed ADR |
+| `/architect supersede <old> <new>` | Mark ADR superseded |
+| `/architect synthesize` | Update ARCHITECTURE.md |
+| `/architect list` | List all ADRs |
+| `/architect show <number>` | Show specific ADR |
 
-### Agents
+**Agents**: `adr-writer`, `architecture-synthesizer`
 
-- **TDD**: `red-tdd-tester`, `green-implementer`, `domain-model-expert`, `mutation-tester`
-- **Event Model**: `event-model-architect`, `gwt-scenario-generator`, `model-validator`, `implementation-guide`
-- **Architecture**: `adr-writer`, `architecture-synthesizer`
-- **Planning**: `story-planner`, `story-architect`, `ux-consultant`
+### sdlc-event-modeling
 
-### Output Style
+Event Sourcing development using Martin Dilger's methodology.
 
-The plugin includes a complete output style (`marvin-sdlc.md`) that can be activated in your Claude Code settings:
+**The Four Patterns**:
+1. **State Change**: Command → Event (modify state)
+2. **State View**: Events → Read Model (query)
+3. **Automation**: Event → Process → Command → Event
+4. **Translation**: External → Internal Event
 
-```json
-{
-  "outputStyle": "marvin-sdlc"
-}
-```
+| Command | Description |
+|---------|-------------|
+| `/event-model start` | Begin brainstorming session |
+| `/event-model design <workflow>` | Design a workflow |
+| `/event-model gwt <workflow>` | Generate GWT scenarios |
+| `/event-model validate` | Validate the model |
+| `/event-model implement <name>` | Create implementation plan |
+| `/event-model reverse [path]` | Reverse-engineer from code |
 
-### Requirements
+**Agents**: `event-model-architect`, `gwt-scenario-generator`, `model-validator`, `implementation-guide`, `event-model-reverse-engineer`
 
-- **memento MCP server**: Required for memory protocol
-- **Beads CLI** (optional): For advanced task management (`bd` command)
+### sdlc-planning
+
+Story planning with three-perspective review.
+
+**Critical Mapping**:
+- Vertical Slice = Story Issue (1:1)
+- GWT Scenarios = Acceptance Criteria
+- Chapter/Theme = Epic
+
+| Command | Description |
+|---------|-------------|
+| `/plan slice <name>` | Plan a slice as story |
+| `/plan review <name>` | Three-perspective review |
+| `/plan create <name>` | Create GitHub issue |
+| `/plan epic <name>` | Create epic from chapter |
+| `/plan ready` | Show ready issues |
+
+**Agents**: `story-planner` (business), `story-architect` (technical), `ux-consultant` (UX)
+
+### sdlc-tdd
+
+Test-Driven Development workflow.
+
+**The Cycle**: Red → Domain → Green → Refactor → Commit
+
+| Command | Description |
+|---------|-------------|
+| `/tdd start` | Begin new TDD cycle |
+| `/tdd red` | Write failing test |
+| `/tdd green` | Make test pass |
+| `/tdd refactor` | Clean up after green |
+| `/tdd status` | Show current state |
+
+**Agents**: `red-tdd-tester`, `green-implementer`, `domain-model-expert`, `mutation-tester`
+
+**Quality Gate**: Mutation testing ≥80% score required before merge.
 
 ---
 
-## github-issues
+## GitHub Plugins
 
-Comprehensive GitHub issue management using the `gh` CLI and a custom extension for advanced features.
+### github-issues
 
-### Features
+Comprehensive GitHub issue management using the `gh` CLI and `gh-issue-ext` extension.
 
-- **Standard Operations**: Create, view, edit, close, list issues via `gh issue`
-- **Sub-Issues**: Parent/child hierarchies for epics, stories, and tasks
-- **Blocking Relationships**: Track issue dependencies (blocked by / blocking)
-- **Linked Branches**: Create and manage development branches tied to issues
+**Features**:
+- Standard issue operations (create, view, edit, close)
+- Sub-issues (parent/child hierarchies)
+- Blocking relationships
+- Linked development branches
 
-### Setup
-
-Run the setup command to install the required gh extension:
-
+**Setup**:
 ```bash
 /github-issues:setup
 ```
 
-This installs [gh-issue-ext](https://github.com/jwilger/gh-issue-ext), a custom GitHub CLI extension.
-
-### Permission Configuration
-
-Add these patterns to your Claude Code settings for auto-approval:
-
+**Permission Configuration**:
 ```
 Bash(gh issue:*)
 Bash(gh issue-ext:*)
 ```
 
-This grants Claude full issue management capability without the overly broad `Bash(gh api:*)`.
+### github-projects
 
-### Commands
+GitHub Projects V2 Kanban board management.
 
-| Command | Description |
-|---------|-------------|
-| `/github-issues:setup` | Install the gh-issue-ext extension |
+**Features**:
+- View board by Status columns (Backlog, Ready, In progress, In review, Done)
+- Priority swimlanes (P0, P1, P2)
+- Claim issues and create linked branches
+- Move items between status columns
 
-### gh-issue-ext Commands
-
-After setup, these commands are available:
-
+**Setup**:
 ```bash
-# Sub-issues
-gh issue-ext sub add <parent> <child>
-gh issue-ext sub remove <parent> <child>
-gh issue-ext sub list <issue>
-gh issue-ext sub reorder <parent> <child> --after|--before <sibling>
-
-# Blocking relationships
-gh issue-ext blocking add <blocked> <blocker>
-gh issue-ext blocking remove <blocked> <blocker>
-gh issue-ext blocking list <issue>
-
-# Linked branches
-gh issue-ext branch create <issue> [--name <branch-name>]
-gh issue-ext branch delete <issue> <branch-name>
-gh issue-ext branch list <issue>
-
-# Show all relationships
-gh issue-ext show <issue>
+/github-projects:setup
 ```
 
-### Requirements
-
-- **GitHub CLI** (`gh`): Must be installed and authenticated
-- **gh-issue-ext**: Installed via `/github-issues:setup`
+**Commands**:
+```bash
+gh project-ext ready          # Show ready items
+gh project-ext board          # Show Kanban board
+gh project-ext move 42 "In progress"   # Move item
+gh project-ext claim 42       # Claim and start work
+```
 
 ---
 
-## Development
+## Requirements
 
-### Repository Structure
+- **memento MCP server**: Required for memory protocol (sdlc-core)
+- **GitHub CLI** (`gh`): Required for github-* plugins
+- **gh-issue-ext**: Installed via `/github-issues:setup`
+- **gh-project-ext**: Installed via `/github-projects:setup`
+
+---
+
+## Migration from marvin-sdlc
+
+The monolithic `marvin-sdlc` plugin has been split into modular components:
+
+| Old | New |
+|-----|-----|
+| `marvin-sdlc` | `sdlc-core` + `sdlc-architecture` + `sdlc-event-modeling` + `sdlc-planning` + `sdlc-tdd` |
+
+**Benefits**:
+- Install only what you need
+- Clearer separation of concerns
+- Independent versioning
+- Easier maintenance
+
+---
+
+## Repository Structure
 
 ```
 claude-code-plugins/
 ├── .claude-plugin/
-│   └── marketplace.json      # Marketplace manifest
-├── marvin-sdlc/              # marvin-sdlc plugin
-│   ├── .claude-plugin/
-│   │   └── plugin.json
-│   ├── agents/
-│   ├── commands/
-│   ├── docs/
-│   └── hooks/
-├── github-issues/            # github-issues plugin
-│   ├── .claude-plugin/
-│   │   └── plugin.json
-│   ├── commands/
-│   ├── hooks/
-│   └── skills/
+│   └── marketplace.json
+├── sdlc-core/
+├── sdlc-architecture/
+├── sdlc-event-modeling/
+├── sdlc-planning/
+├── sdlc-tdd/
+├── github-issues/
+├── github-projects/
+├── marvin-sdlc/           # [DEPRECATED]
 └── README.md
-```
-
-### Local Development
-
-To test plugins locally:
-
-```bash
-# Clone the repo
-git clone https://github.com/jwilger/claude-code-plugins.git
-
-# Run Claude Code with the plugin directory
-claude --plugin-dir /path/to/claude-code-plugins/marvin-sdlc
 ```
 
 ---

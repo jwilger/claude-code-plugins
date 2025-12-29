@@ -1,0 +1,13 @@
+{
+  "name": "sdlc-event-modeling",
+  "version": "1.0.0",
+  "description": "Event Sourcing development using Martin Dilger's methodology - workflow design, GWT scenarios, model validation",
+  "author": {
+    "name": "John Wilger",
+    "email": "john@johnwilger.com"
+  },
+  "keywords": ["event-sourcing", "event-modeling", "dilger", "gwt", "cqrs", "ddd"],
+  "dependencies": ["sdlc-core"],
+  "commands": "./commands/",
+  "agents": "./agents/"
+}

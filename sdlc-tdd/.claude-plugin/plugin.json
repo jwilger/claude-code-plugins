@@ -1,0 +1,13 @@
+{
+  "name": "sdlc-tdd",
+  "version": "1.0.0",
+  "description": "Test-Driven Development workflow with Red/Green/Refactor cycle and domain modeling",
+  "author": {
+    "name": "John Wilger",
+    "email": "john@johnwilger.com"
+  },
+  "keywords": ["tdd", "testing", "red-green-refactor", "domain-modeling", "mutation-testing"],
+  "dependencies": ["sdlc-core"],
+  "commands": "./commands/",
+  "agents": "./agents/"
+}

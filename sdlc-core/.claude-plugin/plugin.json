@@ -1,0 +1,13 @@
+{
+  "name": "sdlc-core",
+  "version": "1.0.0",
+  "description": "Core SDLC foundations: memory protocol verification, shared conventions for software development workflows",
+  "author": {
+    "name": "John Wilger",
+    "email": "john@johnwilger.com"
+  },
+  "keywords": ["sdlc", "memory", "memento", "conventions", "development"],
+  "hooks": "./hooks/hooks.json",
+  "skills": "./skills/",
+  "outputStyles": "./styles/"
+}
