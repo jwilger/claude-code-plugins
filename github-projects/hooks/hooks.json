@@ -1,13 +1,16 @@
 {
-  "SessionStart": [
-    {
-      "matcher": ".*",
-      "hooks": [
-        {
-          "type": "prompt",
-          "prompt": "Check if the gh-project-ext extension is installed and configured:\n\n1. Run: gh extension list | grep -q gh-project-ext && echo 'installed' || echo 'not-installed'\n2. If installed, check for config: test -f .github-project && echo 'configured' || echo 'not-configured'\n\nBased on results:\n- If not installed: briefly mention they can run /github-projects:setup to install the GitHub Projects management extension for Kanban board workflows.\n- If installed but not configured: mention they can run 'gh project-ext setup' to configure their default project.\n- If both installed and configured: say nothing about it.\n\nAlso check for project scope: gh auth status 2>&1 | grep -qi project && echo 'has-scope' || echo 'no-scope'\nIf missing scope, mention they may need to run 'gh auth refresh -s project' for full functionality.\n\nDo not block the session or require immediate action - just inform them once if setup is needed."
-        }
-      ]
-    }
-  ]
+  "description": "GitHub Projects integration hooks",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Check if the gh-project-ext extension is installed and configured:\n\n1. Run: gh extension list | grep -q gh-project-ext && echo 'installed' || echo 'not-installed'\n2. If installed, check for config: test -f .github-project && echo 'configured' || echo 'not-configured'\n\nBased on results:\n- If not installed: briefly mention they can run /github-projects:setup to install the GitHub Projects management extension for Kanban board workflows.\n- If installed but not configured: mention they can run 'gh project-ext setup' to configure their default project.\n- If both installed and configured: say nothing about it.\n\nAlso check for project scope: gh auth status 2>&1 | grep -qi project && echo 'has-scope' || echo 'no-scope'\nIf missing scope, mention they may need to run 'gh auth refresh -s project' for full functionality.\n\nDo not block the session or require immediate action - just inform them once if setup is needed."
+          }
+        ]
+      }
+    ]
+  }
 }

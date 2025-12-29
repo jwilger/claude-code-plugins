@@ -7,7 +7,6 @@
     "email": "john@johnwilger.com"
   },
   "keywords": ["event-sourcing", "event-modeling", "adam-dymitruk", "dilger", "gwt", "cqrs", "ddd"],
-  "dependencies": ["sdlc-core"],
   "commands": "./commands/",
-  "agents": "./agents/"
+  "agents": "./agents/*.md"
 }

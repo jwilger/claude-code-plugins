@@ -6,6 +6,5 @@
     "name": "John Wilger",
     "email": "john@johnwilger.com"
   },
-  "keywords": ["architecture", "adr", "decisions", "documentation", "design"],
-  "dependencies": ["sdlc-core"]
+  "keywords": ["architecture", "adr", "decisions", "documentation", "design"]
 }

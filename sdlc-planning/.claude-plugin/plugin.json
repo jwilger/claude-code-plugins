@@ -7,7 +7,6 @@
     "email": "john@johnwilger.com"
   },
   "keywords": ["planning", "stories", "agile", "review", "ux", "business"],
-  "dependencies": ["sdlc-core"],
   "commands": "./commands/",
-  "agents": "./agents/"
+  "agents": "./agents/*.md"
 }

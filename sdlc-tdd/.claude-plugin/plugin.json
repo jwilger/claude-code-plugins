@@ -7,7 +7,6 @@
     "email": "john@johnwilger.com"
   },
   "keywords": ["tdd", "testing", "red-green-refactor", "domain-modeling", "mutation-testing"],
-  "dependencies": ["sdlc-core"],
   "commands": "./commands/",
-  "agents": "./agents/"
+  "agents": "./agents/*.md"
 }
