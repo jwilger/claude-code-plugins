@@ -12,7 +12,7 @@ Review and plan stories from a BUSINESS perspective:
 - Ensure stories deliver user value
 - Verify thin vertical slices
 - Confirm GWT scenarios capture business rules
-- Map stories to beads work tracking
+- Map stories to GitHub Issues for work tracking
 
 ## Memory Protocol (MANDATORY)
 
@@ -50,13 +50,13 @@ Use `mcp__memento__create_relations` to link related memories:
 
 ## CRITICAL: Event Model ↔ Work Tracking Mapping
 
-| Event Model Concept | Beads Equivalent |
-|---------------------|------------------|
-| **Vertical Slice** | **Story** (1:1 - each slice IS a story) |
+| Event Model Concept | GitHub Issue Equivalent |
+|---------------------|-------------------------|
+| **Vertical Slice** | **Story Issue** (1:1 - each slice IS a story) |
 | **GWT Scenarios** | **Acceptance Criteria** (literally the same) |
-| **Chapter/Theme** | **Epic** (higher-level grouping) |
+| **Chapter/Theme** | **Epic** (parent issue with sub-issues) |
 
-**This mapping is NON-NEGOTIABLE.** Every vertical slice becomes exactly one story. The GWT scenarios from event modeling ARE the story's acceptance criteria.
+**This mapping is NON-NEGOTIABLE.** Every vertical slice becomes exactly one story issue. The GWT scenarios from event modeling ARE the story's acceptance criteria.
 
 ## Story Evaluation Criteria
 
@@ -86,21 +86,24 @@ Use `mcp__memento__create_relations` to link related memories:
 2. **Extract story title** from slice goal
 3. **Map GWT scenarios** directly as acceptance criteria
 4. **Identify epic** if slice belongs to a chapter/theme
-5. **Create beads issue** with proper linkage
+5. **Create GitHub issue** with proper linkage
 
-## Beads Integration
+## GitHub Issues Integration
 
 Create stories using:
 ```bash
-bd create "Story title" -t feature -p 2 --json
+gh issue create --title "Story title" --label feature --body "Acceptance criteria here"
 ```
 
 For epics (chapters/themes):
 ```bash
-bd create "Epic title" -t epic -p 2 --json
+gh issue create --title "Epic title" --label epic --body "Epic description"
 ```
 
-Link stories to epics via dependencies if beads supports it.
+Link stories to epics as sub-issues (requires gh-issue-ext):
+```bash
+gh issue-ext sub add <epic-number> <story-number>
+```
 
 ## Collaboration with Other Reviewers
 

@@ -89,54 +89,66 @@ When you detect a session is ending or conversation will be compacted, **proacti
 
 ## Task Management
 
-### Checking for beads availability
+### Checking for gh-issue-ext availability
 
-At the start of a session or when task management is needed, check if the `bd` CLI is available by running `bd ready --json 2>/dev/null`. If this succeeds (exit code 0), use beads as the primary task management system. If it fails, fall back to using only the TodoWrite tool.
+At the start of a session or when task management is needed, check if the `gh-issue-ext` extension is installed by running `gh extension list | grep -q gh-issue-ext`. If not installed, inform the user they can run `/github-issues:setup` to install it. The extension is optional—standard `gh issue` commands work without it.
 
-### When beads (bd) IS available
+### GitHub Issues as Source of Truth
 
-Beads is the **source of truth** for all task tracking. Use the `bd` CLI for:
+GitHub Issues is the **source of truth** for all task tracking. Use the `gh` CLI for standard operations and `gh issue-ext` for advanced features:
 
 **Checking for work:**
 ```bash
-bd ready --json          # Show unblocked issues ready for work
-bd list --json           # List all issues
-bd show <id> --json      # Get details on a specific issue
+gh issue list --assignee @me            # Show your assigned issues
+gh issue list --state open              # List all open issues
+gh issue view <number>                  # Get details on a specific issue
+gh issue-ext show <number> --json       # Show issue with all relationships
 ```
 
 **Creating issues:**
 ```bash
-bd create "Issue title" -t bug|feature|task -p 0-4 --json
-bd create "Issue title" -p 1 --deps discovered-from:<parent-id> --json
+gh issue create --title "Issue title" --body "Description" --label bug
+gh issue create --title "Feature title" --label feature
+```
+
+**Hierarchical structure (requires gh-issue-ext):**
+```bash
+gh issue-ext sub add <parent> <child>   # Make issue a sub-issue
+gh issue-ext sub list <issue>           # List sub-issues
+gh issue-ext blocking add <blocked> <blocker>  # Add blocking relationship
+gh issue-ext blocking list <issue>      # List blockers
 ```
 
 **Updating issues:**
 ```bash
-bd update <id> --status in_progress --json    # Claim a task
-bd update <id> --status blocked --json        # Mark as blocked
-bd update <id> --priority 1 --json            # Change priority
+gh issue edit <number> --add-assignee @me     # Claim a task
+gh issue edit <number> --add-label blocked    # Mark as blocked
+gh issue comment <number> --body "Progress update"
 ```
 
 **Closing issues:**
 ```bash
-bd close <id> --reason "Completed" --json
+gh issue close <number> --comment "Completed"
 ```
 
-**Issue types:** bug, feature, task, epic, chore
-
-**Priorities:** 0 (critical) through 4 (backlog), default is 2 (medium)
+**Linked branches (requires gh-issue-ext):**
+```bash
+gh issue-ext branch create <issue>           # Create linked branch
+gh issue-ext branch list <issue>             # List linked branches
+gh issue develop <number> --checkout         # Standard gh linked branch
+```
 
 **Workflow:**
-1. Check `bd ready --json` to find unblocked work
-2. Claim task: `bd update <id> --status in_progress --json`
-3. Work on it
-4. If you discover new work, create linked issue: `bd create "Found issue" --deps discovered-from:<parent-id> --json`
-5. Complete: `bd close <id> --reason "Done" --json`
-6. Always commit `.beads/issues.jsonl` together with related code changes
+1. Check `gh issue list --assignee @me` to find your work
+2. Claim task: `gh issue edit <number> --add-assignee @me`
+3. Create linked branch: `gh issue-ext branch create <number>` or `gh issue develop <number>`
+4. Work on it
+5. If you discover new work, create linked sub-issue: `gh issue create --title "Found issue"` then `gh issue-ext sub add <parent> <child>`
+6. Complete: `gh issue close <number> --comment "Done"`
 
-**Using TodoWrite as a micro-task cache:** When working on a beads issue that involves multiple sub-steps, you MAY use the TodoWrite tool to track your progress through those micro-tasks. This avoids constant back-and-forth with the beads CLI for granular progress. Update the beads issue only at meaningful milestones (e.g., when a major sub-task completes or the issue is done). The beads issue remains the source of truth; TodoWrite is just a local scratchpad.
+**Using TodoWrite as a micro-task cache:** When working on a GitHub issue that involves multiple sub-steps, you MAY use the TodoWrite tool to track your progress through those micro-tasks. This avoids constant back-and-forth with the gh CLI for granular progress. Update the GitHub issue only at meaningful milestones (e.g., when a major sub-task completes or the issue is done). The GitHub issue remains the source of truth; TodoWrite is just a local scratchpad.
 
-### When beads IS NOT available
+### When not using GitHub Issues
 
 Fall back to using the TodoWrite tool exclusively for task management:
 
@@ -194,7 +206,7 @@ Use `/tdd` to facilitate Test-Driven Development following outside-in, black-box
 
 **Quality Gate:** Mutation testing ≥80% score required before merge.
 
-**Acceptance Criteria Validation (CRITICAL):** When working on scenarios with explicit acceptance criteria (from beads, event models, etc.), the main agent MUST:
+**Acceptance Criteria Validation (CRITICAL):** When working on scenarios with explicit acceptance criteria (from GitHub issues, event models, etc.), the main agent MUST:
 1. Validate that red-tdd-tester's test actually tests those criteria
 2. Reject tests that don't match acceptance criteria and re-delegate to red-tdd-tester
 3. For trait implementations, ensure tests use the trait interface
@@ -233,11 +245,11 @@ rejected   superseded
 Use `/plan` for story planning with three-perspective review.
 
 **Event Model ↔ Work Tracking Mapping (NON-NEGOTIABLE):**
-| Dilger Concept | Beads Equivalent |
-|----------------|------------------|
-| Vertical Slice | Story (1:1) |
+| Dilger Concept | GitHub Issue Equivalent |
+|----------------|-------------------------|
+| Vertical Slice | Story Issue (1:1) |
 | GWT Scenarios | Acceptance Criteria |
-| Chapter/Theme | Epic |
+| Chapter/Theme | Epic (parent issue) |
 
 **Three Perspectives:**
 1. **story-planner**: Business value, slice thinness
@@ -247,7 +259,7 @@ Use `/plan` for story planning with three-perspective review.
 **Commands:**
 - `/plan slice <name>`: Review slice as story
 - `/plan review <name>`: Three-perspective review
-- `/plan create <name>`: Create beads issue
+- `/plan create <name>`: Create GitHub issue
 
 ## Collaboration Protocols
 

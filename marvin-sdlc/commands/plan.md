@@ -11,13 +11,13 @@ You are facilitating story planning with three-perspective review aligned with t
 
 ## Critical Mapping
 
-| Event Model | Work Tracking (Beads) |
-|-------------|----------------------|
-| Vertical Slice | Story (1:1) |
+| Event Model | Work Tracking (GitHub Issues) |
+|-------------|------------------------------|
+| Vertical Slice | Story Issue (1:1) |
 | GWT Scenarios | Acceptance Criteria |
-| Chapter/Theme | Epic |
+| Chapter/Theme | Epic (parent issue) |
 
-**This is NON-NEGOTIABLE.** Each slice becomes exactly one story.
+**This is NON-NEGOTIABLE.** Each slice becomes exactly one story issue.
 
 ## Determine the Action
 
@@ -25,9 +25,9 @@ You are facilitating story planning with three-perspective review aligned with t
 |-------------------|--------|
 | `slice <name>` | Plan a single slice as story |
 | `review <name>` | Three-perspective review |
-| `create <name>` | Create beads issue for slice |
-| `epic <name>` | Create epic for chapter/theme |
-| `ready` | Show stories ready to implement |
+| `create <name>` | Create GitHub issue for slice |
+| `epic <name>` | Create epic (parent issue) for chapter/theme |
+| `ready` | Show issues ready to implement |
 | (no args or `help`) | Show help |
 
 ## Execute the Action
@@ -68,33 +68,41 @@ After all three return:
 1. Summarize each perspective's findings
 2. Highlight any conflicts between perspectives
 3. Ask user to resolve conflicts before proceeding
-4. If all clear, offer to create beads issue
+4. If all clear, offer to create GitHub issue
 
 ### For Create Story (`create <name>`)
 
-Using beads CLI:
+Using GitHub CLI:
 
 ```bash
-bd create "<Story title from slice>" -t feature -p 2 --json
+gh issue create --title "<Story title from slice>" --label feature --body "## Acceptance Criteria
+
+<GWT scenarios from event model>"
 ```
 
-Add acceptance criteria as a comment or in the description.
+If linking to an epic (requires gh-issue-ext):
+```bash
+gh issue-ext sub add <epic-number> <new-story-number>
+```
 
 ### For Create Epic (`epic <name>`)
 
 For chapters/themes:
 
 ```bash
-bd create "<Epic title from chapter>" -t epic -p 2 --json
+gh issue create --title "<Epic title from chapter>" --label epic --body "Epic description"
 ```
 
 ### For Ready (`ready`)
 
 ```bash
-bd ready --json
+gh issue list --assignee @me --state open
 ```
 
-Show unblocked stories ready for implementation.
+Show issues assigned to you that are ready for implementation. For unblocked issues (requires gh-issue-ext):
+```bash
+gh issue-ext blocking list <issue>  # Check if issue has blockers
+```
 
 ### For Help (no args)
 
@@ -106,14 +114,14 @@ Display:
 Actions:
   /plan slice <name>   - Plan a slice as story
   /plan review <name>  - Three-perspective review
-  /plan create <name>  - Create beads issue
+  /plan create <name>  - Create GitHub issue
   /plan epic <name>    - Create epic from chapter
-  /plan ready          - Show ready stories
+  /plan ready          - Show ready issues
 
 The Mapping:
-  Vertical Slice = Story (1:1)
+  Vertical Slice = Story Issue (1:1)
   GWT Scenarios  = Acceptance Criteria
-  Chapter/Theme  = Epic
+  Chapter/Theme  = Epic (parent issue)
 
 Three Perspectives:
   Business (story-planner)  - Value, slice thinness
@@ -125,7 +133,7 @@ Workflow:
   2. /event-model gwt <workflow>     - Generate scenarios (acceptance criteria)
   3. /plan slice <name>              - Review as story
   4. /plan review <name>             - Three-perspective review
-  5. /plan create <name>             - Create beads issue
+  5. /plan create <name>             - Create GitHub issue
 
 Agents: story-planner, story-architect, ux-consultant
 ```
