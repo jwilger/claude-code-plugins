@@ -7,6 +7,12 @@
     "email": "john@johnwilger.com"
   },
   "keywords": ["event-sourcing", "event-modeling", "adam-dymitruk", "dilger", "gwt", "cqrs", "ddd"],
-  "commands": "./commands/",
-  "agents": "./agents/"
+  "commands": ["./commands/event-model.md"],
+  "agents": [
+    "./agents/event-model-architect.md",
+    "./agents/event-model-reverse-engineer.md",
+    "./agents/gwt-scenario-generator.md",
+    "./agents/implementation-guide.md",
+    "./agents/model-validator.md"
+  ]
 }

@@ -7,6 +7,10 @@
     "email": "john@johnwilger.com"
   },
   "keywords": ["planning", "stories", "agile", "review", "ux", "business"],
-  "commands": "./commands/",
-  "agents": "./agents/"
+  "commands": ["./commands/plan.md"],
+  "agents": [
+    "./agents/story-architect.md",
+    "./agents/story-planner.md",
+    "./agents/ux-consultant.md"
+  ]
 }

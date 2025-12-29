@@ -6,5 +6,11 @@
     "name": "John Wilger",
     "email": "john@johnwilger.com"
   },
-  "commands": "./commands/"
+  "commands": [
+    "./commands/architect.md",
+    "./commands/event-model.md",
+    "./commands/init-project.md",
+    "./commands/plan.md",
+    "./commands/tdd.md"
+  ]
 }

@@ -7,6 +7,11 @@
     "email": "john@johnwilger.com"
   },
   "keywords": ["tdd", "testing", "red-green-refactor", "domain-modeling", "mutation-testing"],
-  "commands": "./commands/",
-  "agents": "./agents/"
+  "commands": ["./commands/tdd.md"],
+  "agents": [
+    "./agents/domain-model-expert.md",
+    "./agents/green-implementer.md",
+    "./agents/mutation-tester.md",
+    "./agents/red-tdd-tester.md"
+  ]
 }

@@ -7,6 +7,9 @@
     "email": "john@johnwilger.com"
   },
   "keywords": ["sdlc", "memory", "memento", "conventions", "development"],
-  "skills": "./skills/",
-  "outputStyles": "./styles/"
+  "skills": [
+    "./skills/memory-protocol/SKILL.md",
+    "./skills/sdlc-conventions/SKILL.md"
+  ],
+  "outputStyles": ["./styles/marvin.md"]
 }
