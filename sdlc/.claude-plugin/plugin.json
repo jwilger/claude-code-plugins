@@ -1,12 +1,13 @@
 {
   "name": "sdlc",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "Complete SDLC workflow with TDD, Event Modeling, ADRs, and GitHub integration",
   "author": {
     "name": "John Wilger",
     "email": "john@johnwilger.com"
   },
   "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow"],
+  "hooks": "./hooks/hooks.json",
   "commands": [
     "./commands/setup.md",
     "./commands/work.md",
