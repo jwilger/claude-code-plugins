@@ -161,9 +161,9 @@ git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'
 
 **If on default branch (main/master):**
 
-Simply create the new branch:
+Simply create the new branch (use `--no-commit` to avoid empty commit issues when working directory is clean):
 ```bash
-gs branch create <issue-number>-<slug>
+gs branch create <issue-number>-<slug> --no-commit
 ```
 
 **If NOT on default branch:**
@@ -191,11 +191,11 @@ If "Start new stack from main":
 ```bash
 git checkout <default-branch>
 git pull --ff-only
-gs branch create <issue-number>-<slug>
+gs branch create <issue-number>-<slug> --no-commit
 ```
 If "Stack anyway":
 ```bash
-gs branch create <issue-number>-<slug>
+gs branch create <issue-number>-<slug> --no-commit
 ```
 
 **Scenario 2: PR exists but is merged**
@@ -214,7 +214,7 @@ If "Switch to main and pull":
 ```bash
 git checkout <default-branch>
 git pull --ff-only
-gs branch create <issue-number>-<slug>
+gs branch create <issue-number>-<slug> --no-commit
 ```
 
 **Scenario 3: PR exists and is open**
@@ -229,14 +229,14 @@ Use AskUserQuestion:
 
 If "Stack on current branch":
 ```bash
-gs branch create <issue-number>-<slug>
+gs branch create <issue-number>-<slug> --no-commit
 ```
 
 If "Start new stack from main":
 ```bash
 git checkout <default-branch>
 git pull --ff-only
-gs branch create <issue-number>-<slug>
+gs branch create <issue-number>-<slug> --no-commit
 ```
 
 **If using standard git:**
