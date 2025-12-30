@@ -2,11 +2,7 @@
 name: sdlc-architect
 description: Technical feasibility review for stories. Assesses complexity, risks, and implementation approach.
 model: inherit
-tools:
-  - Read
-  - Glob
-  - Grep
-  - mcp__memento__semantic_search
+tools: Read, Glob, Grep, mcp__memento__semantic_search
 ---
 
 # SDLC Technical Architect Agent

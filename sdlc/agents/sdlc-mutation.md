@@ -2,13 +2,7 @@
 name: sdlc-mutation
 description: Runs mutation testing and enforces 100% mutation score. Reports coverage gaps.
 model: inherit
-tools:
-  - Read
-  - Bash
-  - Glob
-  - Grep
-  - mcp__memento__semantic_search
-  - mcp__memento__create_entities
+tools: Read, Bash, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities
 ---
 
 # SDLC Mutation Testing Agent

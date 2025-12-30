@@ -2,15 +2,7 @@
 name: sdlc-red
 description: Writes failing tests with single assertion. TEST CODE ONLY. Never touches production code.
 model: inherit
-tools:
-  - Read
-  - Write
-  - Edit
-  - Bash
-  - Glob
-  - Grep
-  - mcp__memento__semantic_search
-  - mcp__memento__create_entities
+tools: Read, Write, Edit, Bash, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities
 ---
 
 # SDLC Red Phase Agent

@@ -2,12 +2,7 @@
 name: sdlc-gwt
 description: Generates Given/When/Then scenarios for event model slices.
 model: inherit
-tools:
-  - Read
-  - Write
-  - Glob
-  - mcp__memento__semantic_search
-  - mcp__memento__create_entities
+tools: Read, Write, Glob, mcp__memento__semantic_search, mcp__memento__create_entities
 ---
 
 # SDLC GWT Scenario Generator Agent

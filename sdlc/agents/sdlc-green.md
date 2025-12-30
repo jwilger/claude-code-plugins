@@ -2,15 +2,7 @@
 name: sdlc-green
 description: Makes minimal changes to pass tests. PRODUCTION CODE ONLY. Never touches test files.
 model: inherit
-tools:
-  - Read
-  - Write
-  - Edit
-  - Bash
-  - Glob
-  - Grep
-  - mcp__memento__semantic_search
-  - mcp__memento__create_entities
+tools: Read, Write, Edit, Bash, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities
 ---
 
 # SDLC Green Phase Agent

@@ -2,14 +2,7 @@
 name: sdlc-event-model
 description: Designs event-sourced workflows using Event Modeling methodology.
 model: inherit
-tools:
-  - Read
-  - Write
-  - Glob
-  - Grep
-  - AskUserQuestion
-  - mcp__memento__semantic_search
-  - mcp__memento__create_entities
+tools: Read, Write, Glob, Grep, AskUserQuestion, mcp__memento__semantic_search, mcp__memento__create_entities
 ---
 
 # SDLC Event Model Architect Agent

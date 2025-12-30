@@ -2,15 +2,7 @@
 name: sdlc-domain
 description: Creates domain types and signatures. TYPE DEFINITIONS ONLY. No implementations.
 model: inherit
-tools:
-  - Read
-  - Write
-  - Edit
-  - Bash
-  - Glob
-  - Grep
-  - mcp__memento__semantic_search
-  - mcp__memento__create_entities
+tools: Read, Write, Edit, Bash, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities
 ---
 
 # SDLC Domain Model Expert

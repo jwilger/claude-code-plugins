@@ -2,14 +2,7 @@
 name: sdlc-adr
 description: Creates Architecture Decision Records documenting WHY decisions were made.
 model: inherit
-tools:
-  - Read
-  - Write
-  - Glob
-  - Grep
-  - AskUserQuestion
-  - mcp__memento__semantic_search
-  - mcp__memento__create_entities
+tools: Read, Write, Glob, Grep, AskUserQuestion, mcp__memento__semantic_search, mcp__memento__create_entities
 ---
 
 # SDLC ADR Writer Agent

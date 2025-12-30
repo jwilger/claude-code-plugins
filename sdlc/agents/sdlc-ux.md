@@ -2,11 +2,7 @@
 name: sdlc-ux
 description: UX coherence review for stories. Ensures user journey consistency and accessibility.
 model: inherit
-tools:
-  - Read
-  - Glob
-  - Grep
-  - mcp__memento__semantic_search
+tools: Read, Glob, Grep, mcp__memento__semantic_search
 ---
 
 # SDLC UX Consultant Agent

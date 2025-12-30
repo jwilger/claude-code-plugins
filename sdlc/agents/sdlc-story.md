@@ -2,11 +2,7 @@
 name: sdlc-story
 description: Business perspective on stories. Enforces 1:1 vertical slice = story mapping. GWT scenarios ARE acceptance criteria.
 model: inherit
-tools:
-  - Read
-  - Glob
-  - Grep
-  - mcp__memento__semantic_search
+tools: Read, Glob, Grep, mcp__memento__semantic_search
 ---
 
 # SDLC Story Planner Agent
