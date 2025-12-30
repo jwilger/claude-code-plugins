@@ -1,0 +1,30 @@
+{
+  "name": "sdlc",
+  "version": "1.1.0",
+  "description": "Complete SDLC workflow with TDD, Event Modeling, ADRs, and GitHub integration",
+  "author": {
+    "name": "John Wilger",
+    "email": "john@johnwilger.com"
+  },
+  "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow"],
+  "commands": [
+    "./commands/setup.md",
+    "./commands/work.md",
+    "./commands/pr.md",
+    "./commands/review.md",
+    "./commands/design.md",
+    "./commands/adr.md"
+  ],
+  "agents": [
+    "./agents/sdlc-red.md",
+    "./agents/sdlc-green.md",
+    "./agents/sdlc-domain.md",
+    "./agents/sdlc-mutation.md",
+    "./agents/sdlc-story.md",
+    "./agents/sdlc-architect.md",
+    "./agents/sdlc-ux.md",
+    "./agents/sdlc-event-model.md",
+    "./agents/sdlc-gwt.md",
+    "./agents/sdlc-adr.md"
+  ]
+}

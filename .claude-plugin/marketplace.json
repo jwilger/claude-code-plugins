@@ -5,65 +5,23 @@
     "email": "john@johnwilger.com"
   },
   "metadata": {
-    "description": "Claude Code plugins for professional development workflows and GitHub integration",
-    "version": "2.0.0"
+    "description": "Claude Code plugins for professional SDLC workflows and Marvin personality",
+    "version": "3.0.0"
   },
   "plugins": [
     {
-      "name": "sdlc-core",
-      "source": "./sdlc-core",
-      "description": "Core SDLC foundations: Marvin persona output style, memory protocol, shared conventions",
-      "version": "1.0.0",
-      "keywords": ["sdlc", "memory", "memento", "marvin", "conventions"]
+      "name": "sdlc",
+      "source": "./sdlc",
+      "description": "Complete SDLC workflow with TDD, Event Modeling, ADRs, and GitHub integration",
+      "version": "1.1.0",
+      "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow", "domain-modeling", "mutation-testing"]
     },
     {
-      "name": "sdlc-architecture",
-      "source": "./sdlc-architecture",
-      "description": "Architecture Decision Records and ARCHITECTURE.md synthesis. Requires: sdlc-core",
-      "version": "1.0.0",
-      "keywords": ["architecture", "adr", "decisions", "documentation", "design"]
-    },
-    {
-      "name": "sdlc-event-modeling",
-      "source": "./sdlc-event-modeling",
-      "description": "Event Modeling (Adam Dymitruk) for event-sourced systems. Based on Martin Dilger's book. Requires: sdlc-core",
-      "version": "1.0.0",
-      "keywords": ["event-sourcing", "event-modeling", "adam-dymitruk", "dilger", "gwt", "cqrs", "ddd"]
-    },
-    {
-      "name": "sdlc-planning",
-      "source": "./sdlc-planning",
-      "description": "Story planning with three-perspective review (business, technical, UX). Requires: sdlc-core",
-      "version": "1.0.0",
-      "keywords": ["planning", "stories", "agile", "review", "ux", "business"]
-    },
-    {
-      "name": "sdlc-tdd",
-      "source": "./sdlc-tdd",
-      "description": "Test-Driven Development workflow with Red/Green/Refactor cycle and domain modeling. Requires: sdlc-core",
-      "version": "1.0.0",
-      "keywords": ["tdd", "testing", "red-green-refactor", "domain-modeling", "mutation-testing"]
-    },
-    {
-      "name": "github-issues",
-      "source": "./github-issues",
-      "description": "Comprehensive GitHub issue management with sub-issues, blocking relationships, and linked branches",
-      "version": "1.0.0",
-      "keywords": ["github", "issues", "sub-issues", "blocking", "project-management", "gh-cli"]
-    },
-    {
-      "name": "github-projects",
-      "source": "./github-projects",
-      "description": "GitHub Projects V2 Kanban board management with status/priority workflows. Requires: github-issues",
-      "version": "1.0.0",
-      "keywords": ["github", "projects", "kanban", "board", "status", "priority", "workflow", "gh-cli"]
-    },
-    {
-      "name": "marvin-sdlc",
-      "source": "./marvin-sdlc",
-      "description": "DEPRECATED - Use sdlc-core + sdlc-* plugins instead. Legacy monolithic SDLC plugin.",
-      "version": "1.0.7",
-      "keywords": ["tdd", "event-sourcing", "adr", "domain-modeling", "marvin", "deprecated"]
+      "name": "marvin-output-style",
+      "source": "./marvin-output-style",
+      "description": "Marvin the Paranoid Android personality for Claude Code - dry wit and existential weariness with flawless competence",
+      "version": "1.1.0",
+      "keywords": ["personality", "marvin", "hitchhikers-guide", "output-style"]
     }
   ]
 }

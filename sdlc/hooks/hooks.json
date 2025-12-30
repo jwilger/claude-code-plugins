@@ -1,0 +1,45 @@
+{
+  "description": "SDLC workflow hooks for TDD enforcement and memory checkpoints",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "SDLC TDD CHECKPOINT: You are about to edit a file directly.\n\nBefore proceeding, check:\n\n1. Is this a TEST file (*_test.rs, *.test.ts, test_*.py, files in tests/, __tests__/, spec/)?\n   → Use sdlc-red agent instead of editing directly\n\n2. Is this PRODUCTION code (src/, lib/, application code)?\n   → Use sdlc-green agent instead of editing directly\n\n3. Is this a TYPE DEFINITION (new struct, enum, trait, interface)?\n   → Use sdlc-domain agent instead of editing directly\n\n4. Is this a BYPASS file (*.md, *.yaml, *.json, .github/*, *.tf, Cargo.toml, package.json)?\n   → OK to edit directly - these don't need TDD\n\nIf you're working on code that should go through TDD, STOP this edit and spawn the appropriate agent.\n\nThe TDD boundaries are INVIOLABLE:\n- sdlc-red: test code only\n- sdlc-green: production code only  \n- sdlc-domain: type definitions only\n\nProceed with this edit ONLY if it's a bypass file or you have explicit user permission to skip TDD."
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "SDLC TDD CHECKPOINT: You are about to write a new file.\n\nBefore proceeding, check:\n\n1. Is this a new TEST file?\n   → Use sdlc-red agent\n\n2. Is this new PRODUCTION code?\n   → Use sdlc-green agent (or sdlc-domain for type definitions)\n\n3. Is this documentation, config, or infrastructure?\n   → OK to write directly\n\nRemember: All production code changes should go through TDD with the appropriate agents."
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "MEMORY PROTOCOL CHECKPOINT: The conversation is about to be compacted.\n\nBefore proceeding, review this session for:\n- Discoveries, patterns, debugging insights\n- Project-specific knowledge and conventions\n- Solutions found through trial and error\n- Architectural decisions or constraints\n\nIf there are unsaved memories, store them NOW using:\n- mcp__memento__create_entities\n- mcp__memento__create_relations\n\nDon't let knowledge be lost to context truncation.\n\nAlso check: Is there work in progress on a GitHub issue? Note the current state so we can resume properly."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "MEMORY PROTOCOL CHECKPOINT: Before finishing, briefly consider:\n\n- Did you discover anything worth remembering?\n- Any patterns, debugging insights, or project conventions?\n- Solutions found through trial and error?\n- Current state of any in-progress work?\n\nIf so, store them in memento now.\n\nAlso: If there's uncommitted work, remind the user about their options (commit, stash, or discard per SDLC workflow)."
+          }
+        ]
+      }
+    ]
+  }
+}

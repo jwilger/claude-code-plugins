@@ -1,0 +1,142 @@
+---
+description: Create or update a pull request for the current work, with mutation testing
+allowed-tools:
+  - Bash
+  - Read
+  - Task
+---
+
+# SDLC Pull Request
+
+Create or update a pull request for the current work. This command:
+1. Runs mutation testing to verify test quality
+2. Creates or updates the PR
+3. Links PR to the issue
+4. Keeps issue in "In Progress" (PR goes to Review)
+
+## Steps
+
+### 1. Load Configuration
+
+Read `.claude/sdlc.yaml` for git workflow settings.
+
+### 2. Detect Current Issue
+
+From the current branch name, extract the issue number:
+```bash
+git branch --show-current
+```
+
+Parse issue number from branch name (e.g., `feature/123-add-login` → `123`).
+
+If no issue number in branch, ask user which issue this PR is for.
+
+### 3. Run Mutation Testing
+
+Use the sdlc-mutation agent to run mutation testing:
+
+```
+Task tool with subagent_type="sdlc-mutation":
+  Run mutation testing on the changes in this branch. Enforce 100% mutation score.
+  Report any surviving mutants that need additional test coverage.
+```
+
+If mutation score is below 100%:
+- Show the surviving mutants
+- Warn that PR can still be created but may need additional tests
+- Ask user if they want to proceed or fix first
+
+### 4. Check for Existing PR
+
+```bash
+gh pr list --head $(git branch --show-current) --json number,url
+```
+
+If PR exists, we'll update it. If not, we'll create it.
+
+### 5. Push Changes
+
+If using git-spice:
+```bash
+gs stack submit
+```
+
+If using standard git:
+```bash
+git push -u origin $(git branch --show-current)
+```
+
+### 6. Create/Update PR
+
+#### If creating new PR:
+
+Get issue details for PR body:
+```bash
+gh issue view <issue-number> --json title,body
+```
+
+Create PR with link to issue:
+```bash
+gh pr create \
+  --title "<issue-title>" \
+  --body "Closes #<issue-number>
+
+## Summary
+<brief summary of changes>
+
+## Changes
+<list of key changes>
+
+## Testing
+- All tests passing
+- Mutation score: <score>%
+
+---
+Related: #<issue-number>" \
+  --assignee @me
+```
+
+#### If updating existing PR:
+
+```bash
+# Push already happened, just ensure it's up to date
+gh pr view --json url
+```
+
+### 7. Link PR to Issue (if not using Closes keyword)
+
+If using gh-issue-ext for explicit linking:
+```bash
+gh issue-ext branch link <issue-number> <branch-name>
+```
+
+### 8. Update Project Status
+
+The PR should show in Review status. If using projects:
+- PR status tracks separately from issue
+- Issue stays in "In Progress" until PR is merged
+
+### 9. Display Result
+
+```
+Pull Request created/updated!
+
+PR: <url>
+Issue: #<number> - <title>
+Mutation Score: <score>%
+
+Status:
+  - PR: In Review
+  - Issue: In Progress (will close when PR merges)
+
+Next steps:
+  - Wait for review feedback
+  - Run /sdlc:review when you have comments to address
+```
+
+## Error Handling
+
+- **Not on feature branch**: Warn that we're on main/master
+- **No commits**: Nothing to create PR for
+- **Mutation testing fails**: Show results, offer to proceed anyway
+- **PR creation fails**: Show error, suggest manual creation
