@@ -72,7 +72,16 @@ After all three return:
 
 ### For Create Story (`create <name>`)
 
-Using GitHub CLI:
+**If story belongs under an epic/parent (PREFERRED):**
+
+Use `/github-issues:create-subtask` to atomically create AND link:
+```bash
+/github-issues:create-subtask <epic-number> "<Story title from slice>"
+```
+
+This prevents orphaned issues by doing both steps in one command.
+
+**If story is standalone (no parent):**
 
 ```bash
 gh issue create --title "<Story title from slice>" --label feature --body "## Acceptance Criteria
@@ -80,10 +89,14 @@ gh issue create --title "<Story title from slice>" --label feature --body "## Ac
 <GWT scenarios from event model>"
 ```
 
-If linking to an epic (requires gh-issue-ext):
+**Manual linking (if issue already exists):**
+
+If you already created an issue and need to link it:
 ```bash
-gh issue-ext sub add <epic-number> <new-story-number>
+gh issue-ext sub add <epic-number> <story-number>
 ```
+
+⚠️ **Warning:** Mentioning "Parent: #NNN" in the issue body does NOT create a real sub-issue relationship. You MUST use `gh issue-ext sub add` or the `/create-subtask` command.
 
 ### For Create Epic (`epic <name>`)
 

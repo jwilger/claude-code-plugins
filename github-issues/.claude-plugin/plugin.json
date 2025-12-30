@@ -6,5 +6,9 @@
     "name": "John Wilger",
     "email": "john@johnwilger.com"
   },
-  "keywords": ["github", "issues", "sub-issues", "blocking", "project-management"]
+  "keywords": ["github", "issues", "sub-issues", "blocking", "project-management"],
+  "commands": [
+    "./commands/setup.md",
+    "./commands/create-subtask.md"
+  ]
 }

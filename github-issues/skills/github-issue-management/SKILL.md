@@ -409,14 +409,34 @@ gh issue-ext branch create 42 --name feature/auth-v2
 
 ---
 
+## Commands
+
+### /github-issues:create-subtask
+
+**Preferred method for creating sub-issues.** This command atomically creates a new issue AND links it as a sub-issue of a parent, preventing orphaned issues.
+
+```bash
+/github-issues:create-subtask <parent-issue-number> "<title>"
+```
+
+**Why use this?** When manually creating sub-issues, it's easy to:
+1. Run `gh issue create`
+2. Mention "Parent: #NNN" in the body
+3. **Forget** to run `gh issue-ext sub add` to actually link them
+
+The `/create-subtask` command eliminates this risk by doing both steps atomically.
+
+---
+
 ## Best Practices
 
-1. **Use descriptive issue titles** - Makes sub-issue lists readable
-2. **Label issues by type** - epic, story, task, bug for clarity
-3. **Link blocking relationships early** - Helps planning and prioritization
-4. **Use consistent branch naming** - `feature/`, `fix/`, `chore/` prefixes
-5. **Close parent issues last** - Ensure all sub-issues are complete
-6. **Use JSON output for scripting** - `--json` flag for automation
+1. **Use `/github-issues:create-subtask` for sub-issues** - Prevents orphaned issues
+2. **Use descriptive issue titles** - Makes sub-issue lists readable
+3. **Label issues by type** - epic, story, task, bug for clarity
+4. **Link blocking relationships early** - Helps planning and prioritization
+5. **Use consistent branch naming** - `feature/`, `fix/`, `chore/` prefixes
+6. **Close parent issues last** - Ensure all sub-issues are complete
+7. **Use JSON output for scripting** - `--json` flag for automation
 
 ---
 

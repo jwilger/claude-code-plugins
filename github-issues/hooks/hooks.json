@@ -11,6 +11,17 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash(gh issue create:*)",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Examine the `gh issue create` command that just ran. Check if the --body argument or heredoc content contained any patterns indicating a parent issue reference: 'Parent Epic:', 'Parent Issue:', 'Parent:', 'Epic:', 'Part of #', 'Subtask of #', '**Parent**:', or similar parent-child relationship text with an issue number.\n\nIf a parent reference pattern was detected AND the command succeeded (created an issue - look for the issue URL in stdout), warn:\n\n\"**Note:** You created an issue referencing a parent (#NNN) in the body, but this doesn't create a GitHub sub-issue relationship. To properly link it:\n\n```bash\ngh issue-ext sub add <parent> <new-issue>\n```\n\nNext time, use `/github-issues:create-subtask <parent> \\\"<title>\\\"` to handle both steps.\"\n\nIf no parent reference was detected, say nothing."
+          }
+        ]
+      }
     ]
   }
 }

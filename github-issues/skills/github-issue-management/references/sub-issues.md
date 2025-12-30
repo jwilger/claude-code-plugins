@@ -5,6 +5,25 @@ Sub-issues allow hierarchical organization of GitHub issues, enabling structures
 - Stories containing Tasks
 - Any parent-child relationship
 
+## ⚠️ Common Pitfall: Orphaned Sub-Issues
+
+**Problem:** When creating a sub-issue, it's easy to:
+1. Run `gh issue create --title "..." --body "Parent: #NNN"`
+2. Think the issue is linked because you mentioned the parent
+3. **Forget** to run `gh issue-ext sub add` to actually create the relationship
+
+This leaves issues that *reference* a parent in their body but aren't *linked* as actual sub-issues.
+
+**Solution:** Use `/github-issues:create-subtask` which does both steps atomically:
+
+```bash
+/github-issues:create-subtask 237 "Integrate coordinator into ProjectionRunner"
+```
+
+This creates the issue AND links it as a sub-issue in one operation.
+
+---
+
 ## Commands Reference
 
 ### gh issue-ext sub add
