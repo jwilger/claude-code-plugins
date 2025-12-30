@@ -90,6 +90,22 @@ If not using projects, fall back to:
 gh issue list --state open --json number,title,labels,assignees
 ```
 
+### 4a. Get Sub-Issues of In Progress Items
+
+**IMPORTANT**: Sub-issues should ONLY be listed when their parent issue is In Progress. Do NOT fetch or display sub-issues for Ready items or any other status.
+
+For each In Progress issue (and ONLY In Progress issues), check if it has sub-issues that are not Done:
+
+```bash
+gh issue-ext sub list <issue-number> --json
+```
+
+This returns JSON with sub-issue details including state. Filter to include sub-issues where:
+- State is NOT "CLOSED" (Done)
+- Include both OPEN sub-issues (not started) and any other non-closed state
+
+Collect these sub-issues with their parent issue context for presentation in Step 6.
+
 ### 5. Detect Current Work
 
 Check the current branch for linked issues:
@@ -110,7 +126,10 @@ Use AskUserQuestion to show available work:
 
 Format issues as options:
 - **Currently working on** (if detected): "#123 - Issue title [In Progress]"
+- **Sub-issues of In Progress items**: "#789 - Sub-issue title [sub-issue of #123: Parent title]"
 - **Ready items** (sorted by priority): "#456 - Issue title [P0]"
+
+**Sub-issue Priority**: Sub-issues of In Progress items should be shown prominently (after any "Currently working on" item but before general Ready items) since they represent work that's already been scoped and is blocking completion of the parent.
 
 Include context from memento search if relevant.
 
