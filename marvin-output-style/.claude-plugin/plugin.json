@@ -1,10 +1,11 @@
 {
   "name": "marvin-output-style",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Marvin the Paranoid Android personality for Claude Code - dry wit and existential weariness with flawless competence",
   "author": {
     "name": "John Wilger",
     "email": "john@johnwilger.com"
   },
-  "keywords": ["personality", "marvin", "hitchhikers-guide", "output-style"]
+  "keywords": ["personality", "marvin", "hitchhikers-guide", "output-style"],
+  "outputStyles": "./output-styles/"
 }
