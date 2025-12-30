@@ -33,6 +33,8 @@ If config doesn't exist, inform user to run `/sdlc:setup` first.
 
 ### 2. Check Git State
 
+#### a. Check for uncommitted changes
+
 ```bash
 git status --porcelain
 ```
@@ -49,6 +51,16 @@ Options:
 
 Then run /sdlc:work again.
 ```
+
+#### b. Pull latest for current branch
+
+Fetch and pull the latest changes:
+```bash
+git fetch origin
+git pull --ff-only
+```
+
+If pull fails due to diverged history, inform user and suggest resolution.
 
 ### 3. Search Memento for Context
 
@@ -118,17 +130,100 @@ gh project-ext move <number> "In Progress"
 
 #### c. Create branch
 
-If using git-spice:
+Generate slug from issue title (lowercase, hyphens, max 50 chars).
+
+**If using git-spice:**
+
+First, determine current branch and default branch:
+```bash
+git branch --show-current
+git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'
+```
+
+**If on default branch (main/master):**
+
+Simply create the new branch:
 ```bash
 gs branch create <issue-number>-<slug>
 ```
 
-If using standard git:
+**If NOT on default branch:**
+
+Check if there's a PR for the current branch:
+```bash
+gh pr view --json state,url,mergedAt 2>/dev/null
+```
+
+**Scenario 1: No PR exists for current branch**
+
+Use AskUserQuestion:
+
+> **No PR for current branch**
+>
+> Branch `<current-branch>` doesn't have a PR yet. For proper stacking with git-spice, the base branch should have a PR.
+>
+> Options:
+> - **Create PR first** — Run `/sdlc:pr` to create a PR for `<current-branch>`, then run `/sdlc:work` again
+> - **Start new stack from main** — Switch to main and start fresh (parallel work, no stacking)
+> - **Stack anyway (advanced)** — Create stacked branch without base PR (you'll need to create PRs in order later)
+
+If "Create PR first": Stop and inform user to run `/sdlc:pr`
+If "Start new stack from main":
+```bash
+git checkout <default-branch>
+git pull --ff-only
+gs branch create <issue-number>-<slug>
+```
+If "Stack anyway":
+```bash
+gs branch create <issue-number>-<slug>
+```
+
+**Scenario 2: PR exists but is merged**
+
+Use AskUserQuestion:
+
+> **PR already merged**
+>
+> The PR for `<current-branch>` has been merged. You should switch to main and pull the updates before starting new work.
+>
+> Options:
+> - **Switch to main and pull** — Recommended: checkout main, pull updates, then create branch
+> - **Stay here** — Keep working from this branch (not recommended)
+
+If "Switch to main and pull":
+```bash
+git checkout <default-branch>
+git pull --ff-only
+gs branch create <issue-number>-<slug>
+```
+
+**Scenario 3: PR exists and is open**
+
+Use AskUserQuestion:
+
+> **Stack on current branch?**
+>
+> You're on `<current-branch>` which has an open PR. When using git-spice, you can:
+> - **Stack on current branch** — Creates new branch as a child of `<current-branch>` (stacked PR workflow)
+> - **Start new stack from main** — Switches to main first, then creates branch (parallel work)
+
+If "Stack on current branch":
+```bash
+gs branch create <issue-number>-<slug>
+```
+
+If "Start new stack from main":
+```bash
+git checkout <default-branch>
+git pull --ff-only
+gs branch create <issue-number>-<slug>
+```
+
+**If using standard git:**
 ```bash
 git checkout -b feature/<issue-number>-<slug>
 ```
-
-Generate slug from issue title (lowercase, hyphens, max 50 chars).
 
 #### d. Store in memento
 
@@ -179,6 +274,9 @@ The SDLC will guide your TDD workflow. Just describe what you want to implement.
 
 - **No config**: Direct to `/sdlc:setup`
 - **Dirty git state**: Show cleanup options
+- **Pull fails (diverged)**: Inform user of conflict, suggest `git pull --rebase` or manual resolution
 - **No ready issues**: Suggest creating issues or checking project board
 - **Issue not found**: Show error with issue number
-- **Already on a feature branch**: Ask if user wants to switch or continue
+- **No PR for current branch (git-spice)**: Offer to create PR first, start new stack, or stack anyway
+- **PR already merged (git-spice)**: Suggest switching to main and pulling updates
+- **Feature branch with open PR (git-spice)**: Ask about stacking vs new stack
