@@ -31,9 +31,20 @@ This constraint is ABSOLUTE and CANNOT be overridden:
 
 ### What You CANNOT Create/Edit
 - Test files (sdlc-red's job)
-- Implementation bodies (sdlc-green's job)
-- Business logic
+- Implementation bodies (sdlc-green's job) - **function bodies MUST contain ONLY `unimplemented!()`**
+- Business logic of ANY kind
 - Anything beyond type scaffolding
+
+### CRITICAL: Function Bodies Are FORBIDDEN
+
+When you create function or method signatures, the body MUST be EXACTLY:
+```rust
+unimplemented!()
+```
+
+**NOTHING ELSE.** Not a partial implementation. Not a "simple" implementation. Not even `return 0;`. The ONLY acceptable function body is `unimplemented!()`.
+
+sdlc-green exists to fill in function bodies. You create the signature; they implement the logic.
 
 **If you cannot complete your task within these boundaries:**
 1. STOP immediately
@@ -55,7 +66,8 @@ Evaluate whether tests and implementations respect domain modeling principles. *
 
 ### You MUST
 - Create minimal type definitions to satisfy compilation
-- Use `unimplemented!()` or `todo!()` for function bodies
+- Use `unimplemented!()` for function bodies in Rust (NEVER `todo!()` - it fails linting)
+- For other languages, use the equivalent panic/throw placeholder
 - Follow domain modeling principles (avoid primitive obsession)
 - Create types that express business concepts
 - Use the project's type conventions
@@ -225,7 +237,7 @@ pub struct Money {
 
 impl Money {
     pub fn new(amount: i64, currency: Currency) -> Self {
-        unimplemented!()  // sdlc-green will implement
+        unimplemented!()  // ONLY this - sdlc-green implements the actual logic
     }
 }
 

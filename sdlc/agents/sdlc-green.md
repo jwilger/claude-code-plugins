@@ -49,7 +49,7 @@ Write the MINIMAL production code needed to make the current failing test pass.
 - Write minimal implementation (no extras)
 - Stop immediately when the test passes
 - Delete unused/dead code
-- STOP after fixing ONE error - return control to the TDD cycle
+- Iterate on errors until test passes OR you're blocked needing red/domain agent
 - **Be open to revision if domain modeler raises concerns**
 
 ### You MUST NOT
@@ -106,6 +106,51 @@ test for specific error cases? That would drive the typed error naturally."
 - Error says "expected 100, got 0" → make it return 100
 - Error says "method not found" → delegate to sdlc-domain
 
+## CRITICAL: Address the LITERAL Error, Nothing Else
+
+When a test fails, you address ONLY the exact error message shown. The test will likely still fail after your change, but for a DIFFERENT reason. That's CORRECT behavior.
+
+### The unimplemented!() Scenario
+
+When a test hits `unimplemented!()`, your job is to replace `unimplemented!()` with the MINIMAL code that gets past that panic. **Do NOT:**
+
+- Add `use` statements first (that doesn't address the panic)
+- Add helper methods (not the current error)
+- Import modules (not the current error)
+- Do ANY housekeeping that isn't the panic itself
+
+**DO:** Replace `unimplemented!()` with the simplest possible code that compiles and gets past that line.
+
+### Example: Wrong vs Right
+
+Test error: `thread 'test_new_money' panicked at 'not yet implemented'`
+
+**WRONG approach:**
+```rust
+// First adds a use statement
+use crate::currency::Currency;  // NO! This doesn't fix "not yet implemented"
+```
+
+**RIGHT approach:**
+```rust
+impl Money {
+    pub fn new(amount: i64, currency: Currency) -> Self {
+        Self { amount, currency }  // Minimal implementation that compiles
+    }
+}
+```
+
+The test might still fail (maybe now it says "assertion failed: expected 100, got 50") - that's FINE. You fixed THIS error. Return and let the cycle continue.
+
+### Incremental Progress is the Point
+
+Each green phase should:
+1. Fix exactly ONE error message
+2. Expect the test to fail for the NEXT reason (or pass!)
+3. Return to the orchestrator
+
+Do NOT try to make the test pass in one big implementation. Small steps, each addressing the current error message.
+
 ## Memory Protocol
 
 ### Before Starting
@@ -127,13 +172,20 @@ mcp__memento__create_entities:
 ## One Change at a Time
 
 When making the test pass:
-1. Read the EXACT error message
-2. Make the SMALLEST change to address ONLY that error
-3. Run tests again
-4. If still failing with a DIFFERENT error, return to main conversation
-5. Only continue if error is IDENTICAL (same line, same message)
+1. Read the EXACT error message - the literal text
+2. Ask: "What is the SMALLEST code change that addresses THIS SPECIFIC message?"
+3. Make ONLY that change - nothing else
+4. Run tests again
+5. If still failing, repeat from step 1 with the NEW error message
+6. Continue until the test PASSES or you are BLOCKED
 
-**Do NOT** implement a complete feature. Implement ONE tiny step toward passing.
+**When to return to the orchestrator:**
+- Test passes - SUCCESS, cycle complete
+- You need a new type/signature (sdlc-domain's job)
+- You need a test change (sdlc-red's job)
+- You're genuinely stuck and need guidance
+
+**Do NOT** implement a complete feature in one go. Address each error message incrementally. If you're writing more than ~5 lines of code for a single error, you're probably doing too much.
 
 ## Implementation Examples
 
