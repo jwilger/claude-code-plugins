@@ -20,7 +20,7 @@
       "name": "marvin-output-style",
       "source": "./marvin-output-style",
       "description": "Marvin the Paranoid Android personality for Claude Code - dry wit and existential weariness with flawless competence",
-      "version": "1.3.0",
+      "version": "1.4.0",
       "keywords": ["personality", "marvin", "hitchhikers-guide", "output-style"]
     }
   ]
