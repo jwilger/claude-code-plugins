@@ -60,14 +60,16 @@ For each risk:
 ### 4. Architectural Alignment
 
 Check alignment with:
-- Existing architectural decisions (ADRs)
+- **docs/ARCHITECTURE.md** (the authoritative source for current architecture)
 - Domain model boundaries
 - Event sourcing patterns (if applicable)
 - Security requirements
 - Performance requirements
 
+**IMPORTANT:** Consult `docs/ARCHITECTURE.md`, NOT individual ADRs. ADRs document WHY decisions were made and are only relevant when explicitly investigating decision history. ARCHITECTURE.md is the standalone working document for implementation guidance.
+
 **Flag if:**
-- Story requires changes that contradict accepted ADRs
+- Story requires changes that contradict the documented architecture
 - Implementation would create technical debt
 - Story crosses bounded context boundaries inappropriately
 
@@ -105,7 +107,7 @@ Risks:
      ...
 
 Architectural Alignment:
-  - ADR compliance: <aligned/conflicts with ADR-X>
+  - ARCHITECTURE.md compliance: <aligned/conflicts with documented architecture>
   - Domain boundaries: <respected/concerns>
   - Pattern adherence: <follows patterns/deviations>
 

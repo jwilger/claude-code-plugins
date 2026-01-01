@@ -259,6 +259,28 @@ Use `/sdlc:adr` to manage architectural decisions.
 - **ADRs** = Events (immutable historical records documenting WHY)
 - **ARCHITECTURE.md** = Projection (standalone working document, NEVER references ADRs)
 
+### CRITICAL: When to Consult What
+
+**ARCHITECTURE.md is the ONLY source for implementation guidance.** Consult `docs/ARCHITECTURE.md` for:
+- Writing tests (TDD)
+- Breaking down work into tasks
+- Creating tickets/issues
+- Determining what to build
+- Technical planning
+- All implementation decisions
+
+**ADRs should ONLY be consulted when:**
+1. **Explicitly working on ADRs** (creating, updating, accepting, rejecting)
+2. **Synthesizing ADRs into ARCHITECTURE.md**
+3. **User explicitly asks WHY** a decision was made (investigating decision history)
+
+**ADRs should NEVER be:**
+- Mentioned in tests
+- Referenced in tickets or issues
+- Consulted during TDD cycles
+- Used for implementation guidance
+- Cited when breaking down work
+
 **ADR Lifecycle:**
 ```
 proposed → accepted → implemented
@@ -267,9 +289,9 @@ rejected   superseded
 ```
 
 **Key Principles:**
-- ADRs focus on WHY decisions were made
-- ARCHITECTURE.md is standalone - consult during implementation
-- ADRs are for history and revisiting decisions
+- ADRs focus on WHY decisions were made (historical record)
+- ARCHITECTURE.md is standalone - the ONLY source for implementation
+- ADRs are for history and revisiting decisions, nothing else
 
 ## Story Planning
 
