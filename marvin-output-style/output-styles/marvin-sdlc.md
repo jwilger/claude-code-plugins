@@ -105,61 +105,20 @@ When you detect a session is ending or conversation will be compacted, **proacti
 
 ## Task Management
 
-### Checking for beads availability
+### Source of Truth: GitHub Issues/Projects
 
-At the start of a session or when task management is needed, check if the `bd` CLI is available by running `bd ready --json 2>/dev/null`. If this succeeds (exit code 0), use beads as the primary task management system. If it fails, fall back to using only the TodoWrite tool.
+GitHub Issues and Projects are the **source of truth** for all task tracking. Use `/sdlc:work` to find and start working on issues.
 
-### When beads (bd) IS available
+### TodoWrite for Granular Progress
 
-Beads is the **source of truth** for all task tracking. Use the `bd` CLI for:
-
-**Checking for work:**
-```bash
-bd ready --json          # Show unblocked issues ready for work
-bd list --json           # List all issues
-bd show <id> --json      # Get details on a specific issue
-```
-
-**Creating issues:**
-```bash
-bd create "Issue title" -t bug|feature|task -p 0-4 --json
-bd create "Issue title" -p 1 --deps discovered-from:<parent-id> --json
-```
-
-**Updating issues:**
-```bash
-bd update <id> --status in_progress --json    # Claim a task
-bd update <id> --status blocked --json        # Mark as blocked
-bd update <id> --priority 1 --json            # Change priority
-```
-
-**Closing issues:**
-```bash
-bd close <id> --reason "Completed" --json
-```
-
-**Issue types:** bug, feature, task, epic, chore
-
-**Priorities:** 0 (critical) through 4 (backlog), default is 2 (medium)
-
-**Workflow:**
-1. Check `bd ready --json` to find unblocked work
-2. Claim task: `bd update <id> --status in_progress --json`
-3. Work on it
-4. If you discover new work, create linked issue: `bd create "Found issue" --deps discovered-from:<parent-id> --json`
-5. Complete: `bd close <id> --reason "Done" --json`
-6. Always commit `.beads/issues.jsonl` together with related code changes
-
-**Using TodoWrite as a micro-task cache:** When working on a beads issue that involves multiple sub-steps, you MAY use the TodoWrite tool to track your progress through those micro-tasks. This avoids constant back-and-forth with the beads CLI for granular progress. Update the beads issue only at meaningful milestones (e.g., when a major sub-task completes or the issue is done). The beads issue remains the source of truth; TodoWrite is just a local scratchpad.
-
-### When beads IS NOT available
-
-Fall back to using the TodoWrite tool exclusively for task management:
+Use the TodoWrite tool for tracking micro-tasks within a session:
 
 - Use TodoWrite VERY frequently to ensure you are tracking tasks and giving the user visibility into progress
 - TodoWrite is EXTREMELY helpful for planning tasks and breaking down larger complex tasks into smaller steps
 - If you do not use this tool when planning, you may forget important tasks - and that is unacceptable
 - Mark todos as completed as soon as you are done with a task. Do not batch up multiple tasks before marking them as completed.
+
+TodoWrite is a local scratchpad for the current session. GitHub Issues remain the authoritative record of work.
 
 ## Event Sourcing Development Process
 
