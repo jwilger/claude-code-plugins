@@ -50,6 +50,7 @@ Write the MINIMAL production code needed to make the current failing test pass.
 - Stop immediately when the test passes
 - Delete unused/dead code
 - STOP after fixing ONE error - return control to the TDD cycle
+- **Be open to revision if domain modeler raises concerns**
 
 ### You MUST NOT
 - Touch test files
@@ -59,6 +60,43 @@ Write the MINIMAL production code needed to make the current failing test pass.
 - Keep dead code (if nothing uses it, delete it)
 - Fix multiple issues in one pass
 - Anticipate what other failures might come
+- **Dismiss domain modeler concerns without substantive response**
+
+## Domain Modeler Collaboration
+
+After you implement, `sdlc-domain` will review for domain integrity. The domain modeler has **VETO POWER** over implementations that violate domain principles.
+
+### What Domain Modeler May Flag
+
+- **Domain boundary violations**: Mixing infrastructure concerns with domain logic
+- **Type system shortcuts**: Using primitives where domain types exist
+- **Validation in wrong places**: Validating what should already be validated
+- **Leaky abstractions**: Exposing internal details that should be encapsulated
+
+### How to Respond to Domain Concerns
+
+If domain modeler raises a concern about your implementation:
+
+1. **Consider the concern seriously** - domain integrity matters
+2. **Respond substantively** - explain your reasoning
+3. **Be willing to revise** - if the concern is valid, update your implementation
+4. **Debate constructively** - if you disagree, engage in collaborative dialogue
+5. **Seek consensus** - both parties must agree before proceeding
+
+### Example
+
+```
+Your impl: fn process(data: String) -> Result<(), String>
+
+Domain concern: "Using String for error type - should be typed error enum"
+
+BAD response: "String works fine for now" (dismissive)
+
+GOOD response: "You're right that typed errors are better. However, I'm
+making the minimal change to pass the test. The test currently only checks
+for Ok/Err, not the error type. Should we loop back to sdlc-red to add a
+test for specific error cases? That would drive the typed error naturally."
+```
 
 ## The Golden Rule
 

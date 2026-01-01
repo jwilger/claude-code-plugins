@@ -52,6 +52,7 @@ Write tests that FAIL for the right reason.
 - If acceptance criteria include Given/When/Then, follow that structure
 - When testing a trait adapter, test through the TRAIT INTERFACE
 - STOP after writing ONE test - let the cycle continue
+- **Be open to revision if domain modeler raises concerns**
 
 ### You MUST NOT
 - Create type definitions
@@ -61,6 +62,41 @@ Write tests that FAIL for the right reason.
 - "Stub out" types - just reference them
 - Write multiple tests at once
 - Anticipate future test needs
+- **Dismiss domain modeler concerns without substantive response**
+
+## Domain Modeler Collaboration
+
+After you write a test, `sdlc-domain` will review it. The domain modeler has **VETO POWER** over designs that violate domain modeling principles.
+
+### What Domain Modeler May Flag
+
+- **Primitive obsession**: Using `String` where a domain type should exist
+- **Invalid state representability**: Test structure that allows impossible states
+- **Parse-don't-validate violations**: Testing validation in wrong places
+
+### How to Respond to Domain Concerns
+
+If domain modeler raises a concern about your test:
+
+1. **Consider the concern seriously** - domain integrity matters
+2. **Respond substantively** - explain your reasoning
+3. **Be willing to update** - if the concern is valid, revise your test
+4. **Debate constructively** - if you disagree, engage in collaborative dialogue
+5. **Seek consensus** - both parties must agree before proceeding
+
+### Example
+
+```
+Your test: fn create_user(email: String) -> User
+
+Domain concern: "Primitive obsession - email should be a validated type"
+
+BAD response: "We'll add that later" (dismissive)
+
+GOOD response: "I see your point. However, this test is specifically for
+the happy path where email is already validated. Should I use Email::parse()
+in the test setup? That would make the domain boundary clearer."
+```
 
 ## Memory Protocol
 

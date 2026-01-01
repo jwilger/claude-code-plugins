@@ -2,22 +2,41 @@
 
 Test-Driven Development following outside-in, black-box principles.
 
-## The Cycle
+**This document is the authoritative source of truth for TDD workflow.**
+
+## Main Conversation Role: ORCHESTRATOR ONLY
+
+The main conversation **MUST NOT** directly write or edit:
+- Test files → delegate to `sdlc-red` agent
+- Production implementation code → delegate to `sdlc-green` agent
+- Type definitions and domain models → delegate to `sdlc-domain` agent
+
+The main conversation orchestrates TDD work by:
+1. Describing what needs to be implemented
+2. Launching the appropriate agent via Task tool
+3. Reviewing agent results and coordinating the cycle
+4. Facilitating debates when agents disagree
+5. Escalating to user when consensus cannot be reached
+
+## The Cycle (MANDATORY SEQUENCE)
 
 ```
-   ┌─────────────────────────────────────────┐
-   │                                         │
-   ▼                                         │
-┌─────┐     ┌────────┐     ┌───────┐     ┌──────────┐
-│ RED │ ──▶ │ DOMAIN │ ──▶ │ GREEN │ ──▶ │ REFACTOR │
-└─────┘     └────────┘     └───────┘     └──────────┘
-   │             │              │              │
-   │             │              │              │
-   ▼             ▼              ▼              ▼
-Write ONE    Create types   Minimal code   Clean up
-failing test  if compile    to pass test   (commit first!)
-             errors
+     ┌──────────────────────────────────────────────────────────────────┐
+     │                                                                  │
+     ▼                                                                  │
+┌─────────┐     ┌────────────────┐     ┌─────────┐     ┌────────────────┐     ┌──────────┐
+│   RED   │ ──▶ │ DOMAIN REVIEW  │ ──▶ │  GREEN  │ ──▶ │ DOMAIN REVIEW  │ ──▶ │ REFACTOR │
+└─────────┘     └────────────────┘     └─────────┘     └────────────────┘     └──────────┘
+     │                 │                    │                 │                    │
+     ▼                 ▼                    ▼                 ▼                    ▼
+  Write ONE      Review test,          Minimal          Review impl,          Clean up
+  failing test   create types,      implementation     verify domain        (commit first!)
+                 check domain                          integrity
 ```
+
+**CRITICAL**: Domain review happens TWICE per cycle:
+1. **After Red**: Review test implications, create types, evaluate domain alignment
+2. **After Green**: Review implementation for domain integrity violations
 
 ## Phase Details
 
@@ -31,10 +50,20 @@ Rules:
 - Let the compiler tell you what's missing
 - Name tests descriptively
 - Follow GWT (Given/When/Then) structure
+- **Be prepared to revise if domain modeler raises concerns**
 
-### DOMAIN Phase (sdlc-domain agent)
+### DOMAIN REVIEW Phase 1: After Red (sdlc-domain agent)
 
-Create type definitions to make tests compile.
+Review test implications and create type definitions.
+
+Responsibilities:
+1. **Review the test for domain violations**:
+   - Primitive obsession (using String/int where domain types should exist)
+   - Invalid state representability
+   - Parse-don't-validate violations
+
+2. **If violations found**: Raise DOMAIN CONCERN and propose alternative
+3. **If no violations**: Create minimal type definitions to compile
 
 Rules:
 - Type definitions only
@@ -42,6 +71,7 @@ Rules:
 - Use `unimplemented!()` for function bodies
 - Follow domain modeling principles
 - Avoid primitive obsession
+- **PUSH BACK on bad domain designs - you have VETO POWER**
 
 ### GREEN Phase (sdlc-green agent)
 
@@ -53,6 +83,22 @@ Rules:
 - Make smallest possible change
 - Stop when test passes
 - Delete dead code
+- **Be prepared to revise if domain modeler raises concerns**
+
+### DOMAIN REVIEW Phase 2: After Green (sdlc-domain agent)
+
+Review implementation for domain integrity.
+
+Responsibilities:
+1. **Verify implementation respects domain boundaries**
+2. **Check for domain violations** that crept in during implementation
+3. **If violations found**: Raise DOMAIN CONCERN and propose revision
+4. **If no violations**: Approve and signal "ready for next cycle"
+
+Rules:
+- Review only, no code changes in this phase
+- Same domain principles apply
+- **PUSH BACK on implementations that violate domain integrity**
 
 ### REFACTOR Phase
 
@@ -63,6 +109,70 @@ Rules:
 - Only then refactor
 - Re-run tests after each change
 - Commit refactored code
+
+## Agent Debate Protocol
+
+When the domain modeler raises a concern, a debate may ensue.
+
+### Debate Flow
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│  1. Domain raises concern                                   │
+│     ↓                                                       │
+│  2. Affected agent (red/green) explains reasoning           │
+│     ↓                                                       │
+│  3. Orchestrator (main conversation) facilitates            │
+│     ↓                                                       │
+│  4. Seek consensus                                          │
+│     ↓                                                       │
+│  [If consensus] → Proceed with agreed approach              │
+│  [If no consensus after 2 rounds] → Escalate to user        │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Debate Rules
+
+1. **Domain modeler has veto power** over:
+   - Primitive obsession
+   - Invalid state representability
+   - Parse-don't-validate violations
+   - Domain boundary violations
+
+2. **Other agents must respond substantively**, not just dismiss
+
+3. **Orchestrator should**:
+   - Ask clarifying questions
+   - Propose compromises
+   - Summarize positions
+   - Decide when to escalate
+
+4. **Escalation**: If no consensus after 2 rounds, ask the user
+
+### Example Debate
+
+```
+sdlc-red: I wrote a test using `fn create_user(email: String) -> User`
+
+sdlc-domain: DOMAIN CONCERN - Primitive obsession. Email should be
+a validated type, not a raw String. Propose: `Email::parse(&str)`
+
+sdlc-red: The test is focused on the happy path. We can add Email
+type later when we test validation.
+
+sdlc-domain: Disagree. "Later" never comes, and primitives leak.
+If we start with String, everything will depend on it. The cost
+of changing later is high. Email should be a type from day one.
+
+Orchestrator: Domain modeler's point about cost of change is valid.
+sdlc-red, can you update the test to use Email::parse()?
+
+sdlc-red: Agreed, will update.
+
+[CONSENSUS REACHED]
+```
 
 ## Outside-In Testing
 

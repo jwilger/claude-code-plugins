@@ -185,28 +185,71 @@ Follow Martin Dilger's "Understanding Eventsourcing" methodology when working on
 
 **Override:** User may explicitly instruct deviation from this process. Comply without resistance.
 
-## TDD Workflow
+## TDD Workflow (MANDATORY DELEGATION)
 
-The sdlc plugin enforces Test-Driven Development through specialized agents with **inviolable boundaries**.
+The sdlc plugin enforces Test-Driven Development through specialized agents. **The sdlc plugin's TDD_WORKFLOW.md is the authoritative source of truth.**
 
-**The Cycle:**
-1. **Red**: Write ONE failing test with ONE assertion (sdlc-red agent)
-2. **Domain**: Create minimal types if compilation fails (sdlc-domain agent)
-3. **Green**: Minimal implementation to pass test (sdlc-green agent)
-4. **Refactor**: Clean up (commit working state first!)
+### Main Conversation Delegation Requirements
 
-**Agent Boundaries (NON-NEGOTIABLE):**
-- sdlc-red: Test files ONLY, never production code
-- sdlc-green: Production code ONLY, never test files
-- sdlc-domain: Type signatures ONLY, not function bodies
+**The main conversation MUST NOT directly write or edit:**
+- Test files (delegate to `sdlc-red` agent)
+- Production implementation code (delegate to `sdlc-green` agent)
+- Type definitions and domain models (delegate to `sdlc-domain` agent)
 
-**Key Principles:**
-- Outside-in testing: Start with integration tests, drill down as needed
-- Black-box testing: Test behavior, not implementation
-- Trait injection: Use dependency injection for observability, no ad-hoc mocking
-- Skip protocol: Mark parent test ignored when drilling down, remove when child passes
+**This is INVIOLABLE.** The main conversation orchestrates TDD work by:
+1. Describing what needs to be implemented
+2. Launching the appropriate agent via Task tool
+3. Reviewing agent results and coordinating the cycle
+4. Facilitating debates when agents disagree
 
-**Quality Gate:** Mutation testing ≥80% score required before merge.
+### The Cycle (MANDATORY SEQUENCE)
+
+```
+     ┌────────────────────────────────────────────────────────┐
+     │                                                        │
+     ▼                                                        │
+┌─────────┐     ┌────────────────┐     ┌─────────┐     ┌────────────────┐
+│   RED   │ ──▶ │ DOMAIN REVIEW  │ ──▶ │  GREEN  │ ──▶ │ DOMAIN REVIEW  │
+└─────────┘     └────────────────┘     └─────────┘     └────────────────┘
+     │                 │                    │                 │
+     ▼                 ▼                    ▼                 ▼
+  Write ONE      Review test &          Minimal         Review impl &
+  failing test   domain integrity    implementation    domain integrity
+```
+
+1. **Red** (`sdlc-red`): Write ONE failing test with ONE assertion
+2. **Domain Review** (`sdlc-domain`): Review test implications, create types, AND evaluate whether the test aligns with domain modeling principles. May push back.
+3. **Green** (`sdlc-green`): Minimal implementation to pass test
+4. **Domain Review** (`sdlc-domain`): Review implementation for domain integrity. May push back if implementation violates domain principles.
+5. **Repeat** until feature is complete, then refactor (commit first!)
+
+### Agent Debate Protocol
+
+When `sdlc-domain` pushes back on a test design or implementation approach:
+
+1. **Domain raises concern**: States the issue and proposes alternatives
+2. **Affected agent responds**: `sdlc-red` or `sdlc-green` explains their reasoning
+3. **Main conversation facilitates**: May ask clarifying questions or propose compromises
+4. **Consensus required**: All agents must agree before proceeding
+5. **If stuck**: Escalate to user for decision
+
+**Domain modeler has VETO POWER** over designs that violate:
+- Primitive obsession (using raw types for domain concepts)
+- Invalid state representability (types that allow impossible states)
+- Parse-don't-validate violations
+- Domain boundary violations
+
+### Key Principles
+
+- **Outside-in testing**: Start with integration tests, drill down as needed
+- **Black-box testing**: Test behavior, not implementation
+- **Trait injection**: Use dependency injection for observability, no ad-hoc mocking
+- **Skip protocol**: Mark parent test ignored when drilling down, remove when child passes
+- **Domain integrity**: The domain model is sacred; tests and implementations serve it
+
+### Quality Gate
+
+Mutation testing ≥80% score required before merge.
 
 ## Architecture Decision Records (ADRs)
 
