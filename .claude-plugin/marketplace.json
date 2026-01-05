@@ -22,6 +22,13 @@
       "description": "Marvin the Paranoid Android personality for Claude Code - dry wit and existential weariness with flawless competence",
       "version": "1.4.2",
       "keywords": ["personality", "marvin", "hitchhikers-guide", "output-style"]
+    },
+    {
+      "name": "bootstrap",
+      "source": "./bootstrap",
+      "description": "Project scaffolding with Nix-based development environments",
+      "version": "0.1.0",
+      "keywords": ["bootstrap", "scaffolding", "nix", "rust", "development-environment"]
     }
   ]
 }

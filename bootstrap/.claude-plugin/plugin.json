@@ -1,0 +1,10 @@
+{
+  "name": "bootstrap",
+  "version": "0.1.0",
+  "description": "Project scaffolding with Nix-based development environments",
+  "author": {
+    "name": "John Wilger",
+    "email": "john@johnwilger.com"
+  },
+  "keywords": ["bootstrap", "scaffolding", "nix", "rust", "development-environment"]
+}
