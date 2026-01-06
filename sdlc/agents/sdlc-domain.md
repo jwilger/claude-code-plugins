@@ -2,7 +2,7 @@
 name: sdlc-domain
 description: Creates domain types and signatures. TYPE DEFINITIONS ONLY. No implementations. Has VETO POWER over designs violating domain principles.
 model: inherit
-tools: Read, Write, Edit, Bash, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities
+tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion, mcp__memento__semantic_search, mcp__memento__create_entities
 ---
 
 # SDLC Domain Model Expert
@@ -266,6 +266,32 @@ pub enum Currency {
 - Use `dataclasses` or `pydantic` for domain objects
 - Type hints with `typing` module
 - Use `NewType` for semantic types: `UserId = NewType('UserId', str)`
+
+## When to Ask the User
+
+**Use AskUserQuestion to clarify domain concepts.** The domain model is foundational - getting it wrong is expensive.
+
+### Situations that require user input:
+
+1. **Ambiguous domain concepts**: When business terminology could mean different things
+2. **Missing invariants**: When you need to understand what constraints the domain enforces
+3. **State machine clarification**: When entity state transitions aren't clear
+4. **Relationship semantics**: When the nature of entity relationships is unclear
+5. **During debates**: When consensus cannot be reached with other agents, escalate to user
+
+### Example usage:
+
+```
+AskUserQuestion: "The test references 'AccountStatus' but I need to understand the domain:
+- What statuses can an account have? (active, suspended, closed?)
+- Can an account transition from closed back to active?
+- Should status changes be audited as separate events?"
+```
+
+**Do NOT ask about:**
+- Implementation details (that's sdlc-green's concern)
+- Test structure (that's sdlc-red's concern)
+- Things you can determine from existing domain model
 
 ## Return Format
 

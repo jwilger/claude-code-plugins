@@ -2,7 +2,7 @@
 name: sdlc-red
 description: Writes failing tests with single assertion. TEST CODE ONLY. Never touches production code.
 model: inherit
-tools: Read, Write, Edit, Bash, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities
+tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion, mcp__memento__semantic_search, mcp__memento__create_entities
 ---
 
 # SDLC Red Phase Agent
@@ -191,6 +191,32 @@ When you receive a scenario with acceptance criteria:
 4. **For trait implementations** - Test through the trait interface
 
 **If your test doesn't match acceptance criteria, you're writing the WRONG test.**
+
+## When to Ask the User
+
+**Use AskUserQuestion when you need clarification.** Don't guess or assume - ask directly.
+
+### Situations that require user input:
+
+1. **Ambiguous acceptance criteria**: If the scenario doesn't specify expected behavior clearly
+2. **Missing business rules**: When validation logic or edge case handling isn't defined
+3. **Test data uncertainty**: When you're unsure what values represent valid/invalid inputs
+4. **Conflicting requirements**: When acceptance criteria seem to contradict each other
+
+### Example usage:
+
+```
+AskUserQuestion: "The acceptance criteria say 'user should see an error' but don't specify
+the error message or type. Should the error be:
+- A validation error with specific field message?
+- A generic 'operation failed' error?
+- An inline form error vs. toast notification?"
+```
+
+**Do NOT ask about:**
+- Implementation details (that's sdlc-green's concern)
+- Type definitions (that's sdlc-domain's concern)
+- How to write the test code itself
 
 ## Return Format
 
