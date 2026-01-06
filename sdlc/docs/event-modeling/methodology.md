@@ -2,11 +2,68 @@
 
 Following Martin Dilger's "Understanding Eventsourcing" approach.
 
-## Core Principle
+## Core Philosophy
+
+**Event modeling is about understanding, not documentation.**
+
+The process of event modeling REVEALS the domain. You cannot skip steps because you think you already understand - the structured conversation surfaces hidden assumptions, identifies edge cases, and creates shared understanding.
+
+## The Prime Directive
 
 **"Not losing information" is foundational.**
 
 Store what happened (events), not just current state. Events are immutable facts that can be replayed, analyzed, and projected in many ways.
+
+## What Event Modeling Is NOT
+
+Event modeling is **not** about:
+- Database schemas
+- API designs
+- Technical architecture
+- Implementation details
+- Performance optimization
+- Technology choices
+
+These decisions belong to **initial architecture design** and **implementation phases** - NOT event modeling.
+
+**The ONLY exception**: Mandatory third-party integrations can be noted by name and general purpose. Example: "Must integrate with Stripe for payments" - but NO technical details.
+
+## The Two-Phase Process
+
+### Phase 1: Domain Discovery
+
+Before diving into any workflow, establish broad understanding:
+
+1. **What does the business do?**
+2. **Who are the actors?** (roles, goals, interactions)
+3. **What are the major processes?** (high-level, not detailed)
+4. **What external systems exist?** (names only)
+5. **What workflows should we model?**
+6. **Which workflow should we start with?** (and why)
+
+Domain discovery stays at a high level. Do NOT dive deep into events and commands for any single workflow.
+
+**Output**: `docs/event_model/domain/overview.md`
+
+### Phase 2: Workflow Design (per workflow)
+
+Each workflow is designed independently, with its own branch and PR.
+
+The Seven Steps (DO NOT SKIP ANY):
+
+1. **Identify the User Goal** - What exactly are they trying to accomplish?
+2. **Brainstorm Events** - What facts need recording? (sticky-note style, no order)
+3. **Order Events Chronologically** - Arrange the story left-to-right
+4. **Identify Commands** - What triggers each event?
+5. **Design Read Models** - What does each actor need to see?
+6. **Find Automations** - What happens automatically?
+7. **Map External Integrations** - What outside systems are involved?
+
+**The Most Important Question**: "And then what happens?"
+
+Ask this relentlessly. After every event, every command, every answer. Keep asking until the workflow is truly complete.
+
+**Output**: `docs/event_model/workflows/<name>.md`
 
 ## The Four Patterns
 
@@ -93,6 +150,7 @@ Bad:
 - `RegisterUser` (command, not event)
 - `ProcessPayment` (present tense)
 - `UserData` (not an event)
+- `UpdateOrderStatus` (command language)
 
 ### Event Content
 
@@ -101,17 +159,6 @@ Events should contain:
 - **When it happened**: Timestamp
 - **Who/what caused it**: Correlation ID, user ID
 - **Relevant data**: Just enough to understand the event
-
-Example:
-```rust
-struct OrderPlaced {
-    order_id: OrderId,
-    customer_id: CustomerId,
-    items: Vec<OrderItem>,
-    total: Money,
-    placed_at: DateTime,
-}
-```
 
 ### Event Granularity
 
@@ -136,56 +183,6 @@ OrderItemAdded { ... }
 OrderCancelled { ... }
 ShippingAddressChanged { ... }
 ```
-
-## Workflow Design
-
-### Step 1: Identify User Goals
-
-Ask:
-- What is the user trying to accomplish?
-- What problem are they solving?
-- What does success look like?
-
-### Step 2: Brainstorm Events
-
-Use sticky notes (physical or virtual):
-- What facts need to be recorded?
-- What would we need for auditing?
-- What decisions happened?
-
-Don't worry about order yet - just capture everything.
-
-### Step 3: Order Chronologically
-
-Arrange events in typical business process order.
-
-### Step 4: Identify Commands
-
-For each event:
-- What triggered it?
-- Who issued the command?
-- What information was provided?
-
-### Step 5: Design Read Models
-
-For each user need:
-- What do they need to see?
-- What data is required?
-- Which events provide this data?
-
-### Step 6: Find Automations
-
-Look for:
-- Events that should trigger other commands
-- Background processing needs
-- Notifications and integrations
-
-### Step 7: Map Integrations
-
-Identify:
-- External data sources
-- Translation needs
-- Integration events
 
 ## Vertical Slices
 
@@ -223,16 +220,55 @@ If a read model needs data not in any event, either:
 2. The read model needs different events
 3. Translation is needed
 
+## The Facilitation Mindset
+
+The AI's role during event modeling is to **facilitate**, not dictate:
+
+### DO:
+- Ask probing questions
+- Challenge assumptions
+- Ensure no steps are skipped
+- Keep asking "And then what happens?"
+- Use business language
+- Focus on behavior, not implementation
+
+### DO NOT:
+- Skip steps because you think you know enough
+- Make architecture decisions
+- Discuss technical implementation
+- Rush to documentation
+- Assume you understand the domain better than the expert
+
+## Per-Workflow PRs
+
+Each workflow design gets its own branch and PR:
+
+1. Start from main for the first workflow
+2. Use git-spice to stack subsequent workflows
+3. Each PR contains:
+   - The workflow documentation
+   - GWT scenarios for that workflow
+4. Review and merge workflows independently
+5. Repeat for next workflow
+
+This allows:
+- Independent review of each workflow
+- Incremental delivery of event models
+- Clean git history
+- Parallel work on multiple workflows
+
 ## Documentation Structure
 
 ```
 docs/event_model/
+├── domain/
+│   └── overview.md              # Domain discovery output
 ├── workflows/
-│   ├── user-registration.md
+│   ├── user-registration.md     # Per-workflow design
 │   ├── order-placement.md
 │   └── payment-processing.md
 └── scenarios/
-    ├── user-registration/
+    ├── user-registration/       # GWT scenarios per workflow
     │   ├── happy-path.md
     │   └── invalid-email.md
     └── order-placement/
@@ -242,8 +278,10 @@ docs/event_model/
 
 ## Summary
 
-1. **Events are facts** - Past tense, immutable, business language
-2. **Four patterns** - State change, state view, automation, translation
-3. **Vertical slices** - Complete user value, independently testable
-4. **Information completeness** - Every read model traces to events
-5. **Workflow-first** - Design business process, then implementation
+1. **Domain discovery first** - Broad understanding before deep dives
+2. **One workflow at a time** - Each with its own PR
+3. **Follow ALL seven steps** - The process reveals understanding
+4. **Keep asking questions** - "And then what happens?"
+5. **NO architecture decisions** - Only business behavior
+6. **Events are facts** - Past tense, immutable, business language
+7. **Information completeness** - Every read model traces to events
