@@ -14,7 +14,14 @@ allowed-tools:
 
 # SDLC Design
 
-Design event model workflows following Martin Dilger's "Understanding Eventsourcing" methodology. This command facilitates the most critical phase of the SDLC - **event modeling is where we truly understand the business domain**.
+Design event model workflows following Martin Dilger's "Understanding Eventsourcing" methodology and Adam Dymitruk's Event Modeling approach (eventmodeling.org). This command facilitates the most critical phase of the SDLC - **event modeling is where we truly understand the business domain**.
+
+## Key Concepts
+
+- **Vertical Slice**: The smallest implementable unit = ONE pattern (Command, View, Automation, or Translation)
+- **Wireframes**: ASCII mockups showing data input/output for every interaction
+- **Mermaid Diagrams**: Flowcharts with swimlanes showing the complete workflow
+- **GWT Scenarios**: Different structures for Commands (Given=events, When=command, Then=events/error) vs Views (Given=state, When=event, Then=new state)
 
 ## Core Philosophy
 
@@ -43,16 +50,26 @@ The AI's role is to be a **facilitator**, not a stenographer. The process involv
 ┌─────────────────────────────────────────────────────────────────┐
 │                     DOMAIN DISCOVERY                             │
 │  Broad understanding of business domain, actors, goals          │
-│  Suggest initial workflow to model                               │
+│  Identify workflows to model                                     │
 │  [Stays on main branch - no PR yet]                             │
 └────────────────────────────────────┬────────────────────────────┘
                                      │
                                      ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                   WORKFLOW DESIGN (per workflow)                 │
+│               WORKFLOW DESIGN (per workflow)                     │
 │  Create fresh branch from main (or stack with git-spice)        │
-│  Deep dive into ONE workflow                                     │
-│  Brainstorm → Order → Commands → Read Models → Automations      │
+│                                                                  │
+│  The 9 Steps (from Dymitruk's Event Modeling):                  │
+│  1. User Goal - what success looks like                         │
+│  2. Brainstorm Events - sticky-note style                       │
+│  3. Order Events - chronological story (The Plot)               │
+│  4. Create Wireframes - ASCII mockups (The Storyboard)          │
+│  5. Identify Commands - what triggers each event                │
+│  6. Design Read Models - what each actor sees                   │
+│  7. Find Automations & Translations                              │
+│  8. Create Mermaid Diagram - flowchart with swimlanes           │
+│  9. Decompose into Slices - ONE pattern per slice               │
+│                                                                  │
 │  [Each workflow gets its own PR]                                │
 └────────────────────────────────────┬────────────────────────────┘
                                      │
@@ -61,6 +78,7 @@ The AI's role is to be a **facilitator**, not a stenographer. The process involv
 │              INFORMATION COMPLETENESS CHECK                      │◄──┐
 │  Every read model field must trace to an event                  │   │
 │  Every event must have a triggering command/automation          │   │
+│  Every wireframe field must trace to event or command           │   │
 │  Create any missing elements immediately                         │   │
 └────────────────────────────────────┬────────────────────────────┘   │
                                      │                                │
@@ -68,8 +86,10 @@ The AI's role is to be a **facilitator**, not a stenographer. The process involv
                                      │
                                      ▼ (complete)
 ┌─────────────────────────────────────────────────────────────────┐
-│                     GWT SCENARIOS (per workflow)                 │
-│  Generate Given/When/Then for each vertical slice               │
+│                 GWT SCENARIOS (per slice)                        │
+│  For Command slices: Given=events, When=cmd, Then=events/error  │
+│  For View slices: Given=state, When=event, Then=new state       │
+│  Include wireframe excerpt in each scenario                      │
 │  Add to same workflow branch/PR                                  │
 └────────────────────────────────────┬────────────────────────────┘
                                      │
@@ -80,6 +100,7 @@ The AI's role is to be a **facilitator**, not a stenographer. The process involv
 │  - Events not yet modeled?                                       │
 │  - Commands with unhandled failure cases?                        │
 │  - Read models missing fields?                                   │
+│  - Wireframes missing data?                                      │
 │  Add any missing elements to workflow                            │
 └────────────────────────────────────┬────────────────────────────┘
                                      │
@@ -214,15 +235,17 @@ Task tool with subagent_type="sdlc-event-model":
   IMPORTANT: This is the most critical part of the SDLC. Do NOT skip steps.
   Do NOT assume you have enough information. The PROCESS is what reveals the truth.
 
-  Guide through EACH step methodically:
+  Guide through EACH step methodically (from Dymitruk's Event Modeling):
 
   Step 1 - User Goal: What exactly is the user trying to accomplish?
   Step 2 - Brainstorm Events: What facts get recorded? (sticky-note style, no order yet)
-  Step 3 - Order Events: Arrange chronologically as the story unfolds
-  Step 4 - Identify Commands: For EACH event, what triggers it?
-  Step 5 - Design Read Models: What does each actor need to see?
-  Step 6 - Find Automations: What events trigger other commands automatically?
-  Step 7 - Map Integrations: External systems that must be integrated (minimal detail)
+  Step 3 - Order Events: Arrange chronologically as the story unfolds (The Plot)
+  Step 4 - Create Wireframes: ASCII mockups for every interaction (The Storyboard)
+  Step 5 - Identify Commands: For EACH event, what triggers it?
+  Step 6 - Design Read Models: What does each actor need to see?
+  Step 7 - Find Automations & Translations: What happens automatically? External systems?
+  Step 8 - Create Mermaid Diagram: Flowchart with swimlanes showing complete workflow
+  Step 9 - Decompose into Slices: ONE pattern per slice (Command, View, Automation, Translation)
 
   At EVERY step, ask probing questions:
   - "And then what happens?"
@@ -235,6 +258,8 @@ Task tool with subagent_type="sdlc-event-model":
   - Discuss technical implementation
   - Skip steps because you think you know enough
   - Rush to documentation
+  - Skip wireframes (they are mandatory!)
+  - Create slices larger than ONE pattern
 
   Store in docs/event_model/workflows/<name>.md
 ```
@@ -282,10 +307,24 @@ Task tool with subagent_type="sdlc-gwt":
 
   Read the workflow from docs/event_model/workflows/<name>.md
 
-  For each vertical slice:
-  1. Write happy path scenario first
-  2. Identify all edge cases through questioning
-  3. Write concrete scenarios with real example data
+  CRITICAL: GWT structure depends on slice type!
+
+  For COMMAND slices:
+  - Given = prior events (with realistic data)
+  - When = command (with realistic input)
+  - Then = events produced OR error (never both)
+
+  For VIEW slices:
+  - Given = current projection state
+  - When = new event to process
+  - Then = resulting projection state
+
+  For each slice:
+  1. Identify the pattern type (Command, View, Automation, Translation)
+  2. Write happy path scenario first
+  3. Identify all edge cases through questioning
+  4. Write concrete scenarios with real example data
+  5. Include wireframe excerpt showing relevant data
 
   These scenarios ARE the acceptance criteria for future stories.
 
@@ -462,12 +501,24 @@ Or with git-spice:
 
 ## The Four Patterns (Reference)
 
-These patterns describe business behavior, NOT technical architecture:
+These patterns describe business behavior, NOT technical architecture. **Each pattern = ONE vertical slice.**
 
-1. **State Change**: Command → Event (a decision was made, a fact recorded)
-2. **State View**: Events → Read Model (what information is derived from facts)
-3. **Automation**: Event → Process → Command → Event (what happens automatically)
-4. **Translation**: External data → Internal event (information from outside our domain)
+1. **Command (State Change)**: Trigger → Command → Event(s)
+   - GWT: Given=events, When=command, Then=events OR error
+   - Color: White → Blue → Orange
+
+2. **View (State View)**: Events → Read Model
+   - GWT: Given=projection state, When=event, Then=new state
+   - Views CANNOT reject - they passively process events
+   - Color: Orange → Green
+
+3. **Automation**: Event → View (todo list) → Process → Command → Event
+   - GWT: Given=events, When=trigger event, Then=command + events
+   - Color: Orange → Green → Purple → Blue → Orange
+
+4. **Translation**: External Data → Internal Event
+   - GWT: Given=external state, When=external trigger, Then=internal event
+   - Anti-corruption layer pattern
 
 ## What We Do NOT Discuss During Event Modeling
 
