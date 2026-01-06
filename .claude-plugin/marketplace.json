@@ -13,7 +13,7 @@
       "name": "sdlc",
       "source": "./sdlc",
       "description": "Complete SDLC workflow with TDD, Event Modeling, ADRs, and GitHub integration",
-      "version": "1.5.1",
+      "version": "1.6.0",
       "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow", "domain-modeling", "mutation-testing"]
     },
     {

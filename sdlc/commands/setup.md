@@ -5,14 +5,16 @@ allowed-tools:
   - Read
   - Write
   - AskUserQuestion
+  - WebFetch
 ---
 
 # SDLC Setup
 
 Initialize the SDLC workflow for this project. This command:
 1. Checks for required tools (gh CLI, git-spice)
-2. Installs required GitHub CLI extensions
-3. Creates `.claude/sdlc.yaml` configuration through interactive prompts
+2. Optionally creates a GitHub repository with branch rulesets
+3. Installs required GitHub CLI extensions
+4. Creates `.claude/sdlc.yaml` configuration through interactive prompts
 
 ## Steps
 
@@ -38,7 +40,154 @@ If project scope is missing, inform user to run:
 gh auth refresh -s project
 ```
 
-### 2. Check/Install GitHub CLI Extensions
+### 2. GitHub Repository Setup
+
+Check if a GitHub remote already exists:
+```bash
+git remote get-url origin 2>/dev/null
+```
+
+If NO remote exists, use AskUserQuestion:
+
+**Question: Create a GitHub repository?**
+- "Yes, create new repository" - Create a new GitHub repository
+- "No, skip repository creation" - Continue without creating a repo
+
+If creating repository:
+
+**Question: Repository visibility?**
+- "Public" - Anyone can see the repository
+- "Private" - Only you and collaborators can access
+
+Get repository name (default to current directory name):
+```bash
+basename "$(pwd)"
+```
+
+Create the repository:
+```bash
+# For public:
+gh repo create <name> --public --source=. --push
+
+# For private:
+gh repo create <name> --private --source=. --push
+```
+
+### 3. Branch Ruleset Configuration
+
+If a GitHub repository exists (either created or pre-existing), ask about branch protection:
+
+**Question: Configure branch protection rulesets?**
+- "Yes, configure rulesets" - Set up protection rules for main branch
+- "No, skip ruleset configuration" - Continue without protection
+
+If configuring rulesets, dynamically discover and present rule options.
+
+#### Dynamic Rule Discovery
+
+Fetch the current available rule types from GitHub's API documentation to ensure you're presenting the latest options. The main categories are:
+
+1. **Commit Requirements**
+   - `required_signatures` - Require signed commits
+   - `required_linear_history` - Prevent merge commits (linear history only)
+
+2. **Pull Request Rules** (`pull_request` type with parameters)
+   - `required_approving_review_count` - Number of required approvals (0-10)
+   - `dismiss_stale_reviews_on_push` - Dismiss approvals when new commits are pushed
+   - `require_code_owner_review` - Require review from code owners
+   - `require_last_push_approval` - Most recent pusher cannot self-approve
+   - `required_review_thread_resolution` - All conversations must be resolved
+   - `allowed_merge_methods` - Which merge strategies are allowed (merge, squash, rebase)
+
+3. **Status Checks** (`required_status_checks` type)
+   - `strict_required_status_checks_policy` - Require branch to be up-to-date
+   - `required_status_checks` - List of required CI checks (context names)
+
+4. **Push Restrictions**
+   - `non_fast_forward` - Prevent force pushes
+   - `deletion` - Prevent branch deletion
+   - `creation` - Restrict who can create matching refs
+
+5. **File Restrictions**
+   - `file_path_restriction` - Block specific file paths
+   - `max_file_size` - Maximum file size in MB
+
+Use AskUserQuestion to ask about each relevant category. Present them in logical groupings:
+
+**Question: Require signed commits?**
+- "Yes" - All commits must be GPG/SSH signed
+- "No" - Allow unsigned commits
+
+**Question: Pull request requirements?** (multiSelect: true)
+- "Require PR before merging" - Changes must go through a pull request
+- "Require code owner review" - Code owners must approve changes
+- "Dismiss stale approvals" - New commits invalidate existing approvals
+- "Require conversation resolution" - All review threads must be resolved
+
+If "Require PR before merging" was selected:
+
+**Question: Number of required approvals?**
+- "0" - PRs required but no approvals needed
+- "1" - One approval required (Recommended)
+- "2" - Two approvals required
+- "3+" - Three or more approvals required
+
+**Question: Prevent force pushes to main?**
+- "Yes" - Block force pushes (Recommended)
+- "No" - Allow force pushes
+
+**Question: Require linear history?**
+- "Yes" - Only allow squash or rebase merges (no merge commits)
+- "No" - Allow merge commits
+
+#### Build and Apply Ruleset
+
+Construct the ruleset JSON based on user selections. Example structure:
+
+```bash
+gh api --method POST /repos/{owner}/{repo}/rulesets \
+  --input - << 'EOF'
+{
+  "name": "main-branch-protection",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": ["~DEFAULT_BRANCH"],
+      "exclude": []
+    }
+  },
+  "rules": [
+    {
+      "type": "required_signatures"
+    },
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 1,
+        "dismiss_stale_reviews_on_push": true,
+        "require_code_owner_review": false,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": true
+      }
+    },
+    {
+      "type": "non_fast_forward"
+    }
+  ]
+}
+EOF
+```
+
+Only include rules that were selected. The `rules` array should only contain the rule objects for enabled options.
+
+For required_status_checks, if the user has CI configured, ask about specific checks:
+```bash
+# List recent workflow runs to discover check names
+gh run list --limit 5 --json name,conclusion 2>/dev/null
+```
+
+### 4. Check/Install GitHub CLI Extensions
 
 Check and install each required extension:
 
@@ -60,7 +209,7 @@ gh extension upgrade jwilger/gh-project-ext
 gh extension upgrade agynio/gh-pr-review
 ```
 
-### 3. Check for git-spice (optional)
+### 5. Check for git-spice (optional)
 
 ```bash
 command -v gs
@@ -68,7 +217,7 @@ command -v gs
 
 If git-spice is available, note it for the config options.
 
-### 4. Interactive Configuration
+### 6. Interactive Configuration
 
 Use AskUserQuestion to gather project preferences:
 
@@ -90,7 +239,7 @@ Use AskUserQuestion to gather project preferences:
 - Brief (one-line notes about what's happening)
 - Explain (full context about agent delegation)
 
-### 5. Create Configuration
+### 7. Create Configuration
 
 Create `.claude/sdlc.yaml` with the gathered settings:
 
@@ -147,7 +296,7 @@ Ensure `.claude/` directory exists:
 mkdir -p .claude
 ```
 
-### 6. Initialize Event Model Docs (if applicable)
+### 8. Initialize Event Model Docs (if applicable)
 
 If mode is `event-modeling`, ask if user wants to create the docs structure:
 
@@ -157,12 +306,18 @@ mkdir -p docs/event_model/{workflows,scenarios}
 
 Create template files if requested.
 
-### 7. Display Success
+### 9. Display Success
 
-Show summary of what was configured and next steps:
+Show summary of what was configured and next steps. Include all relevant sections based on what was actually configured:
 
 ```
 SDLC initialized successfully!
+
+Repository: owner/repo-name (private)  # if created
+Rulesets: main-branch-protection       # if configured
+  - Required signatures: Yes
+  - Required PR approvals: 1
+  - Force push protection: Yes
 
 Configuration: .claude/sdlc.yaml
 Mode: Event Modeling
@@ -187,3 +342,5 @@ Auto-approval patterns to add to Claude settings:
   Bash(gh pr-review:*)
   Bash(gs:*)  # if using git-spice
 ```
+
+Omit sections that weren't configured (e.g., don't show Repository section if no repo was created).
