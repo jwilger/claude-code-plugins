@@ -1,6 +1,6 @@
 {
   "name": "bootstrap",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Project scaffolding with Nix-based development environments",
   "author": {
     "name": "John Wilger",

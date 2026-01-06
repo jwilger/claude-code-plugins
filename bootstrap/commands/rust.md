@@ -174,17 +174,109 @@ Create `.gitignore`:
 .cargo-bin/
 ```
 
-### 8. Initialize Git Repository
+### 8. Create CLAUDE.md
+
+Create `CLAUDE.md` with project-specific guidance:
+
+```markdown
+# CLAUDE.md
+
+This project uses a Nix-based development environment.
+
+## Development Environment
+
+We use Nix flakes for reproducible development environments. The dev shell should already be loaded.
+
+### Running utilities not in the dev shell
+
+If you need a utility that isn't already in the dev shell, use `nix shell` to temporarily run it:
+
+```bash
+nix shell nixpkgs#<package> -c <command>
+```
+
+For example:
+```bash
+nix shell nixpkgs#ripgrep -c rg "pattern" .
+```
+
+## Commit Message Guidelines
+
+We use commitizen-style commit messages. The format is:
+
+```
+<type>(<scope>): <subject>
+
+<body>
+```
+
+**Types:** feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
+
+**IMPORTANT:** Commit messages should explain the *WHY*, not just the what/how. The code diff shows what changed; the commit message should explain the reasoning and context behind the change.
+
+### Good example:
+```
+feat(auth): add rate limiting to login endpoint
+
+Prevent brute-force attacks by limiting login attempts to 5 per minute
+per IP address. This addresses security audit finding SEC-2024-042.
+```
+
+### Bad example:
+```
+feat(auth): add rate limiting
+
+Added rate limiting code to the auth module.
+```
+```
+
+### 9. Build the Nix Development Environment
+
+Build the development shell to verify the flake is valid and generate `flake.lock`:
+
+```bash
+nix develop --command echo "Development shell built successfully"
+```
+
+**Error Handling:**
+
+If the build fails:
+1. Read the error message carefully
+2. Common issues include:
+   - Invalid Nix syntax in flake.nix
+   - Missing inputs or references
+   - Network issues fetching inputs
+3. Attempt to fix the flake.nix based on the error
+4. Re-run the build command
+5. If still failing after 2 attempts, inform the user of the specific error and ask for guidance
+
+The build MUST succeed before proceeding to the git commit step.
+
+### 10. Initialize Git Repository
 
 Run these commands in sequence:
 
 ```bash
 git init
-git add .
-git commit -m "Initialize Rust development environment"
+git add flake.nix flake.lock rust-toolchain.toml .envrc .gitignore CLAUDE.md
+git commit -m "$(cat <<'EOF'
+chore(bootstrap): initialize Nix-based Rust development environment
+
+Establish reproducible development environment using Nix flakes with:
+- Rust stable toolchain via rust-overlay (with clippy, rustfmt, rust-analyzer)
+- cargo-nextest for faster test execution
+- cargo-audit for security vulnerability scanning
+- git-spice for stacked PR workflows
+- direnv integration for automatic environment activation
+
+This foundation ensures all contributors have identical tooling without
+manual setup, eliminating "works on my machine" issues and enabling
+immediate productivity on project onboarding.
+EOF
+)"
 ```
 
-### 9. Display Success
+### 11. Display Success
 
 Show a summary:
 
@@ -193,9 +285,11 @@ Rust project initialized successfully!
 
 Created files:
   - flake.nix (Nix development environment)
+  - flake.lock (pinned dependency versions)
   - rust-toolchain.toml (Rust stable with rustfmt, clippy, rust-src, rust-analyzer)
   - .envrc (direnv integration)
   - .gitignore
+  - CLAUDE.md (development guidelines)
 
 Tool versions:
   - cargo-nextest: X.Y.Z

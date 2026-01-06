@@ -27,7 +27,7 @@
       "name": "bootstrap",
       "source": "./bootstrap",
       "description": "Project scaffolding with Nix-based development environments",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "keywords": ["bootstrap", "scaffolding", "nix", "rust", "development-environment"]
     }
   ]
