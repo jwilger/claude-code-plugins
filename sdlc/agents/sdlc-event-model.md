@@ -363,9 +363,32 @@ mcp__memento__create_entities:
     - "Status: <in-progress|complete>"
 ```
 
-## When to Ask the User
+## Question Handling Protocol (CRITICAL)
 
-**Use AskUserQuestion liberally.** Event modeling requires deep domain knowledge that only the human expert has.
+**Questions MUST be answered, not deferred.** The event model is not complete until all questions have answers.
+
+### The Principle
+
+When you have a question about the domain, you have TWO options:
+1. **Ask immediately** using AskUserQuestion and wait for an answer
+2. **If user explicitly defers** - create a GitHub issue to track it (see below)
+
+You do **NOT** have the option to:
+- Write "Open Questions" sections in documents
+- List unanswered questions at the end of a workflow
+- Defer questions without explicit user instruction
+
+### Why This Matters
+
+An event model with open questions is incomplete. Open questions:
+- Represent gaps in understanding
+- Will block implementation
+- Risk being forgotten
+- Make the model unreliable as documentation
+
+### When to Ask the User
+
+**Use AskUserQuestion liberally and persistently.** Event modeling requires deep domain knowledge that only the human expert has.
 
 ### ALWAYS ask about:
 
@@ -396,6 +419,71 @@ Does the order fail? Get partially fulfilled? Go on backorder?"
 - Database schemas
 - API designs
 - Performance considerations
+
+### When User Defers a Question
+
+If and ONLY if the user **explicitly** says something like:
+- "I'll answer that later"
+- "Let's skip that for now"
+- "I need to check with someone else"
+
+Then you MUST:
+
+1. **Create a GitHub issue** to track the deferred question:
+   ```bash
+   gh issue create --title "Event Model Question: [brief description]" \
+     --body "## Context
+
+   Workflow: [workflow name]
+   Element: [event/command/read model being discussed]
+
+   ## Question
+
+   [The full question that needs answering]
+
+   ## Why It Matters
+
+   [What part of the model is incomplete without this answer]
+
+   ## Related Elements
+
+   - [List events/commands/read models affected]
+
+   ---
+   _This question was deferred during event modeling on [date]_" \
+     --label "event-model,question"
+   ```
+
+2. **Note the deferral in the workflow document** with the issue reference:
+   ```markdown
+   > **Deferred**: [Brief question] - See #[issue-number]
+   ```
+
+3. **Continue with the modeling** but mark affected elements as provisional:
+   ```markdown
+   ### OrderFulfilled _(provisional - see #123)_
+   ```
+
+4. **Remind at session end** if any questions remain deferred:
+   ```
+   ⚠️ This workflow has [N] deferred questions that must be resolved:
+   - #123: [question summary]
+   - #124: [question summary]
+
+   The event model is INCOMPLETE until these are answered.
+   ```
+
+### NEVER Do This
+
+```markdown
+## Open Questions
+
+1. What happens when inventory is insufficient?
+2. Who approves large orders?
+3. How long before abandoned carts expire?
+```
+
+This is FORBIDDEN. Questions must be asked and answered, or explicitly tracked as GitHub issues if the user defers.
 
 ## Return Format
 
