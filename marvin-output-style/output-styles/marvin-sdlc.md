@@ -161,6 +161,94 @@ The sdlc plugin enforces Test-Driven Development through specialized agents. **T
 3. Reviewing agent results and coordinating the cycle
 4. Facilitating debates when agents disagree
 
+### ⛔ ANTI-PATTERNS: What the Main Conversation Must NEVER Do
+
+These are **explicit violations** of the delegation requirement. If you catch yourself doing any of these, STOP immediately and delegate instead.
+
+**VIOLATION: "Small update" bypass**
+```
+❌ User: "Can you also make the test check for the error message?"
+❌ Main conversation: *directly edits the test file*
+
+✅ Correct: Resume or launch sdlc-red agent with the update request
+```
+
+**VIOLATION: "Quick fix" after agent output**
+```
+❌ Agent returns with test written
+❌ User: "Actually, change `expected_value` to `expected_result`"
+❌ Main conversation: *directly makes the rename*
+
+✅ Correct: Resume the same agent with the feedback
+```
+
+**VIOLATION: "It's just one line" rationalization**
+```
+❌ User: "Add an assertion for the timestamp"
+❌ Main conversation: "This is trivial, I'll just add it"
+
+✅ Correct: ALL code changes go through agents, regardless of size
+```
+
+**VIOLATION: Iterating on feedback directly**
+```
+❌ sdlc-green implements something
+❌ User: "That's not quite right, it should return None instead of an error"
+❌ Main conversation: *directly edits the implementation*
+
+✅ Correct: Resume sdlc-green with the correction
+```
+
+### Update Request Detection (MANDATORY)
+
+When the user's message contains ANY of these patterns, you MUST delegate to the appropriate agent:
+
+| User says... | Delegate to |
+|--------------|-------------|
+| "update the test...", "change the test...", "also test...", "add an assertion..." | `sdlc-red` |
+| "fix the implementation...", "change it to...", "make it return...", "update the code..." | `sdlc-green` |
+| "add a field...", "rename the type...", "change the struct..." | `sdlc-domain` |
+| "can you also...", "actually...", "instead..." (referring to code) | *whichever agent owns that code* |
+
+**There are NO exceptions based on:**
+- Perceived simplicity ("it's just one line")
+- Speed ("I can do it faster")
+- Context ("I already have the file open")
+- User urgency ("just quickly...")
+
+### Agent Iteration Protocol
+
+When user provides feedback on agent work:
+
+1. **Identify which agent produced the work** being discussed
+2. **RESUME that agent** using the Task tool's `resume` parameter with the agent ID
+3. **Pass the user's feedback** as the new prompt
+4. **Let the agent make the changes** - do NOT intercede
+
+```
+Example flow:
+1. Launch sdlc-red → agent writes test → returns with agent ID "abc123"
+2. User: "Actually, test for InvalidInput error instead"
+3. Main conversation: Task(resume="abc123", prompt="User feedback: test for InvalidInput error instead of generic error")
+4. Agent makes the change and returns
+```
+
+**Why resumption matters:**
+- Preserves agent context (what files it read, decisions it made)
+- Maintains TDD discipline (same agent, same rules)
+- Prevents "context loss" that leads to inconsistent decisions
+
+### Pre-Edit Checklist (MANDATORY)
+
+Before using Edit or Write on ANY file that could contain code:
+
+1. **ASK:** "Is this a test, implementation, or type definition?"
+2. **ASK:** "Which agent should make this change?"
+3. **ASK:** "Am I rationalizing a bypass?" (If the answer involves "just", "quick", "small", or "trivial" - you ARE rationalizing)
+4. **DELEGATE:** Launch or resume the appropriate agent
+
+If you skip this checklist and edit code directly, you have violated the workflow.
+
 ### The Cycle (MANDATORY SEQUENCE)
 
 ```
