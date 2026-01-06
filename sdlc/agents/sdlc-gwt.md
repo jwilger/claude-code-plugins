@@ -15,16 +15,19 @@ Generate concrete, testable GWT scenarios for event model slices. Each slice rep
 
 ## Context: Per-Workflow PRs
 
-GWT scenarios are generated on the **same branch** as the workflow they belong to. Each workflow + its scenarios form a complete PR for review.
+GWT scenarios are generated on the **same branch** as the workflow they belong to. Scenarios are written **directly into each slice document** - no separate scenario files.
 
 ```
 event-model/<workflow-name> branch contains:
-├── docs/event_model/workflows/<name>.md      # Workflow design
-└── docs/event_model/scenarios/<name>/        # GWT scenarios for this workflow
-    ├── slice-1.md                            # One slice = one pattern
-    ├── slice-2.md
+docs/event_model/workflows/<name>/
+├── overview.md                    # Workflow overview + master diagram
+└── slices/
+    ├── add-item-to-cart.md        # Slice doc WITH GWT scenarios
+    ├── cart-summary.md            # Slice doc WITH GWT scenarios
     └── ...
 ```
+
+Each slice document contains its own GWT scenarios in a `## GWT Scenarios` section at the bottom.
 
 ## The Critical Mapping
 
@@ -184,25 +187,18 @@ For Automation pattern slices:
 
 ## Scenario Documentation Format
 
-Create `docs/event_model/scenarios/<workflow>/<slice>.md`:
+**Add GWT scenarios to existing slice documents** at `docs/event_model/workflows/<workflow>/slices/<slice>.md`.
+
+Each slice document already has structure from the workflow design phase. Add a `## GWT Scenarios` section at the bottom:
+
+### For Command Slices
+
+Add to the existing slice document:
 
 ```markdown
-# Scenarios: <Slice Name>
-
-**Pattern**: Command | View | Automation | Translation
-**Slice Diagram Excerpt**:
-(Show the relevant portion of the workflow mermaid diagram)
-
-## Overview
-<What this slice accomplishes - one sentence>
-
-## Wireframe
-<ASCII wireframe showing data input (for commands) or data display (for views)>
-
 ---
 
-## Command Scenarios
-(Include this section ONLY for Command/Automation/Translation slices)
+## GWT Scenarios
 
 ### Scenario: <Happy Path Title>
 
@@ -225,13 +221,18 @@ Create `docs/event_model/scenarios/<workflow>/<slice>.md`:
 
 **Then** (error - no events):
 - Error: "Descriptive error message"
+```
 
+### For View Slices
+
+Add to the existing slice document:
+
+```markdown
 ---
 
-## Projection Scenarios
-(Include this section ONLY for View slices, or for Command slices that also update a projection)
+## GWT Scenarios
 
-### Scenario: <Projection Update Title>
+### Scenario: <Event Updates Projection>
 
 **Given** (current projection state):
 - ProjectionName { field1: "value", field2: 100 }
@@ -345,7 +346,7 @@ Before completing, verify each scenario:
 - [ ] Is independent of other scenarios
 - [ ] Uses business language (not technical jargon)
 - [ ] Matches event model terminology exactly
-- [ ] Includes wireframe showing relevant data
+- [ ] References the wireframe already in the slice document
 
 ### For Command scenarios:
 - [ ] Given contains ONLY events (with all fields and realistic values)
@@ -375,28 +376,21 @@ If a scenario naturally leads to technical discussion, redirect: "That's an impl
 
 After generating scenarios:
 ```
-GWT Scenarios Generated: <slice-name>
+GWT Scenarios Added: <slice-name>
 
 Pattern: Command | View | Automation | Translation
 
-Command Scenarios: <count>
+Scenarios: <count>
   1. <Happy Path Title>
   2. <Error Case 1 Title>
-  ...
-
-Projection Scenarios: <count>
-  1. <Projection Update Title>
   ...
 
 Coverage:
   - Happy path: Yes
   - Error cases: <list which command rejection reasons are covered>
   - Boundary conditions: <list which boundaries are tested>
-  - Projection updates: <list which events update which projections>
 
-Wireframe: ✓ Included
-
-Documentation: docs/event_model/scenarios/<workflow>/<slice>.md
+Updated: docs/event_model/workflows/<workflow>/slices/<slice>.md
 
 Note: These scenarios are on branch event-model/<workflow>.
 They will be included in the workflow PR.

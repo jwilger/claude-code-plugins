@@ -146,10 +146,14 @@ ls docs/event_model/ 2>/dev/null
 
 If not, create the structure:
 ```bash
-mkdir -p docs/event_model/{domain,workflows,scenarios}
+mkdir -p docs/event_model/domain
+mkdir -p docs/event_model/workflows
 ```
 
-Create `docs/event_model/README.md` explaining the structure.
+Create `docs/event_model/README.md` explaining the structure:
+- `domain/` - Domain discovery overview
+- `workflows/<name>/overview.md` - Workflow overview with master diagram
+- `workflows/<name>/slices/` - Individual slice documents (each self-contained with GWT scenarios)
 
 ### 3. Search Memento for Context
 
@@ -261,7 +265,9 @@ Task tool with subagent_type="sdlc-event-model":
   - Skip wireframes (they are mandatory!)
   - Create slices larger than ONE pattern
 
-  Store in docs/event_model/workflows/<name>.md
+  Output structure:
+  - docs/event_model/workflows/<name>/overview.md (master diagram, slice list)
+  - docs/event_model/workflows/<name>/slices/<slice>.md (one per slice)
 ```
 
 After workflow design completes, **immediately run information completeness check**:
@@ -305,7 +311,8 @@ Then use the sdlc-gwt agent:
 Task tool with subagent_type="sdlc-gwt":
   Generate Given/When/Then scenarios for workflow: <workflow-name>
 
-  Read the workflow from docs/event_model/workflows/<name>.md
+  Read the workflow from docs/event_model/workflows/<name>/overview.md
+  Read each slice from docs/event_model/workflows/<name>/slices/*.md
 
   CRITICAL: GWT structure depends on slice type!
 
@@ -324,11 +331,14 @@ Task tool with subagent_type="sdlc-gwt":
   2. Write happy path scenario first
   3. Identify all edge cases through questioning
   4. Write concrete scenarios with real example data
-  5. Include wireframe excerpt showing relevant data
+  5. Reference the wireframe already in the slice document
 
   These scenarios ARE the acceptance criteria for future stories.
 
-  Write to docs/event_model/scenarios/<workflow>/<slice>.md
+  ADD scenarios to existing slice docs at:
+  docs/event_model/workflows/<workflow>/slices/<slice>.md
+
+  (Add ## GWT Scenarios section at the bottom of each slice document)
 ```
 
 After GWT scenarios are generated, **run GWT feedback evaluation**:
@@ -467,17 +477,19 @@ After workflow design:
 Workflow Designed: <name>
 Branch: event-model/<name>
 
-Events: <count>
-  - <list>
-
-Commands: <count>
-  - <list>
-
-Read Models: <count>
-  - <list>
+Documentation:
+  docs/event_model/workflows/<name>/
+  ├── overview.md
+  └── slices/
+      ├── <slice-1>.md
+      ├── <slice-2>.md
+      └── ...
 
 Vertical Slices: <count>
-  - <list>
+  Command: <list>
+  View: <list>
+  Automation: <list>
+  Translation: <list>
 
 Next steps:
   /sdlc:design gwt <name> - Generate GWT scenarios
@@ -486,11 +498,11 @@ Next steps:
 
 After GWT scenarios:
 ```
-Scenarios Generated: <workflow-name>
+Scenarios Added: <workflow-name>
 
-Slices with scenarios:
-  - <slice 1>: <n> scenarios
-  - <slice 2>: <n> scenarios
+Slices updated:
+  - <slice-1>.md: <n> scenarios
+  - <slice-2>.md: <n> scenarios
 
 PR ready for review. To submit:
   git push && gh pr create

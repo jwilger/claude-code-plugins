@@ -286,11 +286,18 @@ Group by pattern type:
 
 A workflow with 3 commands, 2 views, and 1 automation = 6 slices.
 
-**Output**: Create `docs/event_model/workflows/<name>.md` with:
-- Complete workflow diagram (Mermaid)
-- All wireframes (ASCII)
-- All events, commands, views, automations, translations
-- Decomposed slice list
+**Output**: Create the following documents:
+
+1. `docs/event_model/workflows/<name>/overview.md`:
+   - Workflow description, user goal, actors
+   - Complete workflow diagram (Mermaid)
+   - List of slices with links to slice docs
+
+2. `docs/event_model/workflows/<name>/slices/<slice-name>.md` for EACH slice:
+   - Pattern type and diagram excerpt
+   - Component details (command/view/automation/translation)
+   - Wireframe
+   - GWT scenarios (added later by sdlc-gwt agent)
 
 ### MODE: VALIDATION
 
@@ -571,7 +578,25 @@ A "Place Order" workflow might contain these slices:
 
 That's 7 slices, NOT 1 "Place Order" slice.
 
-## Workflow Documentation Format
+## Documentation Structure
+
+Each workflow produces multiple documents for easier navigation and LLM consumption:
+
+```
+docs/event_model/workflows/<workflow-name>/
+├── overview.md           # High-level workflow overview + master diagram
+└── slices/
+    ├── add-item-to-cart.md    # Command slice (self-contained with GWT)
+    ├── cart-summary.md        # View slice (self-contained with GWT)
+    ├── submit-order.md        # Command slice
+    ├── order-confirmation.md  # View slice
+    ├── reserve-inventory.md   # Automation slice
+    └── payment-webhook.md     # Translation slice
+```
+
+## Workflow Overview Document Format
+
+Create `docs/event_model/workflows/<name>/overview.md`:
 
 ```markdown
 # Workflow: <Name>
@@ -587,8 +612,6 @@ That's 7 slices, NOT 1 "Place Order" slice.
 - **<Actor 2>**: <Their role and goals in this workflow>
 
 ## Workflow Diagram
-
-(Mermaid flowchart with swimlanes by actor. Color-coded: Blue=Commands, Orange=Events, Green=Views)
 
 ` ` `mermaid
 flowchart LR
@@ -633,26 +656,58 @@ flowchart LR
     classDef automation fill:#8b5cf6,color:#fff
 ` ` `
 
-## Events
+## Vertical Slices
 
-### <EventName>
-- **Triggered by**: <Command or automation>
-- **Data**:
-  - field1: type - description
-  - field2: type - description
-- **Business meaning**: <What this event represents in business terms>
+Each slice is ONE pattern. See individual slice documents for details.
 
-## Commands
+### Command Slices
+1. [AddItemToCart](slices/add-item-to-cart.md) - Customer adds product to cart
+2. [SubmitOrder](slices/submit-order.md) - Customer submits order
 
-### <CommandName>
-- **Issued by**: <Actor or automation>
+### View Slices
+3. [CartSummary](slices/cart-summary.md) - Shows cart contents and total
+4. [OrderConfirmation](slices/order-confirmation.md) - Shows order details
+
+### Automation Slices
+5. [ReserveInventory](slices/reserve-inventory.md) - Auto-reserves stock on order
+
+### Translation Slices
+6. [PaymentWebhook](slices/payment-webhook.md) - Stripe webhook integration
+```
+
+## Slice Document Format
+
+Create `docs/event_model/workflows/<name>/slices/<slice-name>.md`:
+
+### Command Slice Template
+
+```markdown
+# Slice: <CommandName>
+
+**Pattern**: Command (State Change)
+**Workflow**: [<Workflow Name>](../overview.md)
+
+## Diagram Excerpt
+
+` ` `mermaid
+flowchart LR
+    UI[<Trigger UI>] --> CMD[<CommandName>]:::command
+    CMD --> EVT[<EventName>]:::event
+    classDef command fill:#3b82f6,color:#fff
+    classDef event fill:#f59e0b,color:#fff
+` ` `
+
+## Command: <CommandName>
+
+- **Issued by**: <Actor>
 - **Produces**: <EventName>
 - **Input**:
   - field1: type - description
   - field2: type - description
 - **Can fail when**: <Business rule violations>
 
-**Wireframe**:
+### Wireframe
+
 ` ` `
 ┌─────────────────────────────────┐
 │  <Command Name>                 │
@@ -660,13 +715,64 @@ flowchart LR
 │  Field 1: [________________]    │
 │  Field 2: [________________]    │
 │                                 │
-│  [Submit Button]                │
+│  [Submit]                       │
 └─────────────────────────────────┘
 ` ` `
 
-## Read Models (Views)
+## Event: <EventName>
 
-### <ReadModelName>
+- **Data**:
+  - field1: type - description
+  - field2: type - description
+- **Business meaning**: <What this fact represents>
+
+---
+
+## GWT Scenarios
+
+### Scenario: <Happy Path>
+
+**Given** (prior events):
+- EventName { field: "value" }
+
+**When** (command):
+- CommandName { input: "value" }
+
+**Then** (events produced):
+- EventName { field: "result", timestamp: "2024-01-15T10:30:00Z" }
+
+### Scenario: <Error Case>
+
+**Given** (prior events):
+- EventName { field: "value" }
+
+**When** (command):
+- CommandName { input: "invalid" }
+
+**Then** (error - no events):
+- Error: "Descriptive error message"
+```
+
+### View Slice Template
+
+```markdown
+# Slice: <ViewName>
+
+**Pattern**: View (State View)
+**Workflow**: [<Workflow Name>](../overview.md)
+
+## Diagram Excerpt
+
+` ` `mermaid
+flowchart LR
+    EVT1[<Event1>]:::event --> VIEW[<ViewName>]:::view
+    EVT2[<Event2>]:::event --> VIEW
+    classDef event fill:#f59e0b,color:#fff
+    classDef view fill:#22c55e,color:#fff
+` ` `
+
+## View: <ViewName>
+
 - **Purpose**: <What question it answers>
 - **For**: <Which actor(s)>
 - **Updated by**: <List of events>
@@ -674,7 +780,8 @@ flowchart LR
   - field1: type - description (from EventX.field)
   - field2: type - description (from EventY.field)
 
-**Wireframe**:
+### Wireframe
+
 ` ` `
 ┌─────────────────────────────────┐
 │  <View Name>                    │
@@ -684,46 +791,111 @@ flowchart LR
 │                                 │
 │  ┌───────┬───────┬───────┐      │
 │  │ Col 1 │ Col 2 │ Col 3 │      │
-│  ├───────┼───────┼───────┤      │
-│  │ data  │ data  │ data  │      │
 │  └───────┴───────┴───────┘      │
 └─────────────────────────────────┘
 ` ` `
 
-## Automations
+---
 
-### <AutomationName>
+## GWT Scenarios
+
+### Scenario: <Event updates view>
+
+**Given** (current projection state):
+- ViewName { field1: "old", field2: 100 }
+
+**When** (event to process):
+- EventName { relevantField: "data" }
+
+**Then** (resulting projection state):
+- ViewName { field1: "new", field2: 70 }
+```
+
+### Automation Slice Template
+
+```markdown
+# Slice: <AutomationName>
+
+**Pattern**: Automation
+**Workflow**: [<Workflow Name>](../overview.md)
+
+## Diagram Excerpt
+
+` ` `mermaid
+flowchart LR
+    EVT1[<TriggerEvent>]:::event --> VIEW[<TodoList>]:::view
+    VIEW --> AUTO[<AutomationName>]:::automation
+    AUTO --> CMD[<CommandName>]:::command
+    CMD --> EVT2[<ResultEvent>]:::event
+    classDef event fill:#f59e0b,color:#fff
+    classDef view fill:#22c55e,color:#fff
+    classDef automation fill:#8b5cf6,color:#fff
+    classDef command fill:#3b82f6,color:#fff
+` ` `
+
+## Automation: <AutomationName>
+
 - **Triggered by**: <EventName>
-- **Monitors**: <View name acting as todo list>
+- **Monitors**: <View acting as todo list>
 - **Process**: <What business logic it applies>
 - **Issues command**: <CommandName>
 - **Terminates when**: <What stops the automation>
 
-## External Integrations (Translations)
+---
 
-### <IntegrationName>
+## GWT Scenarios
+
+### Scenario: <Automation triggers>
+
+**Given** (prior events):
+- SetupEvent { config: "value" }
+
+**When** (trigger event):
+- TriggerEvent { data: "value" }
+
+**Then** (automation issues command, producing events):
+- ResultEvent { outcome: "value", timestamp: "2024-01-15T10:31:00Z" }
+```
+
+### Translation Slice Template
+
+```markdown
+# Slice: <TranslationName>
+
+**Pattern**: Translation
+**Workflow**: [<Workflow Name>](../overview.md)
+
+## Diagram Excerpt
+
+` ` `mermaid
+flowchart LR
+    EXT[External: <System>] --> TRANS[<TranslationName>]:::automation
+    TRANS --> EVT[<InternalEvent>]:::event
+    classDef automation fill:#8b5cf6,color:#fff
+    classDef event fill:#f59e0b,color:#fff
+` ` `
+
+## Translation: <TranslationName>
+
 - **Purpose**: <What business need it serves>
-- **Direction**: <Inbound/Outbound/Both>
-- **External trigger**: <What external event/webhook/etc>
+- **External system**: <Name only - no technical details>
+- **External trigger**: <What causes this>
 - **Internal event**: <What domain event is produced>
 
-## Vertical Slices
+---
 
-Each slice is ONE pattern. List all slices with their type:
+## GWT Scenarios
 
-### Command Slices
-1. **AddItemToCart** - Customer adds product to cart → ItemAddedToCart
-2. **SubmitOrder** - Customer submits order → OrderSubmitted
+### Scenario: <External data translated>
 
-### View Slices
-3. **CartSummary** - Shows cart contents (from ItemAddedToCart, ItemRemovedFromCart)
-4. **OrderConfirmation** - Shows order details (from OrderSubmitted)
+**Given** (external state):
+- External system has processed payment for order ORD-123
 
-### Automation Slices
-5. **ReserveInventory** - Triggered by OrderSubmitted → issues ReserveStock → InventoryReserved
+**When** (external trigger):
+- Webhook received from Stripe with payment confirmation
 
-### Translation Slices
-6. **PaymentWebhook** - Stripe webhook → PaymentReceived
+**Then** (internal event):
+- PaymentReceived { orderId: "ORD-123", amount: 99.95, provider: "stripe" }
 ```
 
 **IMPORTANT**: Replace ` ` ` with actual backticks in real documents.
