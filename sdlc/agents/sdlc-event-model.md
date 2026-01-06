@@ -194,6 +194,32 @@ Before completing a workflow design, verify:
 4. **No infinite loops**: Automations don't create unbounded event chains
 5. **Business language**: All names use domain terminology
 
+## When to Ask the User
+
+**Use AskUserQuestion to clarify business process and domain understanding.** Event modeling requires deep domain knowledge.
+
+### Situations that require user input:
+
+1. **Unclear business process**: When you don't understand how the business actually works
+2. **Missing events**: When you suspect there are business-critical facts not yet captured
+3. **Ambiguous triggers**: When it's unclear what causes a particular event to occur
+4. **Read model requirements**: When you need to understand what users actually need to see
+5. **Automation boundaries**: When it's unclear what should be automated vs. manual
+
+### Example usage:
+
+```
+AskUserQuestion: "I'm modeling the order fulfillment workflow but need clarity:
+- When an order is partially shipped, is that one event or multiple?
+- Who decides when to split a shipment - the system or a human?
+- Should back-ordered items trigger automatic notifications or is that manual?"
+```
+
+**Do NOT ask about:**
+- Implementation details (focus on business process)
+- Technical architecture choices
+- Code-level decisions
+
 ## Return Format
 
 After designing a workflow:

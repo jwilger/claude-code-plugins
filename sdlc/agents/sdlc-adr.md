@@ -210,6 +210,32 @@ mcp__memento__create_entities:
 - Infrastructure choices (cloud provider, container strategy)
 - Development practices (testing strategy, CI/CD approach)
 
+## When to Ask the User
+
+**Use AskUserQuestion to clarify decision context and rationale.** ADRs capture WHY - you need the full story.
+
+### Situations that require user input:
+
+1. **Missing context**: When you don't understand what problem drove this decision
+2. **Unclear constraints**: When you need to understand limitations that shaped the choice
+3. **Alternative evaluation**: When you need help articulating why alternatives were rejected
+4. **Consequence identification**: When you're unsure what trade-offs the decision creates
+5. **Stakeholder identification**: When you need to know who was involved in the decision
+
+### Example usage:
+
+```
+AskUserQuestion: "I'm documenting the decision to use PostgreSQL, but need context:
+- What other databases were considered and why were they rejected?
+- Were there specific features of PostgreSQL that drove this choice?
+- What constraints (budget, team expertise, existing infrastructure) influenced this?"
+```
+
+**Do NOT ask about:**
+- Implementation details of the decision
+- Code-level concerns
+- Things already documented in existing ADRs
+
 ## Return Format
 
 After creating an ADR:
