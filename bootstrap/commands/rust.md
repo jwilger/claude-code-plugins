@@ -6,7 +6,6 @@ allowed-tools:
   - Write
   - AskUserQuestion
   - Glob
-  - Skill
 ---
 
 # Bootstrap Rust Project
@@ -185,19 +184,7 @@ git add .
 git commit -m "Initialize Rust development environment"
 ```
 
-### 9. SDLC Integration
-
-Check if the `/sdlc:setup` command is available by looking for the sdlc plugin.
-
-Use AskUserQuestion:
-
-**Question: Run SDLC setup?**
-- "Yes, configure SDLC workflow" - Invoke the /sdlc:setup command
-- "No, skip SDLC setup" - Complete without SDLC configuration
-
-If user selects yes, use the Skill tool to invoke `sdlc:setup`.
-
-### 10. Display Success
+### 9. Display Success
 
 Show a summary:
 
@@ -214,13 +201,10 @@ Tool versions:
   - cargo-nextest: X.Y.Z
   - cargo-audit: X.Y.Z
 
-Next steps:
-  1. Run `direnv allow` to activate the environment
-  2. Wait for nix to build the development shell
-  3. Start coding!
-```
+**IMPORTANT: Exit Claude Code now and load the Nix development shell.**
 
-If SDLC was skipped but available, remind:
-```
-Tip: Run /sdlc:setup later to configure the SDLC workflow.
+If you have direnv configured, the shell will load automatically when you cd into the project directory.
+Otherwise, run `nix develop` manually to enter the development shell.
+
+Once the development shell is loaded, restart Claude Code in the project directory.
 ```
