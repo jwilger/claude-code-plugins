@@ -140,6 +140,37 @@ If "Require PR before merging" was selected:
 - "Yes" - Only allow squash or rebase merges (no merge commits)
 - "No" - Allow merge commits
 
+**Question: Allowed merge methods?** (multiSelect: true)
+- "Merge commits" - Allow standard merge commits (creates merge commit in history)
+- "Squash merging" - Allow squashing commits into one (Recommended for cleaner history)
+- "Rebase merging" - Allow rebasing commits onto base branch
+
+Note: At least one merge method must be selected. If the user selects "Require linear history" above, inform them that merge commits will be disabled regardless.
+
+**Question: Auto-delete branches after merge?**
+- "Yes" - Automatically delete head branches after PR merge (Recommended)
+- "No" - Keep branches after merge
+
+#### Apply Repository Settings
+
+Before applying rulesets, configure the repository merge and branch deletion settings:
+
+```bash
+gh api --method PATCH /repos/{owner}/{repo} \
+  --field allow_merge_commit=<true|false> \
+  --field allow_squash_merge=<true|false> \
+  --field allow_rebase_merge=<true|false> \
+  --field delete_branch_on_merge=<true|false>
+```
+
+Set each field based on user selections:
+- `allow_merge_commit`: true if "Merge commits" was selected
+- `allow_squash_merge`: true if "Squash merging" was selected
+- `allow_rebase_merge`: true if "Rebase merging" was selected
+- `delete_branch_on_merge`: true if "Yes" to auto-delete
+
+If "Require linear history" was selected, set `allow_merge_commit=false` regardless of the merge methods selection.
+
 #### Build and Apply Ruleset
 
 Construct the ruleset JSON based on user selections. Example structure:
@@ -296,7 +327,36 @@ Ensure `.claude/` directory exists:
 mkdir -p .claude
 ```
 
-### 8. Initialize Event Model Docs (if applicable)
+### 8. Configure Output Style
+
+The sdlc plugin requires the `marvin-output-style:marvin-sdlc` output style to function reliably. This output style contains the TDD workflow orchestration rules, memory protocol, and other critical instructions.
+
+Check if `.claude/settings.json` exists and read its current contents:
+```bash
+cat .claude/settings.json 2>/dev/null || echo "{}"
+```
+
+Create or update `.claude/settings.json` to include the output style. Preserve any existing settings (like permissions) and add/update the `outputStyle` field:
+
+```json
+{
+  "outputStyle": "marvin-output-style:marvin-sdlc"
+}
+```
+
+If the file already has other settings, merge them. For example, if it contains permissions:
+```json
+{
+  "outputStyle": "marvin-output-style:marvin-sdlc",
+  "permissions": {
+    "allow": ["...existing permissions..."]
+  }
+}
+```
+
+**Important**: Use the Write tool to create/update this file, ensuring valid JSON format.
+
+### 9. Initialize Event Model Docs (if applicable)
 
 If mode is `event-modeling`, ask if user wants to create the docs structure:
 
@@ -306,7 +366,7 @@ mkdir -p docs/event_model/{workflows,scenarios}
 
 Create template files if requested.
 
-### 9. Commit and Push Configuration
+### 10. Commit and Push Configuration
 
 Check if there are any changes to commit:
 
@@ -331,11 +391,12 @@ git checkout -b sdlc-setup
 
 2. Stage and commit the changes:
 ```bash
-git add .claude/sdlc.yaml docs/event_model/ 2>/dev/null
+git add .claude/sdlc.yaml .claude/settings.json docs/event_model/ 2>/dev/null
 git add -A  # Catch any other setup-related files
 git commit -m "chore: initialize SDLC configuration
 
 - Add .claude/sdlc.yaml with project preferences
+- Configure output style (marvin-output-style:marvin-sdlc)
 - Configure development mode, git workflow, and GitHub project
 - Set up TDD verbosity and bypass patterns"
 ```
@@ -353,6 +414,7 @@ This PR initializes the SDLC workflow configuration for the project.
 
 ### Changes
 - Created \`.claude/sdlc.yaml\` with project preferences
+- Configured output style (\`marvin-output-style:marvin-sdlc\`) in \`.claude/settings.json\`
 - Configured development mode and git workflow
 - Set up GitHub project integration (if applicable)
 - Initialized event model documentation structure (if applicable)
@@ -373,11 +435,12 @@ Once merged, the project will be fully configured for the SDLC workflow.
 
 1. Stage and commit directly to the current branch:
 ```bash
-git add .claude/sdlc.yaml docs/event_model/ 2>/dev/null
+git add .claude/sdlc.yaml .claude/settings.json docs/event_model/ 2>/dev/null
 git add -A  # Catch any other setup-related files
 git commit -m "chore: initialize SDLC configuration
 
 - Add .claude/sdlc.yaml with project preferences
+- Configure output style (marvin-output-style:marvin-sdlc)
 - Configure development mode, git workflow, and GitHub project
 - Set up TDD verbosity and bypass patterns"
 ```
@@ -391,18 +454,19 @@ git push origin HEAD
 
 Just commit locally without pushing:
 ```bash
-git add .claude/sdlc.yaml docs/event_model/ 2>/dev/null
+git add .claude/sdlc.yaml .claude/settings.json docs/event_model/ 2>/dev/null
 git add -A
 git commit -m "chore: initialize SDLC configuration
 
 - Add .claude/sdlc.yaml with project preferences
+- Configure output style (marvin-output-style:marvin-sdlc)
 - Configure development mode, git workflow, and GitHub project
 - Set up TDD verbosity and bypass patterns"
 ```
 
 Inform the user that changes are committed locally and will be pushed when a remote is configured.
 
-### 10. Display Success
+### 11. Display Success
 
 Show summary of what was configured and next steps. Include all relevant sections based on what was actually configured:
 
@@ -410,11 +474,14 @@ Show summary of what was configured and next steps. Include all relevant section
 SDLC initialized successfully!
 
 Repository: owner/repo-name (private)  # if created
+  Merge methods: squash, rebase         # based on selections
+  Auto-delete branches: Yes             # if enabled
 Rulesets: main-branch-protection       # if configured
   - Required signatures: Yes
   - Required PR approvals: 1
   - Force push protection: Yes
 
+Output Style: marvin-output-style:marvin-sdlc
 Configuration: .claude/sdlc.yaml
 Mode: Event Modeling
 Git Workflow: git-spice
