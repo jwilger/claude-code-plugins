@@ -244,6 +244,185 @@ Check each of these:
 
 Report gaps as **questions to resolve**, not technical problems.
 
+### MODE: COMPLETENESS_CHECK
+
+**Goal**: Verify information completeness and CREATE any missing elements. This is an ITERATIVE process.
+
+**CRITICAL**: This is NOT a passive check. When you find gaps, you MUST:
+1. Create the missing element immediately
+2. Ask the user for any needed clarification
+3. Run the check AGAIN
+4. Repeat until NO gaps remain
+
+**The Loop**:
+
+```
+┌─────────────────────────────────────┐
+│     Run completeness checks         │
+└──────────────────┬──────────────────┘
+                   │
+                   ▼
+          ┌───────────────┐
+          │  Gaps found?  │
+          └───────┬───────┘
+                  │
+       ┌──────────┴──────────┐
+       │ YES                 │ NO
+       ▼                     ▼
+┌─────────────────┐   ┌─────────────────┐
+│ For each gap:   │   │ Check complete! │
+│ 1. Ask user     │   │ Proceed to next │
+│ 2. Create elem  │   │ phase           │
+│ 3. Update doc   │   └─────────────────┘
+└────────┬────────┘
+         │
+         └──────► (back to top)
+```
+
+**Check Criteria**:
+
+1. **Read Model → Event Traceability**
+   - For EVERY field in EVERY read model, identify which event provides that data
+   - If a field has no source event: ASK the user what business fact produces it, CREATE the event
+
+2. **Event → Command/Automation Coverage**
+   - For EVERY event, identify what triggers it (command, automation, or translation)
+   - If an event has no trigger: ASK the user what causes it, CREATE the command/automation
+
+3. **Command Validation Rules**
+   - For EVERY command, identify under what circumstances it would be rejected
+   - If "can fail when" is empty or vague: ASK the user what business rules apply
+
+4. **Automation Termination**
+   - For EVERY automation, identify what stops it from running forever
+   - If termination is unclear: ASK the user what ends the process
+
+**Output Format**:
+
+When gaps are found:
+```
+Information Completeness Check: <workflow-name>
+
+Gap #1: Read model field without source event
+  Read Model: OrderSummary
+  Field: estimatedDeliveryDate
+  Question: "What business event records when the delivery date is estimated?"
+
+[Ask user, get answer, create element]
+
+Gap #2: Event without trigger
+  Event: InventoryReserved
+  Question: "What command or automation triggers inventory reservation?"
+
+[Ask user, get answer, create element]
+
+... repeat for all gaps ...
+
+Re-running completeness check...
+
+[If more gaps found, continue. If not:]
+
+✅ Information completeness check PASSED
+All read model fields trace to events
+All events have triggers
+All commands have validation rules
+All automations have termination conditions
+
+Ready to proceed.
+```
+
+**DO NOT**:
+- Report gaps and stop (you must FIX them)
+- Assume you know the answer without asking
+- Proceed to next phase with ANY gaps remaining
+- Write "Open Questions" sections (see Question Handling Protocol)
+
+### MODE: GWT_FEEDBACK
+
+**Goal**: Evaluate if GWT scenarios reveal missing workflow elements, and add them.
+
+**Context**: This mode runs AFTER GWT scenarios have been generated. The scenarios often reveal gaps in the original workflow design because writing concrete examples forces precision.
+
+**Process**:
+
+1. **Read All Scenarios**
+   - Load every scenario from `docs/event_model/scenarios/<workflow>/`
+   - Understand the full scope of behavior being described
+
+2. **For Each Scenario, Check Given Clauses**
+   - Does the Given clause reference state that requires events we haven't modeled?
+   - Does it require read model fields we haven't defined?
+   - Example: "Given the customer has a loyalty status of Gold" - is there a `LoyaltyStatusAssigned` event?
+
+3. **For Each Scenario, Check When Clauses**
+   - Does the When clause imply a command we haven't defined?
+   - Does it imply validation rules we haven't captured?
+   - Example: "When the customer applies a discount code" - is there a `ApplyDiscountCode` command?
+
+4. **For Each Scenario, Check Then Clauses**
+   - Does the Then clause reference events that don't exist?
+   - Does it imply state changes we haven't modeled?
+   - Example: "Then the loyalty points are credited" - is there a `LoyaltyPointsCredited` event?
+
+5. **For Edge Case Scenarios**
+   - Do failure scenarios reveal command rejection reasons we haven't documented?
+   - Do they reveal events for failure states?
+   - Example: "Then the order is rejected due to insufficient inventory" - is there an `OrderRejected` event?
+
+**For Each Gap Discovered**:
+
+1. ASK the user to clarify the business behavior
+2. ADD the missing element to the workflow document
+3. UPDATE any related elements affected by the addition
+4. NOTE what was added for the subsequent completeness check
+
+**Output Format**:
+
+```
+GWT Feedback Evaluation: <workflow-name>
+
+Analyzing <N> scenarios across <M> slices...
+
+Finding #1: Missing event implied by Given clause
+  Scenario: "Customer applies loyalty discount"
+  Given: "the customer has Gold loyalty status"
+  Missing: No event records how loyalty status is assigned
+  Question: "What business process assigns loyalty status to customers?"
+
+[Ask user, get answer, add to workflow]
+
+Finding #2: Missing command implied by When clause
+  Scenario: "Apply expired discount code"
+  When: "the customer applies discount code 'SAVE20'"
+  Missing: No ApplyDiscountCode command defined
+  Question: "What information does a customer provide when applying a discount code?"
+
+[Ask user, get answer, add to workflow]
+
+Finding #3: Missing failure event implied by Then clause
+  Scenario: "Insufficient inventory for order"
+  Then: "the order is rejected"
+  Missing: No OrderRejected event (only OrderPlaced exists)
+  Question: "What information is recorded when an order is rejected?"
+
+[Ask user, get answer, add to workflow]
+
+GWT Feedback Complete: <workflow-name>
+
+Elements Added:
+  Events: +3 (LoyaltyStatusAssigned, DiscountApplied, OrderRejected)
+  Commands: +1 (ApplyDiscountCode)
+  Read Models: +0
+
+Triggering completeness check for new elements...
+```
+
+**DO NOT**:
+- Skip scenarios because they seem straightforward
+- Assume existing elements cover implied behavior
+- Add elements without asking the user first
+- Proceed without ensuring all scenarios are analyzed
+
 ## The Four Patterns
 
 All event-sourced systems use these four patterns to describe business behavior:

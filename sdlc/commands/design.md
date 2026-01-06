@@ -58,12 +58,42 @@ The AI's role is to be a **facilitator**, not a stenographer. The process involv
                                      │
                                      ▼
 ┌─────────────────────────────────────────────────────────────────┐
+│              INFORMATION COMPLETENESS CHECK                      │◄──┐
+│  Every read model field must trace to an event                  │   │
+│  Every event must have a triggering command/automation          │   │
+│  Create any missing elements immediately                         │   │
+└────────────────────────────────────┬────────────────────────────┘   │
+                                     │                                │
+                            (gaps found?) ────────────────────────────┘
+                                     │
+                                     ▼ (complete)
+┌─────────────────────────────────────────────────────────────────┐
 │                     GWT SCENARIOS (per workflow)                 │
 │  Generate Given/When/Then for each vertical slice               │
 │  Add to same workflow branch/PR                                  │
 └────────────────────────────────────┬────────────────────────────┘
                                      │
                                      ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                  GWT FEEDBACK EVALUATION                         │
+│  Do scenarios reveal missing workflow elements?                  │
+│  - Events not yet modeled?                                       │
+│  - Commands with unhandled failure cases?                        │
+│  - Read models missing fields?                                   │
+│  Add any missing elements to workflow                            │
+└────────────────────────────────────┬────────────────────────────┘
+                                     │
+                                     ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              INFORMATION COMPLETENESS CHECK                      │◄──┐
+│  (Run again after GWT feedback)                                  │   │
+│  Verify all additions are complete                               │   │
+│  Create any missing elements immediately                         │   │
+└────────────────────────────────────┬────────────────────────────┘   │
+                                     │                                │
+                            (gaps found?) ────────────────────────────┘
+                                     │
+                                     ▼ (complete)
 ┌─────────────────────────────────────────────────────────────────┐
 │                     REVIEW & MERGE                               │
 │  Review workflow PR independently                                │
@@ -209,6 +239,30 @@ Task tool with subagent_type="sdlc-event-model":
   Store in docs/event_model/workflows/<name>.md
 ```
 
+After workflow design completes, **immediately run information completeness check**:
+
+```
+Task tool with subagent_type="sdlc-event-model":
+  MODE: COMPLETENESS_CHECK
+
+  Run information completeness check on workflow: <workflow-name>
+
+  This is an ITERATIVE process. For EACH gap found:
+  1. Create the missing element immediately (ask user if needed)
+  2. Update the workflow document
+  3. Run the check AGAIN
+
+  Repeat until NO gaps remain. Only then proceed to GWT scenarios.
+
+  Check criteria:
+  - Every read model field traces to an event field
+  - Every event has a triggering command OR automation OR translation
+  - Every command has validation rules defined
+  - Every automation has termination conditions
+
+  DO NOT proceed to GWT until this check passes completely.
+```
+
 #### `gwt <workflow>` → Generate Scenarios
 
 First verify we're on the correct workflow branch:
@@ -236,6 +290,45 @@ Task tool with subagent_type="sdlc-gwt":
   These scenarios ARE the acceptance criteria for future stories.
 
   Write to docs/event_model/scenarios/<workflow>/<slice>.md
+```
+
+After GWT scenarios are generated, **run GWT feedback evaluation**:
+
+```
+Task tool with subagent_type="sdlc-event-model":
+  MODE: GWT_FEEDBACK
+
+  Evaluate if GWT scenarios reveal missing workflow elements for: <workflow-name>
+
+  Read the scenarios from docs/event_model/scenarios/<workflow>/
+
+  For EACH scenario, ask:
+  1. Does this scenario reference events that aren't in the workflow?
+  2. Does this scenario imply commands with failure cases we haven't modeled?
+  3. Does the Given clause require read model fields we haven't defined?
+  4. Does the Then clause imply events or state changes we're missing?
+
+  For EACH gap discovered:
+  1. Ask the user to clarify the business behavior
+  2. Add the missing element to the workflow document
+  3. Update related elements (commands, events, read models) as needed
+
+  After adding elements, this will trigger another completeness check.
+```
+
+Then **run information completeness check again**:
+
+```
+Task tool with subagent_type="sdlc-event-model":
+  MODE: COMPLETENESS_CHECK
+
+  Run information completeness check on workflow: <workflow-name>
+
+  (Same iterative process as before - repeat until no gaps remain)
+
+  This ensures any elements added during GWT feedback are complete.
+
+  Only after this check passes is the workflow ready for review.
 ```
 
 #### `validate` → Validate Model
