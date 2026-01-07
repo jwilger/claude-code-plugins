@@ -1,16 +1,7 @@
 {
-  "description": "SDLC workflow hooks for TDD enforcement, commit guards, and memory checkpoints",
+  "description": "SDLC workflow hooks for TDD enforcement and memory checkpoints",
   "hooks": {
     "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "prompt",
-            "prompt": "⛔ COMMIT GUARD CHECKPOINT ⛔\n\nYou are about to run a Bash command. Check if this is a git command that could stage or commit protected files.\n\n== PROTECTED FILES (MUST NEVER BE COMMITTED) ==\n- .claude/settings.local.json (local Claude Code settings)\n- Any file matching: .claude/*.local.json\n\n== EVALUATION RULES ==\n\n1. If the command is `git add` with `.` or `-A` or `--all`:\n   - BLOCK unless .claude/settings.local.json is in .gitignore\n   - Suggest: First ensure .claude/settings.local.json is in .gitignore\n\n2. If the command explicitly includes `.claude/settings.local.json`:\n   - BLOCK unconditionally\n   - Reason: This file contains local settings and must never be committed\n\n3. If the command is `git commit` and you suspect protected files are staged:\n   - BLOCK and suggest running `git status` first\n\n4. For all other commands:\n   - APPROVE\n\nRESPOND WITH JSON:\n{\"ok\": true}\nOR\n{\"ok\": false, \"reason\": \"Protected file: <explanation of what to do instead>\"}"
-          }
-        ]
-      },
       {
         "matcher": "Edit",
         "hooks": [
