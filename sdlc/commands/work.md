@@ -19,6 +19,16 @@ hooks:
             If it doesn't exist, stop and tell user to run /sdlc:setup first.
 
             Respond with: {"ok": true}
+  Stop:
+    - hooks:
+        - type: prompt
+          prompt: |
+            Before completing, store the current work context in memento:
+            - Issue being worked on
+            - Branch name
+            - Any decisions or discoveries made
+
+            Output ONLY: {"ok": true}
 ---
 
 # SDLC Work

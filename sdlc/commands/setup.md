@@ -414,18 +414,22 @@ Check if `.claude/settings.json` exists and read its current contents:
 cat .claude/settings.json 2>/dev/null || echo "{}"
 ```
 
-Create or update `.claude/settings.json` to include the output style. Preserve any existing settings (like permissions) and add/update the `outputStyle` field:
+Create or update `.claude/settings.json` to include the output style and recommended settings. Preserve any existing settings (like permissions) and add/update:
 
 ```json
 {
-  "outputStyle": "marvin-output-style:marvin-sdlc"
+  "outputStyle": "marvin-output-style:marvin-sdlc",
+  "respectGitignore": true
 }
 ```
+
+The `respectGitignore` setting improves @-mention file discovery by respecting .gitignore patterns.
 
 If the file already has other settings, merge them. For example, if it contains permissions:
 ```json
 {
   "outputStyle": "marvin-output-style:marvin-sdlc",
+  "respectGitignore": true,
   "permissions": {
     "allow": ["...existing permissions..."]
   }
@@ -582,6 +586,19 @@ Auto-approval patterns to add to Claude settings:
   Bash(gh project-ext *)
   Bash(gh pr-review *)
   Bash(gs *)  # if using git-spice
+
+Optional: Customize TDD agents (disable specific agents):
+  To disable an agent, add to permissions.deny in settings.json:
+  - Task(sdlc-mutation) - Disable mutation testing
+  - Task(sdlc-ux) - Disable UX review
+  - Task(sdlc-architect) - Disable architecture review
+
+  Example settings.json with agent denial:
+  {
+    "permissions": {
+      "deny": ["Task(sdlc-mutation)"]
+    }
+  }
 ```
 
 Omit sections that weren't configured (e.g., don't show Repository section if no repo was created).

@@ -61,6 +61,30 @@ hooks:
             Respond with JSON:
             {"ok": true} - if this is a production implementation file
             {"ok": false, "reason": "sdlc-green can only create production implementation files."} - otherwise
+  PostToolUse:
+    - matcher: Edit
+      hooks:
+        - type: prompt
+          prompt: |
+            🟢 POST-EDIT: Run tests to check progress.
+
+            After this edit, you SHOULD run the relevant tests to see if:
+            1. The test now passes (SUCCESS - return to orchestrator)
+            2. The test fails with a NEW error (progress - address the new error)
+            3. The test fails with the SAME error (no progress - reconsider approach)
+
+            Use Bash to run: cargo test, npm test, pytest, or the project's test command.
+
+            Output ONLY: {"ok": true}
+    - matcher: Write
+      hooks:
+        - type: prompt
+          prompt: |
+            🟢 POST-WRITE: Run tests to check progress.
+
+            After creating this file, you SHOULD run the relevant tests.
+
+            Output ONLY: {"ok": true}
   Stop:
     - hooks:
         - type: prompt

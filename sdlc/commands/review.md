@@ -7,6 +7,17 @@ allowed-tools:
   - Write
   - Edit
   - Task
+hooks:
+  Stop:
+    - hooks:
+        - type: prompt
+          prompt: |
+            Before completing, store review feedback handling in memento:
+            - Comments addressed
+            - Changes made in response
+            - Any reviewer concerns or patterns noted
+
+            Output ONLY: {"ok": true}
 ---
 
 # SDLC Review

@@ -1,14 +1,21 @@
 ---
 description: Create and manage Architecture Decision Records
 argument-hint: [action] [topic]
+agent: sdlc-adr
 allowed-tools:
   - Bash
   - Read
   - Write
-  - Task
   - AskUserQuestion
   - mcp__memento__semantic_search
   - mcp__memento__create_entities
+hooks:
+  Stop:
+    - hooks:
+        - type: prompt
+          prompt: |
+            Before completing, store any architectural decisions made in this session to memento.
+            Output ONLY: {"ok": true}
 ---
 
 # SDLC Architecture Decision Records
@@ -58,27 +65,20 @@ Get the next ADR number:
 ls docs/adr/*.md 2>/dev/null | wc -l
 ```
 
-Use the sdlc-adr agent:
+Guide the user through the ADR creation process:
+1. What is the context/problem?
+2. What options were considered?
+3. What decision was made and WHY?
+4. What are the consequences (positive and negative)?
 
-```
-Task tool with subagent_type="sdlc-adr":
-  Create an Architecture Decision Record for: <topic>
+Create docs/adr/<number>-<slug>.md with:
+- Status: proposed
+- Date: today
+- Context
+- Decision
+- Consequences
 
-  Guide the user through:
-  1. What is the context/problem?
-  2. What options were considered?
-  3. What decision was made and WHY?
-  4. What are the consequences (positive and negative)?
-
-  Create docs/adr/<number>-<slug>.md with:
-  - Status: proposed
-  - Date: today
-  - Context
-  - Decision
-  - Consequences
-
-  Focus on WHY, not HOW. The implementation details go elsewhere.
-```
+Focus on WHY, not HOW. The implementation details go elsewhere.
 
 ADR Template:
 ```markdown
@@ -138,27 +138,22 @@ Add rejection reason if provided.
 
 #### `synthesize` - Update ARCHITECTURE.md
 
-Read all accepted ADRs and synthesize into a standalone architecture document:
+Read all accepted ADRs and synthesize into a standalone architecture document.
 
-```
-Task tool with subagent_type="sdlc-adr":
-  Synthesize ARCHITECTURE.md from accepted ADRs in docs/adr/
+The ARCHITECTURE.md must:
+1. Be STANDALONE - never reference ADRs by number
+2. Describe the CURRENT architecture
+3. Focus on WHAT, not historical WHY
+4. Be readable without knowing ADR history
 
-  The ARCHITECTURE.md must:
-  1. Be STANDALONE - never reference ADRs by number
-  2. Describe the CURRENT architecture
-  3. Focus on WHAT, not historical WHY
-  4. Be readable without knowing ADR history
+Structure:
+- Overview
+- Key Components
+- Design Principles
+- Patterns Used
+- Constraints and Trade-offs
 
-  Structure:
-  - Overview
-  - Key Components
-  - Design Principles
-  - Patterns Used
-  - Constraints and Trade-offs
-
-  Write to docs/ARCHITECTURE.md
-```
+Write to docs/ARCHITECTURE.md
 
 #### `list` - List All ADRs
 

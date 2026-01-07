@@ -63,6 +63,31 @@ hooks:
             Respond with JSON:
             {"ok": true} - if this is a type definition file
             {"ok": false, "reason": "sdlc-domain can only create type definition files."} - otherwise
+  PostToolUse:
+    - matcher: Edit
+      hooks:
+        - type: prompt
+          prompt: |
+            🏛️ POST-EDIT: Run type check to verify compilation.
+
+            After editing type definitions, you SHOULD verify the code compiles:
+            - Rust: cargo check
+            - TypeScript: tsc --noEmit
+            - Python: mypy or pyright
+
+            Compilation errors are expected if tests reference types not yet defined.
+            Focus on YOUR changes compiling correctly.
+
+            Output ONLY: {"ok": true}
+    - matcher: Write
+      hooks:
+        - type: prompt
+          prompt: |
+            🏛️ POST-WRITE: Run type check to verify compilation.
+
+            After creating type definition files, verify the code compiles.
+
+            Output ONLY: {"ok": true}
   Stop:
     - hooks:
         - type: prompt

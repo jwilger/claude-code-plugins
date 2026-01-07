@@ -11,6 +11,18 @@ allowed-tools:
   - mcp__memento__semantic_search
   - mcp__memento__create_entities
   - mcp__memento__create_relations
+hooks:
+  Stop:
+    - hooks:
+        - type: prompt
+          prompt: |
+            Before completing, store event model discoveries in memento:
+            - Domain concepts discovered
+            - Events, commands, and views identified
+            - GWT scenarios created
+            - Any deferred questions or open items
+
+            Output ONLY: {"ok": true}
 ---
 
 # SDLC Design

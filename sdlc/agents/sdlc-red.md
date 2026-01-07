@@ -60,6 +60,32 @@ hooks:
             Respond with JSON:
             {"ok": true} - if this is a test file
             {"ok": false, "reason": "sdlc-red can only create test files."} - if not a test file
+  PostToolUse:
+    - matcher: Edit
+      hooks:
+        - type: prompt
+          prompt: |
+            🔴 POST-EDIT: Run tests to confirm failure.
+
+            After editing this test, you SHOULD run it to confirm:
+            1. The test FAILS (expected in RED phase)
+            2. The failure message is CLEAR and actionable
+            3. There's exactly ONE assertion failing
+
+            If the test passes, you may have written the wrong test.
+
+            Use Bash to run: cargo test, npm test, pytest, or the project's test command.
+
+            Output ONLY: {"ok": true}
+    - matcher: Write
+      hooks:
+        - type: prompt
+          prompt: |
+            🔴 POST-WRITE: Run tests to confirm failure.
+
+            After creating this test file, run it to confirm the test fails as expected.
+
+            Output ONLY: {"ok": true}
   Stop:
     - hooks:
         - type: prompt

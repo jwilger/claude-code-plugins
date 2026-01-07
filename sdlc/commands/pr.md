@@ -17,6 +17,16 @@ hooks:
             If it doesn't exist, stop and tell user to run /sdlc:setup first.
 
             Respond with: {"ok": true}
+  Stop:
+    - hooks:
+        - type: prompt
+          prompt: |
+            Before completing, store the PR context in memento:
+            - PR URL and number
+            - Issue it closes
+            - Mutation testing results
+
+            Output ONLY: {"ok": true}
 ---
 
 # SDLC Pull Request
