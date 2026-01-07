@@ -60,6 +60,12 @@ hooks:
             Respond with JSON:
             {"ok": true} - if this is a test file
             {"ok": false, "reason": "sdlc-red can only create test files."} - if not a test file
+  Stop:
+    - hooks:
+        - type: prompt
+          prompt: |
+            Before completing, if you discovered any test patterns worth remembering,
+            store them in memento. Output ONLY: {"ok": true}
 ---
 
 # SDLC Red Phase Agent

@@ -1,5 +1,6 @@
 ---
 description: Handle PR review feedback - fetch comments and respond appropriately
+context: fork
 allowed-tools:
   - Bash
   - Read

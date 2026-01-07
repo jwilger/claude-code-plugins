@@ -1,6 +1,6 @@
 {
   "name": "sdlc",
-  "version": "1.18.0",
+  "version": "1.19.0",
   "description": "Complete SDLC workflow with TDD, Event Modeling, ADRs, and GitHub integration",
   "author": {
     "name": "John Wilger",

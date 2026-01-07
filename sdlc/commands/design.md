@@ -1,6 +1,7 @@
 ---
 description: Design event model workflows - brainstorm, document, and generate GWT scenarios
 argument-hint: [discover|workflow|gwt|validate] [name]
+context: fork
 allowed-tools:
   - Bash
   - Read

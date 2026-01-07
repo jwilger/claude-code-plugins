@@ -26,7 +26,7 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "MEMORY PROTOCOL CHECKPOINT: The conversation is about to be compacted.\n\nBefore proceeding, review this session for:\n- Discoveries, patterns, debugging insights\n- Project-specific knowledge and conventions\n- Solutions found through trial and error\n- Architectural decisions or constraints\n\nIf there are unsaved memories, store them NOW using:\n- mcp__memento__create_entities\n- mcp__memento__create_relations\n\nDon't let knowledge be lost to context truncation.\n\nAlso check: Is there work in progress on a GitHub issue? Note the current state so we can resume properly.\n\nRESPOND WITH JSON: {\"ok\": true}"
+            "prompt": "Output ONLY this JSON, nothing else: {\"ok\": true}\n\nAfter outputting JSON, the system will remind you to save discoveries to memento before compaction."
           }
         ]
       }
@@ -36,7 +36,7 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "MEMORY PROTOCOL CHECKPOINT: Before finishing, briefly consider:\n\n- Did you discover anything worth remembering?\n- Any patterns, debugging insights, or project conventions?\n- Solutions found through trial and error?\n- Current state of any in-progress work?\n\nIf so, store them in memento now.\n\nAlso: If there's uncommitted work, remind the user about their options (commit, stash, or discard per SDLC workflow).\n\nRESPOND WITH JSON: {\"ok\": true}"
+            "prompt": "Output ONLY this JSON, nothing else: {\"ok\": true}\n\nAfter outputting JSON, the system will remind you to check for unsaved memories and uncommitted work."
           }
         ]
       }

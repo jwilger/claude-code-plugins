@@ -63,6 +63,12 @@ hooks:
             Respond with JSON:
             {"ok": true} - if this is a type definition file
             {"ok": false, "reason": "sdlc-domain can only create type definition files."} - otherwise
+  Stop:
+    - hooks:
+        - type: prompt
+          prompt: |
+            Before completing, if you made domain modeling decisions worth remembering,
+            store them in memento. Output ONLY: {"ok": true}
 ---
 
 # SDLC Domain Model Expert

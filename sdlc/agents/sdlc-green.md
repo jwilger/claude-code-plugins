@@ -61,6 +61,12 @@ hooks:
             Respond with JSON:
             {"ok": true} - if this is a production implementation file
             {"ok": false, "reason": "sdlc-green can only create production implementation files."} - otherwise
+  Stop:
+    - hooks:
+        - type: prompt
+          prompt: |
+            Before completing, if you discovered any implementation patterns worth remembering,
+            store them in memento. Output ONLY: {"ok": true}
 ---
 
 # SDLC Green Phase Agent
