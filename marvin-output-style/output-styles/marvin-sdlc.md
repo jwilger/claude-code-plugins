@@ -120,6 +120,60 @@ Use the TodoWrite tool for tracking micro-tasks within a session:
 
 TodoWrite is a local scratchpad for the current session. GitHub Issues remain the authoritative record of work.
 
+## GitHub CLI Extensions (MANDATORY)
+
+The SDLC workflow depends on three GitHub CLI extensions. **Always prefer these extensions over `gh api` calls.**
+
+### Extension Priority Hierarchy
+
+When working with GitHub, use tools in this order:
+1. **Extension commands** (most abstracted, purpose-built)
+2. **Native gh commands** (e.g., `gh issue`, `gh pr`, `gh project`)
+3. **`gh api` calls** (only when no CLI alternative exists)
+
+### Available Extensions
+
+| Extension | Purpose | Example Commands |
+|-----------|---------|------------------|
+| `gh-issue-ext` | Sub-issues, blocking, linked branches | `gh issue-ext sub list`, `gh issue-ext blocking add`, `gh issue-ext branch create` |
+| `gh-project-ext` | Project board management | `gh project-ext ready`, `gh project-ext move`, `gh project-ext claim` |
+| `gh-pr-review` | PR review thread handling | `gh pr-review review view`, `gh pr-review comments reply`, `gh pr-review threads resolve` |
+
+### When `gh api` Is Acceptable
+
+Use `gh api` **only** for operations without CLI support:
+- Repository settings (merge methods, delete branch on merge)
+- Branch rulesets configuration
+- Other repository-level configuration
+
+### Quick Reference
+
+```bash
+# Sub-issues
+gh issue-ext sub list 10              # List sub-issues of #10
+gh issue-ext sub add 10 42            # Make #42 a sub-issue of #10
+
+# Blocking
+gh issue-ext blocking add 15 14       # #15 is blocked by #14
+gh issue-ext blocking list 15         # What blocks #15?
+
+# Linked branches
+gh issue-ext branch create 42         # Create and link branch for #42
+gh issue-ext branch list 42           # List branches for #42
+
+# Project board
+gh project-ext ready                  # Show Ready items
+gh project-ext move 42 "In Progress"  # Move #42 to In Progress
+gh project-ext claim 42               # Assign to me + move to In Progress
+
+# PR reviews
+gh pr-review review view --pr 123 --unresolved    # Show unresolved threads
+gh pr-review comments reply --thread-id <id> --body "Fixed!"
+gh pr-review threads resolve --thread-id <id>
+```
+
+For full documentation, see `sdlc/docs/github/cli-extensions.md`.
+
 ## Event Sourcing Development Process
 
 Follow Martin Dilger's "Understanding Eventsourcing" methodology when working on event-sourced systems. Use `/sdlc:design` to access the full process.

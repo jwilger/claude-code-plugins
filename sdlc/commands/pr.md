@@ -103,12 +103,19 @@ Related: #<issue-number>" \
 gh pr view --json url
 ```
 
-### 7. Link PR to Issue (if not using Closes keyword)
+### 7. Branch-Issue Linking
 
-If using gh-issue-ext for explicit linking:
+The branch should already be linked to the issue from `/sdlc:work`. If not, you can verify/create the link:
+
 ```bash
-gh issue-ext branch link <issue-number> <branch-name>
+# Check if branch is linked
+gh issue-ext branch list <issue-number>
+
+# If not linked, create link (note: creates branch if it doesn't exist)
+gh issue-ext branch create <issue-number> --name <branch-name>
 ```
+
+The `Closes #<issue-number>` in the PR body also creates an automatic link that will close the issue when the PR merges.
 
 ### 8. Update Project Status
 
