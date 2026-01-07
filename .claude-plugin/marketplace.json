@@ -13,7 +13,7 @@
       "name": "sdlc",
       "source": "./sdlc",
       "description": "Complete SDLC workflow with TDD, Event Modeling, ADRs, and GitHub integration",
-      "version": "1.16.0",
+      "version": "1.17.0",
       "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow", "domain-modeling", "mutation-testing"]
     },
     {
@@ -27,7 +27,7 @@
       "name": "bootstrap",
       "source": "./bootstrap",
       "description": "Project scaffolding with Nix-based development environments",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "keywords": ["bootstrap", "scaffolding", "nix", "rust", "development-environment"]
     }
   ]

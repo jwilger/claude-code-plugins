@@ -258,7 +258,7 @@ Run these commands in sequence:
 
 ```bash
 git init
-git add flake.nix flake.lock rust-toolchain.toml .envrc .gitignore CLAUDE.md
+git add flake.nix flake.lock rust-toolchain.toml .gitignore CLAUDE.md
 git commit -m "$(cat <<'EOF'
 chore(bootstrap): initialize Nix-based Rust development environment
 
