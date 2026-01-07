@@ -176,4 +176,4 @@ This command uses the `gh-pr-review` extension (agynio/gh-pr-review) for:
 
 Install with: `gh extension install agynio/gh-pr-review`
 
-Add to auto-approval: `Bash(gh pr-review:*)`
+Add to auto-approval: `Bash(gh pr-review *)`

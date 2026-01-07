@@ -96,6 +96,25 @@ project: 11
 - **`/sdlc:work`**: Shows ready items with `ready`, moves with `move`
 - **Claiming work**: `claim` handles assignment + status update together
 
+### Project Commands vs Issue Commands
+
+**PREFER project commands when working with boards:**
+
+| Task | Preferred Command | Alternative |
+|------|-------------------|-------------|
+| See what's ready to work on | `gh project-ext ready` | `gh issue list` (no priority) |
+| Move issue to new status | `gh project-ext move 42 "In Progress"` | Manual in GitHub UI |
+| Start work on issue | `gh project-ext claim 42` | `gh issue edit --add-assignee` + move |
+| View board state | `gh project-ext board` | GitHub UI only |
+
+**Use issue commands for:**
+- Creating issues (`gh issue create`)
+- Editing issue content (`gh issue edit --body`)
+- Managing labels (`gh issue edit --add-label`)
+- Closing/reopening (`gh issue close`, `gh issue reopen`)
+
+**Key insight**: Project status is a PROJECT field, not an issue field. You cannot set "In Progress" status using `gh issue edit` - you must use project commands.
+
 ### Native `gh project` Fallback
 
 For operations not covered by the extension (like getting In Progress items):
@@ -143,16 +162,18 @@ Pull request review thread management - viewing, replying, and resolving.
 
 ## Auto-Approval Patterns
 
-Add these to your Claude Code settings for seamless usage:
+Add these to your Claude Code settings for seamless usage (using wildcard syntax):
 
 ```
-Bash(gh issue:*)
-Bash(gh issue-ext:*)
-Bash(gh project:*)
-Bash(gh project-ext:*)
-Bash(gh pr:*)
-Bash(gh pr-review:*)
+Bash(gh issue *)
+Bash(gh issue-ext *)
+Bash(gh project *)
+Bash(gh project-ext *)
+Bash(gh pr *)
+Bash(gh pr-review *)
 ```
+
+**Note**: Claude Code 2.1+ supports wildcard patterns with `*` at any position in the rule.
 
 ## Comparison: Extension vs Native vs API
 

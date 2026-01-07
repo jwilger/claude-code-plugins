@@ -116,12 +116,12 @@ The SDLC manages your GitHub workflow:
 Add these to your Claude Code settings for smoother workflow:
 
 ```
-Bash(gh issue:*)
-Bash(gh issue-ext:*)
-Bash(gh project:*)
-Bash(gh project-ext:*)
-Bash(gh pr-review:*)
-Bash(gs:*)  # if using git-spice
+Bash(gh issue *)
+Bash(gh issue-ext *)
+Bash(gh project *)
+Bash(gh project-ext *)
+Bash(gh pr-review *)
+Bash(gs *)  # if using git-spice
 ```
 
 ## Documentation

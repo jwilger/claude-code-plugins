@@ -6,6 +6,24 @@ allowed-tools:
   - Write
   - AskUserQuestion
   - WebFetch
+hooks:
+  PreToolUse:
+    - matcher: Bash
+      once: true
+      hooks:
+        - type: prompt
+          prompt: |
+            SDLC SETUP PREREQUISITE CHECK (runs once per session)
+
+            Before running setup commands, verify gh CLI is available.
+            This check helps catch missing prerequisites early.
+
+            If the user hasn't installed gh CLI yet, inform them to:
+            1. Install from https://cli.github.com/
+            2. Run `gh auth login` to authenticate
+            3. Run `gh auth refresh -s project` for project scope
+
+            Respond with: {"ok": true}
 ---
 
 # SDLC Setup
@@ -265,6 +283,66 @@ Use AskUserQuestion to gather project preferences:
 - Create new project
 - No project board
 
+#### If "Create new project" is selected:
+
+**Question 3a: Copy from existing project?**
+- Copy from existing project (preserves fields, views, and statuses)
+- Create blank project
+
+##### If copying from existing project:
+
+List available projects for the user to choose from. Fetch projects from:
+
+1. User's own projects:
+```bash
+gh project list --owner "@me" --format json
+```
+
+2. Organizations the user belongs to:
+```bash
+# Get user's organizations
+gh api user/orgs --jq '.[].login' | while read org; do
+  gh project list --owner "$org" --format json 2>/dev/null
+done
+```
+
+Present the projects as options using AskUserQuestion, grouped by owner:
+
+**Question: Select project to copy from**
+Options should show: "owner/project-title (#number)"
+
+After selection, get the project title:
+
+**Question: Title for new project?**
+Default to: "[Repository Name] Board"
+
+Create the project copy:
+```bash
+gh project copy <source-number> \
+  --source-owner <source-owner> \
+  --target-owner "@me" \
+  --title "<new-title>" \
+  --drafts
+```
+
+The `--drafts` flag includes any draft issues from the source project.
+
+**Note**: The copied project inherits:
+- Status field with all options (Backlog, Ready, In Progress, etc.)
+- Priority field if present
+- Custom fields
+- Views and layouts
+
+##### If creating blank project:
+
+```bash
+gh project create --owner "@me" --title "<repository-name> Board"
+```
+
+Then inform user they need to manually configure:
+- Status field with values: Backlog, Ready, In Progress, Review, Done
+- Priority field with values: P0, P1, P2 (optional)
+
 **Question 4: TDD Verbosity**
 - Silent (just use agents, no explanation)
 - Brief (one-line notes about what's happening)
@@ -498,12 +576,78 @@ Next steps:
   - Ask "what issues are ready?" to see available work
 
 Auto-approval patterns to add to Claude settings:
-  Bash(gh issue:*)
-  Bash(gh issue-ext:*)
-  Bash(gh project:*)
-  Bash(gh project-ext:*)
-  Bash(gh pr-review:*)
-  Bash(gs:*)  # if using git-spice
+  Bash(gh issue *)
+  Bash(gh issue-ext *)
+  Bash(gh project *)
+  Bash(gh project-ext *)
+  Bash(gh pr-review *)
+  Bash(gs *)  # if using git-spice
 ```
 
 Omit sections that weren't configured (e.g., don't show Repository section if no repo was created).
+
+### 12. Workflow Automation Setup (If Using GitHub Project)
+
+If a GitHub Project was configured, inform the user about setting up automatic issue-to-project linking:
+
+```
+📋 RECOMMENDED: Auto-Add Issues to Project
+
+To automatically add new issues to your project board, create a GitHub Actions workflow.
+
+Create file: .github/workflows/add-to-project.yml
+
+With the following content:
+```
+
+Then display this workflow content:
+
+```yaml
+name: Add issues to project
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  add-to-project:
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@v1.0.2
+        with:
+          project-url: https://github.com/users/<owner>/projects/<number>
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+```
+
+**Important setup instructions to display:**
+
+```
+⚠️  REQUIRED: Create a Personal Access Token (PAT)
+
+GitHub Actions cannot use the default GITHUB_TOKEN for project operations.
+You need to create a PAT with the following scopes:
+
+1. Go to: https://github.com/settings/tokens?type=beta
+2. Click "Generate new token"
+3. Name: "Add to Project - <repo-name>"
+4. Repository access: Select your repository
+5. Permissions:
+   - Repository permissions:
+     - Issues: Read and write
+     - Metadata: Read-only
+   - Organization permissions (if org project):
+     - Projects: Read and write
+6. Generate and copy the token
+
+Then add it as a repository secret:
+1. Go to: https://github.com/<owner>/<repo>/settings/secrets/actions
+2. Click "New repository secret"
+3. Name: ADD_TO_PROJECT_PAT
+4. Value: <paste your token>
+5. Click "Add secret"
+
+After setup, all new issues will automatically appear in your project board's Backlog.
+```
+
+Replace `<owner>` and `<number>` in the workflow file with the actual project owner and number from the configuration.

@@ -6,6 +6,19 @@ allowed-tools:
   - AskUserQuestion
   - mcp__memento__semantic_search
   - mcp__memento__open_nodes
+hooks:
+  PreToolUse:
+    - matcher: Read
+      once: true
+      hooks:
+        - type: prompt
+          prompt: |
+            SDLC CONFIG CHECK (runs once per session)
+
+            Verify .claude/sdlc.yaml exists before proceeding.
+            If it doesn't exist, stop and tell user to run /sdlc:setup first.
+
+            Respond with: {"ok": true}
 ---
 
 # SDLC Work

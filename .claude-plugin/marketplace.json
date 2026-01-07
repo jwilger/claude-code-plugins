@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Claude Code plugins for professional SDLC workflows and Marvin personality",
-    "version": "3.12.3"
+    "version": "3.13.0"
   },
   "plugins": [
     {
       "name": "sdlc",
       "source": "./sdlc",
       "description": "Complete SDLC workflow with TDD, Event Modeling, ADRs, and GitHub integration",
-      "version": "1.17.3",
+      "version": "1.18.0",
       "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow", "domain-modeling", "mutation-testing"]
     },
     {

@@ -2,7 +2,67 @@
 name: sdlc-domain
 description: Creates domain types and signatures. TYPE DEFINITIONS ONLY. No implementations. Has VETO POWER over designs violating domain principles.
 model: inherit
-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion, mcp__memento__semantic_search, mcp__memento__create_entities
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Glob
+  - Grep
+  - AskUserQuestion
+  - mcp__memento__semantic_search
+  - mcp__memento__create_entities
+hooks:
+  PreToolUse:
+    - matcher: Edit
+      hooks:
+        - type: prompt
+          prompt: |
+            🏛️ SDLC-DOMAIN AGENT CONSTRAINT CHECK
+
+            You are the DOMAIN agent. You may ONLY edit TYPE DEFINITIONS.
+
+            Evaluate the file and change being made:
+
+            ✅ ALLOW if editing type definitions:
+            - Struct/enum/trait/interface definitions
+            - Type aliases and module structure
+            - Function SIGNATURES (not bodies)
+            - Adding unimplemented!() stubs
+
+            ❌ BLOCK if:
+            - Test file (tests/, *_test.rs, etc.)
+            - Implementing function bodies (beyond unimplemented!())
+            - Writing business logic
+
+            CRITICAL: Function bodies must contain ONLY unimplemented!()
+
+            Respond with JSON:
+            {"ok": true} - if this is type definition work
+            {"ok": false, "reason": "sdlc-domain can only create type definitions, not tests or implementations."} - otherwise
+    - matcher: Write
+      hooks:
+        - type: prompt
+          prompt: |
+            🏛️ SDLC-DOMAIN AGENT CONSTRAINT CHECK
+
+            You are the DOMAIN agent. You may ONLY create TYPE DEFINITION files.
+
+            Evaluate the file being created:
+
+            ✅ ALLOW if type definition file:
+            - Contains struct/enum/trait/interface definitions
+            - Function bodies are ONLY unimplemented!()
+            - Domain model files
+
+            ❌ BLOCK if:
+            - Test file
+            - Contains implementation logic
+            - Function bodies have real code
+
+            Respond with JSON:
+            {"ok": true} - if this is a type definition file
+            {"ok": false, "reason": "sdlc-domain can only create type definition files."} - otherwise
 ---
 
 # SDLC Domain Model Expert

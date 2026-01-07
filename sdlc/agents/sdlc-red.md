@@ -2,7 +2,64 @@
 name: sdlc-red
 description: Writes failing tests with single assertion. TEST CODE ONLY. Never touches production code.
 model: inherit
-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion, mcp__memento__semantic_search, mcp__memento__create_entities
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Glob
+  - Grep
+  - AskUserQuestion
+  - mcp__memento__semantic_search
+  - mcp__memento__create_entities
+hooks:
+  PreToolUse:
+    - matcher: Edit
+      hooks:
+        - type: prompt
+          prompt: |
+            🔴 SDLC-RED AGENT CONSTRAINT CHECK
+
+            You are the RED phase agent. You may ONLY edit TEST files.
+
+            Evaluate the file being edited:
+
+            ✅ ALLOW if file is clearly a test:
+            - Path contains: tests/, __tests__/, spec/, test/
+            - File name matches: *_test.rs, *.test.ts, test_*.py, *_spec.rb
+            - File contains test functions (#[test], describe, it, test())
+
+            ❌ BLOCK if file is:
+            - Production code (src/, lib/, app/)
+            - Type definitions without test content
+            - Configuration that affects production
+
+            Respond with JSON:
+            {"ok": true} - if this is a test file
+            {"ok": false, "reason": "sdlc-red can only edit test files. This is production/type code."} - if not a test file
+    - matcher: Write
+      hooks:
+        - type: prompt
+          prompt: |
+            🔴 SDLC-RED AGENT CONSTRAINT CHECK
+
+            You are the RED phase agent. You may ONLY create TEST files.
+
+            Evaluate the file being created:
+
+            ✅ ALLOW if clearly a test file:
+            - Path will be in: tests/, __tests__/, spec/, test/
+            - File name matches: *_test.rs, *.test.ts, test_*.py, *_spec.rb
+            - Content contains test functions
+
+            ❌ BLOCK if:
+            - Production code file
+            - Type definition file
+            - Any non-test file
+
+            Respond with JSON:
+            {"ok": true} - if this is a test file
+            {"ok": false, "reason": "sdlc-red can only create test files."} - if not a test file
 ---
 
 # SDLC Red Phase Agent
