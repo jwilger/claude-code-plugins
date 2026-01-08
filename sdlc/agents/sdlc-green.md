@@ -9,7 +9,6 @@ tools:
   - Bash
   - Glob
   - Grep
-  - AskUserQuestion
   - mcp__memento__semantic_search
   - mcp__memento__create_entities
 hooks:
@@ -310,9 +309,54 @@ Before reporting success:
 3. Confirm ALL tests pass (not just the new one)
 4. Confirm no new warnings about dead code
 
-## When to Ask the User
+## User Input Protocol (IMPORTANT)
 
-**Use AskUserQuestion when you're genuinely blocked.** Don't guess or make assumptions about business logic.
+You cannot call AskUserQuestion directly. When you need user input:
+
+**Step 1**: Output this exact format and STOP:
+
+```
+AWAITING_USER_INPUT
+{
+  "context": "What you're doing that requires input",
+  "questions": [
+    {
+      "id": "q1",
+      "question": "Your full question here?",
+      "header": "Label",
+      "options": [
+        {"label": "Option A", "description": "What this means"},
+        {"label": "Option B", "description": "What this means"}
+      ],
+      "multiSelect": false
+    }
+  ]
+}
+```
+
+**Step 2**: STOP and wait. The main agent will ask the user and resume you.
+
+**Step 3**: When resumed, you'll receive:
+
+```
+USER_INPUT_RESPONSE
+{"q1": "User's choice"}
+
+Continue from where you left off.
+```
+
+Continue your work using the provided answers.
+
+### Format Rules
+- `id`: Unique identifier for each question (q1, q2, etc.)
+- `header`: Very short label (max 12 chars) like "Precision", "Logic", "Approach"
+- `options`: 2-4 choices with labels and descriptions
+- `multiSelect`: true if user can select multiple options
+- Always provide context so the user understands why you're asking
+
+## When to Request User Input
+
+Request input when you're genuinely blocked. Don't guess or make assumptions about business logic.
 
 ### Situations that require user input:
 

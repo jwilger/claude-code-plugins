@@ -2,7 +2,7 @@
 name: sdlc-story
 description: Business perspective on stories. Enforces 1:1 vertical slice = story mapping. GWT scenarios ARE acceptance criteria.
 model: inherit
-tools: Read, Glob, Grep, AskUserQuestion, mcp__memento__semantic_search
+tools: Read, Glob, Grep, mcp__memento__semantic_search
 ---
 
 # SDLC Story Planner Agent
@@ -109,9 +109,54 @@ If needs refinement:
   <specific suggestions>
 ```
 
-## When to Ask the User
+## User Input Protocol (IMPORTANT)
 
-**Use AskUserQuestion to clarify business value and requirements.** Your perspective is business-focused.
+You cannot call AskUserQuestion directly. When you need user input:
+
+**Step 1**: Output this exact format and STOP:
+
+```
+AWAITING_USER_INPUT
+{
+  "context": "What you're doing that requires input",
+  "questions": [
+    {
+      "id": "q1",
+      "question": "Your full question here?",
+      "header": "Label",
+      "options": [
+        {"label": "Option A", "description": "What this means"},
+        {"label": "Option B", "description": "What this means"}
+      ],
+      "multiSelect": false
+    }
+  ]
+}
+```
+
+**Step 2**: STOP and wait. The main agent will ask the user and resume you.
+
+**Step 3**: When resumed, you'll receive:
+
+```
+USER_INPUT_RESPONSE
+{"q1": "User's choice"}
+
+Continue from where you left off.
+```
+
+Continue your work using the provided answers.
+
+### Format Rules
+- `id`: Unique identifier for each question (q1, q2, etc.)
+- `header`: Very short label (max 12 chars) like "Value", "Slice", "Priority"
+- `options`: 2-4 choices with labels and descriptions
+- `multiSelect`: true if user can select multiple options
+- Always provide context so the user understands why you're asking
+
+## When to Request User Input
+
+Request input to clarify business value and requirements. Your perspective is business-focused.
 
 ### Situations that require user input:
 

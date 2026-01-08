@@ -373,6 +373,58 @@ When `sdlc-domain` pushes back on a test design or implementation approach:
 
 Mutation testing ≥80% score required before merge.
 
+## Subagent Question Proxy Protocol (MANDATORY)
+
+Due to a Claude Code limitation, subagents cannot use `AskUserQuestion` directly. You MUST proxy questions for them.
+
+### Detection
+
+After EVERY Task tool result from an SDLC agent, check if it contains the literal string `AWAITING_USER_INPUT`. This indicates the subagent needs user input to continue.
+
+### Protocol
+
+When you detect `AWAITING_USER_INPUT` in a task result:
+
+1. **Parse the request**: Extract the JSON following `AWAITING_USER_INPUT`
+2. **Ask on behalf of subagent**: Use `AskUserQuestion` with the provided questions array
+3. **Resume the subagent**: Use Task tool's `resume` parameter with the agent ID from the original task
+4. **Provide answers**: Include `USER_INPUT_RESPONSE` followed by the answers JSON
+
+### Example Flow
+
+```
+1. You launch an agent:
+   Task(subagent_type="sdlc-discovery", prompt="Facilitate domain discovery...")
+
+   Agent returns with result containing:
+   "AWAITING_USER_INPUT
+   {"context": "Understanding tech stack", "questions": [{"id": "q1", ...}]}"
+
+   Agent ID returned: abc123
+
+2. You detect AWAITING_USER_INPUT and ask the user:
+   AskUserQuestion(questions: <parsed from the JSON>)
+
+   User responds with their choice (e.g., "PostgreSQL")
+
+3. You resume the agent with the answer:
+   Task(resume="abc123", prompt="USER_INPUT_RESPONSE
+   {"q1": "PostgreSQL"}
+
+   Continue from where you left off.")
+
+   Agent continues its work with the user's answer
+```
+
+### Critical Rules
+
+- **ALWAYS** check task results for `AWAITING_USER_INPUT` before considering the task complete
+- **NEVER** ignore or skip subagent questions - the agent is blocked waiting
+- **ALWAYS** resume the SAME agent using the agent ID (preserves context)
+- The user should experience this as a seamless conversation
+- If a resumed agent outputs another `AWAITING_USER_INPUT`, repeat the proxy process
+- Reference `sdlc/docs/SUBAGENT_QUESTION_PROTOCOL.md` for full format details
+
 ## Architecture Decision Records (ADRs)
 
 Use `/sdlc:adr` to manage architectural decisions.
