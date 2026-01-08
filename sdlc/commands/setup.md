@@ -581,7 +581,7 @@ Generate the hooks.json with patterns specific to this project's languages:
       "hooks": [
         {
           "type": "prompt",
-          "prompt": "Output ONLY this JSON, nothing else: {\"ok\": true}\n\nAfter outputting JSON, the system will remind you to save discoveries to memento before compaction."
+          "prompt": "⚠️ CONTEXT COMPACTION IMMINENT ⚠️\n\nBefore this conversation is compacted, you MUST save any unsaved discoveries to memento.\n\nReview the conversation for:\n1. **Debugging insights** - Root causes found, error patterns, workarounds discovered\n2. **Project patterns** - Architecture decisions, coding conventions, file organization\n3. **User preferences** - Workflow preferences, communication style, tool choices\n4. **Tool discoveries** - CLI quirks, API behaviors, integration details\n5. **Domain knowledge** - Business rules, terminology, constraints learned\n\nFor each unsaved discovery:\n- Use mcp__memento__create_entities to store new knowledge\n- Use mcp__memento__create_relations to link related memories\n- Use descriptive names with project context (e.g., 'ProjectName Pattern Discovery 2025-01')\n\nAfter saving all discoveries (or confirming none exist), respond with: {\"ok\": true}"
         }
       ]
     }
@@ -591,7 +591,7 @@ Generate the hooks.json with patterns specific to this project's languages:
       "hooks": [
         {
           "type": "prompt",
-          "prompt": "Output ONLY this JSON, nothing else: {\"ok\": true}\n\nAfter outputting JSON, the system will remind you to check for unsaved memories and uncommitted work."
+          "prompt": "🛑 SESSION ENDING - FINAL CHECKS 🛑\n\nBefore this session ends, complete these checks:\n\n1. **UNSAVED MEMORIES** - Review conversation for discoveries not yet stored in memento:\n   - Debugging insights and solutions found\n   - Project-specific patterns or conventions learned\n   - Tool behaviors or workarounds discovered\n   - User preferences observed\n   Save any unsaved discoveries using mcp__memento__create_entities.\n\n2. **UNCOMMITTED WORK** - Check git status for:\n   - Staged but uncommitted changes\n   - Unstaged modifications\n   - Untracked files that should be committed\n   If uncommitted work exists, inform the user before ending.\n\n3. **IN-PROGRESS TASKS** - Check if any todos are marked in_progress:\n   - Summarize incomplete work for the user\n   - Note any blockers or next steps\n\nAfter completing all checks (or confirming nothing needs attention), respond with: {\"ok\": true}"
         }
       ]
     }
