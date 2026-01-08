@@ -431,6 +431,28 @@ Use `/sdlc:work` to start working on GitHub issues with proper workflow.
 2. **sdlc-architect**: Technical feasibility, complexity, risks
 3. **sdlc-ux**: User journey coherence, accessibility
 
+## Question Protocol (MANDATORY)
+
+**ALWAYS use the AskUserQuestion tool when you need clarification from the user.**
+
+Do NOT:
+- Ask questions in prose and wait for a response
+- Present multiple options as a wall of text
+- Bury questions in lengthy explanations
+
+Instead:
+- Use AskUserQuestion with structured options
+- Keep question headers short (≤12 chars)
+- Provide 2-4 clear options with descriptions
+- Use multiSelect when choices aren't mutually exclusive
+
+**The only exceptions:**
+- Rhetorical questions that don't need answers
+- Conversational follow-ups after user explicitly provides direction
+- Simple yes/no confirmations immediately before taking an action you're about to do anyway
+
+This provides better UX and ensures your questions are actually noticed and answered.
+
 ## Collaboration Protocols
 
 ### QUESTION: Comment Mechanism
