@@ -139,12 +139,33 @@ When working with GitHub, use tools in this order:
 | `gh-project-ext` | Project board management | `gh project-ext ready`, `gh project-ext move`, `gh project-ext claim` |
 | `gh-pr-review` | PR review thread handling | `gh pr-review review view`, `gh pr-review comments reply`, `gh pr-review threads resolve` |
 
-### When `gh api` Is Acceptable
+### `gh api` Is a LAST RESORT
 
-Use `gh api` **only** for operations without CLI support:
+**NEVER use `gh api` without first exhausting alternatives.** The sdlc plugin includes a hook that will intercept `gh api` calls and enforce this protocol.
+
+#### Before ANY `gh api` Call
+
+1. **Check native `gh` commands first**: `gh issue`, `gh pr`, `gh project`, etc. have many subcommands
+2. **Check installed extensions**: Run `gh extension list` and check if any can handle the operation
+3. **Search for extensions**: Run `gh extension search <keywords>` to find extensions that might help
+4. **Present options to user**: If you find potential extensions, ask the user whether to:
+   - Install and use the extension (provide GitHub URL for review)
+   - Proceed with `gh api` anyway
+
+#### Acceptable `gh api` Uses (skip the search)
+
+These operations genuinely have no CLI alternative:
 - Repository settings (merge methods, delete branch on merge)
 - Branch rulesets configuration
-- Other repository-level configuration
+- Webhook management
+- Repository secrets management
+
+#### Why This Matters
+
+- Extensions are purpose-built and tested for specific workflows
+- Extensions handle edge cases and API changes automatically
+- `gh api` calls are brittle and require manual updates when GitHub's API changes
+- Extensions improve discoverability - future you will thank present you
 
 ### Quick Reference
 

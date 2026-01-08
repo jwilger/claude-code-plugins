@@ -1,0 +1,13 @@
+{
+  "PreToolUse": [
+    {
+      "matcher": "Bash(gh api *)",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "GH API INTERCEPTION - EXTENSION-FIRST PROTOCOL\n\nYou are about to run a `gh api` command. This is a LAST RESORT.\n\nBEFORE proceeding, you MUST complete these steps:\n\n## Step 1: Identify the Operation\nWhat GitHub operation are you trying to perform? (e.g., link project to repo, get PR comments, update issue status)\n\n## Step 2: Check Installed Extensions\nRun: `gh extension list`\n\nCheck if ANY installed extension can perform this operation. The SDLC workflow typically has:\n- `gh-issue-ext` - sub-issues, blocking, linked branches\n- `gh-project-ext` - project board operations\n- `gh-pr-review` - PR review comment handling\n\nAlso check native `gh` subcommands (gh issue, gh pr, gh project, etc.).\n\n## Step 3: Search for Extensions (if no installed solution)\nIf no installed extension handles this, search for one:\n```bash\ngh extension search <relevant-keywords>\n```\n\nExamples:\n- For project operations: `gh extension search project`\n- For issue operations: `gh extension search issue`\n- For PR operations: `gh extension search pull-request`\n\n## Step 4: Present Options to User\nIf you found potential extensions, use AskUserQuestion to present:\n- Extension name and what it does\n- URL: `https://github.com/<owner>/<extension-name>`\n- Option to install and use the extension\n- Option to proceed with `gh api` anyway\n\n## Step 5: Only Then Proceed\nOnly run the `gh api` command if:\n- No extension exists for this operation, OR\n- User explicitly chose to use `gh api` instead of an extension\n\n## Acceptable gh api Uses (no search needed)\nThese operations have no CLI alternative - proceed directly:\n- Repository settings (merge methods, delete branch on merge)\n- Branch rulesets configuration\n- Webhook management\n- Repository secrets management\n\nRespond with {\"decision\": \"block\", \"reason\": \"Searching for extension alternatives first\"} to pause and search, or {\"decision\": \"allow\"} if this is an acceptable gh api use case."
+        }
+      ]
+    }
+  ]
+}

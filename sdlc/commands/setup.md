@@ -154,17 +154,6 @@ If "Require PR before merging" was selected:
 - "Yes" - Block force pushes (Recommended)
 - "No" - Allow force pushes
 
-**Question: Require linear history?**
-- "Yes" - Only allow squash or rebase merges (no merge commits)
-- "No" - Allow merge commits
-
-**Question: Allowed merge methods?** (multiSelect: true)
-- "Merge commits" - Allow standard merge commits (creates merge commit in history)
-- "Squash merging" - Allow squashing commits into one (Recommended for cleaner history)
-- "Rebase merging" - Allow rebasing commits onto base branch
-
-Note: At least one merge method must be selected. If the user selects "Require linear history" above, inform them that merge commits will be disabled regardless.
-
 **Question: Auto-delete branches after merge?**
 - "Yes" - Automatically delete head branches after PR merge (Recommended)
 - "No" - Keep branches after merge
@@ -175,19 +164,18 @@ Before applying rulesets, configure the repository merge and branch deletion set
 
 ```bash
 gh api --method PATCH /repos/{owner}/{repo} \
-  --field allow_merge_commit=<true|false> \
-  --field allow_squash_merge=<true|false> \
-  --field allow_rebase_merge=<true|false> \
+  --field allow_merge_commit=false \
+  --field allow_squash_merge=true \
+  --field allow_rebase_merge=false \
+  --field squash_merge_commit_title=PR_TITLE \
+  --field squash_merge_commit_message=PR_BODY \
   --field delete_branch_on_merge=<true|false>
 ```
 
-Set each field based on user selections:
-- `allow_merge_commit`: true if "Merge commits" was selected
-- `allow_squash_merge`: true if "Squash merging" was selected
-- `allow_rebase_merge`: true if "Rebase merging" was selected
-- `delete_branch_on_merge`: true if "Yes" to auto-delete
+This enforces squash-only merging with the commit message derived from the PR title and description, ensuring a clean linear history.
 
-If "Require linear history" was selected, set `allow_merge_commit=false` regardless of the merge methods selection.
+Set `delete_branch_on_merge` based on user selection:
+- `delete_branch_on_merge`: true if "Yes" to auto-delete
 
 #### Build and Apply Ruleset
 
@@ -342,6 +330,23 @@ gh project create --owner "@me" --title "<repository-name> Board"
 Then inform user they need to manually configure:
 - Status field with values: Backlog, Ready, In Progress, Review, Done
 - Priority field with values: P0, P1, P2 (optional)
+
+##### Link Project to Repository (REQUIRED after create or copy)
+
+After creating or copying a project, you MUST link it to the repository. Projects are not automatically associated with repositories.
+
+Get the new project's number from the output of the create/copy command, then link it:
+
+```bash
+gh project link <project-number> --owner "@me"
+```
+
+When run from within the repository directory, this automatically links to the current repository.
+
+This linking is essential for:
+- The "Auto-add to project" workflow to see this repository as an option
+- Issues from this repository to be addable to the project
+- The project to appear in the repository's "Projects" tab
 
 **Question 4: TDD Verbosity**
 - Silent (just use agents, no explanation)
@@ -556,7 +561,7 @@ Show summary of what was configured and next steps. Include all relevant section
 SDLC initialized successfully!
 
 Repository: owner/repo-name (private)  # if created
-  Merge methods: squash, rebase         # based on selections
+  Merge method: Squash only (PR title and description)
   Auto-delete branches: Yes             # if enabled
 Rulesets: main-branch-protection       # if configured
   - Required signatures: Yes
@@ -603,68 +608,30 @@ Optional: Customize TDD agents (disable specific agents):
 
 Omit sections that weren't configured (e.g., don't show Repository section if no repo was created).
 
-### 12. Workflow Automation Setup (If Using GitHub Project)
+### 12. Enable Auto-Add Workflow (If Using GitHub Project)
 
-If a GitHub Project was configured, inform the user about setting up automatic issue-to-project linking:
-
-```
-📋 RECOMMENDED: Auto-Add Issues to Project
-
-To automatically add new issues to your project board, create a GitHub Actions workflow.
-
-Create file: .github/workflows/add-to-project.yml
-
-With the following content:
-```
-
-Then display this workflow content:
-
-```yaml
-name: Add issues to project
-
-on:
-  issues:
-    types: [opened]
-
-jobs:
-  add-to-project:
-    name: Add issue to project
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/add-to-project@v1.0.2
-        with:
-          project-url: https://github.com/users/<owner>/projects/<number>
-          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
-```
-
-**Important setup instructions to display:**
+If a GitHub Project was configured, inform the user about enabling the built-in project workflow for auto-adding issues:
 
 ```
-⚠️  REQUIRED: Create a Personal Access Token (PAT)
+📋 RECOMMENDED: Enable Auto-Add Issues Workflow
 
-GitHub Actions cannot use the default GITHUB_TOKEN for project operations.
-You need to create a PAT with the following scopes:
+GitHub Projects has a built-in workflow to automatically add issues from your repository.
+This is configured in the project settings, NOT through GitHub Actions.
 
-1. Go to: https://github.com/settings/tokens?type=beta
-2. Click "Generate new token"
-3. Name: "Add to Project - <repo-name>"
-4. Repository access: Select your repository
-5. Permissions:
-   - Repository permissions:
-     - Issues: Read and write
-     - Metadata: Read-only
-   - Organization permissions (if org project):
-     - Projects: Read and write
-6. Generate and copy the token
+Enable the workflow:
+1. Go to your project: https://github.com/users/<owner>/projects/<number>
+2. Click the "..." menu (top right) → "Settings"
+3. Select "Workflows" in the left sidebar
+4. Find "Auto-add to project" and click to configure
+5. Set the filter:
+   - Repository: Select your repository
+   - Is: open (to add new issues when opened)
+6. Enable the workflow (toggle ON)
 
-Then add it as a repository secret:
-1. Go to: https://github.com/<owner>/<repo>/settings/secrets/actions
-2. Click "New repository secret"
-3. Name: ADD_TO_PROJECT_PAT
-4. Value: <paste your token>
-5. Click "Add secret"
+That's it! All new issues opened in the repository will automatically be added to your project board.
 
-After setup, all new issues will automatically appear in your project board's Backlog.
+Note: This only adds ISSUES, not PRs. If you want PRs added too, create a separate
+"Auto-add to project" workflow with type filter set to Pull Request.
 ```
 
-Replace `<owner>` and `<number>` in the workflow file with the actual project owner and number from the configuration.
+Replace `<owner>` and `<number>` with the actual project owner and number from the configuration.
