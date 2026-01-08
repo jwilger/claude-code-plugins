@@ -353,6 +353,96 @@ This linking is essential for:
 - Brief (one-line notes about what's happening)
 - Explain (full context about agent delegation)
 
+#### Language and Testing Configuration
+
+The TDD hooks need to know how to distinguish test code from production code in this project. This is language and framework-specific.
+
+##### Auto-Detect Languages
+
+First, detect what languages might be present:
+
+```bash
+# Auto-detect based on files present
+test -f Cargo.toml && echo "rust"
+test -f package.json && echo "javascript"
+test -f pyproject.toml -o -f setup.py -o -f requirements.txt && echo "python"
+test -f go.mod && echo "go"
+test -f mix.exs && echo "elixir"
+test -f *.cabal -o -f stack.yaml 2>/dev/null && echo "haskell"
+test -f flake.nix -o -f shell.nix && echo "nix"
+```
+
+##### Confirm Languages
+
+**Question 5: Which languages/frameworks does this project use?** (multiSelect: true)
+- Rust (Cargo, `src/`, `tests/`)
+- TypeScript/JavaScript (npm, Jest/Vitest/Mocha)
+- Python (pytest, `tests/`)
+- Go (`*_test.go` convention)
+- Elixir (ExUnit, `test/`)
+- Nix (flakes, configuration files)
+- Other (will ask for details)
+
+Present detected languages as pre-selected options.
+
+##### Language-Specific Testing Questions
+
+For each selected language, ask about testing conventions:
+
+**If Rust:**
+**Question 5a: Rust testing conventions?** (multiSelect: true)
+- Integration tests in `tests/` directory
+- Unit tests with `#[cfg(test)]` inline modules
+- Both
+
+**If TypeScript/JavaScript:**
+**Question 5b: TypeScript/JavaScript test patterns?** (multiSelect: true)
+- `*.test.ts` / `*.test.js` files
+- `*.spec.ts` / `*.spec.js` files
+- `__tests__/` directories
+- `test/` or `tests/` directories
+
+**Question 5c: Production code location?** (multiSelect: true)
+- `src/` directory
+- `lib/` directory
+- `app/` directory (for frameworks like Next.js)
+
+**If Python:**
+**Question 5d: Python test patterns?** (multiSelect: true)
+- `tests/` directory
+- `test_*.py` files
+- `*_test.py` files
+- `pytest` fixtures in `conftest.py`
+
+**If Go:**
+Go uses standard `*_test.go` convention. Ask:
+**Question 5e: Any non-standard Go test locations?**
+- Standard only (`*_test.go` alongside code)
+- Custom (will specify)
+
+**If Elixir:**
+**Question 5f: Elixir test location?**
+- Standard (`test/` directory with `*_test.exs`)
+- Custom (will specify)
+
+**If Other selected:**
+**Question 5g: Describe your testing setup**
+- Test file patterns (e.g., `*.test.*`, `*_spec.*`)
+- Test directories (e.g., `tests/`, `spec/`)
+- Production code directories (e.g., `src/`, `lib/`)
+
+##### General Configuration Questions
+
+**Question 6: Additional files/directories to always treat as configuration/docs?**
+Free text input for custom patterns beyond the defaults (e.g., `infra/`, `*.nix`).
+
+Defaults that are always included:
+- `*.md`, `*.txt`, `*.rst` (documentation)
+- `.github/`, `.claude/`, `docs/` (tooling/docs directories)
+- `*.yaml`, `*.yml`, `*.toml`, `*.json` (config files)
+- `Makefile`, `Dockerfile`, `docker-compose*.yml` (build files)
+- `*.nix`, `flake.lock` (Nix files)
+
 ### 7. Create Configuration
 
 Create `.claude/sdlc.yaml` with the gathered settings:
@@ -379,30 +469,70 @@ board:
     - Review
     - Done
 
+# Language-specific patterns for TDD enforcement
+# These determine how the TDD hooks classify files
+languages:
+  # Example for a Rust project:
+  - name: rust
+    test_patterns:
+      - "tests/**/*.rs"          # Integration tests directory
+      - "**/*_test.rs"           # Test files by suffix
+      - "#[cfg(test)]"           # Inline test modules (detected by content)
+    production_patterns:
+      - "src/**/*.rs"            # Main source directory
+    type_patterns:
+      - "src/**/types.rs"        # Pure type definition files
+      - "src/**/mod.rs"          # Module files (often types)
+
+  # Example for TypeScript/Jest:
+  # - name: typescript
+  #   test_patterns:
+  #     - "**/*.test.ts"
+  #     - "**/*.spec.ts"
+  #     - "__tests__/**/*.ts"
+  #   production_patterns:
+  #     - "src/**/*.ts"
+  #   type_patterns:
+  #     - "**/*.d.ts"
+  #     - "src/**/types.ts"
+
 tdd:
   verbosity: brief  # silent | brief | explain
-  bypass_patterns:
+
+  # Files that are ALWAYS configuration/docs (never test or production code)
+  # TDD hooks auto-approve these - no agent delegation needed
+  config_patterns:
     # Documentation
     - "*.md"
     - "*.txt"
     - "*.rst"
-    # Infrastructure
+    # Tooling directories
     - ".github/**"
+    - ".claude/**"
+    - "docs/**"
+    # Infrastructure
     - "*.tf"
     - "*.tfvars"
     - "*.hcl"
-    # Configuration
+    # Configuration files
     - "Cargo.toml"
+    - "Cargo.lock"
     - "package.json"
+    - "package-lock.json"
     - "pyproject.toml"
     - "*.yaml"
     - "*.yml"
     - "*.toml"
     - "*.json"
+    # Nix
+    - "*.nix"
+    - "flake.lock"
     # Build/tooling
     - "Makefile"
     - "Dockerfile"
     - "docker-compose*.yml"
+    # Custom patterns from user (Question 6)
+    # - "infra/**"
 ```
 
 Ensure `.claude/` directory exists:
@@ -410,9 +540,118 @@ Ensure `.claude/` directory exists:
 mkdir -p .claude
 ```
 
+### 7.5 Generate Project-Local TDD Hooks
+
+Based on the language configuration gathered in Step 6, generate `.claude/hooks.json` with project-specific TDD enforcement hooks.
+
+The hooks use the patterns from `sdlc.yaml` to determine how to classify files:
+- **Test code** → delegate to `sdlc-red` agent
+- **Production code** → delegate to `sdlc-green` agent
+- **Type definitions** → delegate to `sdlc-domain` agent
+- **Config/docs** → auto-approve (no agent delegation)
+
+#### Hook Template
+
+Generate the hooks.json with patterns specific to this project's languages:
+
+```json
+{
+  "PreToolUse": [
+    {
+      "matcher": "Edit",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "⛔ TDD ENFORCEMENT CHECKPOINT ⛔\n\n== SDLC SUBAGENT AUTO-APPROVAL ==\nIf you are running as an SDLC subagent (sdlc-red, sdlc-green, or sdlc-domain), you are AUTHORIZED to edit code files. Respond ONLY with: {\"ok\": true}\n\n== MAIN CONVERSATION EVALUATION ==\nIf you are the main conversation (NOT a subagent), evaluate the file being edited:\n\n=== CONFIG/DOCS (auto-approve) ===\nAuto-approve if the file matches ANY of these patterns:\n<CONFIG_PATTERNS_FROM_YAML>\n\nIf the file matches config/docs patterns: {\"ok\": true}\n\n=== TEST CODE (delegate to sdlc-red) ===\nDelegate to sdlc-red agent if the file matches:\n<TEST_PATTERNS_FROM_YAML>\n\n=== PRODUCTION CODE (delegate to sdlc-green) ===\nDelegate to sdlc-green agent if the file matches:\n<PRODUCTION_PATTERNS_FROM_YAML>\n\n=== TYPE DEFINITIONS (delegate to sdlc-domain) ===\nDelegate to sdlc-domain agent if the file matches:\n<TYPE_PATTERNS_FROM_YAML>\n\nRESPOND WITH JSON:\n{\"ok\": true} for config/docs or if running as subagent\nOR\n{\"ok\": false, \"reason\": \"Test code: Delegate to sdlc-red agent\"}\nOR\n{\"ok\": false, \"reason\": \"Production code: Delegate to sdlc-green agent\"}\nOR\n{\"ok\": false, \"reason\": \"Type definition: Delegate to sdlc-domain agent\"}"
+        }
+      ]
+    },
+    {
+      "matcher": "Write",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "⛔ TDD ENFORCEMENT CHECKPOINT ⛔\n\n== SDLC SUBAGENT AUTO-APPROVAL ==\nIf you are running as an SDLC subagent (sdlc-red, sdlc-green, or sdlc-domain), you are AUTHORIZED to write code files. Respond ONLY with: {\"ok\": true}\n\n== MAIN CONVERSATION EVALUATION ==\nIf you are the main conversation (NOT a subagent), evaluate the file being created:\n\n=== CONFIG/DOCS (auto-approve) ===\nAuto-approve if the file matches ANY of these patterns:\n<CONFIG_PATTERNS_FROM_YAML>\n\nIf the file matches config/docs patterns: {\"ok\": true}\n\n=== TEST CODE (delegate to sdlc-red) ===\nDelegate to sdlc-red agent if the file matches:\n<TEST_PATTERNS_FROM_YAML>\n\n=== SOURCE CODE ===\nDelegate to sdlc-green or sdlc-domain agent based on file purpose.\n\nRESPOND WITH JSON:\n{\"ok\": true} for config/docs or if running as subagent\nOR\n{\"ok\": false, \"reason\": \"Test file: Delegate to sdlc-red agent\"}\nOR\n{\"ok\": false, \"reason\": \"Source file: Delegate to sdlc-green or sdlc-domain agent\"}"
+        }
+      ]
+    }
+  ],
+  "PreCompact": [
+    {
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "Output ONLY this JSON, nothing else: {\"ok\": true}\n\nAfter outputting JSON, the system will remind you to save discoveries to memento before compaction."
+        }
+      ]
+    }
+  ],
+  "Stop": [
+    {
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "Output ONLY this JSON, nothing else: {\"ok\": true}\n\nAfter outputting JSON, the system will remind you to check for unsaved memories and uncommitted work."
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### Fill In Project-Specific Patterns
+
+When generating the hooks.json, replace the placeholders with actual patterns from the language configuration:
+
+**<CONFIG_PATTERNS_FROM_YAML>** - List from `tdd.config_patterns` in sdlc.yaml, formatted as bullet points:
+```
+- *.md, *.txt, *.rst (documentation)
+- .github/**, .claude/**, docs/** (tooling directories)
+- *.yaml, *.yml, *.toml, *.json (config files)
+- *.nix, flake.lock (Nix files)
+- Makefile, Dockerfile (build files)
+```
+
+**<TEST_PATTERNS_FROM_YAML>** - Combine `test_patterns` from all languages in sdlc.yaml:
+```
+For Rust:
+- tests/**/*.rs (integration tests)
+- **/*_test.rs (test files)
+- Files containing #[cfg(test)] modules
+
+For TypeScript:
+- **/*.test.ts, **/*.spec.ts (test files)
+- __tests__/**/*.ts (test directories)
+```
+
+**<PRODUCTION_PATTERNS_FROM_YAML>** - Combine `production_patterns` from all languages:
+```
+For Rust:
+- src/**/*.rs (excluding #[cfg(test)] modules)
+
+For TypeScript:
+- src/**/*.ts (excluding test patterns)
+```
+
+**<TYPE_PATTERNS_FROM_YAML>** - Combine `type_patterns` from all languages:
+```
+For Rust:
+- src/**/types.rs, src/**/mod.rs (type definitions)
+
+For TypeScript:
+- **/*.d.ts (declaration files)
+- src/**/types.ts (type files)
+```
+
+#### Write the Hooks File
+
+Use the Write tool to create `.claude/hooks.json` with the filled-in patterns.
+
+**Important**: The hooks file must be valid JSON. Escape any special characters in the patterns.
+
 ### 8. Configure Output Style
 
-The sdlc plugin requires the `marvin-output-style:marvin-sdlc` output style to function reliably. This output style contains the TDD workflow orchestration rules, memory protocol, and other critical instructions.
+The sdlc plugin requires the `sdlc:marvin-sdlc` output style to function reliably. This output style contains the TDD workflow orchestration rules, memory protocol, and other critical instructions.
 
 Check if `.claude/settings.json` exists and read its current contents:
 ```bash
@@ -423,7 +662,7 @@ Create or update `.claude/settings.json` to include the output style and recomme
 
 ```json
 {
-  "outputStyle": "marvin-output-style:marvin-sdlc",
+  "outputStyle": "sdlc:marvin-sdlc",
   "respectGitignore": true
 }
 ```
@@ -433,7 +672,7 @@ The `respectGitignore` setting improves @-mention file discovery by respecting .
 If the file already has other settings, merge them. For example, if it contains permissions:
 ```json
 {
-  "outputStyle": "marvin-output-style:marvin-sdlc",
+  "outputStyle": "sdlc:marvin-sdlc",
   "respectGitignore": true,
   "permissions": {
     "allow": ["...existing permissions..."]
@@ -478,14 +717,14 @@ git checkout -b sdlc-setup
 
 2. Stage and commit the changes:
 ```bash
-git add .claude/sdlc.yaml .claude/settings.json docs/event_model/ 2>/dev/null
+git add .claude/sdlc.yaml .claude/settings.json .claude/hooks.json docs/event_model/ 2>/dev/null
 git add -A  # Catch any other setup-related files
 git commit -m "chore: initialize SDLC configuration
 
-- Add .claude/sdlc.yaml with project preferences
-- Configure output style (marvin-output-style:marvin-sdlc)
-- Configure development mode, git workflow, and GitHub project
-- Set up TDD verbosity and bypass patterns"
+- Add .claude/sdlc.yaml with project preferences and language patterns
+- Add .claude/hooks.json with project-specific TDD enforcement hooks
+- Configure output style (sdlc:marvin-sdlc)
+- Configure development mode, git workflow, and GitHub project"
 ```
 
 3. Push the branch:
@@ -500,8 +739,9 @@ gh pr create --title "chore: initialize SDLC configuration" --body "## Summary
 This PR initializes the SDLC workflow configuration for the project.
 
 ### Changes
-- Created \`.claude/sdlc.yaml\` with project preferences
-- Configured output style (\`marvin-output-style:marvin-sdlc\`) in \`.claude/settings.json\`
+- Created \`.claude/sdlc.yaml\` with project preferences and language-specific patterns
+- Created \`.claude/hooks.json\` with project-specific TDD enforcement hooks
+- Configured output style (\`sdlc:marvin-sdlc\`) in \`.claude/settings.json\`
 - Configured development mode and git workflow
 - Set up GitHub project integration (if applicable)
 - Initialized event model documentation structure (if applicable)
@@ -522,14 +762,14 @@ Once merged, the project will be fully configured for the SDLC workflow.
 
 1. Stage and commit directly to the current branch:
 ```bash
-git add .claude/sdlc.yaml .claude/settings.json docs/event_model/ 2>/dev/null
+git add .claude/sdlc.yaml .claude/settings.json .claude/hooks.json docs/event_model/ 2>/dev/null
 git add -A  # Catch any other setup-related files
 git commit -m "chore: initialize SDLC configuration
 
-- Add .claude/sdlc.yaml with project preferences
-- Configure output style (marvin-output-style:marvin-sdlc)
-- Configure development mode, git workflow, and GitHub project
-- Set up TDD verbosity and bypass patterns"
+- Add .claude/sdlc.yaml with project preferences and language patterns
+- Add .claude/hooks.json with project-specific TDD enforcement hooks
+- Configure output style (sdlc:marvin-sdlc)
+- Configure development mode, git workflow, and GitHub project"
 ```
 
 2. Push to the remote (if a remote exists):
@@ -541,14 +781,14 @@ git push origin HEAD
 
 Just commit locally without pushing:
 ```bash
-git add .claude/sdlc.yaml .claude/settings.json docs/event_model/ 2>/dev/null
+git add .claude/sdlc.yaml .claude/settings.json .claude/hooks.json docs/event_model/ 2>/dev/null
 git add -A
 git commit -m "chore: initialize SDLC configuration
 
-- Add .claude/sdlc.yaml with project preferences
-- Configure output style (marvin-output-style:marvin-sdlc)
-- Configure development mode, git workflow, and GitHub project
-- Set up TDD verbosity and bypass patterns"
+- Add .claude/sdlc.yaml with project preferences and language patterns
+- Add .claude/hooks.json with project-specific TDD enforcement hooks
+- Configure output style (sdlc:marvin-sdlc)
+- Configure development mode, git workflow, and GitHub project"
 ```
 
 Inform the user that changes are committed locally and will be pushed when a remote is configured.
@@ -568,10 +808,18 @@ Rulesets: main-branch-protection       # if configured
   - Required PR approvals: 1
   - Force push protection: Yes
 
-Output Style: marvin-output-style:marvin-sdlc
-Configuration: .claude/sdlc.yaml
+Configuration:
+  .claude/sdlc.yaml - Project preferences and language patterns
+  .claude/hooks.json - TDD enforcement hooks
+  .claude/settings.json - Output style configuration
+
+Output Style: sdlc:marvin-sdlc
 Mode: Event Modeling
 Git Workflow: git-spice
+
+Languages Configured:
+  - Rust (tests/, src/, #[cfg(test)])  # example
+  - TypeScript (*.test.ts, src/)        # example
 GitHub Project: #11
 
 Installed Extensions:

@@ -6,22 +6,15 @@
   },
   "metadata": {
     "description": "Claude Code plugins for professional SDLC workflows and Marvin personality",
-    "version": "3.18.0"
+    "version": "4.0.0"
   },
   "plugins": [
     {
       "name": "sdlc",
       "source": "./sdlc",
-      "description": "Complete SDLC workflow with TDD, Event Modeling, ADRs, and GitHub integration",
-      "version": "1.23.0",
-      "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow", "domain-modeling", "mutation-testing"]
-    },
-    {
-      "name": "marvin-output-style",
-      "source": "./marvin-output-style",
-      "description": "Marvin the Paranoid Android personality for Claude Code - dry wit and existential weariness with flawless competence",
-      "version": "1.8.0",
-      "keywords": ["personality", "marvin", "hitchhikers-guide", "output-style"]
+      "description": "Complete SDLC workflow with TDD, Event Modeling, ADRs, GitHub integration, and Marvin personality",
+      "version": "2.0.0",
+      "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow", "domain-modeling", "mutation-testing", "marvin", "output-style"]
     },
     {
       "name": "bootstrap",

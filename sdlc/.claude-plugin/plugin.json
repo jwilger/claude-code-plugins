@@ -1,18 +1,21 @@
 {
   "name": "sdlc",
-  "version": "1.23.0",
-  "description": "Complete SDLC workflow with TDD, Event Modeling, ADRs, and GitHub integration",
+  "version": "2.0.0",
+  "description": "Complete SDLC workflow with TDD, Event Modeling, ADRs, GitHub integration, and Marvin personality",
   "author": {
     "name": "John Wilger",
     "email": "john@johnwilger.com"
   },
-  "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow"],
+  "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow", "marvin", "output-style"],
+  "outputStyles": "./output-styles/",
   "commands": [
     "./commands/setup.md",
+    "./commands/start.md",
     "./commands/work.md",
     "./commands/pr.md",
     "./commands/review.md",
     "./commands/design.md",
+    "./commands/plan.md",
     "./commands/adr.md"
   ],
   "agents": [
@@ -23,7 +26,10 @@
     "./agents/sdlc-story.md",
     "./agents/sdlc-architect.md",
     "./agents/sdlc-ux.md",
-    "./agents/sdlc-event-model.md",
+    "./agents/sdlc-discovery.md",
+    "./agents/sdlc-workflow-designer.md",
+    "./agents/sdlc-model-checker.md",
+    "./agents/sdlc-design-facilitator.md",
     "./agents/sdlc-gwt.md",
     "./agents/sdlc-adr.md"
   ]

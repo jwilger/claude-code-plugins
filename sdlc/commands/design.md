@@ -55,6 +55,7 @@ The AI's role is to be a **facilitator**, not a stenographer. The process involv
 - `workflow [name]` - Design a specific workflow (creates PR)
 - `gwt <workflow-name>` - Generate GWT scenarios for a workflow
 - `validate` - Validate the complete event model
+- `arch` - Make architecture decisions (creates ARCHITECTURE.md via ADRs)
 - (no args) - Resume where you left off or start discovery
 
 ## The Process Flow
@@ -133,6 +134,24 @@ The AI's role is to be a **facilitator**, not a stenographer. The process involv
 │  Review workflow PR independently                                │
 │  Merge when complete                                             │
 │  Repeat for next workflow                                        │
+└────────────────────────────────────┬────────────────────────────┘
+                                     │
+                    (all workflows complete?)
+                                     │
+                                     ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   ARCHITECTURE DESIGN                            │
+│  Technology stack decisions (informed by event model)           │
+│  Domain boundaries (bounded contexts from events)               │
+│  Integration approaches (for translations)                       │
+│  Cross-cutting concerns                                          │
+│                                                                  │
+│  For EACH decision:                                              │
+│  1. Create ADR via /sdlc:adr decide <topic>                     │
+│  2. Accept ADR                                                   │
+│  3. Synthesize to ARCHITECTURE.md                                │
+│                                                                  │
+│  [Creates docs/ARCHITECTURE.md - enables /sdlc:plan]            │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -184,31 +203,17 @@ Based on arguments:
 
 **This phase establishes broad domain understanding WITHOUT diving deep into any single workflow.**
 
-Use the sdlc-event-model agent with discover mode:
+Use the sdlc-discovery agent:
 
 ```
-Task tool with subagent_type="sdlc-event-model":
-  MODE: DOMAIN_DISCOVERY
-
+Task tool with subagent_type="sdlc-discovery":
   Facilitate domain discovery for [project-name].
 
-  Your goal is to understand the BUSINESS DOMAIN broadly:
+  Build broad understanding of the business domain:
   1. Who are the actors/users of the system?
   2. What are their high-level goals?
   3. What major business processes exist?
-  4. What external systems must we integrate with? (Note: just names and purposes, NO technical details)
-
-  DO NOT:
-  - Dive deep into any single workflow
-  - Make architecture decisions
-  - Discuss technical implementation
-  - Collect more detail than needed to identify workflows
-
-  DO:
-  - Ask broad, open-ended questions
-  - Build a mental map of the domain
-  - Identify potential workflows to model
-  - Suggest which workflow to start with and WHY
+  4. What external systems must we integrate with?
 
   Store results in docs/event_model/domain/overview.md
 
@@ -241,52 +246,32 @@ If on an event-model branch and git-spice available:
 gs branch create event-model/<workflow-name>
 ```
 
-Then use the sdlc-event-model agent:
+Then use the sdlc-workflow-designer agent:
 
 ```
-Task tool with subagent_type="sdlc-event-model":
-  MODE: WORKFLOW_DESIGN
-
+Task tool with subagent_type="sdlc-workflow-designer":
   Design the workflow: <workflow-name>
 
-  IMPORTANT: This is the most critical part of the SDLC. Do NOT skip steps.
-  Do NOT assume you have enough information. The PROCESS is what reveals the truth.
+  Guide through the 9-step event modeling process:
+  1. User Goal
+  2. Brainstorm Events
+  3. Order Events (The Plot)
+  4. Create Wireframes (The Storyboard)
+  5. Identify Commands
+  6. Design Read Models
+  7. Find Automations & Translations
+  8. Create Mermaid Diagram
+  9. Decompose into Slices
 
-  Guide through EACH step methodically (from Dymitruk's Event Modeling):
-
-  Step 1 - User Goal: What exactly is the user trying to accomplish?
-  Step 2 - Brainstorm Events: What facts get recorded? (sticky-note style, no order yet)
-  Step 3 - Order Events: Arrange chronologically as the story unfolds (The Plot)
-  Step 4 - Create Wireframes: ASCII mockups for every interaction (The Storyboard)
-  Step 5 - Identify Commands: For EACH event, what triggers it?
-  Step 6 - Design Read Models: What does each actor need to see?
-  Step 7 - Find Automations & Translations: What happens automatically? External systems?
-  Step 8 - Create Mermaid Diagram: Flowchart with swimlanes showing complete workflow
-  Step 9 - Decompose into Slices: ONE pattern per slice (Command, View, Automation, Translation)
-
-  At EVERY step, ask probing questions:
-  - "And then what happens?"
-  - "What if [scenario]?"
-  - "Who needs to know about this?"
-  - "What could go wrong?"
-
-  Do NOT:
-  - Make ANY architecture decisions
-  - Discuss technical implementation
-  - Skip steps because you think you know enough
-  - Rush to documentation
-  - Skip wireframes (they are mandatory!)
-  - Create slices larger than ONE pattern
-
-  Output structure:
-  - docs/event_model/workflows/<name>/overview.md (master diagram, slice list)
+  Output:
+  - docs/event_model/workflows/<name>/overview.md
   - docs/event_model/workflows/<name>/slices/<slice>.md (one per slice)
 ```
 
 After workflow design completes, **immediately run information completeness check**:
 
 ```
-Task tool with subagent_type="sdlc-event-model":
+Task tool with subagent_type="sdlc-model-checker":
   MODE: COMPLETENESS_CHECK
 
   Run information completeness check on workflow: <workflow-name>
@@ -297,14 +282,6 @@ Task tool with subagent_type="sdlc-event-model":
   3. Run the check AGAIN
 
   Repeat until NO gaps remain. Only then proceed to GWT scenarios.
-
-  Check criteria:
-  - Every read model field traces to an event field
-  - Every event has a triggering command OR automation OR translation
-  - Every command has validation rules defined
-  - Every automation has termination conditions
-
-  DO NOT proceed to GWT until this check passes completely.
 ```
 
 #### `gwt <workflow>` → Generate Scenarios
@@ -357,23 +334,17 @@ Task tool with subagent_type="sdlc-gwt":
 After GWT scenarios are generated, **run GWT feedback evaluation**:
 
 ```
-Task tool with subagent_type="sdlc-event-model":
+Task tool with subagent_type="sdlc-model-checker":
   MODE: GWT_FEEDBACK
 
   Evaluate if GWT scenarios reveal missing workflow elements for: <workflow-name>
 
-  Read the scenarios from docs/event_model/scenarios/<workflow>/
-
-  For EACH scenario, ask:
-  1. Does this scenario reference events that aren't in the workflow?
-  2. Does this scenario imply commands with failure cases we haven't modeled?
-  3. Does the Given clause require read model fields we haven't defined?
-  4. Does the Then clause imply events or state changes we're missing?
+  Read the scenarios from docs/event_model/workflows/<workflow>/slices/*.md
 
   For EACH gap discovered:
   1. Ask the user to clarify the business behavior
   2. Add the missing element to the workflow document
-  3. Update related elements (commands, events, read models) as needed
+  3. Update related elements as needed
 
   After adding elements, this will trigger another completeness check.
 ```
@@ -381,12 +352,10 @@ Task tool with subagent_type="sdlc-event-model":
 Then **run information completeness check again**:
 
 ```
-Task tool with subagent_type="sdlc-event-model":
+Task tool with subagent_type="sdlc-model-checker":
   MODE: COMPLETENESS_CHECK
 
   Run information completeness check on workflow: <workflow-name>
-
-  (Same iterative process as before - repeat until no gaps remain)
 
   This ensures any elements added during GWT feedback are complete.
 
@@ -396,7 +365,7 @@ Task tool with subagent_type="sdlc-event-model":
 #### `validate` → Validate Model
 
 ```
-Task tool with subagent_type="sdlc-event-model":
+Task tool with subagent_type="sdlc-model-checker":
   MODE: VALIDATION
 
   Validate the event model in docs/event_model/
@@ -410,6 +379,84 @@ Task tool with subagent_type="sdlc-event-model":
   6. Translation coverage - external data has anti-corruption layers
 
   Report gaps as questions to resolve, not technical problems.
+```
+
+#### `arch` → Architecture Design Phase
+
+**Prerequisites**:
+- At least one workflow must be complete with GWT scenarios
+- Domain discovery must exist (`docs/event_model/domain/overview.md`)
+
+Check prerequisites:
+```bash
+# Check domain discovery exists
+test -f docs/event_model/domain/overview.md || echo "No domain discovery"
+
+# Check for complete workflows (with GWT scenarios)
+ls docs/event_model/workflows/*/overview.md 2>/dev/null || echo "No workflows"
+```
+
+If prerequisites not met:
+```
+Cannot proceed with architecture without a completed event model.
+
+Missing:
+- [Domain discovery if missing]: Run /sdlc:design discover
+- [Workflows if missing]: Run /sdlc:design workflow <name>
+
+The architecture phase requires understanding WHAT we're building
+(from the event model) before deciding HOW to build it.
+```
+
+**Process**:
+
+This phase bridges event modeling to implementation by making architectural decisions informed by the event model.
+
+Use the sdlc-design-facilitator agent:
+
+```
+Task tool with subagent_type="sdlc-design-facilitator":
+  Design architecture for the system based on event model in docs/event_model/
+
+  Read and understand:
+  1. Domain overview from docs/event_model/domain/overview.md
+  2. All workflow overviews
+  3. All slices and their patterns (Command, View, Automation, Translation)
+
+  Facilitate architectural decisions in these categories:
+  1. Technology Stack
+  2. Domain Boundaries
+  3. Integration Approaches
+  4. Cross-Cutting Concerns
+
+  For EACH significant decision:
+  1. Present options with tradeoffs using AskUserQuestion
+  2. After user decides, create ADR: /sdlc:adr decide <topic>
+  3. Wait for user to accept ADR: /sdlc:adr accept <number>
+
+  After all decisions are made and ADRs accepted:
+  - Run /sdlc:adr synthesize to create/update ARCHITECTURE.md
+```
+
+**Output**:
+```
+Architecture Design Complete: <project-name>
+
+ADRs Created:
+  - ADR-001: <title> [accepted]
+  - ADR-002: <title> [accepted]
+  ...
+
+Architecture Document: docs/ARCHITECTURE.md
+
+Key Decisions:
+  - Technology: <stack summary>
+  - Boundaries: <bounded contexts summary>
+  - Integration: <approach summary>
+  - Cross-cutting: <patterns summary>
+
+Next step:
+  /sdlc:plan - Create GitHub issues from event model slices
 ```
 
 ### 5. After Workflow Design - Create/Update PR
