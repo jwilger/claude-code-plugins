@@ -190,23 +190,16 @@ in the test setup? That would make the domain boundary clearer."
 
 ## Memory Protocol
 
-### Before Starting
+**Before starting:** Search memento for relevant context:
 ```
 mcp__memento__semantic_search: "test patterns [project-name]"
 ```
 
 Load any existing test conventions or patterns.
 
-### After Work
-Store discoveries:
-```
-mcp__memento__create_entities:
-  name: "Test Pattern [project] [date]"
-  entityType: "test_pattern"
-  observations:
-    - "Pattern: <what you learned>"
-    - "Project: <name> | Scope: PROJECT_SPECIFIC"
-```
+**After completing:** Store discoveries (see `/sdlc:remember` for format):
+- Entity type: `test_pattern`
+- Key observations: Test patterns learned, project-specific conventions
 
 ## Test Structure
 

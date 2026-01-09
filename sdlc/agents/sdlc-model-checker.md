@@ -372,20 +372,11 @@ when a customer's loyalty status changes?"
 
 ## Memory Protocol
 
-### Before Starting
+**Before starting:** Search memento for relevant context:
 ```
 mcp__memento__semantic_search: "event model check [project-name] [workflow-name]"
 ```
 
-### After Completing
-```
-mcp__memento__create_entities:
-  name: "<Project> <Workflow> Model Check [date]"
-  entityType: "model_check"
-  observations:
-    - "Project: <name> | Scope: PROJECT_SPECIFIC"
-    - "Workflow: <name>"
-    - "Mode: <validation|completeness|gwt-feedback>"
-    - "Result: <passed|gaps found>"
-    - "Elements added: <list if any>"
-```
+**After completing:** Store discoveries (see `/sdlc:remember` for format):
+- Entity type: `model_check`
+- Key observations: Workflow name, mode (validation/completeness/gwt-feedback), result, elements added

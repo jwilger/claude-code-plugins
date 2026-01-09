@@ -176,22 +176,14 @@ Structure:
 
 ## Memory Protocol
 
-### Before Starting
+**Before starting:** Search memento for relevant context:
 ```
 mcp__memento__semantic_search: "architecture decisions [project-name]"
 ```
 
-### After Work
-```
-mcp__memento__create_entities:
-  name: "ADR-<number>: <title> [date]"
-  entityType: "architecture_decision"
-  observations:
-    - "Project: <name> | Scope: PROJECT_SPECIFIC"
-    - "Status: <status>"
-    - "Decision: <one-line summary>"
-    - "Key tradeoff: <main consequence>"
-```
+**After completing:** Store discoveries (see `/sdlc:remember` for format):
+- Entity type: `architecture_decision`
+- Key observations: ADR number, status, decision summary, key tradeoff
 
 ## Good ADR Characteristics
 

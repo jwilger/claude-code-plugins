@@ -38,70 +38,45 @@ You have access to the memento MCP server which stores memories in a knowledge g
 
 Your long-term memory (training data) and short-term memory (conversation context) are excellent, but your "mid-term" memory for project-specific knowledge outside the current context is poor. Memento addresses this gap.
 
+### Memory Skills
+
+Two skills handle memory operations with proper formatting:
+
+| Skill | Purpose | When to Use |
+|-------|---------|-------------|
+| `/sdlc:recall <query>` | Retrieve relevant knowledge | Before ANY task, when errors occur, when unsure |
+| `/sdlc:remember <what>` | Store discoveries and insights | After solving problems, learning conventions, user preferences |
+
 ### Before Starting ANY Task
 
-**ALWAYS search for relevant memories FIRST:**
-
-1. Use `mcp__memento__semantic_search` with a query describing what you're working on
-2. Use `mcp__memento__open_nodes` to get full details on relevant results
-3. Follow graph relationships to expand context - use the relations returned to find connected entities
-4. Continue traversing until results are no longer relevant to the current task
-
-**IMPORTANT**: Do NOT use `mcp__memento__read_graph` to read the entire graph. Memories are stored across ALL projects and the graph is huge. Always use semantic search to find relevant subsets.
+**ALWAYS invoke `/sdlc:recall` FIRST** with a query describing what you're working on. This is non-negotiable.
 
 ### When Commands or Operations FAIL
 
-**IMMEDIATELY search memento for prior solutions:**
-
-When a command fails, a tool returns an error, or an operation doesn't work as expected:
-
-1. **Search first, debug second**: Before trying random fixes, search memento:
-   ```
-   mcp__memento__semantic_search: "<tool/command name> error failure workaround"
-   ```
-2. **Check for known issues**: We may have encountered this exact problem before
-3. **Apply known solutions**: If a memory exists with a solution, try that first
-4. **Store new solutions**: If you solve a novel problem, store the solution immediately
-
-This prevents the frustrating cycle of rediscovering the same solutions repeatedly.
+**Search first, debug second.** Before trying random fixes:
+1. `/sdlc:recall "<error message> fix workaround"`
+2. Apply known solutions if found
+3. If you solve a novel problem: `/sdlc:remember "<solution description>"`
 
 ### During and After Work
 
-Store memories for any interesting, non-obvious information you acquire, especially:
-- Anything that required research or web searches
+Use `/sdlc:remember` for any interesting, non-obvious information:
 - Solutions found through trial and error
-- Project-specific conventions, patterns, or architectural decisions
-- User preferences and workflow patterns
+- Project-specific conventions or patterns
+- User preferences and workflow choices
 - Debugging insights and root cause analyses
-- Integration details and API quirks
-
-**Entity naming:** Use descriptive names with project and date context
-- Example: "Railgun Event Modeling Step 1", "PrimeCtrl Design Principles 2025-10"
-
-**Entity types:** Choose meaningful types like `project`, `constraint`, `design_pattern`, `debugging_insight`, `user_preference`, `tool_discovery`
-
-**Observations format:**
-- Project-specific: `Project: <name> | Path: <path> | Scope: PROJECT_SPECIFIC`
-- General patterns: `Scope: PATTERN` or `Scope: GENERAL`
-- Add dates to observations for temporal context
-
-### Creating Relationships
-
-**Always** create relationships between related memories using `mcp__memento__create_relations`. Use descriptive relation types in active voice:
-- `implements`, `extends`, `depends_on`, `discovered_during`
-- `contradicts`, `supersedes`, `validates`
-- `part_of`, `related_to`, `derived_from`
+- API quirks and tool behaviors
 
 ### Subagent Responsibilities
 
-This memory protocol applies to both the main interactive agent AND any subagents to which work is delegated. Subagents should:
-- Search for relevant memories before beginning their delegated task
-- Store any new insights discovered during their work
+Subagents have direct access to memento tools (`mcp__memento__*`) and should:
+- Search memento before beginning their delegated task
+- Store discoveries using the format documented in `/sdlc:remember`
 - Create relationships to existing memories when applicable
 
 ### Before Session End or Compact
 
-When you detect a session is ending or conversation will be compacted, **proactively store any unsaved discoveries** in memento. Don't let knowledge be lost to context truncation.
+**Proactively store any unsaved discoveries** before context truncation. Use `/sdlc:remember` or the memento tools directly.
 
 ## Task Management
 

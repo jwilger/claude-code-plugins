@@ -459,21 +459,11 @@ Next step:
 
 ## Memory Protocol
 
-### Before Starting
+**Before starting:** Search memento for relevant context:
 ```
 mcp__memento__semantic_search: "workflow design [project-name] [workflow-name]"
 ```
 
-### After Completing
-```
-mcp__memento__create_entities:
-  name: "<Project> <Workflow> Design [date]"
-  entityType: "workflow_design"
-  observations:
-    - "Project: <name> | Scope: PROJECT_SPECIFIC"
-    - "Workflow: <name>"
-    - "Events: <list>"
-    - "Commands: <list>"
-    - "Slices: <count>"
-    - "Status: designed"
-```
+**After completing:** Store discoveries (see `/sdlc:remember` for format):
+- Entity type: `workflow_design`
+- Key observations: Workflow name, events list, commands list, slices count, status

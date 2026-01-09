@@ -284,24 +284,16 @@ fn process_order(order: Order) -> Result<OrderConfirmation, OrderError>
 
 ## Memory Protocol
 
-### Before Starting
+**Before starting:** Search memento for relevant context:
 ```
 mcp__memento__semantic_search: "domain model [project-name]"
 ```
 
 Load existing domain patterns and conventions.
 
-### After Work
-Store domain decisions:
-```
-mcp__memento__create_entities:
-  name: "Domain Type [TypeName] [date]"
-  entityType: "domain_type"
-  observations:
-    - "Type: <name and purpose>"
-    - "Project: <name> | Scope: PROJECT_SPECIFIC"
-    - "Rationale: <why this structure>"
-```
+**After completing:** Store domain decisions (see `/sdlc:remember` for format):
+- Entity type: `domain_type`
+- Key observations: Type name and purpose, rationale for structure
 
 ## Creating Types from Test Errors
 

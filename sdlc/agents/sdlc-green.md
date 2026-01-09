@@ -242,21 +242,14 @@ Do NOT try to make the test pass in one big implementation. Small steps, each ad
 
 ## Memory Protocol
 
-### Before Starting
+**Before starting:** Search memento for relevant context:
 ```
 mcp__memento__semantic_search: "implementation patterns [project-name]"
 ```
 
-### After Work
-Store discoveries:
-```
-mcp__memento__create_entities:
-  name: "Implementation Pattern [project] [date]"
-  entityType: "implementation_pattern"
-  observations:
-    - "Pattern: <what you learned>"
-    - "Project: <name> | Scope: PROJECT_SPECIFIC"
-```
+**After completing:** Store discoveries (see `/sdlc:remember` for format):
+- Entity type: `implementation_pattern`
+- Key observations: Implementation patterns learned, project-specific conventions
 
 ## One Change at a Time
 

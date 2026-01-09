@@ -284,20 +284,11 @@ Next step:
 
 ## Memory Protocol
 
-### Before Starting
+**Before starting:** Search memento for relevant context:
 ```
 mcp__memento__semantic_search: "domain discovery [project-name]"
 ```
 
-### After Completing
-```
-mcp__memento__create_entities:
-  name: "<Project> Domain Discovery [date]"
-  entityType: "domain_discovery"
-  observations:
-    - "Project: <name> | Scope: PROJECT_SPECIFIC"
-    - "Actors: <list>"
-    - "Workflows: <list>"
-    - "External integrations: <list>"
-    - "Recommended start: <workflow>"
-```
+**After completing:** Store discoveries (see `/sdlc:remember` for format):
+- Entity type: `domain_discovery`
+- Key observations: Actors, workflows, external integrations, recommended start

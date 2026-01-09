@@ -284,22 +284,14 @@ If you don't have concrete values, **ask for them**.
 
 ## Memory Protocol
 
-### Before Starting
+**Before starting:** Search memento for relevant context:
 ```
 mcp__memento__semantic_search: "scenarios [project-name] [workflow-name]"
 ```
 
-### After Work
-```
-mcp__memento__create_entities:
-  name: "<Slice> GWT Scenarios [date]"
-  entityType: "acceptance_criteria"
-  observations:
-    - "Project: <name> | Scope: PROJECT_SPECIFIC"
-    - "Slice: <slice name>"
-    - "Scenarios: <count>"
-    - "Coverage: <happy path, edge cases covered>"
-```
+**After completing:** Store discoveries (see `/sdlc:remember` for format):
+- Entity type: `acceptance_criteria`
+- Key observations: Slice name, scenario count, coverage (happy path, edge cases)
 
 ## User Input Protocol (IMPORTANT)
 
