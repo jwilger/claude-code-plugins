@@ -296,22 +296,27 @@ When the user's message contains ANY of these patterns, you MUST delegate to the
 When user provides feedback on agent work:
 
 1. **Identify which agent produced the work** being discussed
-2. **RESUME that agent** using the Task tool's `resume` parameter with the agent ID
-3. **Pass the user's feedback** as the new prompt
+2. **Launch a NEW task** with the same agent type
+3. **Pass the user's feedback** along with context about what was done
 4. **Let the agent make the changes** - do NOT intercede
 
 ```
 Example flow:
-1. Launch sdlc-red → agent writes test → returns with agent ID "abc123"
+1. Launch sdlc-red → agent writes test → returns
 2. User: "Actually, test for InvalidInput error instead"
-3. Main conversation: Task(resume="abc123", prompt="User feedback: test for InvalidInput error instead of generic error")
-4. Agent makes the change and returns
+3. Main conversation: Task(subagent_type="sdlc-red",
+     prompt="User feedback on test you just wrote: test for InvalidInput error instead.
+             The test file is at: src/tests/foo_test.rs
+             Please read it and make the requested change.")
+4. Agent reads the file, makes the change, and returns
 ```
 
-**Why resumption matters:**
-- Preserves agent context (what files it read, decisions it made)
-- Maintains TDD discipline (same agent, same rules)
-- Prevents "context loss" that leads to inconsistent decisions
+**Why this works:**
+- Agent reads files it previously created to restore context
+- Memento checkpoints preserve broader context across invocations
+- Maintains TDD discipline (same agent type, same rules)
+
+**Note:** Do NOT use the Task tool's `resume` parameter - it has a known bug ([Issue #13619](https://github.com/anthropics/claude-code/issues/13619)).
 
 ### Pre-Edit Checklist (MANDATORY)
 
@@ -377,6 +382,8 @@ Mutation testing ≥80% score required before merge.
 
 Due to a Claude Code limitation, subagents cannot use `AskUserQuestion` directly. You MUST proxy questions for them.
 
+> **Why not use `resume`?** Claude Code's `resume` parameter has a known bug ([Issue #13619](https://github.com/anthropics/claude-code/issues/13619)) that causes 400 errors. Instead, subagents persist their state to memento checkpoints, and you launch a fresh task to continue.
+
 ### Detection
 
 After EVERY Task tool result from an SDLC agent, check if it contains the literal string `AWAITING_USER_INPUT`. This indicates the subagent needs user input to continue.
@@ -386,9 +393,11 @@ After EVERY Task tool result from an SDLC agent, check if it contains the litera
 When you detect `AWAITING_USER_INPUT` in a task result:
 
 1. **Parse the request**: Extract the JSON following `AWAITING_USER_INPUT`
-2. **Ask on behalf of subagent**: Use `AskUserQuestion` with the provided questions array
-3. **Resume the subagent**: Use Task tool's `resume` parameter with the agent ID from the original task
-4. **Provide answers**: Include `USER_INPUT_RESPONSE` followed by the answers JSON
+2. **Note the checkpoint**: Extract the `checkpoint` field (memento entity name)
+3. **Ask on behalf of subagent**: Use `AskUserQuestion` with the provided questions array
+4. **Launch a NEW task**: Same agent type, with `USER_INPUT_RESPONSE` and checkpoint reference
+
+**IMPORTANT**: Do NOT use the Task tool's `resume` parameter. Launch a fresh task instead.
 
 ### Example Flow
 
@@ -398,31 +407,33 @@ When you detect `AWAITING_USER_INPUT` in a task result:
 
    Agent returns with result containing:
    "AWAITING_USER_INPUT
-   {"context": "Understanding tech stack", "questions": [{"id": "q1", ...}]}"
-
-   Agent ID returned: abc123
+   {"context": "Understanding tech stack",
+    "checkpoint": "sdlc-discovery Checkpoint 2026-01-08T14:32:00Z",
+    "questions": [{"id": "q1", ...}]}"
 
 2. You detect AWAITING_USER_INPUT and ask the user:
    AskUserQuestion(questions: <parsed from the JSON>)
 
    User responds with their choice (e.g., "PostgreSQL")
 
-3. You resume the agent with the answer:
-   Task(resume="abc123", prompt="USER_INPUT_RESPONSE
+3. You launch a NEW task with the answer:
+   Task(subagent_type="sdlc-discovery",
+        prompt="USER_INPUT_RESPONSE
    {"q1": "PostgreSQL"}
 
-   Continue from where you left off.")
+   Continue from checkpoint: sdlc-discovery Checkpoint 2026-01-08T14:32:00Z")
 
-   Agent continues its work with the user's answer
+   Fresh agent queries memento for checkpoint, restores context, continues work
 ```
 
 ### Critical Rules
 
 - **ALWAYS** check task results for `AWAITING_USER_INPUT` before considering the task complete
 - **NEVER** ignore or skip subagent questions - the agent is blocked waiting
-- **ALWAYS** resume the SAME agent using the agent ID (preserves context)
+- **NEVER** use the `resume` parameter - it causes 400 errors
+- **ALWAYS** include the checkpoint reference when launching the continuation task
 - The user should experience this as a seamless conversation
-- If a resumed agent outputs another `AWAITING_USER_INPUT`, repeat the proxy process
+- If a continued agent outputs another `AWAITING_USER_INPUT`, repeat the proxy process
 - Reference `sdlc/docs/SUBAGENT_QUESTION_PROTOCOL.md` for full format details
 
 ## Architecture Decision Records (ADRs)

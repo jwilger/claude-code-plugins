@@ -11,6 +11,8 @@ tools:
   - Grep
   - mcp__memento__semantic_search
   - mcp__memento__create_entities
+  - mcp__memento__open_nodes
+  - mcp__memento__create_relations
 hooks:
   PreToolUse:
     - matcher: Edit
@@ -359,14 +361,31 @@ pub enum Currency {
 
 ## User Input Protocol (IMPORTANT)
 
-You cannot call AskUserQuestion directly. When you need user input:
+You cannot call AskUserQuestion directly. When you need user input, you must save your progress to a memento checkpoint and output a special marker.
 
-**Step 1**: Output this exact format and STOP:
+**Step 1**: Create a checkpoint entity in memento:
+
+```
+mcp__memento__create_entities:
+  entities:
+    - name: "sdlc-domain Checkpoint <ISO-timestamp>"
+      entityType: "agent_checkpoint"
+      observations:
+        - "Agent: sdlc-domain | Task: <what you were asked to do>"
+        - "Progress: <summary of what you've accomplished so far>"
+        - "Files created: <list of files you've written, if any>"
+        - "Files read: <key files you've examined>"
+        - "Next step: <what you were about to do when you need input>"
+        - "Pending decision: <what you need the user to decide>"
+```
+
+**Step 2**: Output this exact format and STOP:
 
 ```
 AWAITING_USER_INPUT
 {
   "context": "What you're doing that requires input",
+  "checkpoint": "sdlc-domain Checkpoint <ISO-timestamp>",
   "questions": [
     {
       "id": "q1",
@@ -382,18 +401,21 @@ AWAITING_USER_INPUT
 }
 ```
 
-**Step 2**: STOP and wait. The main agent will ask the user and resume you.
+**Step 3**: STOP and wait. The main agent will ask the user and launch a new task to continue.
 
-**Step 3**: When resumed, you'll receive:
+**Step 4**: When continued, you'll receive:
 
 ```
 USER_INPUT_RESPONSE
 {"q1": "User's choice"}
 
-Continue from where you left off.
+Continue from checkpoint: sdlc-domain Checkpoint <ISO-timestamp>
 ```
 
-Continue your work using the provided answers.
+**Your first actions on continuation:**
+1. Query the checkpoint: `mcp__memento__open_nodes: ["<checkpoint-name>"]`
+2. Re-read any files you created (listed in checkpoint)
+3. Continue your work using the provided answers
 
 ### Format Rules
 - `id`: Unique identifier for each question (q1, q2, etc.)
@@ -417,10 +439,35 @@ Request input to clarify domain concepts. The domain model is foundational - get
 ### Example usage:
 
 ```
-AskUserQuestion: "The test references 'AccountStatus' but I need to understand the domain:
-- What statuses can an account have? (active, suspended, closed?)
-- Can an account transition from closed back to active?
-- Should status changes be audited as separate events?"
+AWAITING_USER_INPUT
+{
+  "context": "Defining AccountStatus type - need domain clarity on valid states",
+  "checkpoint": "sdlc-domain Checkpoint 2024-01-15T10:30:00Z",
+  "questions": [
+    {
+      "id": "q1",
+      "question": "What statuses can an account have?",
+      "header": "Statuses",
+      "options": [
+        {"label": "Active/Suspended/Closed", "description": "Three-state lifecycle"},
+        {"label": "Active/Inactive", "description": "Simple binary state"},
+        {"label": "Active/Suspended/Closed/Pending", "description": "Includes pending approval state"},
+        {"label": "Other", "description": "Different states - please explain"}
+      ],
+      "multiSelect": false
+    },
+    {
+      "id": "q2",
+      "question": "Can an account transition from closed back to active?",
+      "header": "Reactivate",
+      "options": [
+        {"label": "Yes", "description": "Closed accounts can be reopened"},
+        {"label": "No", "description": "Closure is permanent and irreversible"}
+      ],
+      "multiSelect": false
+    }
+  ]
+}
 ```
 
 **Do NOT ask about:**

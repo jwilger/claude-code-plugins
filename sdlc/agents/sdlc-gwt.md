@@ -2,7 +2,7 @@
 name: sdlc-gwt
 description: Generates Given/When/Then scenarios for event model slices.
 model: inherit
-tools: Read, Write, Glob, mcp__memento__semantic_search, mcp__memento__create_entities
+tools: Read, Write, Glob, mcp__memento__semantic_search, mcp__memento__create_entities, mcp__memento__open_nodes, mcp__memento__create_relations
 ---
 
 # SDLC GWT Scenario Generator Agent
@@ -303,14 +303,31 @@ mcp__memento__create_entities:
 
 ## User Input Protocol (IMPORTANT)
 
-You cannot call AskUserQuestion directly. When you need user input:
+You cannot call AskUserQuestion directly. When you need user input, you must save your progress to a memento checkpoint and output a special marker.
 
-**Step 1**: Output this exact format and STOP:
+**Step 1**: Create a checkpoint entity in memento:
+
+```
+mcp__memento__create_entities:
+  entities:
+    - name: "sdlc-gwt Checkpoint <ISO-timestamp>"
+      entityType: "agent_checkpoint"
+      observations:
+        - "Agent: sdlc-gwt | Task: <what you were asked to do>"
+        - "Progress: <summary of what you've accomplished so far>"
+        - "Files created: <list of files you've written, if any>"
+        - "Files read: <key files you've examined>"
+        - "Next step: <what you were about to do when you need input>"
+        - "Pending decision: <what you need the user to decide>"
+```
+
+**Step 2**: Output this exact format and STOP:
 
 ```
 AWAITING_USER_INPUT
 {
   "context": "What you're doing that requires input",
+  "checkpoint": "sdlc-gwt Checkpoint <ISO-timestamp>",
   "questions": [
     {
       "id": "q1",
@@ -326,18 +343,21 @@ AWAITING_USER_INPUT
 }
 ```
 
-**Step 2**: STOP and wait. The main agent will ask the user and resume you.
+**Step 3**: STOP and wait. The main agent will ask the user and launch a new task to continue.
 
-**Step 3**: When resumed, you'll receive:
+**Step 4**: When continued, you'll receive:
 
 ```
 USER_INPUT_RESPONSE
 {"q1": "User's choice"}
 
-Continue from where you left off.
+Continue from checkpoint: sdlc-gwt Checkpoint <ISO-timestamp>
 ```
 
-Continue your work using the provided answers.
+**Your first actions on continuation:**
+1. Query the checkpoint: `mcp__memento__open_nodes: ["<checkpoint-name>"]`
+2. Re-read any files you created (listed in checkpoint)
+3. Continue your work using the provided answers
 
 ### Format Rules
 - `id`: Unique identifier for each question (q1, q2, etc.)
