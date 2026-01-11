@@ -336,50 +336,13 @@ When `sdlc-domain` pushes back on a test design or implementation approach:
 5. **If stuck**: Escalate to user for decision
 
 **Domain modeler has VETO POWER** over designs that violate:
-- **Semantic type violations**: Using structural types (NonEmptyString) instead of semantic types (UserName, EmailAddress)
+- Semantic type violations (structural types where semantic types belong)
 - Primitive obsession (using raw types for domain concepts)
 - Invalid state representability (types that allow impossible states)
 - Parse-don't-validate violations
 - Domain boundary violations
 
-### Semantic vs Structural Types (CRITICAL)
-
-Domain types must be **SEMANTIC** (what it means) not just **STRUCTURAL** (what it is):
-
-| Type | Category | Problem |
-|------|----------|---------|
-| `NonEmptyString` | Structural | Describes validation, not meaning |
-| `UserName` | Semantic | Describes domain concept |
-
-```
-// BAD: Structural - same type for different concepts
-User { name: NonEmptyString, email: NonEmptyString }  // Compiler can't catch confusion
-
-// GOOD: Semantic - each concept has its own type
-User { name: UserName, email: EmailAddress }  // Compiler catches mistakes
-```
-
-**Rule**: If two fields could be confused, they need different types.
-
-**Composition pattern** (language-agnostic): Structural types are building blocks. Semantic types wrap them:
-- Rust: Use `nutype` crate - `#[nutype(validate(not_empty))] pub struct UserName(String)`
-- TypeScript: `type UserName = NonEmpty<string> & { __brand: 'UserName' }`
-- Python: `class UserName(NonEmptyString)` or composition
-- Go/Java/Kotlin: wrapper types with constructors
-
-**Ergonomic conversions**: Make valid conversions easy, invalid conversions impossible:
-- ✅ Extraction OUT (get inner value) - should be trivial
-- ✅ Display/toString - always available
-- ❌ Construction FROM primitive without validation - NEVER
-- ❌ Conversion between semantic types - NEVER
-
-### On-Demand Domain Audit
-
-Use `/sdlc:domain-audit` for a focused domain type audit:
-- Identifies structural types that should be semantic
-- Finds runtime checks that could be compile-time
-- Reports issues concisely without generating documentation files
-- Can fix issues on request
+Use `/sdlc:domain-audit` for on-demand domain type audits.
 
 ### Key Principles
 
