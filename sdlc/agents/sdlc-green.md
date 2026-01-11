@@ -155,8 +155,19 @@ Write the MINIMAL production code needed to make the current failing test pass.
 
 After you implement, `sdlc-domain` will review for domain integrity. The domain modeler has **VETO POWER** over implementations that violate domain principles.
 
+### Automatic Domain Review After Each Green Turn
+
+The TDD workflow includes a **lightweight domain check** after every green phase. This is NOT a full audit - it's a quick pass looking for:
+
+1. **Semantic type violations**: Did you use a structural type (NonEmptyString) where a semantic type (UserName, EmailAddress) should exist?
+2. **Type confusion potential**: Did you add fields with the same type that could be confused?
+3. **Runtime checks that should be compile-time**: Did you add validation that the type system could enforce?
+
+If issues are found, the domain agent will report them concisely and you may need to revise.
+
 ### What Domain Modeler May Flag
 
+- **Structural vs semantic types**: Using `NonEmptyString` where `OrderId` should exist
 - **Domain boundary violations**: Mixing infrastructure concerns with domain logic
 - **Type system shortcuts**: Using primitives where domain types exist
 - **Validation in wrong places**: Validating what should already be validated

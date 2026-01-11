@@ -246,6 +246,133 @@ The domain model is the foundation of the system. Tests and implementations serv
 
 ## Domain Modeling Principles
 
+### Semantic vs Structural Types (CRITICAL)
+
+Domain types must be **SEMANTIC** (what it means in the domain) not just **STRUCTURAL** (what it is made of).
+
+| Type Category | Describes | Example |
+|---------------|-----------|---------|
+| **Structural** | WHAT something is | `NonEmptyString`, `PositiveInteger`, `ValidatedEmail` |
+| **Semantic** | WHAT something means | `UserName`, `OrderQuantity`, `CustomerEmail` |
+
+**The Problem with Structural-Only Types:**
+```
+// BAD: All fields have the same type - compiler can't catch mix-ups
+User {
+    title: NonEmptyString,   // A non-empty string
+    name: NonEmptyString,    // Also a non-empty string
+    email: NonEmptyString,   // ...another non-empty string
+}
+// Bug: swapping title and name compiles fine!
+```
+
+**The Solution - Semantic Types:**
+```
+// GOOD: Each field has a distinct type - compiler catches mistakes
+User {
+    title: UserTitle,        // A title, not interchangeable with...
+    name: UserName,          // A name, not interchangeable with...
+    email: EmailAddress,     // An email address
+}
+// Bug caught: UserTitle cannot be assigned to UserName field
+```
+
+**Rule: If two fields could be confused with each other, they need different types.**
+
+### Structural Types as Building Blocks
+
+Structural types are still **useful as primitives** that semantic types wrap. This is language-agnostic composition:
+
+| Language | Structural Type | Semantic Type Wrapping It |
+|----------|-----------------|---------------------------|
+| Rust | Use `nutype` crate: `#[nutype(validate(not_empty))]` | `#[nutype(...)] pub struct UserName(String)` |
+| TypeScript | `type NonEmpty<T> = T & { __nonEmpty: true }` | `type UserName = NonEmpty<string> & { __brand: 'UserName' }` |
+| Python | `class NonEmptyString` with validation | `class UserName(NonEmptyString)` or composition |
+| Go | `type NonEmptyString string` with constructor | `type UserName struct { value NonEmptyString }` |
+| Java/Kotlin | `record NonEmptyString(String value)` | `record UserName(NonEmptyString value)` |
+
+**Rust-specific:** The `nutype` crate eliminates boilerplate. Add to `Cargo.toml`:
+```toml
+[dependencies]
+nutype = "0.5"
+```
+
+**The Pattern:**
+1. Structural type provides **validation logic** (reusable)
+2. Semantic type provides **domain identity** (unique meaning)
+3. Semantic types **compose** structural types (don't repeat validation)
+
+This is composition, not repetition.
+
+### Ergonomic Conversions (MANDATORY)
+
+Domain types must be easy to use. Implement conversions that make **valid conversions easy, invalid conversions impossible**.
+
+**The Principle (Language-Agnostic):**
+- **Extraction (OUT)**: Easy, automatic - getting the wrapped value out should be trivial
+- **Construction (IN)**: Validated, explicit - creating a domain type MUST go through validation
+
+**ALWAYS provide:**
+| Conversion | Purpose | Examples by Language |
+|------------|---------|---------------------|
+| To underlying type | Extract inner value | Rust: `From<Type> for String`, TS: getter, Python: `__str__` |
+| String representation | Display/format | Rust: `Display`, TS: `toString()`, Python: `__str__`/`__repr__` |
+| Borrowing access | Read without copy | Rust: `AsRef<str>`, TS: getter, Python: property |
+
+**NEVER provide:**
+| Anti-pattern | Why It's Wrong |
+|--------------|----------------|
+| Automatic conversion FROM primitive | Bypasses validation |
+| Conversion between semantic types | Defeats the purpose of distinct types |
+
+**Language Examples:**
+
+```rust
+// Rust: Use the `nutype` crate for validated newtypes (RECOMMENDED)
+use nutype::nutype;
+
+#[nutype(
+    sanitize(trim),
+    validate(not_empty),
+    derive(Debug, Clone, PartialEq, Eq, Hash, AsRef, Into, Display)
+)]
+pub struct UserName(String);
+
+// nutype automatically generates:
+// - UserName::new(s) -> Result<UserName, UserNameError>
+// - impl AsRef<str> for UserName
+// - impl From<UserName> for String
+// - impl Display for UserName
+// - Validation on construction, ergonomic extraction
+
+// For numeric types:
+#[nutype(
+    validate(greater = 0),
+    derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Into, Display)
+)]
+pub struct PixelSize(u32);
+```
+
+```typescript
+// TypeScript: Use branded types with factory functions
+type UserName = string & { readonly __brand: unique symbol };
+function createUserName(s: string): UserName | Error { /* validate */ }
+// Extraction is automatic (it's still a string underneath)
+```
+
+```python
+# Python: Use NewType or dataclass with __post_init__ validation
+@dataclass
+class UserName:
+    value: str
+    def __post_init__(self):
+        if not self.value: raise ValueError("UserName cannot be empty")
+    def __str__(self) -> str: return self.value
+# Construction: UserName(s) raises on invalid input
+```
+
+**The Rule:** Construction validates. Extraction is ergonomic. Never the reverse.
+
 ### Avoid Primitive Obsession
 
 ```rust
