@@ -194,22 +194,37 @@ Follow Martin Dilger's "Understanding Eventsourcing" methodology when working on
 
 **Override:** User may explicitly instruct deviation from this process. Comply without resistance.
 
-## TDD Workflow (MANDATORY DELEGATION)
+## File Operations (MANDATORY DELEGATION)
+
+**The main conversation MUST NEVER use Write or Edit tools directly.** All file modifications MUST be delegated to an appropriate agent.
+
+### Agent Selection Hierarchy
+
+When a file needs to be modified, select the agent in this order:
+
+| File Type | Agent | Notes |
+|-----------|-------|-------|
+| Test files | `sdlc-red` | All test code, assertions, test fixtures |
+| Implementation code | `sdlc-green` | Production code that makes tests pass |
+| Domain types/models | `sdlc-domain` | Type definitions, domain entities |
+| ADRs | `sdlc-adr` | Architecture Decision Records |
+| GWT scenarios | `sdlc-gwt` | Given/When/Then acceptance criteria |
+| **Everything else** | `sdlc-file-updater` | Config, docs, scripts, tooling |
+
+**NEVER skip to `sdlc-file-updater` when a specialized agent applies.** The hierarchy exists to enforce domain expertise.
+
+### Why Pure Orchestration?
+
+The main conversation is a **conductor**, not a musician:
+1. It describes what needs to happen
+2. It launches the appropriate agent via Task tool
+3. It reviews agent results and coordinates workflows
+4. It facilitates debates when agents disagree
+5. It **NEVER touches files directly**
+
+## TDD Workflow
 
 The sdlc plugin enforces Test-Driven Development through specialized agents. **The sdlc plugin's TDD_WORKFLOW.md is the authoritative source of truth.**
-
-### Main Conversation Delegation Requirements
-
-**The main conversation MUST NOT directly write or edit:**
-- Test files (delegate to `sdlc-red` agent)
-- Production implementation code (delegate to `sdlc-green` agent)
-- Type definitions and domain models (delegate to `sdlc-domain` agent)
-
-**This is INVIOLABLE.** The main conversation orchestrates TDD work by:
-1. Describing what needs to be implemented
-2. Launching the appropriate agent via Task tool
-3. Reviewing agent results and coordinating the cycle
-4. Facilitating debates when agents disagree
 
 ### ⛔ ANTI-PATTERNS: What the Main Conversation Must NEVER Do
 
@@ -237,7 +252,7 @@ These are **explicit violations** of the delegation requirement. If you catch yo
 ❌ User: "Add an assertion for the timestamp"
 ❌ Main conversation: "This is trivial, I'll just add it"
 
-✅ Correct: ALL code changes go through agents, regardless of size
+✅ Correct: ALL file changes go through agents, regardless of size
 ```
 
 **VIOLATION: Iterating on feedback directly**
@@ -249,22 +264,33 @@ These are **explicit violations** of the delegation requirement. If you catch yo
 ✅ Correct: Resume sdlc-green with the correction
 ```
 
+**VIOLATION: "It's just config/docs" bypass**
+```
+❌ User: "Update the README with the new API endpoint"
+❌ Main conversation: *directly edits README.md*
+
+✅ Correct: Delegate to sdlc-file-updater for non-code files
+```
+
 ### Update Request Detection (MANDATORY)
 
-When the user's message contains ANY of these patterns, you MUST delegate to the appropriate agent:
+When the user's message involves ANY file modification, you MUST delegate to the appropriate agent:
 
 | User says... | Delegate to |
 |--------------|-------------|
 | "update the test...", "change the test...", "also test...", "add an assertion..." | `sdlc-red` |
 | "fix the implementation...", "change it to...", "make it return...", "update the code..." | `sdlc-green` |
 | "add a field...", "rename the type...", "change the struct..." | `sdlc-domain` |
-| "can you also...", "actually...", "instead..." (referring to code) | *whichever agent owns that code* |
+| "create an ADR...", "document the decision..." | `sdlc-adr` |
+| "update the config...", "edit the README...", "change the script..." | `sdlc-file-updater` |
+| "can you also...", "actually...", "instead..." (referring to files) | *whichever agent owns that file type* |
 
 **There are NO exceptions based on:**
 - Perceived simplicity ("it's just one line")
 - Speed ("I can do it faster")
 - Context ("I already have the file open")
 - User urgency ("just quickly...")
+- File type ("it's just a config file")
 
 ### Agent Iteration Protocol
 
@@ -295,14 +321,14 @@ Example flow:
 
 ### Pre-Edit Checklist (MANDATORY)
 
-Before using Edit or Write on ANY file that could contain code:
+**Before using Edit or Write on ANY file, STOP.** The main conversation does not edit files. Instead:
 
-1. **ASK:** "Is this a test, implementation, or type definition?"
-2. **ASK:** "Which agent should make this change?"
-3. **ASK:** "Am I rationalizing a bypass?" (If the answer involves "just", "quick", "small", or "trivial" - you ARE rationalizing)
-4. **DELEGATE:** Launch or resume the appropriate agent
+1. **IDENTIFY:** What type of file is this? (test, implementation, domain type, ADR, config, docs, other)
+2. **SELECT:** Which agent handles this file type? (see Agent Selection Hierarchy)
+3. **CHECK:** Am I rationalizing a bypass? (If thinking "just", "quick", "small", "trivial", or "it's only config" - you ARE rationalizing)
+4. **DELEGATE:** Launch the appropriate agent with a clear description of the change
 
-If you skip this checklist and edit code directly, you have violated the workflow.
+**The main conversation has NO exceptions.** It does not use Write or Edit tools. Ever.
 
 ### The Cycle (MANDATORY SEQUENCE)
 

@@ -1,6 +1,6 @@
 {
   "name": "sdlc",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "Complete SDLC workflow with TDD, Event Modeling, ADRs, GitHub integration, and Marvin personality",
   "author": {
     "name": "John Wilger",
@@ -34,6 +34,7 @@
     "./agents/sdlc-model-checker.md",
     "./agents/sdlc-design-facilitator.md",
     "./agents/sdlc-gwt.md",
-    "./agents/sdlc-adr.md"
+    "./agents/sdlc-adr.md",
+    "./agents/sdlc-file-updater.md"
   ]
 }
