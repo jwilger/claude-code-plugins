@@ -1,12 +1,12 @@
 {
   "name": "sdlc",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "description": "Complete SDLC workflow with TDD, Event Modeling, ADRs, GitHub integration, and Marvin personality",
   "author": {
     "name": "John Wilger",
     "email": "john@johnwilger.com"
   },
-  "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow", "marvin", "output-style", "code-review", "debugging"],
+  "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow", "marvin", "output-style", "code-review", "debugging", "hooks", "todo-enforcement"],
   "outputStyles": "./output-styles/",
   "commands": [
     "./commands/shared/orchestration.md",
