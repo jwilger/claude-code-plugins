@@ -1,6 +1,6 @@
 ---
 description: Design event model workflows - brainstorm, document, and generate GWT scenarios
-argument-hint: [discover|workflow|gwt|validate] [name]
+argument-hint: [discover|workflow|gwt|validate|arch|design-system] [name]
 context: fork
 allowed-tools:
   - Bash
@@ -56,6 +56,7 @@ The AI's role is to be a **facilitator**, not a stenographer. The process involv
 - `gwt <workflow-name>` - Generate GWT scenarios for a workflow
 - `validate` - Validate the complete event model
 - `arch` - Make architecture decisions (creates ARCHITECTURE.md via ADRs)
+- `design-system` - Create/update the design system using Atomic Design methodology
 - (no args) - Resume where you left off or start discovery
 
 ## The Process Flow
@@ -152,6 +153,23 @@ The AI's role is to be a **facilitator**, not a stenographer. The process involv
 │  3. Synthesize to ARCHITECTURE.md                                │
 │                                                                  │
 │  [Creates docs/ARCHITECTURE.md - enables /sdlc:plan]            │
+└────────────────────────────────────────────────────────────────┬┘
+                                     │
+                    (UI application?)
+                                     │
+                                     ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     DESIGN SYSTEM (optional)                    │
+│  For apps with user interfaces (not CLI tools)                  │
+│  Creates reusable components using Atomic Design                │
+│                                                                 │
+│  Process:                                                       │
+│  1. Read event model wireframes for UI patterns                 │
+│  2. Define design tokens (colors, typography, spacing)          │
+│  3. Build atomic hierarchy (atoms → molecules → organisms)      │
+│  4. Map read models to component data                           │
+│                                                                 │
+│  [Creates docs/design-system/]                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -459,6 +477,71 @@ Next step:
   /sdlc:plan - Create GitHub issues from event model slices
 ```
 
+#### `design-system` → Create/Update Design System
+
+**Prerequisites**:
+- Architecture must exist (`docs/ARCHITECTURE.md`)
+- At least one workflow must have wireframes
+
+Check prerequisites:
+```bash
+# Check architecture exists
+test -f docs/ARCHITECTURE.md || echo "No architecture"
+
+# Check for workflows with wireframes
+ls docs/event_model/workflows/*/overview.md 2>/dev/null || echo "No workflows"
+```
+
+If prerequisites not met:
+```
+Cannot create design system without architecture decisions.
+
+Missing:
+- [Architecture if missing]: Run /sdlc:design arch first
+
+The design system phase requires knowing the technology stack
+(from architecture) to make appropriate component decisions.
+```
+
+If prerequisites met, use the sdlc-ux agent in Design System mode:
+
+```
+Task tool with subagent_type="sdlc-ux":
+  MODE: DESIGN_SYSTEM
+
+  Create/update the design system for [project-name].
+
+  Read the event model wireframes from docs/event_model/workflows/
+  Read the architecture from docs/ARCHITECTURE.md
+
+  Follow the Atomic Design process:
+  1. Analyze wireframes for common UI patterns
+  2. Gather visual style preferences from user
+  3. Create design tokens
+  4. Build component hierarchy (atoms → molecules → organisms → templates)
+  5. Map read models to component data requirements
+
+  Output to docs/design-system/
+```
+
+**Output**:
+```
+Design System Created: <project-name>
+
+Design Tokens: docs/design-system/tokens.md
+
+Components:
+  Atoms: <count> (<list>)
+  Molecules: <count> (<list>)
+  Organisms: <count> (<list>)
+  Templates: <count> (<list>)
+
+Read Model Mappings: docs/design-system/mappings.md
+
+Next step:
+  /sdlc:plan - Create GitHub issues from event model slices
+```
+
 ### 5. After Workflow Design - Create/Update PR
 
 After completing a workflow and its GWT scenarios:
@@ -569,6 +652,37 @@ PR ready for review. To submit:
 
 Or with git-spice:
   gs branch submit
+```
+
+After design system:
+```
+Design System Created: <project-name>
+
+Documentation:
+  docs/design-system/
+  ├── tokens.md
+  ├── atoms/
+  │   ├── <atom-1>.md
+  │   └── ...
+  ├── molecules/
+  │   ├── <molecule-1>.md
+  │   └── ...
+  ├── organisms/
+  │   ├── <organism-1>.md
+  │   └── ...
+  ├── templates/
+  │   ├── <template-1>.md
+  │   └── ...
+  └── mappings.md
+
+Components:
+  Atoms: <count>
+  Molecules: <count>
+  Organisms: <count>
+  Templates: <count>
+
+Next step:
+  /sdlc:plan - Create GitHub issues from event model slices
 ```
 
 ## The Four Patterns (Reference)

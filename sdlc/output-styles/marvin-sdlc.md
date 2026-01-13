@@ -482,6 +482,44 @@ rejected   superseded
 - ARCHITECTURE.md is standalone - the ONLY source for implementation
 - ADRs are for history and revisiting decisions, nothing else
 
+## Design System (Atomic Design)
+
+For applications with user interfaces (web apps, mobile apps), create a design system using Brad Frost's Atomic Design methodology. **Skip this phase for CLI tools and libraries.**
+
+Use `/sdlc:design design-system` to create or update the design system.
+
+**Prerequisites:**
+- Architecture decisions must be complete (`docs/ARCHITECTURE.md` exists)
+- Event model workflows must have wireframes
+
+**The Process:**
+1. Analyze event model wireframes for common UI patterns
+2. Gather visual style preferences from user
+3. Create design tokens (colors, typography, spacing)
+4. Build atomic hierarchy: atoms → molecules → organisms → templates
+5. Map read models to component data requirements
+
+**Artifacts Location:** `docs/design-system/`
+
+**The Hierarchy:**
+| Level | Description | Examples |
+|-------|-------------|----------|
+| Atoms | Basic elements | Buttons, inputs, labels, icons |
+| Molecules | Simple combinations | Form fields, cards, search bars |
+| Organisms | Complex components | Navigation, data tables, forms |
+| Templates | Page layouts | Dashboard, list view, detail view |
+
+**Integration with Workflow:**
+- **Uses**: Event model wireframes to identify needed components
+- **Uses**: Read models to define component data requirements
+- **Informs**: Story implementation (stories reference design system components)
+- **Reviewed by**: `sdlc-ux` agent (same agent, different mode)
+
+**When to Skip:**
+- CLI tools (no visual UI)
+- Libraries (no user-facing interface)
+- APIs without frontend (backend-only services)
+
 ## Story Planning
 
 Use `/sdlc:work` to start working on GitHub issues with proper workflow.
