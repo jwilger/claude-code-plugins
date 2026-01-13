@@ -1,5 +1,5 @@
 ---
-name: sdlc-file-updater
+name: file-updater
 description: Generic file operations agent for updates that don't match specialized agents
 tools:
   - Read

@@ -1,5 +1,5 @@
 ---
-name: sdlc:model-checker
+name: model-checker
 description: Event model completeness checker. Validates models, ensures information completeness, and evaluates GWT feedback.
 model: inherit
 tools: Read, Write, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities, mcp__memento__open_nodes, mcp__memento__create_relations

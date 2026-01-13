@@ -1,5 +1,5 @@
 ---
-name: sdlc:red
+name: red
 description: Writes failing tests with single assertion. TEST CODE ONLY. Never touches production code.
 model: inherit
 skills:

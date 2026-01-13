@@ -1,5 +1,5 @@
 ---
-name: sdlc-design-facilitator
+name: design-facilitator
 description: Architecture design facilitator. Guides initial architecture decisions based on completed event models, creating ADRs and synthesizing ARCHITECTURE.md.
 model: inherit
 tools: Read, Write, Glob, Grep, Bash, Task, mcp__memento__semantic_search, mcp__memento__create_entities, mcp__memento__open_nodes, mcp__memento__create_relations

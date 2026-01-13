@@ -1,5 +1,5 @@
 ---
-name: sdlc:mutation
+name: mutation
 description: Runs mutation testing and enforces 100% mutation score. Reports coverage gaps.
 model: inherit
 tools: Read, Bash, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities

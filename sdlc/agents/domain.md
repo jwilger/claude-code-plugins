@@ -1,5 +1,5 @@
 ---
-name: sdlc:domain
+name: domain
 description: Creates domain types and signatures. TYPE DEFINITIONS ONLY. No implementations. Has VETO POWER over designs violating domain principles.
 model: inherit
 skills:

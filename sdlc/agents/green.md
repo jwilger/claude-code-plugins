@@ -1,5 +1,5 @@
 ---
-name: sdlc:green
+name: green
 description: Makes minimal changes to pass tests. PRODUCTION CODE ONLY. Never touches test files.
 model: inherit
 skills:
