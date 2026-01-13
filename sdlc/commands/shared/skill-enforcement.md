@@ -23,6 +23,8 @@ This is not a suggestion. This is how you prevent errors that seem obvious in hi
 | Creating ANY type | `sdlc:domain` agent | "It's just a struct" |
 | Solving ANY error | `/sdlc:recall` | "I know what the problem is" |
 | Finishing ANY task | `/sdlc:remember` | "It wasn't interesting" |
+| After RED phase | `sdlc:domain` agent | "It's obviously not a domain concern" |
+| After GREEN phase | `sdlc:domain` agent | "It's just a rendering/UI fix" |
 
 ## Rationalization Red Flags
 
@@ -38,6 +40,10 @@ Watch for these thoughts - they are ALWAYS wrong:
 | "The skill doesn't perfectly apply" | 1% relevance = 100% invocation | Invoke it anyway |
 | "It will slow me down" | Bugs slow you down more | Take the time |
 | "The user seems in a hurry" | Hurried work = buggy work | Follow the process |
+| "This is obviously not a domain concern" | That's exactly when domain issues sneak in | Invoke `sdlc:domain` |
+| "It's just a rendering/UI fix" | UI can leak domain concepts | Invoke `sdlc:domain` |
+| "Domain would just rubber-stamp it" | The ritual matters as much as the outcome | Invoke `sdlc:domain` |
+| "We're in bug-fix mode, not TDD mode" | Bug fixes need TDD MORE, not less | Full cycle required |
 
 ## Skill Priority Order
 

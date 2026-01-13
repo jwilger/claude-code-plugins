@@ -63,6 +63,39 @@ Domain review happens TWICE per cycle:
 1. **After Red**: Review test implications, create types, evaluate domain alignment
 2. **After Green**: Review implementation for domain integrity violations
 
+### Domain Review is MANDATORY (NO EXCEPTIONS)
+
+**You MUST invoke `sdlc:domain` after EVERY red phase and EVERY green phase.**
+
+This is unconditional. There are NO valid reasons to skip domain review:
+- NOT for "trivial" changes
+- NOT for "obvious" rendering/UI fixes
+- NOT for "simple" bug fixes
+- NOT for "just one line"
+- NOT for "it's clearly not a domain concern"
+
+**Even if the domain agent will likely just approve**, the discipline of invoking it:
+- Forces a pause to consider domain integrity
+- Catches cases where "obviously just X" accidentally introduces problems
+- Maintains the ritual that keeps the workflow consistent
+- Provides documentation that the review happened
+
+**Minimum domain review output** (even for "trivial" changes):
+```
+Domain review: No domain types modified, no primitive obsession introduced.
+APPROVE - proceed to [next phase]
+```
+
+### The "Quick Fix" Trap
+
+When fixing bugs or making "small" changes, you are **especially likely** to skip domain review. This is when you need it MOST:
+
+- Bug fixes often introduce shortcuts that bypass type safety
+- "Small" changes accumulate into primitive obsession
+- "Obvious" rendering changes can leak domain concepts
+
+**If you catch yourself thinking "this is too trivial for domain review" - that thought IS the red flag.**
+
 ### Anti-Patterns (VIOLATIONS)
 
 | Pattern | Why It Fails | Correct Action |
@@ -70,6 +103,9 @@ Domain review happens TWICE per cycle:
 | "Just a small update" | Bypasses TDD | Launch `sdlc:red` first |
 | "Quick fix" | Skips domain review | Full cycle required |
 | "One line change" | Still needs verification | Run through agents |
+| "Obviously not a domain concern" | Rationalization - review anyway | Invoke `sdlc:domain` |
+| "It's just rendering/UI" | UI can leak domain concepts | Invoke `sdlc:domain` |
+| "Domain would just rubber-stamp it" | The ritual matters | Invoke `sdlc:domain` |
 
 ### Pre-Edit Checklist
 
