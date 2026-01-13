@@ -315,16 +315,23 @@ Add review feedback as a comment on each issue.
 If using GitHub Projects (from config):
 
 ```bash
-# Get project number from config
-PROJECT_NUM=$(grep 'project:' .claude/sdlc.yaml | awk '{print $2}')
-OWNER=$(grep 'owner:' .claude/sdlc.yaml | awk '{print $2}')
+# Load project configuration from .claude/sdlc.yaml
+owner=$(yq '.github.owner' .claude/sdlc.yaml)
+project=$(yq '.github.project' .claude/sdlc.yaml)
 
-# Add epic to project
-gh project-ext add <epic-number>
+# Only proceed if project is configured
+if [ -n "$project" ] && [ "$project" != "null" ]; then
+  # Add epic to project
+  gh project-ext add <epic-number> --owner "$owner" --project "$project"
 
-# Add stories to project with Backlog status
-gh project-ext add <story-number>
-gh project-ext move <story-number> "Backlog"
+  # Add stories to project with Backlog status
+  for story_number in <story-numbers>; do
+    gh project-ext move "$story_number" "Backlog" --owner "$owner" --project "$project"
+  done
+else
+  # No project configured - skip board update
+  echo "Note: No GitHub Project configured. To configure, run: /sdlc:setup"
+fi
 ```
 
 ### 10. Store in Memento

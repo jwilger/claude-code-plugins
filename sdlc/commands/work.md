@@ -166,8 +166,21 @@ gh issue edit <number> --add-assignee @me
 ```
 
 #### b. Move to In Progress (if using projects)
+
+Load the project configuration from `.claude/sdlc.yaml`:
 ```bash
-gh project-ext move <number> "In Progress"
+owner=$(yq '.github.owner' .claude/sdlc.yaml)
+project=$(yq '.github.project' .claude/sdlc.yaml)
+```
+
+If project is not null/empty:
+```bash
+gh project-ext move <number> "In Progress" --owner "$owner" --project "$project"
+```
+
+If project is null or not configured, skip the move step with an informational message:
+```
+Note: No GitHub Project configured. To configure, run: /sdlc:setup
 ```
 
 #### c. Create branch
