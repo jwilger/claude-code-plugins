@@ -53,91 +53,43 @@ Create GitHub issues from event model slices. This command bridges the design ph
 | GWT Scenarios | Acceptance Criteria |
 | Pattern Type | Label |
 
-**One vertical slice = One story issue.** No exceptions.
-
 ## Arguments
 
 `$ARGUMENTS` may contain:
 - `<workflow-name>` - Plan a specific workflow
 - (no args) - Plan all unplanned workflows
 
-## Prerequisites (ENFORCED)
-
-1. **Configuration**: `.claude/sdlc.yaml` must exist
-2. **Architecture**: `docs/ARCHITECTURE.md` must exist
-3. **Event Model**: At least one workflow with slices must exist
-
-If prerequisites are not met, inform user and stop:
-
-```
-Cannot create issues without completing prior phases.
-
-Missing:
-- [If no config]: Run /sdlc:setup first
-- [If no architecture]: Run /sdlc:design arch first
-- [If no workflows]: Run /sdlc:design workflow <name> first
-
-The planning phase requires:
-1. Event model (WHAT we're building - business behavior)
-2. Architecture (HOW we'll build it - technical decisions)
-
-Only then can we create actionable work items.
-```
-
 ## Steps
 
-### 1. Load Configuration
+### 1. Load and Verify Prerequisites
 
-Read `.claude/sdlc.yaml` for:
-- GitHub project settings (project number, owner)
-- Board status names
-
-### 2. Verify Prerequisites
+Read `.claude/sdlc.yaml` for GitHub project settings (project number, owner, board status names).
 
 ```bash
-# Check config exists
-test -f .claude/sdlc.yaml || echo "NO_CONFIG"
-
-# Check architecture exists
-test -f docs/ARCHITECTURE.md || echo "NO_ARCHITECTURE"
-
-# Check for workflows with slices
-ls docs/event_model/workflows/*/slices/*.md 2>/dev/null | head -1 || echo "NO_SLICES"
+# Verify all prerequisites exist
+test -f .claude/sdlc.yaml || { echo "Missing config. Run /sdlc:setup"; exit 1; }
+test -f docs/ARCHITECTURE.md || { echo "Missing architecture. Run /sdlc:design arch"; exit 1; }
+ls docs/event_model/workflows/*/slices/*.md 2>/dev/null | head -1 || { echo "No slices. Run /sdlc:design workflow <name>"; exit 1; }
 ```
 
-If any prerequisite is missing, show the error message above and stop.
-
-### 3. Find Workflows to Plan
+### 2. Find Workflows to Plan
 
 If workflow name provided in arguments, use that. Otherwise, find all workflows:
 
 ```bash
-# List all workflows
 ls -d docs/event_model/workflows/*/ 2>/dev/null | xargs -I{} basename {}
-```
-
-For each workflow, check if epic already exists:
-```bash
-# Search for existing epic issue
 gh issue list --label "event-model,epic" --search "<workflow-name>" --json number,title
 ```
 
-### 4. Search Memento for Context
+### 3. Search Memento for Context
 
 ```
 mcp__memento__semantic_search: "planning session [project-name] [workflow-name]"
 ```
 
-Check if this workflow was previously planned and if there are notes.
+### 4. For Each Workflow - Create Epic
 
-### 5. For Each Workflow - Create Epic
-
-Read the workflow overview:
-```bash
-cat docs/event_model/workflows/<workflow-name>/overview.md
-```
-
-**Create Epic Issue**:
+Read `docs/event_model/workflows/<workflow-name>/overview.md` and create:
 
 ```bash
 gh issue create \
@@ -150,8 +102,6 @@ gh issue create \
 <from workflow overview.md - user goal, actors involved>
 
 ### Vertical Slices
-This epic contains the following stories (to be linked):
-
 <placeholder - will be updated with story issue numbers>
 
 ### Workflow Diagram
@@ -159,38 +109,20 @@ This epic contains the following stories (to be linked):
 <mermaid diagram from overview.md>
 ```
 
-### Acceptance
-All story issues must be completed for this epic to be done.
-
 ---
 Generated from: docs/event_model/workflows/<name>/overview.md
 EOF
 )"
 ```
 
-Store the epic issue number for later.
+### 5. For Each Slice - Create Story Issue
 
-### 6. For Each Slice - Create Story Issue
-
-List all slices in the workflow:
 ```bash
 ls docs/event_model/workflows/<workflow-name>/slices/*.md
+gh issue list --label "event-model,<workflow-name>,<slice-name>" --json number  # Check existing
 ```
 
-For each slice file:
-
-1. **Check if story already exists**:
-```bash
-gh issue list --label "event-model,<workflow-name>,<slice-name>" --json number
-```
-
-2. **Read the slice document** to extract:
-   - Slice name and pattern type (Command/View/Automation/Translation)
-   - Description
-   - Wireframe (if present)
-   - GWT scenarios
-
-3. **Create Story Issue**:
+For each slice, read the document and create:
 
 ```bash
 gh issue create \
@@ -198,59 +130,31 @@ gh issue create \
   --label "event-model,<workflow-name>,<pattern-type>" \
   --body "$(cat <<'EOF'
 ## Slice: <name>
-
-**Pattern**: <Command|View|Automation|Translation>
-**Workflow**: <workflow-name>
-**Epic**: #<epic-number>
+**Pattern**: <Command|View|Automation|Translation> | **Epic**: #<epic-number>
 
 ### Description
 <from slice document>
 
 ### Wireframe
-```
-<wireframe from slice document, if present>
-```
+<if present in slice document>
 
 ### Acceptance Criteria
-
-The following scenarios define "done" for this story:
-
-<For each GWT scenario in the slice document>
-
-#### Scenario: <scenario-name>
-
-**Given**
-- [ ] <given clause as checklist item>
-
-**When**
-- [ ] <when clause as checklist item>
-
-**Then**
-- [ ] <then clause as checklist item>
-
----
-
-<End for each scenario>
-
-### Technical Notes
-Refer to docs/ARCHITECTURE.md for implementation guidance.
+<For each GWT scenario>
+#### Scenario: <name>
+- [ ] **Given**: <clause>
+- [ ] **When**: <clause>
+- [ ] **Then**: <clause>
 
 ---
 Generated from: docs/event_model/workflows/<workflow>/slices/<slice>.md
 EOF
 )"
-```
 
-4. **Link as sub-issue of epic**:
-```bash
+# Link as sub-issue
 gh issue-ext sub add <epic-number> <story-number>
 ```
 
-5. **Collect story number** for updating epic.
-
-### 7. Update Epic with Story Links
-
-After creating all stories, update the epic body with actual issue numbers:
+### 6. Update Epic with Story Links
 
 ```bash
 gh issue edit <epic-number> --body "$(cat <<'EOF'
@@ -262,7 +166,6 @@ gh issue edit <epic-number> --body "$(cat <<'EOF'
 ### Vertical Slices
 - [ ] #<story-1> - <slice-1-name> [<pattern-type>]
 - [ ] #<story-2> - <slice-2-name> [<pattern-type>]
-- [ ] #<story-3> - <slice-3-name> [<pattern-type>]
 ...
 
 ### Workflow Diagram
@@ -270,71 +173,27 @@ gh issue edit <epic-number> --body "$(cat <<'EOF'
 <mermaid diagram>
 ```
 
-### Acceptance
-All linked stories must be completed for this epic to be done.
-
 ---
 Generated from: docs/event_model/workflows/<name>/overview.md
 EOF
 )"
 ```
 
-### 8. Run Three-Perspective Review (Optional)
-
-For complex stories, offer to run the three-perspective review:
-
-Use AskUserQuestion:
-```
-**Run perspective reviews on created stories?**
-- "Yes, review all" - Run business, technical, and UX review on each story
-- "Review key stories only" - Select which stories to review
-- "Skip reviews" - Add stories to backlog without review
-```
-
-If reviewing, for each story:
-
-```
-Task tool with subagent_type="sdlc-story":
-  Review story #<number> from the business value perspective.
-  Check: clear user value, appropriate slice thinness, complete GWT scenarios.
-
-Task tool with subagent_type="sdlc-architect":
-  MODE: REVIEW
-  Review story #<number> from the technical feasibility perspective.
-  Check alignment with docs/ARCHITECTURE.md.
-
-Task tool with subagent_type="sdlc-ux":
-  Review story #<number> from the user experience perspective.
-  Check journey coherence and accessibility.
-```
-
-Add review feedback as a comment on each issue.
-
-### 9. Add to Project Board
-
-If using GitHub Projects (from config):
+### 7. Add to Project Board
 
 ```bash
-# Load project configuration from .claude/sdlc.yaml
 owner=$(yq '.github.owner' .claude/sdlc.yaml)
 project=$(yq '.github.project' .claude/sdlc.yaml)
 
-# Only proceed if project is configured
 if [ -n "$project" ] && [ "$project" != "null" ]; then
-  # Add epic to project
   gh project-ext add <epic-number> --owner "$owner" --project "$project"
-
-  # Add stories to project with Backlog status
   for story_number in <story-numbers>; do
     gh project-ext move "$story_number" "Backlog" --owner "$owner" --project "$project"
   done
-else
-  # No project configured - skip board update
-  echo "Note: No GitHub Project configured. To configure, run: /sdlc:setup"
 fi
 ```
 
-### 10. Store in Memento
+### 8. Store in Memento
 
 ```
 mcp__memento__create_entities:
@@ -346,48 +205,44 @@ mcp__memento__create_entities:
     - "Epic: #<epic-number>"
     - "Stories created: <count>"
     - "Story numbers: #<n1>, #<n2>, #<n3>..."
-    - "Pattern breakdown: <n> Command, <n> View, <n> Automation, <n> Translation"
 ```
 
-### 11. Display Results
+### 9. Display Results
 
 ```
 Planning Complete: <workflow-name>
 
-Epic Created:
-  #<epic-number> - Epic: <Workflow Name>
-  URL: <issue-url>
+Epic: #<epic-number> - Epic: <Workflow Name>
 
 Stories Created: <total-count>
+  Command: #<n1>, #<n2>
+  View: #<n3>
+  Automation: #<n4>
+  Translation: #<n5>
 
-  Command Slices (<count>):
-    #<n1> - <slice-name>
-    #<n2> - <slice-name>
-
-  View Slices (<count>):
-    #<n3> - <slice-name>
-
-  Automation Slices (<count>):
-    #<n4> - <slice-name>
-
-  Translation Slices (<count>):
-    #<n5> - <slice-name>
-
-Project Board: <project-name>
-  All issues added to Backlog
-
-Perspective Reviews:
-  - Business: <completed/skipped>
-  - Technical: <completed/skipped>
-  - UX: <completed/skipped>
-
-Next steps:
-  /sdlc:work - Start working on a story
-  gh issue view <epic-number> - View the epic
-
-To plan another workflow:
-  /sdlc:plan <workflow-name>
+Next: /sdlc:work to start a story
 ```
+
+## Optional Enhancement: Three-Perspective Review
+
+For complex stories, offer perspective reviews:
+
+```
+Task tool with subagent_type="sdlc:story":
+  Review story #<number> from business value perspective.
+  Check: clear user value, appropriate slice thinness, complete GWT scenarios.
+
+Task tool with subagent_type="sdlc:architect":
+  MODE: REVIEW
+  Review story #<number> from technical feasibility perspective.
+  Check alignment with docs/ARCHITECTURE.md.
+
+Task tool with subagent_type="sdlc:ux":
+  Review story #<number> from user experience perspective.
+  Check journey coherence and accessibility.
+```
+
+Add review feedback as a comment on each issue.
 
 ## Error Handling
 
@@ -396,14 +251,10 @@ To plan another workflow:
 - **No workflows**: Direct to `/sdlc:design discover` then `/sdlc:design workflow`
 - **Issue creation fails**: Show error, suggest manual creation, continue with remaining
 - **Duplicate detection**: Skip already-created stories, note in output
-- **Sub-issue linking fails**: Create issue without link, warn user to link manually
 
 ## Labels Used
 
-The command creates/uses these labels:
 - `event-model` - All issues from event model
 - `epic` - Epic issues (workflow level)
 - `<workflow-name>` - Workflow identifier
 - `command` / `view` / `automation` / `translation` - Pattern type
-
-If labels don't exist, they will be created automatically by `gh issue create`.

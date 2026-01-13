@@ -1,6 +1,6 @@
 {
   "name": "sdlc",
-  "version": "2.5.0",
+  "version": "3.0.0",
   "description": "Complete SDLC workflow with TDD, Event Modeling, ADRs, GitHub integration, and Marvin personality",
   "author": {
     "name": "John Wilger",
@@ -9,6 +9,14 @@
   "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow", "marvin", "output-style"],
   "outputStyles": "./output-styles/",
   "commands": [
+    "./commands/shared/orchestration.md",
+    "./commands/shared/memory-protocol.md",
+    "./commands/shared/event-modeling.md",
+    "./commands/shared/atomic-design.md",
+    "./commands/shared/github-issues.md",
+    "./commands/shared/user-input-protocol.md",
+    "./commands/shared/tdd-constraints.md",
+    "./commands/shared/git-spice.md",
     "./commands/setup.md",
     "./commands/start.md",
     "./commands/work.md",
@@ -22,19 +30,19 @@
     "./commands/domain-audit.md"
   ],
   "agents": [
-    "./agents/sdlc-red.md",
-    "./agents/sdlc-green.md",
-    "./agents/sdlc-domain.md",
-    "./agents/sdlc-mutation.md",
-    "./agents/sdlc-story.md",
-    "./agents/sdlc-architect.md",
-    "./agents/sdlc-ux.md",
-    "./agents/sdlc-discovery.md",
-    "./agents/sdlc-workflow-designer.md",
-    "./agents/sdlc-model-checker.md",
-    "./agents/sdlc-design-facilitator.md",
-    "./agents/sdlc-gwt.md",
-    "./agents/sdlc-adr.md",
-    "./agents/sdlc-file-updater.md"
+    "./agents/red.md",
+    "./agents/green.md",
+    "./agents/domain.md",
+    "./agents/mutation.md",
+    "./agents/story.md",
+    "./agents/architect.md",
+    "./agents/ux.md",
+    "./agents/discovery.md",
+    "./agents/workflow-designer.md",
+    "./agents/model-checker.md",
+    "./agents/design-facilitator.md",
+    "./agents/gwt.md",
+    "./agents/adr.md",
+    "./agents/file-updater.md"
   ]
 }

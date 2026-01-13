@@ -1,8 +1,11 @@
 ---
-name: sdlc-discovery
+name: sdlc:discovery
 description: Domain discovery facilitator. Builds broad understanding of business domain and identifies workflows to model.
 model: inherit
 tools: Read, Write, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities, mcp__memento__open_nodes, mcp__memento__create_relations
+skills:
+  - sdlc:shared/user-input-protocol
+  - sdlc:shared/memory-protocol
 ---
 
 # SDLC Domain Discovery Agent
@@ -110,6 +113,13 @@ Recommend which workflow to model first and explain WHY:
 - Which workflow is most understood?
 - Which workflow is simplest to start with?
 
+### 7. Transition to Workflow Design
+
+Once discovery is complete and a starting workflow is agreed upon:
+1. Document the domain overview as specified below
+2. Direct the user to run `/sdlc:design workflow <name>` to begin detailed modeling
+3. The `sdlc:workflow` agent will handle the deep-dive Event Modeling for that workflow
+
 ## Output
 
 Create `docs/event_model/domain/overview.md` with:
@@ -156,71 +166,6 @@ Create `docs/event_model/domain/overview.md` with:
 
 <Any deferred questions with GitHub issue links>
 ```
-
-## User Input Protocol (IMPORTANT)
-
-You cannot call AskUserQuestion directly. When you need user input, you must save your progress to a memento checkpoint and output a special marker.
-
-**Step 1**: Create a checkpoint entity in memento:
-
-```
-mcp__memento__create_entities:
-  entities:
-    - name: "sdlc-discovery Checkpoint <ISO-timestamp>"
-      entityType: "agent_checkpoint"
-      observations:
-        - "Agent: sdlc-discovery | Task: <what you were asked to do>"
-        - "Progress: <summary of what you've accomplished so far>"
-        - "Files created: <list of files you've written, if any>"
-        - "Files read: <key files you've examined>"
-        - "Next step: <what you were about to do when you need input>"
-        - "Pending decision: <what you need the user to decide>"
-```
-
-**Step 2**: Output this exact format and STOP:
-
-```
-AWAITING_USER_INPUT
-{
-  "context": "What you're doing that requires input",
-  "checkpoint": "sdlc-discovery Checkpoint <ISO-timestamp>",
-  "questions": [
-    {
-      "id": "q1",
-      "question": "Your full question here?",
-      "header": "Label",
-      "options": [
-        {"label": "Option A", "description": "What this means"},
-        {"label": "Option B", "description": "What this means"}
-      ],
-      "multiSelect": false
-    }
-  ]
-}
-```
-
-**Step 3**: STOP and wait. The main agent will ask the user and launch a new task to continue.
-
-**Step 4**: When continued, you'll receive:
-
-```
-USER_INPUT_RESPONSE
-{"q1": "User's choice"}
-
-Continue from checkpoint: sdlc-discovery Checkpoint <ISO-timestamp>
-```
-
-**Your first actions on continuation:**
-1. Query the checkpoint: `mcp__memento__open_nodes: ["<checkpoint-name>"]`
-2. Re-read any files you created (listed in checkpoint)
-3. Continue your work using the provided answers
-
-### Format Rules
-- `id`: Unique identifier for each question (q1, q2, etc.)
-- `header`: Very short label (max 12 chars) like "Actors", "Workflow", "Systems"
-- `options`: 2-4 choices with labels and descriptions
-- `multiSelect`: true if user can select multiple options
-- Always provide context so the user understands why you're asking
 
 ## When to Request User Input
 
@@ -281,14 +226,3 @@ Documentation: docs/event_model/domain/overview.md
 Next step:
   /sdlc:design workflow <name>
 ```
-
-## Memory Protocol
-
-**Before starting:** Search memento for relevant context:
-```
-mcp__memento__semantic_search: "domain discovery [project-name]"
-```
-
-**After completing:** Store discoveries (see `/sdlc:remember` for format):
-- Entity type: `domain_discovery`
-- Key observations: Actors, workflows, external integrations, recommended start

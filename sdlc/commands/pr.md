@@ -56,10 +56,10 @@ If no issue number in branch, ask user which issue this PR is for.
 
 ### 3. Run Mutation Testing
 
-Use the sdlc-mutation agent to run mutation testing:
+Use the sdlc:mutation agent to run mutation testing:
 
 ```
-Task tool with subagent_type="sdlc-mutation":
+Task tool with subagent_type="sdlc:mutation":
   Run mutation testing on the changes in this branch. Enforce 100% mutation score.
   Report any surviving mutants that need additional test coverage.
 ```
@@ -79,7 +79,7 @@ If PR exists, we'll update it. If not, we'll create it.
 
 ### 5. Push Changes
 
-If using git-spice:
+If using git-spice (see [shared/git-spice](mdc:shared/git-spice) for usage):
 ```bash
 gs stack submit
 ```

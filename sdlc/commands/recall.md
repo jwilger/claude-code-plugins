@@ -97,62 +97,27 @@ Suggestions:
 - Consider storing this knowledge after you discover it
 ```
 
-## Examples
-
-### Example 1: Recalling project patterns
+## Example
 
 Arguments: "test patterns for TaskFlow"
 
 ```
+# 1. Semantic search with key terms
 mcp__memento__semantic_search:
   query: "test patterns TaskFlow project"
   limit: 10
 
-# Results show: "TaskFlow Test Patterns 2026-01"
-
+# 2. Open relevant results
 mcp__memento__open_nodes:
   names: ["TaskFlow Test Patterns 2026-01"]
 
-# Returns full entity with observations and relations
-# Follow any "extends" or "part_of" relations for more context
+# 3. Follow relations (extends, part_of) for more context
+# 4. Synthesize findings in output format above
 ```
 
-### Example 2: Recalling debugging solutions
+**Same process applies to:** debugging solutions ("cargo test hanging"), architecture decisions, user preferences, domain concepts.
 
-Arguments: "cargo test hanging"
-
-```
-mcp__memento__semantic_search:
-  query: "cargo test hang timeout error"
-  limit: 10
-
-# Results show: "Cargo Test Timeout Fix TaskFlow 2026-01"
-
-mcp__memento__open_nodes:
-  names: ["Cargo Test Timeout Fix TaskFlow 2026-01"]
-
-# Returns the debugging insight with solution
-```
-
-### Example 3: No results found
-
-Arguments: "kubernetes deployment configuration"
-
-```
-mcp__memento__semantic_search:
-  query: "kubernetes deployment configuration"
-  limit: 10
-
-# Returns empty or irrelevant results
-
-# Output:
-No relevant memories found for: "kubernetes deployment configuration"
-
-Suggestions:
-- This project may not use Kubernetes
-- Try searching for: "deployment", "infrastructure", "container"
-- If you discover this information, use /sdlc:remember to store it
-```
+**If no results:** suggest alternative search terms or note the knowledge may not be stored yet.
 
 ## When to Use This Skill
 

@@ -12,20 +12,6 @@ allowed-tools:
 
 Smart entry point that detects the current SDLC phase and routes to the appropriate command.
 
-## Detection Order
-
-Check project state in this order and route to the first incomplete phase:
-
-```
-1. No .claude/sdlc.yaml           → /sdlc:setup
-2. No domain discovery            → /sdlc:design discover
-3. Workflows without GWT          → /sdlc:design gwt <workflow>
-4. No ARCHITECTURE.md             → /sdlc:design arch
-5. Slices without GitHub issues   → /sdlc:plan
-6. Issues exist, none in progress → /sdlc:work
-7. On feature branch              → Show current work status
-```
-
 ## Steps
 
 ### 1. Check for SDLC Configuration
@@ -96,14 +82,18 @@ ls -d docs/event_model/workflows/*/ 2>/dev/null | head -1 || echo "NO_WORKFLOWS"
 ```
 
 **If NO_WORKFLOWS**:
+
+This indicates the domain overview was written but no workflows were designed yet.
+This is a normal progression after discovery, or may indicate the workflow directory
+was accidentally deleted. Check domain overview for suggested starting workflow.
+
 ```
 Domain discovered, but no workflows designed yet.
 
-Read domain overview for suggested starting workflow:
-  cat docs/event_model/domain/overview.md
-
 Next step:
   /sdlc:design workflow <name>
+
+Check docs/event_model/domain/overview.md for suggested workflows to design first.
 ```
 Then STOP.
 
@@ -233,24 +223,3 @@ To start new work:
 
 This will show ready items from your project board.
 ```
-
-## Project Status Summary
-
-At the end, always show a brief status:
-
-```
-SDLC Status: <project-name>
-
-✅ Configuration:    .claude/sdlc.yaml
-✅ Domain Discovery: docs/event_model/domain/overview.md
-✅ Workflows:        <N> designed
-✅ GWT Scenarios:    All workflows covered
-✅ Architecture:     docs/ARCHITECTURE.md
-✅ GitHub Issues:    <N> epics, <M> stories
-⏳ Current Work:     <branch or "none">
-
-Mode: event-modeling
-Project: <project-number if configured>
-```
-
-Use ✅ for complete phases, ⏳ for in-progress, ❌ for missing.

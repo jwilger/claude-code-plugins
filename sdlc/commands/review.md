@@ -43,39 +43,14 @@ No PR found for current branch.
 Run /sdlc:pr first to create a pull request.
 ```
 
-### 2. Fetch Review Comments
+### 2. Fetch and Organize Comments
 
-Use the gh-pr-review extension to get all pending review comments:
-
+Use gh-pr-review to get unresolved review threads:
 ```bash
-# Get all unresolved review threads
 gh pr-review review view -R <owner>/<repo> --pr <number> --unresolved
-
-# Get threads from a specific reviewer
-gh pr-review review view -R <owner>/<repo> --pr <number> \
-  --reviewer <username> \
-  --states CHANGES_REQUESTED
 ```
 
-This returns a structured view of all inline comments with their thread IDs.
-
-### 3. Organize Comments
-
-Group comments by:
-1. **Unresolved threads** - Comments that need response
-2. **Resolved threads** - Already addressed
-3. **General comments** - Not tied to specific lines
-
-For each unresolved comment, show:
-- File path and line number
-- Comment author
-- Comment text
-- Any existing replies in thread
-
-### 4. Present Comments to User
-
-Display formatted summary:
-
+Display formatted summary grouping by file:
 ```
 PR #<number> has <count> pending review comments:
 
@@ -89,22 +64,20 @@ File: src/auth/mod.rs
 Would you like me to address these comments?
 ```
 
-### 5. Address Each Comment
+### 3. Address Each Comment
 
-For each comment, the process is:
+For each comment:
 
 #### a. Make the code change (if needed)
 
 Use the appropriate agent:
-- For test changes: sdlc-red
-- For implementation changes: sdlc-green
-- For type changes: sdlc-domain
+- Test changes: sdlc:red
+- Implementation changes: sdlc:green
+- Type changes: sdlc:domain
 
-#### b. Reply to the comment IN THE SAME THREAD
+#### b. Reply in-thread
 
-This is critical - replies must be in-thread, not as general comments.
-
-Using gh-pr-review extension:
+Replies must be in-thread using gh-pr-review:
 ```bash
 gh pr-review comments reply \
   --thread-id <thread-id> \
@@ -112,51 +85,35 @@ gh pr-review comments reply \
   -R <owner>/<repo> <pr-number>
 ```
 
-The response should:
-- Acknowledge the feedback
-- Explain what change was made (or why no change was made)
-- Be professional and concise
+Response decision tree:
+- IF change made THEN acknowledge feedback and explain the change made
+- IF no change needed THEN explain why with reasoning and offer to discuss
+- IF question or clarification THEN answer directly and ask if more detail needed
 
 Example responses:
-- "Good catch! Added email validation using the `validator` crate. See updated code."
-- "You're right, `Result` is clearer here. Updated to return `Result<User, AuthError>`."
-- "Added rustdoc comment explaining the function's purpose and parameters."
+- "Good catch! Added email validation using the `validator` crate."
+- "Updated to return `Result<User, AuthError>` as suggested."
+- "This is intentional because [reason]. Happy to discuss if you see issues."
 
-#### c. If no change needed, explain why
+### 4. Commit and Push
 
-Sometimes a review comment doesn't require a code change:
-- "This is intentional because [reason]. The [constraint] requires this approach."
-- "I considered this, but [tradeoff]. Happy to discuss if you see issues."
-
-### 6. Commit Changes
-
-After addressing comments, commit:
 ```bash
 git add .
 git commit -m "Address review feedback
 
 - <summary of changes>
 - Responds to comments from @reviewer"
-```
-
-### 7. Push and Request Re-Review
-
-```bash
 git push
 ```
 
-Request re-review:
-```bash
-gh pr edit <number> --add-reviewer <original-reviewer>
-```
+### 5. Request Re-Review
 
-Or using the review request endpoint:
 ```bash
 gh api repos/{owner}/{repo}/pulls/<number>/requested_reviewers \
   -f reviewers[]="<reviewer>"
 ```
 
-### 8. Display Summary
+### 6. Display Summary
 
 ```
 Review feedback addressed!
@@ -181,11 +138,5 @@ PR: <url>
 
 ## gh-pr-review Extension
 
-This command uses the `gh-pr-review` extension (agynio/gh-pr-review) for:
-- Viewing review threads: `gh pr-review review view`
-- Replying to threads: `gh pr-review comments reply`
-- Resolving threads: `gh pr-review threads resolve`
-
-Install with: `gh extension install agynio/gh-pr-review`
-
-Add to auto-approval: `Bash(gh pr-review *)`
+Install: `gh extension install agynio/gh-pr-review`
+Auto-approval: `Bash(gh pr-review *)`

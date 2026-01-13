@@ -1,7 +1,7 @@
 ---
 description: Create and manage Architecture Decision Records
 argument-hint: [action] [topic]
-agent: sdlc-adr
+agent: sdlc:adr
 allowed-tools:
   - Bash
   - Read
@@ -24,10 +24,7 @@ Manage Architecture Decision Records (ADRs). ADRs are immutable historical recor
 
 ## The Pattern
 
-- **ADRs** = Events (immutable facts about decisions)
-- **ARCHITECTURE.md** = Projection (current architecture view, standalone document)
-
-ADRs focus on WHY decisions were made. ARCHITECTURE.md shows WHAT the current architecture is.
+ADRs are immutable events recording WHY decisions were made. ARCHITECTURE.md is a projection showing WHAT the current architecture is.
 
 ## Arguments
 
@@ -79,6 +76,13 @@ Create docs/adr/<number>-<slug>.md with:
 - Consequences
 
 Focus on WHY, not HOW. The implementation details go elsewhere.
+
+ADR Lifecycle:
+```
+proposed → accepted → implemented
+    ↓          ↓
+rejected   superseded
+```
 
 ADR Template:
 ```markdown
@@ -202,13 +206,3 @@ To accept this ADR:
 To update architecture docs after accepting:
   /sdlc:adr synthesize
 ```
-
-## ADR Lifecycle
-
-```
-proposed → accepted → implemented
-    ↓          ↓
-rejected   superseded
-```
-
-ADRs are immutable once accepted. To change a decision, create a new ADR that supersedes the old one.

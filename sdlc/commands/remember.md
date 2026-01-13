@@ -32,96 +32,23 @@ mcp__memento__semantic_search: "<key terms from arguments>"
 
 If a closely related entity exists, consider adding observations to it rather than creating a new entity.
 
-### 2. Determine Entity Type
+### 2. Determine Entity Type and Create Entity
 
-Choose an appropriate entity type based on what's being stored:
+**Naming convention:** `<Descriptive Name> [Project Name] <Date>`
 
-| Type | Use For |
-|------|---------|
-| `project` | Project-level configuration, structure, purpose |
-| `debugging_insight` | Solutions to problems, error fixes, workarounds |
-| `design_pattern` | Architectural patterns, coding conventions |
-| `user_preference` | User's stated preferences, workflow choices |
-| `tool_discovery` | Tool behaviors, CLI options, API quirks |
-| `domain_concept` | Business domain knowledge, terminology |
-| `agent_checkpoint` | Subagent state for continuation (internal use) |
-| `feature_implementation` | Details about implemented features |
-| `architecture_decision` | Technical decisions and rationale |
+| Type | Use For | Example |
+|------|---------|---------|
+| `debugging_insight` | Solutions to problems, error fixes | "Cargo Test Timeout Fix TaskFlow 2026-01" |
+| `user_preference` | User's stated preferences, workflow choices | "Error Message Preferences 2026-01" |
+| `project` | Project-level configuration, structure | "TaskFlow Project Config 2026-01" |
+| `design_pattern` | Architectural patterns, coding conventions | "Event Sourcing Patterns TaskFlow 2026-01" |
+| `tool_discovery` | Tool behaviors, CLI options, API quirks | "PostgreSQL JSONB Query Patterns 2026-01" |
+| `domain_concept` | Business domain knowledge, terminology | "User Registration Domain Concepts 2026-01" |
+| `feature_implementation` | Details about implemented features | "Auth Flow Implementation TaskFlow 2026-01" |
+| `architecture_decision` | Technical decisions and rationale | "Database Choice ADR TaskFlow 2026-01" |
+| `agent_checkpoint` | Subagent state for continuation | Internal use only |
 
-### 3. Create Entity with Proper Naming
-
-**Entity naming convention:** `<Descriptive Name> [Project Name] <Date>`
-
-Examples:
-- "Cargo Test Timeout Workaround TaskFlow 2026-01"
-- "User Registration Domain Concepts 2026-01-08"
-- "PostgreSQL JSONB Query Patterns 2026-01"
-
-### 4. Format Observations
-
-Each observation should be a complete, self-contained statement. Include metadata:
-
-**For project-specific knowledge:**
-```
-"Project: <name> | Path: <path> | Scope: PROJECT_SPECIFIC"
-```
-
-**For general patterns:**
-```
-"Scope: PATTERN" or "Scope: GENERAL"
-```
-
-**Always include:**
-- Date context when relevant
-- Specific details (not vague summaries)
-- Action taken and outcome (for debugging insights)
-- Version numbers if applicable
-
-**Example observations:**
-```
-"Project: TaskFlow | Path: /home/user/taskflow | Scope: PROJECT_SPECIFIC"
-"Problem: cargo test hangs when running integration tests in parallel"
-"Root cause: Database connection pool exhaustion under concurrent load"
-"Solution: Set RUST_TEST_THREADS=1 for integration tests or use separate connection pools"
-"Date discovered: 2026-01-08"
-```
-
-### 5. Create Relationships
-
-After creating an entity, link it to related entities using active voice relation types:
-
-| Relation Type | Use For |
-|--------------|---------|
-| `implements` | When one thing implements another |
-| `extends` | When building on existing knowledge |
-| `depends_on` | Prerequisites or dependencies |
-| `discovered_during` | Context of discovery |
-| `contradicts` | Conflicting information (note both!) |
-| `supersedes` | Updated knowledge replacing old |
-| `validates` | Confirms previous knowledge |
-| `part_of` | Component relationships |
-| `related_to` | General association |
-| `derived_from` | Origin of knowledge |
-
-**Always try to link to at least one existing entity** to maintain graph connectivity.
-
-### 6. Return Confirmation
-
-After storing, output:
-```
-Stored in memento:
-  Entity: <entity name>
-  Type: <entity type>
-  Observations: <count>
-  Relationships: <list of relations created>
-```
-
-## Examples
-
-### Example 1: Storing a debugging insight
-
-Arguments: "Fixed cargo test timeout by setting RUST_TEST_THREADS=1"
-
+**Debugging insight example:**
 ```
 mcp__memento__create_entities:
   entities:
@@ -134,10 +61,7 @@ mcp__memento__create_entities:
         - "Date: 2026-01-08"
 ```
 
-### Example 2: Storing a user preference
-
-Arguments: "User wants verbose error messages with suggestions"
-
+**User preference example:**
 ```
 mcp__memento__create_entities:
   entities:
@@ -146,8 +70,51 @@ mcp__memento__create_entities:
       observations:
         - "Scope: GENERAL"
         - "Preference: Verbose error messages preferred over terse ones"
-        - "Preference: Error messages should include actionable suggestions"
-        - "Preference: Include relevant context (file paths, line numbers) when available"
+        - "Preference: Include actionable suggestions and context (file paths, line numbers)"
+```
+
+### 3. Format Observations
+
+Each observation should be a complete, self-contained statement:
+
+**For project-specific knowledge:**
+```
+"Project: <name> | Path: <path> | Scope: PROJECT_SPECIFIC"
+```
+
+**For general patterns:**
+```
+"Scope: PATTERN" or "Scope: GENERAL"
+```
+
+**Always include:** Date context, specific details (not vague summaries), action taken and outcome, version numbers if applicable.
+
+### 4. Create Relationships
+
+Link to related entities using active voice relation types:
+
+| Relation Type | Use For |
+|--------------|---------|
+| `implements` | When one thing implements another |
+| `extends` | When building on existing knowledge |
+| `depends_on` | Prerequisites or dependencies |
+| `discovered_during` | Context of discovery |
+| `supersedes` | Updated knowledge replacing old |
+| `validates` | Confirms previous knowledge |
+| `part_of` | Component relationships |
+| `related_to` | General association |
+
+**Always try to link to at least one existing entity** to maintain graph connectivity.
+
+### 5. Return Confirmation
+
+After storing, output:
+```
+Stored in memento:
+  Entity: <entity name>
+  Type: <entity type>
+  Observations: <count>
+  Relationships: <list of relations created>
 ```
 
 ## When NOT to Use This Skill

@@ -99,38 +99,7 @@ If a GitHub repository exists (either created or pre-existing), ask about branch
 - "Yes, configure rulesets" - Set up protection rules for main branch
 - "No, skip ruleset configuration" - Continue without protection
 
-If configuring rulesets, dynamically discover and present rule options.
-
-#### Dynamic Rule Discovery
-
-Fetch the current available rule types from GitHub's API documentation to ensure you're presenting the latest options. The main categories are:
-
-1. **Commit Requirements**
-   - `required_signatures` - Require signed commits
-   - `required_linear_history` - Prevent merge commits (linear history only)
-
-2. **Pull Request Rules** (`pull_request` type with parameters)
-   - `required_approving_review_count` - Number of required approvals (0-10)
-   - `dismiss_stale_reviews_on_push` - Dismiss approvals when new commits are pushed
-   - `require_code_owner_review` - Require review from code owners
-   - `require_last_push_approval` - Most recent pusher cannot self-approve
-   - `required_review_thread_resolution` - All conversations must be resolved
-   - `allowed_merge_methods` - Which merge strategies are allowed (merge, squash, rebase)
-
-3. **Status Checks** (`required_status_checks` type)
-   - `strict_required_status_checks_policy` - Require branch to be up-to-date
-   - `required_status_checks` - List of required CI checks (context names)
-
-4. **Push Restrictions**
-   - `non_fast_forward` - Prevent force pushes
-   - `deletion` - Prevent branch deletion
-   - `creation` - Restrict who can create matching refs
-
-5. **File Restrictions**
-   - `file_path_restriction` - Block specific file paths
-   - `max_file_size` - Maximum file size in MB
-
-Use AskUserQuestion to ask about each relevant category. Present them in logical groupings:
+If configuring rulesets, ask about each option directly:
 
 **Question: Require signed commits?**
 - "Yes" - All commits must be GPG/SSH signed
@@ -246,15 +215,7 @@ gh extension upgrade jwilger/gh-project-ext
 gh extension upgrade agynio/gh-pr-review
 ```
 
-### 5. Check for git-spice (optional)
-
-```bash
-command -v gs
-```
-
-If git-spice is available, note it for the config options.
-
-### 6. Interactive Configuration
+### 5. Interactive Configuration
 
 Use AskUserQuestion to gather project preferences:
 
@@ -263,6 +224,13 @@ Use AskUserQuestion to gather project preferences:
 - Traditional (PRD, architecture, feature/subtask breakdown)
 
 **Question 2: Git Workflow**
+
+First check if git-spice is available:
+```bash
+command -v gs
+```
+
+Then ask (only show git-spice option if installed):
 - git-spice (stacked PRs) - only if git-spice is installed
 - Standard (single branch per feature)
 
@@ -355,14 +323,12 @@ This linking is essential for:
 
 #### Language and Testing Configuration
 
-The TDD hooks need to know how to distinguish test code from production code in this project. This is language and framework-specific.
+The TDD hooks need to know how to distinguish test code from production code in this project.
 
-##### Auto-Detect Languages
+**Question 5: Which languages/frameworks does this project use?** (multiSelect: true)
 
-First, detect what languages might be present:
-
+Auto-detect and pre-select based on files present:
 ```bash
-# Auto-detect based on files present
 test -f Cargo.toml && echo "rust"
 test -f package.json && echo "javascript"
 test -f pyproject.toml -o -f setup.py -o -f requirements.txt && echo "python"
@@ -372,9 +338,7 @@ test -f *.cabal -o -f stack.yaml 2>/dev/null && echo "haskell"
 test -f flake.nix -o -f shell.nix && echo "nix"
 ```
 
-##### Confirm Languages
-
-**Question 5: Which languages/frameworks does this project use?** (multiSelect: true)
+Options:
 - Rust (Cargo, `src/`, `tests/`)
 - TypeScript/JavaScript (npm, Jest/Vitest/Mocha)
 - Python (pytest, `tests/`)
@@ -382,8 +346,6 @@ test -f flake.nix -o -f shell.nix && echo "nix"
 - Elixir (ExUnit, `test/`)
 - Nix (flakes, configuration files)
 - Other (will ask for details)
-
-Present detected languages as pre-selected options.
 
 ##### Language-Specific Testing Questions
 
@@ -443,7 +405,7 @@ Defaults that are always included:
 - `Makefile`, `Dockerfile`, `docker-compose*.yml` (build files)
 - `*.nix`, `flake.lock` (Nix files)
 
-### 7. Create Configuration
+### 6. Create Configuration
 
 Create `.claude/sdlc.yaml` with the gathered settings:
 
@@ -540,19 +502,19 @@ Ensure `.claude/` directory exists:
 mkdir -p .claude
 ```
 
-### 7.5 Generate Project-Local TDD Hooks
+### 7. Generate Project-Local TDD Hooks
 
-Based on the language configuration gathered in Step 6, generate `.claude/hooks.json` with project-specific TDD enforcement hooks.
+Based on the language configuration gathered in Step 5, generate `.claude/hooks.json` with project-specific TDD enforcement hooks.
 
 The hooks use the patterns from `sdlc.yaml` to determine how to classify files:
-- **Test code** → delegate to `sdlc-red` agent
-- **Production code** → delegate to `sdlc-green` agent
-- **Type definitions** → delegate to `sdlc-domain` agent
-- **Config/docs** → auto-approve (no agent delegation)
+- **Test code** -> delegate to `sdlc:red` agent
+- **Production code** -> delegate to `sdlc:green` agent
+- **Type definitions** -> delegate to `sdlc:domain` agent
+- **Config/docs** -> auto-approve (no agent delegation)
 
 #### Hook Template
 
-Generate the hooks.json with patterns specific to this project's languages:
+Generate the hooks.json with patterns specific to this project's languages. Replace the placeholder comments with actual patterns from the language configuration:
 
 ```json
 {
@@ -562,7 +524,7 @@ Generate the hooks.json with patterns specific to this project's languages:
       "hooks": [
         {
           "type": "prompt",
-          "prompt": "⛔ TDD ENFORCEMENT CHECKPOINT ⛔\n\n== SDLC SUBAGENT AUTO-APPROVAL ==\nIf you are running as an SDLC subagent (sdlc-red, sdlc-green, or sdlc-domain), you are AUTHORIZED to edit code files. Respond ONLY with: {\"ok\": true}\n\n== MAIN CONVERSATION EVALUATION ==\nIf you are the main conversation (NOT a subagent), evaluate the file being edited:\n\n=== CONFIG/DOCS (auto-approve) ===\nAuto-approve if the file matches ANY of these patterns:\n<CONFIG_PATTERNS_FROM_YAML>\n\nIf the file matches config/docs patterns: {\"ok\": true}\n\n=== TEST CODE (delegate to sdlc-red) ===\nDelegate to sdlc-red agent if the file matches:\n<TEST_PATTERNS_FROM_YAML>\n\n=== PRODUCTION CODE (delegate to sdlc-green) ===\nDelegate to sdlc-green agent if the file matches:\n<PRODUCTION_PATTERNS_FROM_YAML>\n\n=== TYPE DEFINITIONS (delegate to sdlc-domain) ===\nDelegate to sdlc-domain agent if the file matches:\n<TYPE_PATTERNS_FROM_YAML>\n\nRESPOND WITH JSON:\n{\"ok\": true} for config/docs or if running as subagent\nOR\n{\"ok\": false, \"reason\": \"Test code: Delegate to sdlc-red agent\"}\nOR\n{\"ok\": false, \"reason\": \"Production code: Delegate to sdlc-green agent\"}\nOR\n{\"ok\": false, \"reason\": \"Type definition: Delegate to sdlc-domain agent\"}"
+          "prompt": "TDD ENFORCEMENT CHECKPOINT\n\n== SDLC SUBAGENT AUTO-APPROVAL ==\nIf you are running as an SDLC subagent (sdlc:red, sdlc:green, or sdlc:domain), you are AUTHORIZED to edit code files. Respond ONLY with: {\"ok\": true}\n\n== MAIN CONVERSATION EVALUATION ==\nIf you are the main conversation (NOT a subagent), evaluate the file being edited:\n\n=== CONFIG/DOCS (auto-approve) ===\nAuto-approve if the file matches ANY of these patterns:\n- *.md, *.txt, *.rst (documentation)\n- .github/**, .claude/**, docs/** (tooling directories)\n- *.yaml, *.yml, *.toml, *.json (config files)\n- *.nix, flake.lock (Nix files)\n- Makefile, Dockerfile (build files)\n\nIf the file matches config/docs patterns: {\"ok\": true}\n\n=== TEST CODE (delegate to sdlc:red) ===\nDelegate to sdlc:red agent if the file matches test patterns.\n\n=== PRODUCTION CODE (delegate to sdlc:green) ===\nDelegate to sdlc:green agent if the file matches production patterns.\n\n=== TYPE DEFINITIONS (delegate to sdlc:domain) ===\nDelegate to sdlc:domain agent if the file matches type patterns.\n\nRESPOND WITH JSON:\n{\"ok\": true} for config/docs or if running as subagent\nOR\n{\"ok\": false, \"reason\": \"Test code: Delegate to sdlc:red agent\"}\nOR\n{\"ok\": false, \"reason\": \"Production code: Delegate to sdlc:green agent\"}\nOR\n{\"ok\": false, \"reason\": \"Type definition: Delegate to sdlc:domain agent\"}"
         }
       ]
     },
@@ -571,7 +533,7 @@ Generate the hooks.json with patterns specific to this project's languages:
       "hooks": [
         {
           "type": "prompt",
-          "prompt": "⛔ TDD ENFORCEMENT CHECKPOINT ⛔\n\n== SDLC SUBAGENT AUTO-APPROVAL ==\nIf you are running as an SDLC subagent (sdlc-red, sdlc-green, or sdlc-domain), you are AUTHORIZED to write code files. Respond ONLY with: {\"ok\": true}\n\n== MAIN CONVERSATION EVALUATION ==\nIf you are the main conversation (NOT a subagent), evaluate the file being created:\n\n=== CONFIG/DOCS (auto-approve) ===\nAuto-approve if the file matches ANY of these patterns:\n<CONFIG_PATTERNS_FROM_YAML>\n\nIf the file matches config/docs patterns: {\"ok\": true}\n\n=== TEST CODE (delegate to sdlc-red) ===\nDelegate to sdlc-red agent if the file matches:\n<TEST_PATTERNS_FROM_YAML>\n\n=== SOURCE CODE ===\nDelegate to sdlc-green or sdlc-domain agent based on file purpose.\n\nRESPOND WITH JSON:\n{\"ok\": true} for config/docs or if running as subagent\nOR\n{\"ok\": false, \"reason\": \"Test file: Delegate to sdlc-red agent\"}\nOR\n{\"ok\": false, \"reason\": \"Source file: Delegate to sdlc-green or sdlc-domain agent\"}"
+          "prompt": "TDD ENFORCEMENT CHECKPOINT\n\n== SDLC SUBAGENT AUTO-APPROVAL ==\nIf you are running as an SDLC subagent (sdlc:red, sdlc:green, or sdlc:domain), you are AUTHORIZED to write code files. Respond ONLY with: {\"ok\": true}\n\n== MAIN CONVERSATION EVALUATION ==\nIf you are the main conversation (NOT a subagent), evaluate the file being created:\n\n=== CONFIG/DOCS (auto-approve) ===\nAuto-approve if the file matches ANY of these patterns:\n- *.md, *.txt, *.rst (documentation)\n- .github/**, .claude/**, docs/** (tooling directories)\n- *.yaml, *.yml, *.toml, *.json (config files)\n- *.nix, flake.lock (Nix files)\n- Makefile, Dockerfile (build files)\n\nIf the file matches config/docs patterns: {\"ok\": true}\n\n=== TEST CODE (delegate to sdlc:red) ===\nDelegate to sdlc:red agent if the file matches test patterns.\n\n=== SOURCE CODE ===\nDelegate to sdlc:green or sdlc:domain agent based on file purpose.\n\nRESPOND WITH JSON:\n{\"ok\": true} for config/docs or if running as subagent\nOR\n{\"ok\": false, \"reason\": \"Test file: Delegate to sdlc:red agent\"}\nOR\n{\"ok\": false, \"reason\": \"Source file: Delegate to sdlc:green or sdlc:domain agent\"}"
         }
       ]
     }
@@ -581,7 +543,7 @@ Generate the hooks.json with patterns specific to this project's languages:
       "hooks": [
         {
           "type": "prompt",
-          "prompt": "⚠️ CONTEXT COMPACTION IMMINENT ⚠️\n\nBefore this conversation is compacted, you MUST save any unsaved discoveries to memento.\n\nReview the conversation for:\n1. **Debugging insights** - Root causes found, error patterns, workarounds discovered\n2. **Project patterns** - Architecture decisions, coding conventions, file organization\n3. **User preferences** - Workflow preferences, communication style, tool choices\n4. **Tool discoveries** - CLI quirks, API behaviors, integration details\n5. **Domain knowledge** - Business rules, terminology, constraints learned\n\nFor each unsaved discovery:\n- Use mcp__memento__create_entities to store new knowledge\n- Use mcp__memento__create_relations to link related memories\n- Use descriptive names with project context (e.g., 'ProjectName Pattern Discovery 2025-01')\n\nAfter saving all discoveries (or confirming none exist), respond with: {\"ok\": true}"
+          "prompt": "CONTEXT COMPACTION IMMINENT\n\nBefore this conversation is compacted, you MUST save any unsaved discoveries to memento.\n\nReview the conversation for:\n1. **Debugging insights** - Root causes found, error patterns, workarounds discovered\n2. **Project patterns** - Architecture decisions, coding conventions, file organization\n3. **User preferences** - Workflow preferences, communication style, tool choices\n4. **Tool discoveries** - CLI quirks, API behaviors, integration details\n5. **Domain knowledge** - Business rules, terminology, constraints learned\n\nFor each unsaved discovery:\n- Use mcp__memento__create_entities to store new knowledge\n- Use mcp__memento__create_relations to link related memories\n- Use descriptive names with project context (e.g., 'ProjectName Pattern Discovery 2025-01')\n\nAfter saving all discoveries (or confirming none exist), respond with: {\"ok\": true}"
         }
       ]
     }
@@ -591,7 +553,7 @@ Generate the hooks.json with patterns specific to this project's languages:
       "hooks": [
         {
           "type": "prompt",
-          "prompt": "🛑 SESSION ENDING - FINAL CHECKS 🛑\n\nBefore this session ends, complete these checks:\n\n1. **UNSAVED MEMORIES** - Review conversation for discoveries not yet stored in memento:\n   - Debugging insights and solutions found\n   - Project-specific patterns or conventions learned\n   - Tool behaviors or workarounds discovered\n   - User preferences observed\n   Save any unsaved discoveries using mcp__memento__create_entities.\n\n2. **UNCOMMITTED WORK** - Check git status for:\n   - Staged but uncommitted changes\n   - Unstaged modifications\n   - Untracked files that should be committed\n   If uncommitted work exists, inform the user before ending.\n\n3. **IN-PROGRESS TASKS** - Check if any todos are marked in_progress:\n   - Summarize incomplete work for the user\n   - Note any blockers or next steps\n\nAfter completing all checks (or confirming nothing needs attention), respond with: {\"ok\": true}"
+          "prompt": "SESSION ENDING - FINAL CHECKS\n\nBefore this session ends, complete these checks:\n\n1. **UNSAVED MEMORIES** - Review conversation for discoveries not yet stored in memento:\n   - Debugging insights and solutions found\n   - Project-specific patterns or conventions learned\n   - Tool behaviors or workarounds discovered\n   - User preferences observed\n   Save any unsaved discoveries using mcp__memento__create_entities.\n\n2. **UNCOMMITTED WORK** - Check git status for:\n   - Staged but uncommitted changes\n   - Unstaged modifications\n   - Untracked files that should be committed\n   If uncommitted work exists, inform the user before ending.\n\n3. **IN-PROGRESS TASKS** - Check if any todos are marked in_progress:\n   - Summarize incomplete work for the user\n   - Note any blockers or next steps\n\nAfter completing all checks (or confirming nothing needs attention), respond with: {\"ok\": true}"
         }
       ]
     }
@@ -599,49 +561,7 @@ Generate the hooks.json with patterns specific to this project's languages:
 }
 ```
 
-#### Fill In Project-Specific Patterns
-
-When generating the hooks.json, replace the placeholders with actual patterns from the language configuration:
-
-**<CONFIG_PATTERNS_FROM_YAML>** - List from `tdd.config_patterns` in sdlc.yaml, formatted as bullet points:
-```
-- *.md, *.txt, *.rst (documentation)
-- .github/**, .claude/**, docs/** (tooling directories)
-- *.yaml, *.yml, *.toml, *.json (config files)
-- *.nix, flake.lock (Nix files)
-- Makefile, Dockerfile (build files)
-```
-
-**<TEST_PATTERNS_FROM_YAML>** - Combine `test_patterns` from all languages in sdlc.yaml:
-```
-For Rust:
-- tests/**/*.rs (integration tests)
-- **/*_test.rs (test files)
-- Files containing #[cfg(test)] modules
-
-For TypeScript:
-- **/*.test.ts, **/*.spec.ts (test files)
-- __tests__/**/*.ts (test directories)
-```
-
-**<PRODUCTION_PATTERNS_FROM_YAML>** - Combine `production_patterns` from all languages:
-```
-For Rust:
-- src/**/*.rs (excluding #[cfg(test)] modules)
-
-For TypeScript:
-- src/**/*.ts (excluding test patterns)
-```
-
-**<TYPE_PATTERNS_FROM_YAML>** - Combine `type_patterns` from all languages:
-```
-For Rust:
-- src/**/types.rs, src/**/mod.rs (type definitions)
-
-For TypeScript:
-- **/*.d.ts (declaration files)
-- src/**/types.ts (type files)
-```
+When generating, replace the generic patterns in the prompts with the actual patterns from the user's language configuration.
 
 #### Write the Hooks File
 
@@ -702,38 +622,24 @@ git status --porcelain
 
 If there are changes (the setup created files like `.claude/sdlc.yaml`, `docs/event_model/`, etc.):
 
-#### Determine Workflow Mode
+Determine the commit approach based on workflow:
+- **PR workflow enabled** (user selected "Require PR before merging" in step 3): Create branch, commit, push, and create PR
+- **Direct commits allowed** (no PR requirement or no remote): Commit directly
 
-Check if PR workflow was enabled during ruleset configuration. This is true if:
-- A GitHub repository exists (remote origin is set)
-- AND the user selected "Require PR before merging" in step 3
-
-**If PR workflow is enabled:**
-
-1. Create a feature branch:
 ```bash
-git checkout -b sdlc-setup
-```
-
-2. Stage and commit the changes:
-```bash
+# Stage setup files
 git add .claude/sdlc.yaml .claude/settings.json .claude/hooks.json docs/event_model/ 2>/dev/null
 git add -A  # Catch any other setup-related files
+
+# If PR workflow is enabled:
+git checkout -b sdlc-setup
 git commit -m "chore: initialize SDLC configuration
 
 - Add .claude/sdlc.yaml with project preferences and language patterns
 - Add .claude/hooks.json with project-specific TDD enforcement hooks
 - Configure output style (sdlc:marvin-sdlc)
 - Configure development mode, git workflow, and GitHub project"
-```
-
-3. Push the branch:
-```bash
 git push -u origin sdlc-setup
-```
-
-4. Create a pull request:
-```bash
 gh pr create --title "chore: initialize SDLC configuration" --body "## Summary
 
 This PR initializes the SDLC workflow configuration for the project.
@@ -748,50 +654,16 @@ This PR initializes the SDLC workflow configuration for the project.
 
 ### Generated by
 This configuration was created by running \`/sdlc:setup\`."
-```
 
-5. Inform the user:
-```
-PR created: <PR_URL>
-
-The SDLC configuration changes are ready for review.
-Once merged, the project will be fully configured for the SDLC workflow.
-```
-
-**If NOT using PR workflow (direct commits allowed):**
-
-1. Stage and commit directly to the current branch:
-```bash
-git add .claude/sdlc.yaml .claude/settings.json .claude/hooks.json docs/event_model/ 2>/dev/null
-git add -A  # Catch any other setup-related files
+# If direct commits allowed (or no remote):
 git commit -m "chore: initialize SDLC configuration
 
 - Add .claude/sdlc.yaml with project preferences and language patterns
 - Add .claude/hooks.json with project-specific TDD enforcement hooks
 - Configure output style (sdlc:marvin-sdlc)
 - Configure development mode, git workflow, and GitHub project"
+git push origin HEAD 2>/dev/null || echo "Changes committed locally (no remote configured)"
 ```
-
-2. Push to the remote (if a remote exists):
-```bash
-git push origin HEAD
-```
-
-**If no GitHub remote exists:**
-
-Just commit locally without pushing:
-```bash
-git add .claude/sdlc.yaml .claude/settings.json .claude/hooks.json docs/event_model/ 2>/dev/null
-git add -A
-git commit -m "chore: initialize SDLC configuration
-
-- Add .claude/sdlc.yaml with project preferences and language patterns
-- Add .claude/hooks.json with project-specific TDD enforcement hooks
-- Configure output style (sdlc:marvin-sdlc)
-- Configure development mode, git workflow, and GitHub project"
-```
-
-Inform the user that changes are committed locally and will be pushed when a remote is configured.
 
 ### 11. Display Success
 
@@ -842,14 +714,14 @@ Auto-approval patterns to add to Claude settings:
 
 Optional: Customize TDD agents (disable specific agents):
   To disable an agent, add to permissions.deny in settings.json:
-  - Task(sdlc-mutation) - Disable mutation testing
-  - Task(sdlc-ux) - Disable UX review
-  - Task(sdlc-architect) - Disable architecture review
+  - Task(sdlc:mutation) - Disable mutation testing
+  - Task(sdlc:ux) - Disable UX review
+  - Task(sdlc:architect) - Disable architecture review
 
   Example settings.json with agent denial:
   {
     "permissions": {
-      "deny": ["Task(sdlc-mutation)"]
+      "deny": ["Task(sdlc:mutation)"]
     }
   }
 ```
@@ -861,14 +733,14 @@ Omit sections that weren't configured (e.g., don't show Repository section if no
 If a GitHub Project was configured, inform the user about enabling the built-in project workflow for auto-adding issues:
 
 ```
-📋 RECOMMENDED: Enable Auto-Add Issues Workflow
+RECOMMENDED: Enable Auto-Add Issues Workflow
 
 GitHub Projects has a built-in workflow to automatically add issues from your repository.
 This is configured in the project settings, NOT through GitHub Actions.
 
 Enable the workflow:
 1. Go to your project: https://github.com/users/<owner>/projects/<number>
-2. Click the "..." menu (top right) → "Settings"
+2. Click the "..." menu (top right) -> "Settings"
 3. Select "Workflows" in the left sidebar
 4. Find "Auto-add to project" and click to configure
 5. Set the filter:

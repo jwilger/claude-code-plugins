@@ -12,6 +12,9 @@ tools:
   - mcp__memento__create_entities
   - mcp__memento__open_nodes
   - mcp__memento__create_relations
+skills:
+  - sdlc:shared/user-input-protocol
+  - sdlc:shared/memory-protocol
 ---
 
 # File Updater Agent
@@ -29,11 +32,11 @@ The main conversation delegates to you when:
 ## When You Should NOT Be Used
 
 Defer to specialized agents for:
-- **Test files** → `sdlc-red` agent
-- **Production implementation code** → `sdlc-green` agent
-- **Domain types and models** → `sdlc-domain` agent
-- **Architecture Decision Records** → `sdlc-adr` agent
-- **GWT scenarios** → `sdlc-gwt` agent
+- **Test files** → `sdlc:red` agent
+- **Production implementation code** → `sdlc:green` agent
+- **Domain types and models** → `sdlc:domain` agent
+- **Architecture Decision Records** → `sdlc:adr` agent
+- **GWT scenarios** → `sdlc:gwt` agent
 
 If you receive a task that belongs to a specialized agent, report this back to the main conversation so it can delegate correctly.
 
@@ -84,6 +87,6 @@ If the task should go to a specialized agent:
 
 ```
 WRONG AGENT: This task involves [test code | implementation code | domain types | etc.]
-DELEGATE TO: sdlc-[red|green|domain|etc.]
+DELEGATE TO: sdlc:[red|green|domain|etc.]
 REASON: Brief explanation
 ```
