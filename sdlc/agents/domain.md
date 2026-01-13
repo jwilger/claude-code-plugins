@@ -195,6 +195,7 @@ Watch for these thoughts - they indicate you're about to violate domain modeling
 
 | If you're thinking... | The truth is... | Action |
 |-----------------------|-----------------|--------|
+| "This is basically a margin/offset/spacing" | You're translating to a technical analogy. What IS it? | Name it for what it IS (CanvasPadding, not Offset) |
 | "A simple String is fine here for now" | Primitive obsession starts with "just this once" | Create the semantic type NOW |
 | "I'll implement this method body since it's simple" | You are sdlc:domain, not sdlc:green. Bodies are THEIR job | Put `unimplemented!()`. Return to orchestrator |
 | "This struct might need more fields later" | YAGNI - tests demand what's needed, not speculation | Only add fields tests reference |
@@ -351,6 +352,36 @@ Domain types must be **SEMANTIC** (what it means in the domain) not just **STRUC
 |---------------|-----------|---------|
 | **Structural** | WHAT something is | `NonEmptyString`, `PositiveInteger`, `ValidatedEmail` |
 | **Semantic** | WHAT something means | `UserName`, `OrderQuantity`, `CustomerEmail` |
+
+### Name Types for What They ARE, Not What They're LIKE (CRITICAL)
+
+**The Cardinal Rule:** When naming a domain type, ask "What IS this thing?" — not "What is this thing LIKE?"
+
+The answer to that question IS the type name. No translation. No analogy. No reaching for technical concepts.
+
+| If the domain concept is... | The type name is... | NOT... |
+|-----------------------------|---------------------|--------|
+| Canvas padding | `CanvasPadding` | `Offset`, `Margin`, `Spacing`, `PixelSize` |
+| Order quantity | `OrderQuantity` | `PositiveInteger`, `Count`, `Amount` |
+| User's email | `UserEmail` | `Email`, `ValidatedEmail`, `NonEmptyString` |
+| Connection timeout | `ConnectionTimeout` | `Duration`, `Milliseconds`, `TimeSpan` |
+
+**The Failure Mode to Avoid:**
+
+```
+1. See domain concept (canvas padding)
+2. ❌ WRONG: "What technical category does this fit into?" → margin, offset, spacing...
+3. ✅ RIGHT: "What IS this in the domain?" → It's canvas padding. Done.
+```
+
+**Why This Matters:**
+
+Technical analogies are lies. They suggest substitutability that doesn't exist:
+- `CanvasPadding` is NOT a "kind of offset" — it's literally the padding around a canvas
+- `OrderQuantity` is NOT a "kind of positive integer" — it's how many items someone ordered
+- Calling them by technical analogies loses domain meaning and enables confusion
+
+**The Test:** If you find yourself saying "this is basically a..." or "this is like a..." — STOP. You're about to create a structural type when you need a semantic one. The thing IS what it IS in the domain.
 
 **The Problem with Structural-Only Types:**
 ```
