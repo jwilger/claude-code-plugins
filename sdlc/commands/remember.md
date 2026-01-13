@@ -1,5 +1,5 @@
 ---
-description: Store discoveries and insights in memento knowledge graph
+description: INVOKE after solving problems or learning conventions. Stores in memento
 argument-hint: <what-to-remember>
 model: haiku
 allowed-tools:

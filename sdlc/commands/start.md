@@ -1,5 +1,5 @@
 ---
-description: Smart entry point - detects project state and routes to appropriate SDLC phase
+description: INVOKE to begin work. Auto-detects project state and routes to appropriate phase
 allowed-tools:
   - Bash
   - Read

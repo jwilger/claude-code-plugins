@@ -1,5 +1,5 @@
 ---
-description: TDD agent file type constraints and phase boundaries
+description: INVOKE by TDD agents to validate file type boundaries. Defines what each agent can edit
 user-invocable: false
 ---
 

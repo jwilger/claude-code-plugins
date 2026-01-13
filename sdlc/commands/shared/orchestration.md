@@ -1,11 +1,18 @@
 ---
-description: SDLC orchestration rules - TDD workflow, file delegation, question proxy
+description: INVOKE for ALL file operations. Orchestrator delegates to agents, never writes directly
 user-invocable: false
 ---
 
 # Orchestration Rules
 
 The main conversation is an **orchestrator only**. It coordinates work but never writes code directly.
+
+## Core Protocol: Skill Enforcement
+
+**Before ANY task, invoke the skill enforcement protocol.** See `sdlc:shared/skill-enforcement` for:
+- The 1% rule (if a skill might apply, invoke it)
+- Rationalization red flags
+- Mandatory invocations
 
 ## File Operations (MANDATORY DELEGATION)
 
@@ -81,6 +88,31 @@ When launching an agent:
 3. Specify the current TDD phase
 4. Review the agent's output before proceeding
 5. If agent raises concerns, facilitate debate
+
+### Fresh Context Protocol (CRITICAL)
+
+**Agents have ZERO context from the conversation.** Every agent invocation starts fresh.
+
+When launching ANY agent, you MUST provide:
+
+| Information | Why | Example |
+|-------------|-----|---------|
+| File paths | Agent can't see what you've been discussing | "Edit `src/domain/user.rs`" |
+| Current test | Green needs to know what to pass | "Make `test_user_creation` pass" |
+| Acceptance criteria | What "done" looks like | "User must have valid email" |
+| Relevant domain types | Prevent primitive obsession | "Use the `Email` type from `types.rs`" |
+| Error messages | What specifically failed | "Test fails with: expected Ok, got Err" |
+
+**NEVER say:**
+- "As discussed earlier..." - Agent wasn't in that discussion
+- "Continue from where we left off" - Agent has no memory
+- "You know what to do" - Agent knows nothing
+- "Fix the issue" - Which issue? Be specific
+
+**ALWAYS say:**
+- "The test at `tests/user_test.rs:45` fails with [exact error]"
+- "Implement `fn create_user()` in `src/domain/user.rs` to make this pass"
+- "Use the `Email` type for the email field, not `String`"
 
 ## Subagent Question Proxy Protocol
 
@@ -159,3 +191,55 @@ Orchestrator: Facilitates, proposes compromise
 - Ask for specific tradeoff analysis
 - Propose middle-ground solutions
 - Know when to escalate (don't let debates drag)
+
+## Parallel Development (Worktrees)
+
+When `git.worktrees: true` in `.claude/sdlc.yaml`, the project supports parallel development.
+
+### Worktree-Aware Context
+
+When working in a worktree:
+1. **Check current location**: `git worktree list` shows all active worktrees
+2. **Include worktree path** when launching agents so they know the context
+3. **Store worktree info in memento** for session continuity
+
+### Parallel Slice Prerequisites
+
+Before starting parallel work on slices:
+1. **Event schemas must be defined** - The contracts between slices
+2. **Integration points must be spec'd** - Shared interfaces documented
+3. **Slices must be independent** - No implementation dependencies
+
+### When Parallel Development is Safe
+
+| Scenario | Safe for Parallel? | Why |
+|----------|-------------------|-----|
+| Two slices from same workflow | YES | Slices are independent by design |
+| Slice and its dependent | NO | Must complete integration first |
+| Slice and shared infrastructure | DEPENDS | Infrastructure must be spec'd/stubbed |
+| Two unrelated features | YES | No interaction |
+
+### Worktree Cleanup
+
+After PR merge:
+```bash
+# List worktrees
+git worktree list
+
+# Remove merged worktree
+git worktree remove <path>
+
+# Prune stale worktrees
+git worktree prune
+```
+
+## Code Review Gate
+
+Before creating PRs, the **three-stage code review** must pass:
+1. **Stage 1: Spec Compliance** - All acceptance criteria implemented?
+2. **Stage 2: Code Quality** - Clean, maintainable, well-tested?
+3. **Stage 3: Domain Integrity** - Domain types used correctly? Compile-time enforcement opportunities?
+
+Stage 3 invokes `sdlc:domain` for deep analysis including a **Compile-Time Enforcement Audit** - identifying runtime checks in tests that the type system could enforce instead.
+
+See `sdlc:code-reviewer` agent for details. All three stages must pass before mutation testing.

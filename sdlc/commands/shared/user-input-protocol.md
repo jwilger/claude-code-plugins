@@ -1,5 +1,5 @@
 ---
-description: AWAITING_USER_INPUT protocol for subagent question proxying
+description: INVOKE when subagent needs user input. AWAITING_USER_INPUT JSON format
 user-invocable: false
 ---
 

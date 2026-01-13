@@ -1,5 +1,5 @@
 ---
-description: Event sourcing and event modeling workflow rules
+description: INVOKE when designing event-sourced systems. Defines 4 patterns and workflow rules
 user-invocable: false
 ---
 

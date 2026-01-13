@@ -1,5 +1,5 @@
 ---
-description: Handle PR review feedback - fetch comments and respond appropriately
+description: INVOKE when PR has review comments to address. Fetches and responds to feedback
 context: fork
 allowed-tools:
   - Bash

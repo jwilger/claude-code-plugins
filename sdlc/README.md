@@ -79,10 +79,11 @@ The SDLC enforces strict TDD boundaries through specialized agents:
 
 | Agent | Responsibility | Can Edit |
 |-------|----------------|----------|
-| `sdlc-red` | Write failing tests | Test files only |
-| `sdlc-green` | Make tests pass | Production code only |
-| `sdlc-domain` | Create type definitions | Type signatures only |
-| `sdlc-mutation` | Run mutation testing | Read-only |
+| `sdlc:red` | Write failing tests | Test files only |
+| `sdlc:green` | Make tests pass | Production code only |
+| `sdlc:domain` | Create type definitions, PR domain review | Type signatures only |
+| `sdlc:mutation` | Run mutation testing | Read-only |
+| `sdlc:code-reviewer` | Three-stage PR review (spec, quality, domain) | Read-only |
 
 These boundaries are **inviolable** - each agent can only edit its designated files.
 

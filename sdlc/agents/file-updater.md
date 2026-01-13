@@ -1,6 +1,6 @@
 ---
 name: file-updater
-description: Generic file operations agent for updates that don't match specialized agents
+description: INVOKE for config, docs, or scripts. Handles files outside TDD agent scope
 tools:
   - Read
   - Write

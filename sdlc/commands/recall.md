@@ -1,5 +1,5 @@
 ---
-description: Retrieve relevant knowledge from memento knowledge graph
+description: INVOKE before ANY task to check for existing solutions in memento
 argument-hint: <what-to-recall>
 model: haiku
 allowed-tools:

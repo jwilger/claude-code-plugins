@@ -1,5 +1,5 @@
 ---
-description: GitHub CLI extensions and issue management workflow
+description: INVOKE when managing GitHub issues, projects, or PRs. Extension command reference
 user-invocable: false
 ---
 

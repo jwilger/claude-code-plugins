@@ -1,6 +1,6 @@
 ---
 name: gwt
-description: Generates Given/When/Then scenarios for event model slices.
+description: INVOKE to generate GWT scenarios for event model slices. Creates acceptance criteria
 model: inherit
 tools: Read, Write, Glob, mcp__memento__semantic_search, mcp__memento__create_entities, mcp__memento__open_nodes, mcp__memento__create_relations
 skills:

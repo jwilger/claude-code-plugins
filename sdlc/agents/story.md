@@ -1,6 +1,6 @@
 ---
 name: story
-description: Business perspective on stories. Enforces 1:1 vertical slice = story mapping. GWT scenarios ARE acceptance criteria.
+description: INVOKE when reviewing story value and slice independence. Business perspective reviewer
 model: inherit
 tools: Read, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities, mcp__memento__open_nodes, mcp__memento__create_relations
 skills:

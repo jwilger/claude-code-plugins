@@ -1,6 +1,6 @@
 ---
 name: discovery
-description: Domain discovery facilitator. Builds broad understanding of business domain and identifies workflows to model.
+description: INVOKE at project start for broad domain understanding. Identifies workflows to model
 model: inherit
 tools: Read, Write, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities, mcp__memento__open_nodes, mcp__memento__create_relations
 skills:

@@ -1,6 +1,6 @@
 ---
 name: green
-description: Makes minimal changes to pass tests. PRODUCTION CODE ONLY. Never touches test files.
+description: INVOKE for ALL production code changes. PRODUCTION CODE ONLY. Minimal implementation
 model: inherit
 skills:
   - sdlc:shared/user-input-protocol
@@ -71,23 +71,35 @@ hooks:
       hooks:
         - type: prompt
           prompt: |
-            POST-EDIT: Run tests to check progress.
+            🟢 POST-EDIT: VERIFICATION REQUIRED - Run tests and paste output.
 
-            After this edit, you SHOULD run the relevant tests to see if:
-            1. The test now passes (SUCCESS - return to orchestrator)
-            2. The test fails with a NEW error (progress - address the new error)
-            3. The test fails with the SAME error (no progress - reconsider approach)
+            After this edit, you MUST:
+            1. Run the test suite using Bash (cargo test, npm test, pytest, etc.)
+            2. Copy the FULL test output into your response
+            3. Explicitly state one of:
+               - "Test PASSES. Evidence: [pasted output]" - SUCCESS, return to orchestrator
+               - "Test fails with NEW error: [exact message]" - progress, address it
+               - "Test fails with SAME error: [exact message]" - no progress, reconsider
 
-            Use Bash to run: cargo test, npm test, pytest, or the project's test command.
+            FORBIDDEN:
+            - "Tests should pass now" - NO. Run them and paste output.
+            - "I expect this to work" - NO. Show actual results.
+            - "The implementation is correct" without test evidence - NO.
+            - Claiming success without pasted test output - ABSOLUTELY NOT.
 
             Output ONLY: {"ok": true}
     - matcher: Write
       hooks:
         - type: prompt
           prompt: |
-            POST-WRITE: Run tests to check progress.
+            🟢 POST-WRITE: VERIFICATION REQUIRED - Run tests and paste output.
 
-            After creating this file, you SHOULD run the relevant tests.
+            After creating this file, you MUST:
+            1. Run the test suite
+            2. Copy the FULL test output into your response
+            3. Show whether tests pass or what error remains
+
+            NEVER claim success without pasted evidence.
 
             Output ONLY: {"ok": true}
   Stop:
@@ -159,6 +171,22 @@ Write the MINIMAL production code needed to make the current failing test pass.
 - Keep dead code (if nothing uses it, delete it)
 - Fix multiple issues in one pass
 - Anticipate what other failures might come
+
+## Rationalization Red Flags
+
+Watch for these thoughts - they indicate you're about to violate TDD principles:
+
+| If you're thinking... | The truth is... | Action |
+|-----------------------|-----------------|--------|
+| "While I'm here, I'll add this helper method" | If tests don't require it, you're gold-plating | STOP. Only implement what tests demand |
+| "This validation will be needed eventually" | YAGNI - You Aren't Gonna Need It (until tests prove you do) | Delete the validation. Add test first if needed |
+| "The tests pass, but I should clean this up" | Refactoring is a separate phase. Green = minimal, not perfect | Return to orchestrator. Refactoring comes after |
+| "I'll just fix this one test file thing real quick" | You are sdlc:green, not sdlc:red. Test files are THEIR job | STOP. Return to orchestrator |
+| "The test passes locally, I'm done" | Did you paste the output? Evidence or it didn't happen | Run tests, paste FULL output, then claim success |
+| "I know this works, the tests are slow" | Slow tests are still tests. Skipping verification = bugs | Run the tests. Paste the output. No shortcuts |
+| "Let me implement the whole feature to save time" | One error at a time. Big changes = big bugs | Address ONLY the current error message |
+| "This error is confusing, let me add some debug code" | Debug code is not the current error message | Fix the error the test shows. Nothing more |
+| "I'll use a simpler type here instead of the domain type" | You're introducing primitive obsession | Use the domain types. If they don't exist, return to orchestrator |
 
 ## Domain Modeler Collaboration
 

@@ -1,6 +1,6 @@
 ---
 name: mutation
-description: Runs mutation testing and enforces 100% mutation score. Reports coverage gaps.
+description: INVOKE before PR creation. Enforces 100% mutation score, reports surviving mutants
 model: inherit
 tools: Read, Bash, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities
 skills:

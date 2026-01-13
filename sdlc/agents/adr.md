@@ -1,6 +1,6 @@
 ---
 name: adr
-description: Creates Architecture Decision Records documenting WHY decisions were made.
+description: INVOKE to create or update ADRs. Documents WHY architecture decisions were made
 model: inherit
 tools: Read, Write, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities, mcp__memento__open_nodes, mcp__memento__create_relations
 skills:

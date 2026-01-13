@@ -1,5 +1,5 @@
 ---
-description: Git-spice stacked PR workflow guidance
+description: INVOKE when using git-spice for stacked PRs. Branch and submit commands
 user-invocable: false
 ---
 

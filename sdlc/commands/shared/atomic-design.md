@@ -1,5 +1,5 @@
 ---
-description: Atomic Design methodology for UI component systems
+description: INVOKE when designing UI component systems. Atoms, molecules, organisms hierarchy
 user-invocable: false
 ---
 

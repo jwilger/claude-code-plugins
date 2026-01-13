@@ -1,5 +1,5 @@
 ---
-description: Audit domain types for semantic correctness and compile-time safety opportunities
+description: INVOKE to review domain types for primitive obsession, invalid state representability, or safety gaps
 invocation: user
 ---
 
@@ -22,10 +22,10 @@ Perform a focused audit of domain types in the codebase, identifying opportuniti
 
 ## Execution
 
-Invoke the sdlc-domain agent with a focused audit prompt:
+Invoke the sdlc:domain agent with a focused audit prompt:
 
 ```
-Task(subagent_type="sdlc-domain",
+Task(subagent_type="sdlc:domain",
      prompt="Perform a FOCUSED domain type audit. No documentation files - just analysis and fixes.
 
 ## Audit Scope

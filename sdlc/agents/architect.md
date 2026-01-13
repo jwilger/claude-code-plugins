@@ -1,6 +1,6 @@
 ---
 name: architect
-description: Technical feasibility reviewer. Reviews stories/slices for complexity, risks, and architectural alignment.
+description: INVOKE when reviewing technical complexity, risks, or architectural alignment
 model: inherit
 tools: Read, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities, mcp__memento__open_nodes, mcp__memento__create_relations
 skills:

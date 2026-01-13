@@ -1,5 +1,5 @@
 ---
-description: Memento memory protocol - recall before tasks, remember after discoveries
+description: INVOKE before ANY task (recall first) and after discoveries (remember solutions)
 user-invocable: false
 ---
 

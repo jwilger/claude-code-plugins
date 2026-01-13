@@ -1,5 +1,5 @@
 ---
-description: Start working on a GitHub issue - shows ready items, handles assignment and branch creation
+description: INVOKE to start or continue work on an issue. Shows ready items, creates branch
 allowed-tools:
   - Bash
   - Read
@@ -49,10 +49,13 @@ Start or continue working on a GitHub issue. This command:
 
 Read `.claude/sdlc.yaml` to get:
 - Git workflow preference (git-spice vs standard)
+- **Worktree mode** (`git.worktrees: true` enables parallel development)
 - GitHub project settings
 - Board status names
 
 If config doesn't exist, inform user to run `/sdlc:setup` first.
+
+**Worktree Detection**: If `git.worktrees: true`, this command will create isolated worktrees for parallel development of independent vertical slices.
 
 ### 2. Check Git State
 
@@ -151,16 +154,59 @@ If project is null or not configured, skip the move step with an informational m
 Note: No GitHub Project configured. To configure, run: /sdlc:setup
 ```
 
-#### c. Create branch
+#### c. Create branch (or worktree)
 
 Generate slug from issue title (lowercase, hyphens, max 50 chars).
 
-**If using git-spice:** For git-spice workflow guidance, invoke the `sdlc:shared/git-spice` skill or see its documentation.
+**If worktrees enabled (`git.worktrees: true`):**
 
-**If using standard git:**
+Worktrees enable parallel development of independent vertical slices. Each worktree is an isolated workspace with its own working directory.
+
+```bash
+# Determine worktree location
+# Priority: existing .worktrees/ or worktrees/ > sibling directory
+worktree_base="../$(basename $(pwd))-worktrees"
+mkdir -p "$worktree_base"
+
+# Create worktree with new branch
+git worktree add "$worktree_base/<issue-number>-<slug>" -b feature/<issue-number>-<slug>
+
+# Verify worktree location
+echo "Worktree created at: $worktree_base/<issue-number>-<slug>"
+```
+
+After creating the worktree:
+1. Note the worktree path for the user
+2. Run any project setup (npm install, cargo build, etc.)
+3. Run baseline tests to ensure clean starting state
+4. Store worktree path in memento for reference
+
+**If using git-spice (no worktrees):** For git-spice workflow guidance, invoke the `sdlc:shared/git-spice` skill or see its documentation.
+
+**If using standard git (no worktrees):**
 ```bash
 git checkout -b feature/<issue-number>-<slug>
 ```
+
+**Parallel Development Note**: With worktrees enabled, you can work on multiple independent slices simultaneously. Each slice gets its own isolated worktree directory.
+
+**How to work in parallel:**
+1. In your main project, run `/sdlc:work 123` → creates worktree at `../myproject-worktrees/123-slice-name`
+2. Open a **new terminal window**, `cd` to the worktree directory
+3. Launch a **separate Claude Code instance** there (`claude`)
+4. Back in your main project, run `/sdlc:work 456` for another slice
+5. Repeat for each parallel slice
+
+**Why separate instances?**
+- Each Claude instance has isolated context (no confusion about which files)
+- Git operations don't conflict
+- Each slice gets full TDD workflow attention
+
+**When parallel development is safe:**
+- Vertical slices are designed to be independent
+- Slices share only event schemas (documented contracts from event modeling)
+- Integration points are spec'd BEFORE dependent work begins
+- Shared code (integration points) should be merged to main before dependent slices start
 
 #### d. Store in memento
 

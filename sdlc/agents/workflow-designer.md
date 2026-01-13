@@ -1,6 +1,6 @@
 ---
 name: workflow-designer
-description: Event modeling workflow designer. Guides through the 9-step process to design a complete workflow with wireframes and slices.
+description: INVOKE to design a workflow using 9-step event modeling. Creates wireframes and slices
 model: inherit
 tools: Read, Write, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities, mcp__memento__open_nodes, mcp__memento__create_relations
 skills:

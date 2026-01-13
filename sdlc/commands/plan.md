@@ -1,5 +1,5 @@
 ---
-description: Create GitHub issues from event model slices - bridges design to implementation
+description: INVOKE when event model slices are ready. Creates GitHub issues from slices
 argument-hint: [workflow-name]
 allowed-tools:
   - Bash

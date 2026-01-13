@@ -1,5 +1,5 @@
 ---
-description: Create and manage Architecture Decision Records
+description: INVOKE when making architecture decisions. Creates/manages ADRs with status tracking
 argument-hint: [action] [topic]
 agent: sdlc:adr
 allowed-tools:

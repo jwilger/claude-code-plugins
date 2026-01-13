@@ -1,5 +1,5 @@
 ---
-description: Design event model workflows - brainstorm, document, and generate GWT scenarios
+description: INVOKE for domain discovery, workflow design, GWT generation, or architecture guidance
 argument-hint: [discover|workflow|gwt|validate|arch|design-system] [name]
 context: fork
 allowed-tools:

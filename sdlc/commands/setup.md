@@ -1,5 +1,5 @@
 ---
-description: Initialize SDLC project configuration and install required GitHub CLI extensions
+description: INVOKE once per project to configure SDLC workflow and install gh extensions
 allowed-tools:
   - Bash
   - Read
@@ -234,6 +234,12 @@ Then ask (only show git-spice option if installed):
 - git-spice (stacked PRs) - only if git-spice is installed
 - Standard (single branch per feature)
 
+**Question 2b: Enable Git Worktrees for Parallel Development?**
+- Yes - Create isolated worktrees for each issue (enables parallel work on independent slices)
+- No - Use standard checkout (one issue at a time)
+
+**Note**: Worktrees are especially useful for event-modeled projects where vertical slices are designed to be independent. With worktrees, you can run `/sdlc:work` multiple times to start parallel work on different slices, each in its own isolated workspace.
+
 **Question 3: GitHub Project**
 - Link to existing project (ask for project number/URL)
 - Create new project
@@ -417,6 +423,7 @@ mode: event-modeling  # or: traditional
 
 git:
   workflow: git-spice  # or: standard
+  worktrees: true      # Enable isolated worktrees for parallel development
   require_clean: true
 
 github:
