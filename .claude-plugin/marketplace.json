@@ -19,9 +19,9 @@
     {
       "name": "bootstrap",
       "source": "./bootstrap",
-      "description": "Project scaffolding with Nix-based development environments",
-      "version": "0.4.0",
-      "keywords": ["bootstrap", "scaffolding", "nix", "rust", "development-environment"]
+      "description": "Intelligent Nix devshell bootstrapper for any language or framework",
+      "version": "1.0.0",
+      "keywords": ["bootstrap", "scaffolding", "nix", "flake", "devshell", "development-environment", "language-agnostic"]
     }
   ]
 }

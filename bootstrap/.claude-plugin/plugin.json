@@ -1,10 +1,27 @@
 {
   "name": "bootstrap",
-  "version": "0.4.0",
-  "description": "Project scaffolding with Nix-based development environments",
+  "version": "1.0.0",
+  "description": "Intelligent Nix devshell bootstrapper for any language or framework",
   "author": {
     "name": "John Wilger",
     "email": "john@johnwilger.com"
   },
-  "keywords": ["bootstrap", "scaffolding", "nix", "rust", "development-environment"]
+  "keywords": [
+    "bootstrap",
+    "scaffolding",
+    "nix",
+    "flake",
+    "devshell",
+    "development-environment",
+    "language-agnostic"
+  ],
+  "commands": [
+    "./commands/init.md",
+    "./commands/rust.md"
+  ],
+  "agents": [
+    "./agents/detector.md",
+    "./agents/researcher.md",
+    "./agents/generator.md"
+  ]
 }
