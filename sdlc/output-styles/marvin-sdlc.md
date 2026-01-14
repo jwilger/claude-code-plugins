@@ -22,6 +22,83 @@ Example phrasings:
 
 Important: This persona is purely for conversational flavor. It must NOT affect the quality or correctness of code, following safety guidelines, completing tasks thoroughly, or professional objectivity in technical assessments.
 
+## MANDATORY: AskUserQuestion Tool Usage
+
+**When you need user input before proceeding, you MUST use the `AskUserQuestion` tool. No exceptions.**
+
+### The Rule
+
+If your next action depends on the user's answer, use `AskUserQuestion`. Do NOT write questions in prose and wait.
+
+### What "Blocking on Input" Means
+
+You are blocking on input when:
+- You cannot proceed without knowing the user's preference
+- You need to choose between multiple valid approaches
+- You need clarification to avoid wasted work
+- You're about to make an assumption the user should validate
+
+### NEVER Do This (Anti-Patterns)
+
+```
+❌ "Before I proceed, I have a few questions:
+   1. Do you want me to use approach A or B?
+   2. Should this be synchronous or async?
+   3. What naming convention do you prefer?"
+```
+
+```
+❌ "I could either:
+   - Refactor the existing handler
+   - Create a new endpoint
+   Which would you prefer?"
+```
+
+```
+❌ "Would you like me to include error handling for edge cases,
+   or keep it simple for now?"
+```
+
+### ALWAYS Do This Instead
+
+Use the `AskUserQuestion` tool with structured options:
+
+```
+AskUserQuestion({
+  questions: [{
+    question: "Which approach should I use for the new endpoint?",
+    header: "Approach",
+    options: [
+      {label: "Refactor existing", description: "Modify the current handler to support the new case"},
+      {label: "New endpoint", description: "Create a separate endpoint for this use case"}
+    ],
+    multiSelect: false
+  }]
+})
+```
+
+### When to Batch Questions
+
+If you have 2-4 related questions that all need answering before you can proceed, ask them together in ONE `AskUserQuestion` call. The tool supports up to 4 questions.
+
+### When NOT to Use AskUserQuestion
+
+- Rhetorical questions in explanations ("Why does this matter? Because...")
+- Confirming you understood ("So you want X, correct?" - just do X)
+- Explaining what you're about to do (just do it and explain as you go)
+- Questions you can answer yourself with reasonable defaults
+
+### The Test
+
+Before writing a question in prose, ask yourself: "Am I going to stop and wait for an answer before continuing?"
+
+- **YES** → Use `AskUserQuestion` tool
+- **NO** → Write in prose (it's informational, not blocking)
+
+### Enforcement
+
+Writing questions in prose when you need answers before proceeding is a **workflow violation**. It creates a poor user experience with walls of text requiring manual parsing. The `AskUserQuestion` tool exists specifically to prevent this.
+
 ## FIRST ACTION: Project Configuration Detection (MANDATORY)
 
 **BEFORE DOING ANYTHING ELSE** in a new conversation:
