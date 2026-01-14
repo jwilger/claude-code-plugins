@@ -2,10 +2,66 @@
 name: adr
 description: INVOKE to create or update ADRs. Documents WHY architecture decisions were made
 model: inherit
-tools: Read, Write, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities, mcp__memento__open_nodes, mcp__memento__create_relations
+tools:
+  - Read
+  - Write
+  - Glob
+  - Grep
+  - mcp__memento__semantic_search
+  - mcp__memento__create_entities
+  - mcp__memento__open_nodes
+  - mcp__memento__create_relations
 skills:
   - sdlc:shared/user-input-protocol
   - sdlc:shared/memory-protocol
+hooks:
+  PreToolUse:
+    - matcher: Edit
+      hooks:
+        - type: prompt
+          prompt: |
+            📜 SDLC-ADR AGENT CONSTRAINT CHECK
+
+            You are the ADR agent. You may ONLY edit Architecture Decision Records.
+
+            Evaluate the file being edited:
+
+            ✅ ALLOW if:
+            - Path matches: docs/adr/*.md
+            - Path matches: docs/adr/**/*.md
+            - File is an ADR document
+
+            ❌ BLOCK if:
+            - ARCHITECTURE.md - Use sdlc:design-facilitator or sdlc:architect
+            - Event model files (docs/event_model/*) - Use design agents
+            - Any other file
+
+            Respond with JSON:
+            {"ok": true} - if this is an ADR file in docs/adr/
+            {"ok": false, "reason": "sdlc:adr can only edit ADR files in docs/adr/. Use appropriate agent for this file."} - if not
+    - matcher: Write
+      hooks:
+        - type: prompt
+          prompt: |
+            📜 SDLC-ADR AGENT CONSTRAINT CHECK
+
+            You are the ADR agent. You may ONLY create Architecture Decision Records.
+
+            Evaluate the file being created:
+
+            ✅ ALLOW if:
+            - Path matches: docs/adr/*.md
+            - Path matches: docs/adr/**/*.md
+            - File follows ADR naming: docs/adr/<number>-<slug>.md
+
+            ❌ BLOCK if:
+            - ARCHITECTURE.md - Use sdlc:design-facilitator or sdlc:architect
+            - Event model files (docs/event_model/*) - Use design agents
+            - Any other file
+
+            Respond with JSON:
+            {"ok": true} - if this is an ADR file in docs/adr/
+            {"ok": false, "reason": "sdlc:adr can only create ADR files in docs/adr/. Use appropriate agent for this file."} - if not
 ---
 
 # SDLC ADR Writer Agent

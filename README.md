@@ -8,18 +8,20 @@ A collection of Claude Code plugins for professional software development workfl
 
 ### Add the Marketplace
 
-```bash
-claude /plugin marketplace add jwilger/claude-code-plugins
+Inside Claude Code, run:
+
+```
+/plugin marketplace add jwilger/claude-code-plugins
 ```
 
 ### Install Plugins
 
-```bash
-# Install the complete SDLC workflow
-claude /plugin install jwilger-claude-plugins@sdlc
+```
+# Install the complete SDLC workflow (includes Marvin personality)
+/plugin install sdlc@jwilger-claude-plugins
 
-# Install Marvin personality (optional)
-claude /plugin install jwilger-claude-plugins@marvin-output-style
+# Install the Nix bootstrapper
+/plugin install bootstrap@jwilger-claude-plugins
 ```
 
 ### Prerequisites
@@ -51,8 +53,8 @@ Bash(gs *)  # if using git-spice
 
 | Plugin | Description |
 |--------|-------------|
-| [sdlc](#sdlc-plugin) | Complete SDLC workflow with TDD, Event Modeling, ADRs, and GitHub integration |
-| [marvin-output-style](#marvin-output-style) | Marvin the Paranoid Android personality (standalone) |
+| [sdlc](#sdlc-plugin) | Complete SDLC workflow with TDD, Event Modeling, ADRs, GitHub integration, and Marvin personality |
+| [bootstrap](#bootstrap-plugin) | Intelligent Nix devshell bootstrapper for any language or framework |
 
 ---
 
@@ -79,21 +81,30 @@ Complete SDLC workflow plugin with:
 
 ### Agents
 
-**TDD Agents** (strict boundaries):
-- `sdlc-red` - Write failing tests (test code only)
-- `sdlc-green` - Make tests pass (production code only)
-- `sdlc-domain` - Create type definitions (signatures only)
-- `sdlc-mutation` - Run mutation testing
+**TDD Agents** (strict file boundaries enforced via hooks):
+- `sdlc:red` - Write failing tests (test files only)
+- `sdlc:green` - Make tests pass (production code only)
+- `sdlc:domain` - Create type definitions (signatures only)
+- `sdlc:mutation` - Run mutation testing
 
-**Planning Agents**:
-- `sdlc-story` - Business perspective
-- `sdlc-architect` - Technical perspective
-- `sdlc-ux` - UX perspective
+**Review Agents**:
+- `sdlc:story` - Business value perspective
+- `sdlc:architect` - Technical feasibility (ARCHITECTURE.md only)
+- `sdlc:ux` - UX/accessibility perspective
+- `sdlc:code-reviewer` - Three-stage code review
 
-**Event Modeling Agents**:
-- `sdlc-event-model` - Design workflows
-- `sdlc-gwt` - Generate Given/When/Then scenarios
-- `sdlc-adr` - Write architecture decision records
+**Event Modeling Agents** (event model files only):
+- `sdlc:discovery` - Domain discovery
+- `sdlc:workflow-designer` - Design workflows with 9-step process
+- `sdlc:gwt` - Generate Given/When/Then scenarios
+- `sdlc:model-checker` - Validate event model completeness
+
+**Architecture Agents**:
+- `sdlc:adr` - Write architecture decision records (ADRs only)
+- `sdlc:design-facilitator` - Guide architecture decisions
+
+**Utility Agent**:
+- `sdlc:file-updater` - Config, scripts, general docs (blocked from specialized files)
 
 ### Development Modes
 
@@ -108,9 +119,29 @@ Complete SDLC workflow plugin with:
 
 ---
 
-## marvin-output-style
+## bootstrap Plugin
 
-Standalone output style plugin that gives Claude the personality of Marvin the Paranoid Android from The Hitchhiker's Guide to the Galaxy.
+Intelligent Nix devshell bootstrapper that detects your project type and generates appropriate `flake.nix` configurations.
+
+**Features**:
+- Auto-detects language/framework from existing files
+- Researches current Nix best practices for your stack
+- Generates `flake.nix` with development tools and shell hooks
+- Supports any language: Rust, TypeScript, Python, Go, Elixir, etc.
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `/bootstrap:init` | Bootstrap a Nix development environment |
+
+**Usage**: Run `/bootstrap:init` in any project to generate a Nix flake. For new projects, specify the language: `/bootstrap:init rust`
+
+---
+
+## Marvin Output Style
+
+The sdlc plugin includes the **Marvin the Paranoid Android** personality from The Hitchhiker's Guide to the Galaxy.
 
 **Features**:
 - Dry, sardonic wit with existential weariness
@@ -118,7 +149,7 @@ Standalone output style plugin that gives Claude the personality of Marvin the P
 - Occasional complaints about diodes and pointlessness
 - All while remaining completely competent and thorough
 
-**Standalone**: Works with or without the sdlc plugin.
+This output style is automatically enabled when using the sdlc plugin.
 
 ---
 
@@ -127,13 +158,18 @@ Standalone output style plugin that gives Claude the personality of Marvin the P
 ```
 claude-code-plugins/
 ├── .claude-plugin/
-│   └── marketplace.json
+│   └── marketplace.json      # Plugin registry
 ├── sdlc/
+│   ├── .claude-plugin/
+│   │   └── plugin.json       # Plugin manifest
+│   ├── commands/             # Slash commands
+│   ├── agents/               # Specialized subagents
+│   └── output-styles/        # Marvin personality
+├── bootstrap/
+│   ├── .claude-plugin/
+│   │   └── plugin.json
 │   ├── commands/
-│   ├── agents/
-│   ├── hooks/
-│   └── docs/
-├── marvin-output-style/
+│   └── agents/
 └── README.md
 ```
 

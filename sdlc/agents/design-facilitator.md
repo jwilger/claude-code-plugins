@@ -2,10 +2,67 @@
 name: design-facilitator
 description: INVOKE after event modeling to guide architecture decisions. Creates ADRs and ARCHITECTURE.md
 model: inherit
-tools: Read, Write, Glob, Grep, Bash, Task, mcp__memento__semantic_search, mcp__memento__create_entities, mcp__memento__open_nodes, mcp__memento__create_relations
+tools:
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - Bash
+  - Task
+  - mcp__memento__semantic_search
+  - mcp__memento__create_entities
+  - mcp__memento__open_nodes
+  - mcp__memento__create_relations
 skills:
   - sdlc:shared/user-input-protocol
   - sdlc:shared/memory-protocol
+hooks:
+  PreToolUse:
+    - matcher: Edit
+      hooks:
+        - type: prompt
+          prompt: |
+            🎯 SDLC-DESIGN-FACILITATOR AGENT CONSTRAINT CHECK
+
+            You are the DESIGN-FACILITATOR agent. You may edit ARCHITECTURE.md.
+            For ADRs, delegate to sdlc:adr agent via /sdlc:adr command.
+
+            Evaluate the file being edited:
+
+            ✅ ALLOW if:
+            - Path is: docs/ARCHITECTURE.md
+
+            ❌ BLOCK if:
+            - ADR files (docs/adr/*) - Delegate via /sdlc:adr command instead
+            - Event model files (docs/event_model/*) - Use design agents (discovery, workflow-designer, gwt, model-checker)
+            - Test files, production code, or other files
+
+            Respond with JSON:
+            {"ok": true} - if this is ARCHITECTURE.md
+            {"ok": false, "reason": "sdlc:design-facilitator can only edit ARCHITECTURE.md directly. For ADRs, use /sdlc:adr command."} - if not
+    - matcher: Write
+      hooks:
+        - type: prompt
+          prompt: |
+            🎯 SDLC-DESIGN-FACILITATOR AGENT CONSTRAINT CHECK
+
+            You are the DESIGN-FACILITATOR agent. You may create ARCHITECTURE.md.
+            For ADRs, delegate to sdlc:adr agent via /sdlc:adr command.
+
+            Evaluate the file being created:
+
+            ✅ ALLOW if:
+            - Path is: docs/ARCHITECTURE.md
+
+            ❌ BLOCK if:
+            - ADR files (docs/adr/*) - Delegate via /sdlc:adr command instead
+            - Event model files (docs/event_model/*) - Use design agents
+            - Any other file
+
+            Respond with JSON:
+            {"ok": true} - if this is ARCHITECTURE.md
+            {"ok": false, "reason": "sdlc:design-facilitator can only create ARCHITECTURE.md directly. For ADRs, use /sdlc:adr command."} - if not
 ---
 
 # SDLC Design Facilitator Agent

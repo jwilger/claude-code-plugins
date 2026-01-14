@@ -2,10 +2,66 @@
 name: workflow-designer
 description: INVOKE to design a workflow using 9-step event modeling. Creates wireframes and slices
 model: inherit
-tools: Read, Write, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities, mcp__memento__open_nodes, mcp__memento__create_relations
+tools:
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - mcp__memento__semantic_search
+  - mcp__memento__create_entities
+  - mcp__memento__open_nodes
+  - mcp__memento__create_relations
 skills:
   - sdlc:shared/user-input-protocol
   - sdlc:shared/memory-protocol
+hooks:
+  PreToolUse:
+    - matcher: Edit
+      hooks:
+        - type: prompt
+          prompt: |
+            📋 SDLC-WORKFLOW-DESIGNER AGENT CONSTRAINT CHECK
+
+            You are the WORKFLOW-DESIGNER agent. You may ONLY edit event model files.
+
+            Evaluate the file being edited:
+
+            ✅ ALLOW if:
+            - Path matches: docs/event_model/**/*
+            - File is workflow overview or slice documentation
+
+            ❌ BLOCK if:
+            - ADR files (docs/adr/*) - Use sdlc:adr agent
+            - ARCHITECTURE.md - Use sdlc:design-facilitator or sdlc:architect
+            - Test files, production code, or config files
+
+            Respond with JSON:
+            {"ok": true} - if this is an event model file
+            {"ok": false, "reason": "sdlc:workflow-designer can only edit event model files in docs/event_model/. Use appropriate agent for this file."} - if not
+    - matcher: Write
+      hooks:
+        - type: prompt
+          prompt: |
+            📋 SDLC-WORKFLOW-DESIGNER AGENT CONSTRAINT CHECK
+
+            You are the WORKFLOW-DESIGNER agent. You may ONLY create event model files.
+
+            Evaluate the file being created:
+
+            ✅ ALLOW if:
+            - Path matches: docs/event_model/**/*
+            - Creating workflow docs: docs/event_model/workflows/<name>/overview.md
+            - Creating slice docs: docs/event_model/workflows/<name>/slices/<slice>.md
+
+            ❌ BLOCK if:
+            - ADR files (docs/adr/*) - Use sdlc:adr agent
+            - ARCHITECTURE.md - Use sdlc:design-facilitator or sdlc:architect
+            - Any other file
+
+            Respond with JSON:
+            {"ok": true} - if this is an event model file
+            {"ok": false, "reason": "sdlc:workflow-designer can only create event model files in docs/event_model/. Use appropriate agent for this file."} - if not
 ---
 
 # SDLC Workflow Designer Agent

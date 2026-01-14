@@ -2,10 +2,63 @@
 name: gwt
 description: INVOKE to generate GWT scenarios for event model slices. Creates acceptance criteria
 model: inherit
-tools: Read, Write, Glob, mcp__memento__semantic_search, mcp__memento__create_entities, mcp__memento__open_nodes, mcp__memento__create_relations
+tools:
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - mcp__memento__semantic_search
+  - mcp__memento__create_entities
+  - mcp__memento__open_nodes
+  - mcp__memento__create_relations
 skills:
   - sdlc:shared/user-input-protocol
   - sdlc:shared/memory-protocol
+hooks:
+  PreToolUse:
+    - matcher: Edit
+      hooks:
+        - type: prompt
+          prompt: |
+            🎭 SDLC-GWT AGENT CONSTRAINT CHECK
+
+            You are the GWT agent. You may ONLY edit event model slice files to add GWT scenarios.
+
+            Evaluate the file being edited:
+
+            ✅ ALLOW if:
+            - Path matches: docs/event_model/**/*
+            - File is a slice document where GWT scenarios are added
+
+            ❌ BLOCK if:
+            - ADR files (docs/adr/*) - Use sdlc:adr agent
+            - ARCHITECTURE.md - Use sdlc:design-facilitator or sdlc:architect
+            - Test files, production code, or config files
+
+            Respond with JSON:
+            {"ok": true} - if this is an event model file
+            {"ok": false, "reason": "sdlc:gwt can only edit event model files in docs/event_model/. Use appropriate agent for this file."} - if not
+    - matcher: Write
+      hooks:
+        - type: prompt
+          prompt: |
+            🎭 SDLC-GWT AGENT CONSTRAINT CHECK
+
+            You are the GWT agent. You may ONLY create event model files.
+
+            Evaluate the file being created:
+
+            ✅ ALLOW if:
+            - Path matches: docs/event_model/**/*
+
+            ❌ BLOCK if:
+            - ADR files (docs/adr/*) - Use sdlc:adr agent
+            - ARCHITECTURE.md - Use sdlc:design-facilitator or sdlc:architect
+            - Any other file
+
+            Respond with JSON:
+            {"ok": true} - if this is an event model file
+            {"ok": false, "reason": "sdlc:gwt can only create event model files in docs/event_model/. Use appropriate agent for this file."} - if not
 ---
 
 # SDLC GWT Scenario Generator Agent

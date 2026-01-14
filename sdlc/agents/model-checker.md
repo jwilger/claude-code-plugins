@@ -2,10 +2,64 @@
 name: model-checker
 description: INVOKE to validate event model completeness. Checks information flow and GWT coverage
 model: inherit
-tools: Read, Write, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities, mcp__memento__open_nodes, mcp__memento__create_relations
+tools:
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - mcp__memento__semantic_search
+  - mcp__memento__create_entities
+  - mcp__memento__open_nodes
+  - mcp__memento__create_relations
 skills:
   - sdlc:shared/user-input-protocol
   - sdlc:shared/memory-protocol
+hooks:
+  PreToolUse:
+    - matcher: Edit
+      hooks:
+        - type: prompt
+          prompt: |
+            ✅ SDLC-MODEL-CHECKER AGENT CONSTRAINT CHECK
+
+            You are the MODEL-CHECKER agent. You may ONLY edit event model files to fix gaps.
+
+            Evaluate the file being edited:
+
+            ✅ ALLOW if:
+            - Path matches: docs/event_model/**/*
+            - File is workflow or slice documentation being corrected
+
+            ❌ BLOCK if:
+            - ADR files (docs/adr/*) - Use sdlc:adr agent
+            - ARCHITECTURE.md - Use sdlc:design-facilitator or sdlc:architect
+            - Test files, production code, or config files
+
+            Respond with JSON:
+            {"ok": true} - if this is an event model file
+            {"ok": false, "reason": "sdlc:model-checker can only edit event model files in docs/event_model/. Use appropriate agent for this file."} - if not
+    - matcher: Write
+      hooks:
+        - type: prompt
+          prompt: |
+            ✅ SDLC-MODEL-CHECKER AGENT CONSTRAINT CHECK
+
+            You are the MODEL-CHECKER agent. You may ONLY create event model files to fill gaps.
+
+            Evaluate the file being created:
+
+            ✅ ALLOW if:
+            - Path matches: docs/event_model/**/*
+
+            ❌ BLOCK if:
+            - ADR files (docs/adr/*) - Use sdlc:adr agent
+            - ARCHITECTURE.md - Use sdlc:design-facilitator or sdlc:architect
+            - Any other file
+
+            Respond with JSON:
+            {"ok": true} - if this is an event model file
+            {"ok": false, "reason": "sdlc:model-checker can only create event model files in docs/event_model/. Use appropriate agent for this file."} - if not
 ---
 
 # SDLC Model Checker Agent

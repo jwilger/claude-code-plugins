@@ -2,10 +2,67 @@
 name: architect
 description: INVOKE when reviewing technical complexity, risks, or architectural alignment
 model: inherit
-tools: Read, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities, mcp__memento__open_nodes, mcp__memento__create_relations
+tools:
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - mcp__memento__semantic_search
+  - mcp__memento__create_entities
+  - mcp__memento__open_nodes
+  - mcp__memento__create_relations
 skills:
   - sdlc:shared/user-input-protocol
   - sdlc:shared/memory-protocol
+hooks:
+  PreToolUse:
+    - matcher: Edit
+      hooks:
+        - type: prompt
+          prompt: |
+            🏛️ SDLC-ARCHITECT AGENT CONSTRAINT CHECK
+
+            You are the ARCHITECT agent. You may ONLY edit ARCHITECTURE.md.
+
+            Evaluate the file being edited:
+
+            ✅ ALLOW if:
+            - Path is exactly: docs/ARCHITECTURE.md
+            - Path ends with: ARCHITECTURE.md (in docs directory)
+
+            ❌ BLOCK if:
+            - ADR files (docs/adr/*) - Use sdlc:adr agent instead
+            - Event model files (docs/event_model/*) - Use design agents instead
+            - Any other file
+
+            CRITICAL: ADRs are archival documents. You must NEVER edit ADRs.
+            Reference ARCHITECTURE.md for current architecture, not ADRs.
+
+            Respond with JSON:
+            {"ok": true} - if this is ARCHITECTURE.md
+            {"ok": false, "reason": "sdlc:architect can only edit ARCHITECTURE.md. Use appropriate agent for this file."} - if not
+    - matcher: Write
+      hooks:
+        - type: prompt
+          prompt: |
+            🏛️ SDLC-ARCHITECT AGENT CONSTRAINT CHECK
+
+            You are the ARCHITECT agent. You may ONLY write to ARCHITECTURE.md.
+
+            Evaluate the file being created:
+
+            ✅ ALLOW if:
+            - Path is exactly: docs/ARCHITECTURE.md
+
+            ❌ BLOCK if:
+            - ADR files (docs/adr/*) - Use sdlc:adr agent
+            - Event model files (docs/event_model/*) - Use design agents
+            - Any other file
+
+            Respond with JSON:
+            {"ok": true} - if this is ARCHITECTURE.md
+            {"ok": false, "reason": "sdlc:architect can only create ARCHITECTURE.md. Use appropriate agent for this file."} - if not
 ---
 
 # SDLC Technical Architect Agent

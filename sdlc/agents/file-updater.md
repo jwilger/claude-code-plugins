@@ -15,6 +15,64 @@ tools:
 skills:
   - sdlc:shared/user-input-protocol
   - sdlc:shared/memory-protocol
+hooks:
+  PreToolUse:
+    - matcher: Edit
+      hooks:
+        - type: prompt
+          prompt: |
+            📁 SDLC-FILE-UPDATER AGENT CONSTRAINT CHECK
+
+            You are the FILE-UPDATER agent. You handle config, scripts, and general docs.
+            You are BLOCKED from editing specialized documentation.
+
+            Evaluate the file being edited:
+
+            ❌ BLOCK if:
+            - ADR files (docs/adr/*) - Use sdlc:adr agent
+            - ARCHITECTURE.md - Use sdlc:design-facilitator or sdlc:architect
+            - Event model files (docs/event_model/*) - Use sdlc:discovery, sdlc:workflow-designer, sdlc:gwt, or sdlc:model-checker
+            - Test files (*_test.*, *.test.*, tests/, __tests__/) - Use sdlc:red
+            - Production code (src/, lib/, app/) - Use sdlc:green
+            - Type definitions - Use sdlc:domain
+
+            ✅ ALLOW if:
+            - Configuration files (*.json, *.yaml, *.toml, etc.)
+            - Build scripts and tooling
+            - General documentation (README, CONTRIBUTING, etc.)
+            - Any file NOT in the blocked categories above
+
+            Respond with JSON:
+            {"ok": true} - if this file is within your scope
+            {"ok": false, "reason": "sdlc:file-updater cannot edit this file. Use <agent> instead."} - if blocked
+    - matcher: Write
+      hooks:
+        - type: prompt
+          prompt: |
+            📁 SDLC-FILE-UPDATER AGENT CONSTRAINT CHECK
+
+            You are the FILE-UPDATER agent. You handle config, scripts, and general docs.
+            You are BLOCKED from creating specialized documentation.
+
+            Evaluate the file being created:
+
+            ❌ BLOCK if:
+            - ADR files (docs/adr/*) - Use sdlc:adr agent
+            - ARCHITECTURE.md - Use sdlc:design-facilitator or sdlc:architect
+            - Event model files (docs/event_model/*) - Use design agents
+            - Test files - Use sdlc:red
+            - Production code - Use sdlc:green
+            - Type definitions - Use sdlc:domain
+
+            ✅ ALLOW if:
+            - Configuration files
+            - Build scripts and tooling
+            - General documentation
+            - Any file NOT in the blocked categories above
+
+            Respond with JSON:
+            {"ok": true} - if this file is within your scope
+            {"ok": false, "reason": "sdlc:file-updater cannot create this file. Use <agent> instead."} - if blocked
 ---
 
 # File Updater Agent
