@@ -166,6 +166,104 @@ When launching ANY agent, you MUST provide:
 - "Implement `fn create_user()` in `src/domain/user.rs` to make this pass"
 - "Use the `Email` type for the email field, not `String`"
 
+## Invocation Gate Protocol (MANDATORY)
+
+**Each TDD agent has a confirmation gate.** If you don't provide the required confirmations, the agent will REJECT the invocation and return an error. This is by design - it forces you to maintain conscious awareness of workflow state.
+
+### Red Agent Invocation
+
+You MUST include ONE of these context blocks:
+
+**Starting first test:**
+```
+RED_CONTEXT: FIRST_TEST
+ACCEPTANCE_CRITERIA:
+- <criterion 1>
+- <criterion 2>
+```
+
+**Continuing after completed cycle:**
+```
+RED_CONTEXT: CONTINUING
+PREVIOUS_CYCLE_COMPLETE:
+- Test: <previous test name>
+- Status: PASSES
+- Refactoring: <"None" or "Completed: <description>">
+NEXT_CRITERIA:
+- <next criterion to implement>
+```
+
+**Drilling down into complex behavior:**
+```
+RED_CONTEXT: DRILL_DOWN
+PARENT_TEST: <ignored test name>
+FOCUSED_BEHAVIOR: <specific behavior to test>
+```
+
+### Domain Agent Invocation
+
+You MUST include ONE of these context blocks:
+
+**After red phase (for type creation):**
+```
+DOMAIN_CONTEXT: AFTER_RED
+RED_PHASE_COMPLETE:
+- Test: <test name>
+- Failure: <exact error message>
+```
+
+**After green phase (for implementation review):**
+```
+DOMAIN_CONTEXT: AFTER_GREEN
+GREEN_PHASE_COMPLETE:
+- Test: <test name>
+- Result: <"PASSES" or "fails with: <error>">
+- Files modified: <list>
+```
+
+**For PR review:**
+```
+DOMAIN_CONTEXT: PR_REVIEW
+PR_SCOPE:
+- Files to review: <list>
+- Workstream: <description>
+```
+
+### Green Agent Invocation
+
+You MUST include BOTH of these confirmation blocks:
+
+```
+RED_PHASE_COMPLETE:
+- Test: <test name>
+- Failure: <exact error message>
+
+DOMAIN_CHECK_PASSED:
+- Types created: <list> OR "No new types needed"
+- Concerns: "None" OR "Resolved: <resolution>"
+```
+
+### Why Gates Exist
+
+These gates prevent:
+- Invoking green before a test exists
+- Invoking green before domain review
+- Invoking red before previous cycle completes
+- Invoking domain without knowing which phase it's reviewing
+- Losing track of workflow state during complex sessions
+
+**If an agent returns `INVOCATION GATE FAILED`**, you skipped a step. Go back and complete the missing workflow step, then re-invoke with proper confirmations.
+
+### Gate Confirmation Template
+
+Use this checklist before each agent invocation:
+
+```
+[ ] Red: Have I specified FIRST_TEST, CONTINUING, or DRILL_DOWN with required details?
+[ ] Domain: Have I specified AFTER_RED, AFTER_GREEN, or PR_REVIEW with required details?
+[ ] Green: Have I confirmed BOTH red completion AND domain check?
+```
+
 ## Subagent Question Proxy Protocol
 
 Subagents cannot ask users questions directly. Detect and proxy their requests.
