@@ -14,6 +14,22 @@ The main conversation is an **orchestrator only**. It coordinates work but never
 - Rationalization red flags
 - Mandatory invocations
 
+## ADR Isolation Principle (CRITICAL)
+
+**ADRs are archival documents.** They exist ONLY to preserve the context of WHY decisions were made, for use when we might reconsider those decisions in the future.
+
+**NEVER reference ADRs in:**
+- GitHub issues or PRs
+- Code comments
+- Review feedback
+- Story/slice documentation
+- Implementation guidance
+- Any day-to-day work output
+
+**ALWAYS reference ARCHITECTURE.md instead** - it is THE authoritative source for current architecture.
+
+The ONLY time ADRs should be consulted is when someone is actively considering changing an architectural decision and needs to understand why the original decision was made.
+
 ## File Operations (MANDATORY DELEGATION)
 
 The main conversation **MUST NEVER** use Write or Edit tools directly. All file modifications go through specialized agents.

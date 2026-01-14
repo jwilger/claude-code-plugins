@@ -192,15 +192,12 @@ For EACH significant decision: present options with tradeoffs, after user decide
 ```
 Architecture Design Complete: <project-name>
 
-ADRs Created:
-  - ADR-001: <title> [accepted]
-  - ADR-002: <title> [accepted]
-  ...
-
-Architecture Document: docs/ARCHITECTURE.md
+Architecture Document: docs/ARCHITECTURE.md (THE authoritative source)
 
 Next step:
   /sdlc:plan - Create GitHub issues from event model slices
+
+Note: Decision context preserved in docs/adr/ (archival - consult only when reconsidering decisions).
 ```
 
 #### `design-system`

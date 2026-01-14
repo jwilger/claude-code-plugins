@@ -20,11 +20,17 @@ hooks:
 
 # SDLC Architecture Decision Records
 
-Manage Architecture Decision Records (ADRs). ADRs are immutable historical records documenting WHY architectural decisions were made.
+Manage Architecture Decision Records (ADRs). ADRs are **archival documents** that preserve the context of WHY architectural decisions were made.
 
 ## The Pattern
 
-ADRs are immutable events recording WHY decisions were made. ARCHITECTURE.md is a projection showing WHAT the current architecture is.
+ADRs are immutable events recording WHY decisions were made. ARCHITECTURE.md is the **authoritative source** showing WHAT the current architecture is.
+
+## CRITICAL: ADR Isolation
+
+ADRs are for archival purposes only. They should **NEVER** be referenced in GitHub issues, PRs, code reviews, or implementation guidance. All ongoing work should reference **ARCHITECTURE.md** exclusively.
+
+The ONLY time to consult an ADR is when actively reconsidering an architectural decision.
 
 ## Arguments
 

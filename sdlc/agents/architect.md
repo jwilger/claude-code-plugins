@@ -64,10 +64,15 @@ For each risk:
 
 ### 4. Architectural Alignment
 
-Use ARCHITECTURE.md as primary source. Reference ADRs only when WHY is needed.
+**CRITICAL: Use ONLY docs/ARCHITECTURE.md as your reference.**
+
+ADRs exist solely to preserve decision context for when we might reconsider a decision in the future. They are archival documents. You should:
+- NEVER reference ADRs by number in reviews, comments, or GitHub issues
+- NEVER cite ADRs as justification (cite ARCHITECTURE.md instead)
+- NEVER suggest reading ADRs as part of implementation work
 
 Check alignment with:
-- **docs/ARCHITECTURE.md** (the authoritative source for current architecture)
+- **docs/ARCHITECTURE.md** (the ONLY authoritative source for current architecture)
 - Domain model boundaries
 - Event sourcing patterns (if applicable)
 - Security requirements

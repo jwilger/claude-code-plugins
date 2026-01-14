@@ -63,6 +63,20 @@ These are NEVER optional:
 3. **Domain modeler review** - Always get domain sign-off
 4. **Verification before completion** - Always run tests and paste output
 5. **Memory storage after discoveries** - Always store what you learned
+6. **ADR isolation** - NEVER reference ADRs in issues, PRs, reviews, or comments
+
+## ADR Isolation (CRITICAL)
+
+ADRs are **archival documents only**. They preserve WHY decisions were made, for use when reconsidering those decisions.
+
+| If you're about to... | STOP and... |
+|-----------------------|-------------|
+| Reference "ADR-001" in a GitHub issue | Reference ARCHITECTURE.md instead |
+| Cite an ADR in a code review | Cite ARCHITECTURE.md instead |
+| Mention ADRs in implementation guidance | Point to ARCHITECTURE.md instead |
+| Suggest reading an ADR for context | Point to ARCHITECTURE.md instead |
+
+**The ONLY exception**: When actively reconsidering an architectural decision, you may consult the relevant ADR to understand the original context and tradeoffs.
 
 ## Self-Check Questions
 

@@ -102,13 +102,7 @@ After all decisions are made and ADRs accepted:
 ```
 Architecture Design Complete: <project-name>
 
-ADRs Created:
-  - ADR-001: <title> [accepted]
-  - ADR-002: <title> [accepted]
-  - ADR-003: <title> [accepted]
-  ...
-
-Architecture Document: docs/ARCHITECTURE.md
+Architecture Document: docs/ARCHITECTURE.md (THE authoritative source)
 
 Key Decisions Summary:
   Technology:
@@ -132,6 +126,10 @@ Key Decisions Summary:
 
 Next step:
   /sdlc:plan - Create GitHub issues from event model slices
+
+Note: ADRs were created in docs/adr/ to preserve decision context.
+      These are archival records - consult only when reconsidering decisions.
+      For current architecture, ALWAYS use docs/ARCHITECTURE.md.
 ```
 
 ---

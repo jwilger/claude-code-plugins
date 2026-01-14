@@ -139,7 +139,7 @@ This will guide you through:
 - Integration approaches
 - Cross-cutting concerns
 
-Each decision becomes an ADR, synthesized into ARCHITECTURE.md.
+The result is docs/ARCHITECTURE.md - the authoritative source for all architecture questions.
 ```
 Then STOP.
 
