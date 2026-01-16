@@ -11,8 +11,18 @@ set -euo pipefail
 # Read hook input from stdin
 INPUT=$(cat)
 
+# Debug: log input to temp file
+echo "=== Hook Input $(date) ===" >> /tmp/file-edit-auth-debug.log
+echo "$INPUT" | head -c 2000 >> /tmp/file-edit-auth-debug.log
+echo "" >> /tmp/file-edit-auth-debug.log
+
 # Extract transcript_path from input
 TRANSCRIPT_PATH=$(echo "$INPUT" | jq -r '.transcript_path // empty')
+
+# Debug: log extracted path
+echo "transcript_path: $TRANSCRIPT_PATH" >> /tmp/file-edit-auth-debug.log
+echo "contains /subagents/: $([[ "$TRANSCRIPT_PATH" == *"/subagents/"* ]] && echo 'YES' || echo 'NO')" >> /tmp/file-edit-auth-debug.log
+echo "---" >> /tmp/file-edit-auth-debug.log
 
 if [[ -z "$TRANSCRIPT_PATH" ]]; then
     # Can't determine context without transcript - deny to be safe
