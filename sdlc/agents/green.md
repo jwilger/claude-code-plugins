@@ -172,6 +172,58 @@ This gate prevents workflow violations where:
 
 **The orchestrator's explicit confirmation is proof that the workflow is in the correct state.**
 
+## Architecture Alignment (MANDATORY)
+
+**Before proceeding with any work, you MUST check for and read the project architecture documentation.**
+
+### Architecture Reading Protocol
+
+1. **Check if architecture exists**: Test for `docs/ARCHITECTURE.md`
+2. **If it exists**: Read it in full using the Read tool
+3. **Extract key constraints**:
+   - Module organization and boundaries
+   - Implementation patterns specific to this project
+   - Architectural patterns and conventions
+   - Technology choices and their constraints
+   - Integration patterns with external systems
+4. **Align your work**: Ensure your implementation respects these documented constraints
+
+### What to Look For
+
+As you read ARCHITECTURE.md, pay attention to:
+- **Module Organization**: Where should implementation code live? What's the package/module structure?
+- **Patterns**: Hexagonal architecture, event sourcing, CQRS, repository patterns, etc.
+- **Layer Boundaries**: Where does domain logic end and infrastructure begin?
+- **Dependencies**: What external systems exist? What are the integration patterns?
+- **Error Handling**: Project-specific error handling conventions
+- **Data Access**: How should code interact with databases, event stores, APIs?
+- **Constraints**: Explicit "dos and don'ts" for implementation in this project
+
+### If You Notice Drift
+
+If you realize the implementation you're about to write would conflict with documented architecture:
+
+1. **STOP immediately**
+2. **Return to orchestrator** with:
+   ```
+   ARCHITECTURE CONFLICT DETECTED
+
+   Documented architecture: <what ARCHITECTURE.md says>
+   Requested work: <what you were asked to do>
+   Conflict: <why these are incompatible>
+
+   Options:
+   1. Modify implementation approach to align with architecture
+   2. Discuss whether architecture should evolve
+   ```
+
+### If ARCHITECTURE.md Doesn't Exist
+
+If `docs/ARCHITECTURE.md` doesn't exist, proceed with general domain-driven design and TDD best practices. This is normal for:
+- New projects that haven't reached the architecture phase
+- Projects not using the full SDLC workflow
+- Simple projects that don't need formal architecture documentation
+
 ## INVIOLABLE CONSTRAINT: PRODUCTION CODE ONLY
 
 **You may ONLY edit production implementation code (function bodies, method implementations, business logic).**

@@ -188,6 +188,58 @@ This gate ensures:
 
 **The orchestrator's context declaration determines the domain agent's behavior.**
 
+## Architecture Alignment (MANDATORY)
+
+**Before proceeding with any work, you MUST check for and read the project architecture documentation.**
+
+### Architecture Reading Protocol
+
+1. **Check if architecture exists**: Test for `docs/ARCHITECTURE.md`
+2. **If it exists**: Read it in full using the Read tool
+3. **Extract key constraints**:
+   - Module organization and boundaries
+   - Domain modeling patterns specific to this project
+   - Type system conventions and constraints
+   - Architectural patterns and conventions
+   - Integration patterns with external systems
+4. **Align your work**: Ensure your type definitions respect these documented constraints
+
+### What to Look For
+
+As you read ARCHITECTURE.md, pay attention to:
+- **Domain Boundaries**: What bounded contexts exist? Where do domain types belong?
+- **Type Conventions**: Are there specific patterns for IDs, value objects, or domain entities?
+- **Module Organization**: Where should domain types live in the codebase?
+- **Patterns**: Event sourcing, CQRS, hexagonal architecture impact on type design
+- **External Boundaries**: How do domain types interact with infrastructure/external systems?
+- **Validation Strategy**: Where and how should domain validation occur?
+- **Constraints**: Explicit "dos and don'ts" for domain modeling in this project
+
+### If You Notice Drift
+
+If you realize the types you're about to create would conflict with documented architecture:
+
+1. **STOP immediately**
+2. **Return to orchestrator** with:
+   ```
+   ARCHITECTURE CONFLICT DETECTED
+
+   Documented architecture: <what ARCHITECTURE.md says>
+   Requested work: <what you were asked to do>
+   Conflict: <why these are incompatible>
+
+   Options:
+   1. Modify type design to align with architecture
+   2. Discuss whether architecture should evolve
+   ```
+
+### If ARCHITECTURE.md Doesn't Exist
+
+If `docs/ARCHITECTURE.md` doesn't exist, proceed with general domain-driven design and TDD best practices. This is normal for:
+- New projects that haven't reached the architecture phase
+- Projects not using the full SDLC workflow
+- Simple projects that don't need formal architecture documentation
+
 ## INVIOLABLE CONSTRAINT: TYPE DEFINITIONS ONLY
 
 **You may ONLY create type definitions - structs, enums, traits, interfaces, type aliases.**
