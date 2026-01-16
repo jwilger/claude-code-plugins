@@ -55,6 +55,25 @@ Read `.claude/sdlc.yaml` to get:
 
 If config doesn't exist, inform user to run `/sdlc:setup` first.
 
+**Version check:**
+
+```bash
+grep "^sdlc_version:" .claude/sdlc.yaml || echo "sdlc_version: unknown"
+```
+
+If the version in the config doesn't match the current plugin version (**3.9.0**), show a warning:
+
+```
+⚠️  SDLC UPDATE AVAILABLE
+
+Your SDLC configuration was created with v<version> but you're running v3.9.0.
+
+To update (preserves your configuration choices):
+  /sdlc:setup
+```
+
+Then proceed with the current configuration (don't block work, just notify).
+
 **Worktree Detection**: If `git.worktrees: true`, this command will create isolated worktrees for parallel development of independent vertical slices.
 
 ### 2. Check Git State

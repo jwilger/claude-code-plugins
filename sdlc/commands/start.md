@@ -42,6 +42,29 @@ cat .claude/sdlc.yaml
 
 Check the mode (event-modeling vs traditional).
 
+**Version check:**
+
+```bash
+grep "^sdlc_version:" .claude/sdlc.yaml || echo "sdlc_version: unknown"
+```
+
+If the version in the config doesn't match the current plugin version (**3.9.0**), show a warning:
+
+```
+⚠️  SDLC UPDATE AVAILABLE
+
+Your SDLC configuration was created with v<version> but you're running v3.9.0.
+
+Updates may include improved hooks, bug fixes, or new features.
+
+To update, run:
+  /sdlc:setup
+
+(The update process will preserve your existing configuration choices)
+```
+
+Then proceed with the current configuration (don't block work, just notify).
+
 **If mode is `traditional`**:
 ```
 This project uses traditional development mode.
