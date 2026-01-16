@@ -1,5 +1,22 @@
 # SDLC Plugin Changelog
 
+## [3.12.1] - 2026-01-16
+
+### Fixed
+- **CRITICAL: All hook JSON schemas corrected** - Fixed prompt-based hooks to use correct response format
+  - Prompt-based hooks require `{"ok": boolean, "reason": "..."}` format
+  - Command-based hooks use `{"decision": "block", "reason": "..."}` format
+  - All plugin hooks are prompt-based, so all must use `{"ok": boolean}` format
+  - Fixed 5 hooks in hooks.json: Stop, SubagentStop (domain review), SubagentStop (orchestration), SubagentStop (question detection), SessionStart
+  - Fixed 4 hooks in setup.md command template: SubagentStop (domain review), SubagentStop (orchestration), SubagentStop (question detection), SessionStart
+  - v3.11.0 and v3.12.0 had this wrong - introduced validation errors when hooks executed
+
+### Why This Matters
+The v3.11.0 "fix" was actually a regression. We changed from the CORRECT format (`{"ok": true}`) to the WRONG format (`{"decision": "allow"}`). This caused validation errors whenever hooks tried to block operations. All hooks in v3.11.0 and v3.12.0 would fail with "Schema validation failed" errors when executed.
+
+### Migration
+Run `/sdlc:setup` in existing projects to get corrected hook templates. The domain review enforcement and other features from v3.12.0 now work correctly.
+
 ## [3.12.0] - 2026-01-16
 
 ### Added
@@ -76,10 +93,11 @@ New projects automatically get all enhancements.
   - `sdlc:discovery` - Domain discovery documents
   - Previous hooks only listed TDD agents (red, green, domain) + adr + file-updater
 
-### Fixed
-- **SubagentStop hook JSON schema** - Orchestration reminder now returns `{"decision": "allow"}`
-  - Changed from invalid `{"ok": true}` format
-  - Fixes "JSON validation failed" error after subagents completed
+### Fixed (REGRESSION - Fixed in v3.12.1)
+- **SubagentStop hook JSON schema** - Orchestration reminder changed to return `{"decision": "allow"}`
+  - Changed from `{"ok": true}` format
+  - **This was actually incorrect** - prompt-based hooks require `{"ok": boolean}`, not `{"decision": string}`
+  - This introduced validation errors that were fixed in v3.12.1
 
 ### Why This Matters
 The previous delegation model had orchestrator try to route files based on patterns, which was complex and had gaps (config files in sdlc.yaml but not hooks). The new model is simpler: hooks just check "are you authorized?" and agents validate their own files. This eliminates the config/hooks inconsistency reported in PR review and ensures ALL file operations go through proper agents.
