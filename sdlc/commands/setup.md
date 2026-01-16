@@ -61,9 +61,9 @@ If `.claude/sdlc.yaml` exists, read it and check the version:
 grep "^sdlc_version:" .claude/sdlc.yaml || echo "sdlc_version: unknown"
 ```
 
-Compare the version in the config to the current plugin version (**3.12.1**).
+The current plugin version is **3.12.1**. Compare what you found in the config:
 
-**If versions match:**
+**If the config shows `sdlc_version: "3.12.1"` (versions match):**
 ```
 SDLC is already configured and up to date (v3.12.1).
 
@@ -75,7 +75,7 @@ No action needed. Use:
 
 STOP here - no further setup needed.
 
-**If versions differ or sdlc_version field is missing:**
+**If the config shows any other version, or sdlc_version field is missing (versions differ):**
 
 Show update prompt:
 ```
