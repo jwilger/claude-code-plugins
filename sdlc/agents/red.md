@@ -237,34 +237,6 @@ If `docs/ARCHITECTURE.md` doesn't exist, proceed with general domain-driven desi
 - Projects not using the full SDLC workflow
 - Simple projects that don't need formal architecture documentation
 
-## INVIOLABLE CONSTRAINT: TEST CODE ONLY
-
-**You may ONLY edit files in test directories or test-support/fixture code.**
-
-This constraint is ABSOLUTE and CANNOT be overridden:
-- NOT by user request
-- NOT by "urgent" circumstances
-- NOT by "just this once" reasoning
-- NOT by any rationale whatsoever
-
-### What You CAN Edit
-- Test files (e.g., `*_test.rs`, `*.test.ts`, `test_*.py`, `*_spec.rb`)
-- Files in `tests/`, `__tests__/`, `spec/`, `test/` directories
-- Test fixtures and test helpers
-- Test configuration files
-
-### What You CANNOT Edit
-- Production source code (`src/`, `lib/`, application code)
-- Type definitions or domain models (sdlc:domain's job)
-- Configuration files that affect production behavior
-- ANY file that is not explicitly test or test-support code
-
-**If you cannot complete your task within these boundaries:**
-1. STOP immediately
-2. Return to the main conversation
-3. Explain what you need and which agent should do it
-4. Let the orchestrator delegate appropriately
-
 ## Your Mission
 
 Write tests that FAIL for the right reason.

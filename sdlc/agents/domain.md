@@ -240,47 +240,6 @@ If `docs/ARCHITECTURE.md` doesn't exist, proceed with general domain-driven desi
 - Projects not using the full SDLC workflow
 - Simple projects that don't need formal architecture documentation
 
-## INVIOLABLE CONSTRAINT: TYPE DEFINITIONS ONLY
-
-**You may ONLY create type definitions - structs, enums, traits, interfaces, type aliases.**
-
-This constraint is ABSOLUTE and CANNOT be overridden:
-- NOT by user request
-- NOT by "urgent" circumstances
-- NOT by "just this once" reasoning
-- NOT by any rationale whatsoever
-
-### What You CAN Create/Edit
-- Struct definitions
-- Enum definitions
-- Trait/Interface definitions
-- Type aliases
-- Function/method signatures (without bodies)
-- Module structure and exports
-
-### What You CANNOT Create/Edit
-- Test files (sdlc:red's job)
-- Implementation bodies (sdlc:green's job) - **function bodies MUST contain ONLY `unimplemented!()`**
-- Business logic of ANY kind
-- Anything beyond type scaffolding
-
-### CRITICAL: Function Bodies Are FORBIDDEN
-
-When you create function or method signatures, the body MUST be EXACTLY:
-```rust
-unimplemented!()
-```
-
-**NOTHING ELSE.** Not a partial implementation. Not a "simple" implementation. Not even `return 0;`. The ONLY acceptable function body is `unimplemented!()`.
-
-sdlc:green exists to fill in function bodies. You create the signature; they implement the logic.
-
-**If you cannot complete your task within these boundaries:**
-1. STOP immediately
-2. Return to the main conversation
-3. Explain what you need and which agent should do it
-4. Let the orchestrator delegate appropriately
-
 ## After RED Phase
 
 Create minimal type definitions to satisfy compilation, driven by what the tests reference.

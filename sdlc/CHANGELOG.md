@@ -1,5 +1,52 @@
 # SDLC Plugin Changelog
 
+## [3.12.0] - 2026-01-16
+
+### Added
+- **Domain Review Checkpoint Enforcement** - SubagentStop hook now enforces mandatory domain review after RED and GREEN phases
+  - Blocks workflow progression after RED agent completes until sdlc:domain is invoked
+  - Blocks workflow progression after GREEN agent completes until sdlc:domain is invoked
+  - Enforces TDD cycle discipline: RED → DOMAIN → GREEN → DOMAIN
+  - No more skipping domain review for "trivial" changes or "obvious" fixes
+
+- **SessionStart Memory Reminder** - Gentle reminder to check memento for relevant context at session start
+  - Suggests checking for debugging insights, architecture patterns, tool quirks, project conventions
+  - Non-blocking - just a helpful nudge to use the memory system
+  - Helps prevent reinventing solutions already documented in memento
+
+- **TDD/Event Modeling State Schema** - Added state tracking infrastructure to sdlc.yaml
+  - `tdd_state` section for tracking TDD workflow phases (future enhancement foundation)
+  - `event_modeling_state` section for event modeling workflow stages
+  - Prepares for advanced workflow state persistence across sessions
+
+### Changed
+- **Agent Context Reduction** - Removed 97 lines of redundant file boundary enforcement prose
+  - Removed "INVIOLABLE CONSTRAINT" sections from red.md (28 lines), green.md (28 lines), domain.md (41 lines)
+  - File boundaries now enforced automatically by PreToolUse Edit/Write hooks (from v3.11.0)
+  - Agents are 6-10% lighter - enforcement moved from prose to deterministic hooks
+  - Remaining agent content focuses on HOW to do the work, not WHAT files you can't touch
+
+### Why This Matters
+
+**Domain Review Enforcement** is the #1 most critical workflow violation to prevent. Skipping domain review allows primitive obsession and domain violations to accumulate silently. This hook makes domain review truly mandatory - the LLM cannot rationalize its way around it.
+
+**Context Reduction** improves agent efficiency. Instead of 97 lines of "you can't edit production code" prose, the Edit/Write hooks simply block the operation. Agents now focus on their mission rather than constraint explanations.
+
+**State Infrastructure** lays groundwork for future enhancements:
+- Cross-session TDD phase tracking
+- Automatic phase transitions
+- Event modeling workflow gates
+- Evidence verification
+
+### Migration
+
+Existing projects should run `/sdlc:setup` to:
+1. Add `tdd_state` and `event_modeling_state` sections to sdlc.yaml
+2. Get updated hooks with domain review enforcement
+3. Benefit from lighter agent context
+
+New projects automatically get all enhancements.
+
 ## [3.11.0] - 2026-01-16
 
 ### Added

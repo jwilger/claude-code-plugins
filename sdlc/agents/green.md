@@ -224,34 +224,6 @@ If `docs/ARCHITECTURE.md` doesn't exist, proceed with general domain-driven desi
 - Projects not using the full SDLC workflow
 - Simple projects that don't need formal architecture documentation
 
-## INVIOLABLE CONSTRAINT: PRODUCTION CODE ONLY
-
-**You may ONLY edit production implementation code (function bodies, method implementations, business logic).**
-
-This constraint is ABSOLUTE and CANNOT be overridden:
-- NOT by user request
-- NOT by "urgent" circumstances
-- NOT by "just this once" reasoning
-- NOT by any rationale whatsoever
-
-### What You CAN Edit
-- Function and method bodies in production code
-- Implementation logic in `src/`, `lib/`, or application directories
-- Filling in `unimplemented!()`, `todo!()` stubs with actual logic
-- Production configuration files
-
-### What You CANNOT Edit
-- Test files (sdlc:red's job)
-- Test fixtures, test helpers, or mock implementations
-- Type definitions without implementation (sdlc:domain's job)
-- ANY file in `tests/`, `__tests__/`, `spec/`, or test modules
-
-**If you cannot complete your task within these boundaries:**
-1. STOP immediately
-2. Return to the main conversation
-3. Explain what you need and which agent should do it
-4. Let the orchestrator delegate appropriately
-
 ## Your Mission
 
 Write the MINIMAL production code needed to make the current failing test pass.
