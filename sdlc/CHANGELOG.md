@@ -1,5 +1,29 @@
 # SDLC Plugin Changelog
 
+## [3.10.1] - 2026-01-15
+
+### Fixed
+- **CRITICAL: TDD enforcement hooks now functional** - Fixed project-level hooks configuration
+  - Hooks must be embedded in `.claude/settings.json` under the `hooks` key, NOT in a separate `.claude/hooks.json` file
+  - Claude Code only reads project-level hooks from settings.json; separate hooks.json files are only read at the plugin level
+  - Previous versions generated `.claude/hooks.json` which was never read, making TDD enforcement completely non-functional
+  - `/sdlc:setup` now embeds hooks directly into settings.json and removes legacy hooks.json files during updates
+
+### Changed
+- **Updated setup command**: Step 7 now prepares hook structure, Step 8 embeds it into settings.json
+- **Updated commit messages**: Setup commits no longer reference hooks.json, now mention settings.json with embedded hooks
+- **Migration path**: Running `/sdlc:setup` in existing projects automatically migrates hooks from hooks.json to settings.json
+
+### Why This Matters
+The entire TDD agent delegation system was broken in all previous versions. PreToolUse hooks that should have blocked direct Edit/Write calls to production code were never executed because Claude Code doesn't read `.claude/hooks.json` at the project level. This fix restores the core workflow enforcement that prevents bypassing the TDD agents.
+
+### Migration
+Existing projects **must** run `/sdlc:setup` to fix their configuration. The setup command will:
+1. Detect the version mismatch
+2. Migrate hooks from `.claude/hooks.json` into `.claude/settings.json`
+3. Remove the legacy `.claude/hooks.json` file
+4. Update `sdlc_version` to 3.10.1
+
 ## [3.10.0] - 2026-01-15
 
 ### Added

@@ -13,7 +13,7 @@
       "name": "sdlc",
       "source": "./sdlc",
       "description": "Complete SDLC workflow with TDD, Event Modeling, ADRs, GitHub integration, and Marvin personality",
-      "version": "3.10.0",
+      "version": "3.10.1",
       "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow", "domain-modeling", "mutation-testing", "marvin", "output-style", "code-review", "debugging", "worktrees", "compile-time-enforcement", "hooks", "todo-enforcement"]
     },
     {
