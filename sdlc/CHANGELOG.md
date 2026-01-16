@@ -1,5 +1,21 @@
 # SDLC Plugin Changelog
 
+## [3.12.2] - 2026-01-16
+
+### Fixed
+- **SessionStart hook no longer blocks** - Made SessionStart memory reminder truly non-blocking
+  - Removed "Respond with JSON only: {\"ok\": true}" requirement
+  - Hook now says "This reminder does not require a response - proceed directly with the user's request"
+  - Fixes "SessionStart:startup hook error" when user asks a question immediately at session start
+  - Previous versions had contradictory instruction: "GENTLE REMINDER, not a requirement" but forced JSON response
+  - Hook is now purely informational - Claude can proceed with user's request without responding to hook
+
+### Why This Matters
+SessionStart hooks that require responses create a protocol conflict when users immediately ask questions at startup. Claude has to choose between responding to the hook (JSON) or responding to the user (natural language), causing validation errors and confusion. Making the hook truly non-blocking eliminates this friction.
+
+### Migration
+Run `/sdlc:setup` in existing projects to get the updated non-blocking SessionStart hook.
+
 ## [3.12.1] - 2026-01-16
 
 ### Fixed

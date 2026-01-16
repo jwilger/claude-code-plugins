@@ -70,7 +70,7 @@
       "hooks": [
         {
           "type": "prompt",
-          "prompt": "🧠 MEMORY PROTOCOL REMINDER\n\nThis is a new session. Before diving into work, consider checking memento for relevant context.\n\nMemento may have useful information about:\n- 🐛 Debugging - Similar issues solved before?\n- 🏗️ Architecture - Patterns or decisions documented?\n- 🔧 Tools - Known quirks, workarounds, or configurations?\n- 📋 Conventions - Project-specific patterns or preferences?\n\nTo search: Use mcp__memento__semantic_search with your task description as the query.\n\nThis is a GENTLE REMINDER, not a requirement. If you're confident the work is novel or memento isn't available, proceed without searching.\n\nRespond with JSON only: {\"ok\": true}"
+          "prompt": "🧠 MEMORY PROTOCOL REMINDER\n\nThis is a new session. Before diving into work, consider checking memento for relevant context.\n\nMemento may have useful information about:\n- 🐛 Debugging - Similar issues solved before?\n- 🏗️ Architecture - Patterns or decisions documented?\n- 🔧 Tools - Known quirks, workarounds, or configurations?\n- 📋 Conventions - Project-specific patterns or preferences?\n\nTo search: Use mcp__memento__semantic_search with your task description as the query.\n\nThis is a GENTLE REMINDER, not a requirement. If you're confident the work is novel or memento isn't available, proceed without searching. This reminder does not require a response - proceed directly with the user's request."
         }
       ]
     }
