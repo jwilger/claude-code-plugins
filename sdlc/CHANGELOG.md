@@ -1,5 +1,42 @@
 # SDLC Plugin Changelog
 
+## [3.11.0] - 2026-01-16
+
+### Added
+- **PreToolUse hooks for Edit and Write** - Complete file operation delegation enforcement
+  - Blocks ALL direct file edits/writes from main orchestrator
+  - Only authorized subagents can modify files
+  - Uses correct `hookSpecificOutput` schema with `permissionDecision: allow|deny`
+  - Agents self-identify and are responsible for validating file type matches their domain
+
+### Changed
+- **Simplified delegation model** - No more pattern matching in hooks
+  - Hooks act as "bouncers" - check agent identity, not file patterns
+  - Agents validate file types themselves
+  - All file operations MUST go through agents (no exceptions)
+
+### Removed
+- **`tdd.config_patterns` from sdlc.yaml** - No longer needed with identity-based authorization
+  - Old hooks used these patterns to auto-approve config files
+  - New hooks don't use patterns at all
+  - Existing configs with this field will continue to work (field is just ignored)
+
+- **Complete agent list in hooks** - Added missing event modeling and architecture agents
+  - `sdlc:design-facilitator` - Architecture decisions (ADRs, ARCHITECTURE.md)
+  - `sdlc:gwt` - GWT scenarios in event model docs
+  - `sdlc:workflow-designer` - Event model workflow documents
+  - `sdlc:model-checker` - Event model completeness fixes
+  - `sdlc:discovery` - Domain discovery documents
+  - Previous hooks only listed TDD agents (red, green, domain) + adr + file-updater
+
+### Fixed
+- **SubagentStop hook JSON schema** - Orchestration reminder now returns `{"decision": "allow"}`
+  - Changed from invalid `{"ok": true}` format
+  - Fixes "JSON validation failed" error after subagents completed
+
+### Why This Matters
+The previous delegation model had orchestrator try to route files based on patterns, which was complex and had gaps (config files in sdlc.yaml but not hooks). The new model is simpler: hooks just check "are you authorized?" and agents validate their own files. This eliminates the config/hooks inconsistency reported in PR review and ensures ALL file operations go through proper agents.
+
 ## [3.10.1] - 2026-01-15
 
 ### Fixed

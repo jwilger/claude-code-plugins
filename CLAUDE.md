@@ -19,6 +19,19 @@ claude plugin validate bootstrap
 /plugin
 ```
 
+## Documentation Verification
+
+**CRITICAL**: When implementing or modifying features that interact with Claude Code's APIs (hooks, permissions, tool schemas, etc.), you MUST verify against the official documentation:
+
+1. **Always consult docs first** before implementing new features
+2. **Verify JSON schemas** against official examples (especially for hooks)
+3. **Check return formats** for all hook types (Stop, SubagentStop, PreToolUse, etc.)
+4. **Use the claude-code-guide agent** to fetch current documentation when uncertain
+
+Example: SubagentStop hooks require `{"decision": "allow"|"block", "reason": "..."}`, NOT `{"ok": true}`. This type of schema mistake can cause silent failures or validation errors.
+
+Official docs: https://code.claude.com/docs
+
 ## Plugin Architecture
 
 ### Marketplace Structure

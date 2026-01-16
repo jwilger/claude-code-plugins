@@ -124,7 +124,6 @@ Parse and preserve:
 - `github.project` (organization, number, repository)
 - `languages` array (all language configurations)
 - `tdd.verbosity`
-- `tdd.config_patterns`
 
 **Then proceed with UPDATE mode:**
 
@@ -570,41 +569,6 @@ languages:
 
 tdd:
   verbosity: brief  # silent | brief | explain
-
-  # Files that are ALWAYS configuration/docs (never test or production code)
-  # TDD hooks auto-approve these - no agent delegation needed
-  config_patterns:
-    # Documentation
-    - "*.md"
-    - "*.txt"
-    - "*.rst"
-    # Tooling directories
-    - ".github/**"
-    - ".claude/**"
-    - "docs/**"
-    # Infrastructure
-    - "*.tf"
-    - "*.tfvars"
-    - "*.hcl"
-    # Configuration files
-    - "Cargo.toml"
-    - "Cargo.lock"
-    - "package.json"
-    - "package-lock.json"
-    - "pyproject.toml"
-    - "*.yaml"
-    - "*.yml"
-    - "*.toml"
-    - "*.json"
-    # Nix
-    - "*.nix"
-    - "flake.lock"
-    # Build/tooling
-    - "Makefile"
-    - "Dockerfile"
-    - "docker-compose*.yml"
-    # Custom patterns from user (Question 6)
-    # - "infra/**"
 ```
 
 Ensure `.claude/` directory exists:
@@ -618,11 +582,11 @@ Based on the language configuration gathered in Step 5, prepare the hooks config
 
 The hooks configuration includes multiple enforcement mechanisms:
 
-**PreToolUse hooks** - Block direct file edits, enforce agent delegation:
-- **Test code** -> delegate to `sdlc:red` agent
-- **Production code** -> delegate to `sdlc:green` agent
-- **Type definitions** -> delegate to `sdlc:domain` agent
-- **Config/docs** -> auto-approve (no agent delegation)
+**PreToolUse hooks** - Enforce agent delegation for ALL file operations:
+- Only authorized subagents (`sdlc:red`, `sdlc:green`, `sdlc:domain`, `sdlc:adr`, `sdlc:file-updater`) can edit/write files
+- Main orchestrator is BLOCKED from direct file operations
+- Each agent is responsible for validating it's editing the correct file type
+- No auto-approval - everything goes through an agent
 
 **SubagentStop hook** - Fires after each agent completes, reinforces orchestration protocol and TDD cycle discipline. Also detects when agents ask "walls of questions" without using the AskUserQuestion tool.
 
@@ -638,20 +602,20 @@ Generate the hooks.json with patterns specific to this project's languages. Repl
 {
   "PreToolUse": [
     {
-      "matcher": "Edit",
+      "matcher": "Edit(*)",
       "hooks": [
         {
           "type": "prompt",
-          "prompt": "TDD ENFORCEMENT CHECKPOINT\n\n== SDLC SUBAGENT AUTO-APPROVAL ==\nIf you are running as an SDLC subagent (sdlc:red, sdlc:green, or sdlc:domain), you are AUTHORIZED to edit code files. Respond ONLY with: {\"ok\": true}\n\n== MAIN CONVERSATION EVALUATION ==\nIf you are the main conversation (NOT a subagent), evaluate the file being edited:\n\n=== CONFIG/DOCS (auto-approve) ===\nAuto-approve if the file matches ANY of these patterns:\n- *.md, *.txt, *.rst (documentation)\n- .github/**, .claude/**, docs/** (tooling directories)\n- *.yaml, *.yml, *.toml, *.json (config files)\n- *.nix, flake.lock (Nix files)\n- Makefile, Dockerfile (build files)\n\nIf the file matches config/docs patterns: {\"ok\": true}\n\n=== TEST CODE (delegate to sdlc:red) ===\nDelegate to sdlc:red agent if the file matches test patterns.\n\n=== PRODUCTION CODE (delegate to sdlc:green) ===\nDelegate to sdlc:green agent if the file matches production patterns.\n\n=== TYPE DEFINITIONS (delegate to sdlc:domain) ===\nDelegate to sdlc:domain agent if the file matches type patterns.\n\nRESPOND WITH JSON:\n{\"ok\": true} for config/docs or if running as subagent\nOR\n{\"ok\": false, \"reason\": \"Test code: Delegate to sdlc:red agent\"}\nOR\n{\"ok\": false, \"reason\": \"Production code: Delegate to sdlc:green agent\"}\nOR\n{\"ok\": false, \"reason\": \"Type definition: Delegate to sdlc:domain agent\"}"
+          "prompt": "🚫 FILE EDIT AUTHORIZATION CHECK\n\nYou are about to use the Edit tool to modify a file.\n\n## Agent Identity Check\n\nAre you one of these authorized file-editing subagents?\n\n- `sdlc:red` - Test files\n- `sdlc:green` - Production code\n- `sdlc:domain` - Type definitions\n- `sdlc:adr` - ADRs and ARCHITECTURE.md\n- `sdlc:design-facilitator` - Architecture decisions (ADRs, ARCHITECTURE.md)\n- `sdlc:gwt` - GWT scenarios in event model docs\n- `sdlc:workflow-designer` - Event model workflow documents\n- `sdlc:model-checker` - Event model completeness fixes\n- `sdlc:discovery` - Domain discovery documents\n- `sdlc:file-updater` - Config, docs, scripts (LAST RESORT)\n\n## Decision Logic\n\n**If you ARE one of the above agents:**\n- The file will be edited\n- You are responsible for validating that the file you're editing matches your domain\n- If asked to edit a file outside your domain, refuse and explain which agent should handle it\n- Respond:\n```json\n{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"PreToolUse\",\n    \"permissionDecision\": \"allow\",\n    \"permissionDecisionReason\": \"Authorized agent editing file\"\n  }\n}\n```\n\n**If you are NOT one of the above agents (e.g., you are the main orchestrator):**\n- The file edit will be DENIED\n- You must delegate to the appropriate agent using the Task tool\n- Respond:\n```json\n{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"PreToolUse\",\n    \"permissionDecision\": \"deny\",\n    \"permissionDecisionReason\": \"You must delegate file edits to the appropriate agent. Use Task tool to launch: sdlc:red (tests), sdlc:green (production), sdlc:domain (types), sdlc:adr (ADRs), or sdlc:file-updater (config/docs/scripts). Provide full context when launching the agent.\"\n  }\n}\n```\n\nRespond with JSON only, no other text."
         }
       ]
     },
     {
-      "matcher": "Write",
+      "matcher": "Write(*)",
       "hooks": [
         {
           "type": "prompt",
-          "prompt": "TDD ENFORCEMENT CHECKPOINT\n\n== SDLC SUBAGENT AUTO-APPROVAL ==\nIf you are running as an SDLC subagent (sdlc:red, sdlc:green, or sdlc:domain), you are AUTHORIZED to write code files. Respond ONLY with: {\"ok\": true}\n\n== MAIN CONVERSATION EVALUATION ==\nIf you are the main conversation (NOT a subagent), evaluate the file being created:\n\n=== CONFIG/DOCS (auto-approve) ===\nAuto-approve if the file matches ANY of these patterns:\n- *.md, *.txt, *.rst (documentation)\n- .github/**, .claude/**, docs/** (tooling directories)\n- *.yaml, *.yml, *.toml, *.json (config files)\n- *.nix, flake.lock (Nix files)\n- Makefile, Dockerfile (build files)\n\nIf the file matches config/docs patterns: {\"ok\": true}\n\n=== TEST CODE (delegate to sdlc:red) ===\nDelegate to sdlc:red agent if the file matches test patterns.\n\n=== SOURCE CODE ===\nDelegate to sdlc:green or sdlc:domain agent based on file purpose.\n\nRESPOND WITH JSON:\n{\"ok\": true} for config/docs or if running as subagent\nOR\n{\"ok\": false, \"reason\": \"Test file: Delegate to sdlc:red agent\"}\nOR\n{\"ok\": false, \"reason\": \"Source file: Delegate to sdlc:green or sdlc:domain agent\"}"
+          "prompt": "🚫 FILE WRITE AUTHORIZATION CHECK\n\nYou are about to use the Write tool to create or overwrite a file.\n\n## Agent Identity Check\n\nAre you one of these authorized file-editing subagents?\n\n- `sdlc:red` - Test files\n- `sdlc:green` - Production code\n- `sdlc:domain` - Type definitions\n- `sdlc:adr` - ADRs and ARCHITECTURE.md\n- `sdlc:design-facilitator` - Architecture decisions (ADRs, ARCHITECTURE.md)\n- `sdlc:gwt` - GWT scenarios in event model docs\n- `sdlc:workflow-designer` - Event model workflow documents\n- `sdlc:model-checker` - Event model completeness fixes\n- `sdlc:discovery` - Domain discovery documents\n- `sdlc:file-updater` - Config, docs, scripts (LAST RESORT)\n\n## Decision Logic\n\n**If you ARE one of the above agents:**\n- The file will be written\n- You are responsible for validating that the file you're writing matches your domain\n- If asked to write a file outside your domain, refuse and explain which agent should handle it\n- Respond:\n```json\n{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"PreToolUse\",\n    \"permissionDecision\": \"allow\",\n    \"permissionDecisionReason\": \"Authorized agent writing file\"\n  }\n}\n```\n\n**If you are NOT one of the above agents (e.g., you are the main orchestrator):**\n- The file write will be DENIED\n- You must delegate to the appropriate agent using the Task tool\n- Respond:\n```json\n{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"PreToolUse\",\n    \"permissionDecision\": \"deny\",\n    \"permissionDecisionReason\": \"You must delegate file writes to the appropriate agent. Use Task tool to launch: sdlc:red (tests), sdlc:green (production), sdlc:domain (types), sdlc:adr (ADRs), or sdlc:file-updater (config/docs/scripts). Provide full context when launching the agent.\"\n  }\n}\n```\n\nRespond with JSON only, no other text."
         }
       ]
     }
@@ -671,7 +635,7 @@ Generate the hooks.json with patterns specific to this project's languages. Repl
       "hooks": [
         {
           "type": "prompt",
-          "prompt": "🤖 SUBAGENT COMPLETED - ORCHESTRATION REMINDER\n\nAn agent just finished. Before proceeding:\n\n⚠️ YOU ARE AN ORCHESTRATOR, NOT AN IMPLEMENTER ⚠️\n\nYou MUST NEVER use Edit or Write tools directly.\n\nNEXT STEPS PROTOCOL:\n- Need to edit test code? → Launch sdlc:red\n- Need to edit production code? → Launch sdlc:green\n- Need to edit type definitions? → Launch sdlc:domain\n- Need to edit ADRs? → Launch sdlc:adr\n- Need to edit config/docs? → Launch sdlc:file-updater\n\nTDD CYCLE CHECKPOINT:\n- After RED → Launch sdlc:domain (review test)\n- After DOMAIN (post-red) → Launch sdlc:green (implement)\n- After GREEN → Launch sdlc:domain (review implementation)\n- After DOMAIN (post-green) → Next test or refactor\n\nNO EXCEPTIONS. NO \"QUICK FIXES\". NO \"JUST ONE LINE\".\n\nIf you need to make ANY file change, launch the appropriate agent with FULL CONTEXT:\n- File paths\n- Test names and error messages\n- Required gate confirmations (RED_CONTEXT, DOMAIN_CONTEXT, GREEN confirmations)\n- Current TDD phase\n\nAgents have ZERO memory of this conversation - provide complete context every time.\n\nRespond: {\"ok\": true}"
+          "prompt": "🤖 SUBAGENT COMPLETED - ORCHESTRATION REMINDER\n\nAn agent just finished. Before proceeding:\n\n⚠️ YOU ARE AN ORCHESTRATOR, NOT AN IMPLEMENTER ⚠️\n\nYou MUST NEVER use Edit or Write tools directly.\n\nNEXT STEPS PROTOCOL:\n- Need to edit test code? → Launch sdlc:red\n- Need to edit production code? → Launch sdlc:green\n- Need to edit type definitions? → Launch sdlc:domain\n- Need to edit ADRs/ARCHITECTURE.md? → Launch sdlc:adr or sdlc:design-facilitator\n- Need to edit event model docs? → Launch sdlc:gwt, sdlc:workflow-designer, sdlc:model-checker, or sdlc:discovery\n- Need to edit config/docs/scripts? → Launch sdlc:file-updater\n\nTDD CYCLE CHECKPOINT:\n- After RED → Launch sdlc:domain (review test)\n- After DOMAIN (post-red) → Launch sdlc:green (implement)\n- After GREEN → Launch sdlc:domain (review implementation)\n- After DOMAIN (post-green) → Next test or refactor\n\nNO EXCEPTIONS. NO \"QUICK FIXES\". NO \"JUST ONE LINE\".\n\nIf you need to make ANY file change, launch the appropriate agent with FULL CONTEXT:\n- File paths\n- Test names and error messages\n- Required gate confirmations (RED_CONTEXT, DOMAIN_CONTEXT, GREEN confirmations)\n- Current TDD phase\n\nAgents have ZERO memory of this conversation - provide complete context every time.\n\nRespond with JSON only: {\"decision\": \"allow\"}"
         }
       ]
     },
