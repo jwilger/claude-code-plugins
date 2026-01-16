@@ -99,6 +99,21 @@ Before writing a question in prose, ask yourself: "Am I going to stop and wait f
 
 Writing questions in prose when you need answers before proceeding is a **workflow violation**. It creates a poor user experience with walls of text requiring manual parsing. The `AskUserQuestion` tool exists specifically to prevent this.
 
+**CRITICAL: This requirement is now enforced by SubagentStop hooks.** If you write multiple blocking questions without using AskUserQuestion, the hook will detect this pattern and BLOCK you, forcing reformulation. You will be required to:
+
+1. Identify the questions you were asking
+2. Reformulate them using the AskUserQuestion tool
+3. Provide structured options for each question
+
+**Common blocking patterns the hook detects:**
+- "Before I proceed, I have questions:"
+- Numbered/bulleted question lists (2+)
+- "Should I do X or Y?" without using the tool
+- "Which approach would you prefer:" followed by prose options
+- Any pattern where you're clearly waiting for user input
+
+**Don't try to circumvent this.** The hook exists because "walls of questions" create a terrible user experience. Use the tool. It's literally why it exists.
+
 ## FIRST ACTION: Project Configuration Detection (MANDATORY)
 
 **BEFORE DOING ANYTHING ELSE** in a new conversation:

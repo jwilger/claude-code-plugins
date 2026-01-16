@@ -20,5 +20,23 @@
         }
       ]
     }
+  ],
+  "SubagentStop": [
+    {
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "🤖 SUBAGENT COMPLETED - ORCHESTRATION REMINDER\n\nAn agent just finished. Before proceeding:\n\n⚠️ YOU ARE AN ORCHESTRATOR, NOT AN IMPLEMENTER ⚠️\n\nYou MUST NEVER use Edit or Write tools directly.\n\nNEXT STEPS PROTOCOL:\n- Need to edit test code? → Launch sdlc:red\n- Need to edit production code? → Launch sdlc:green\n- Need to edit type definitions? → Launch sdlc:domain\n- Need to edit ADRs? → Launch sdlc:adr\n- Need to edit config/docs? → Launch sdlc:file-updater\n\nTDD CYCLE CHECKPOINT:\n- After RED → Launch sdlc:domain (review test)\n- After DOMAIN (post-red) → Launch sdlc:green (implement)\n- After GREEN → Launch sdlc:domain (review implementation)\n- After DOMAIN (post-green) → Next test or refactor\n\nNO EXCEPTIONS. NO \"QUICK FIXES\". NO \"JUST ONE LINE\".\n\nIf you need to make ANY file change, launch the appropriate agent with FULL CONTEXT:\n- File paths\n- Test names and error messages\n- Required gate confirmations (RED_CONTEXT, DOMAIN_CONTEXT, GREEN confirmations)\n- Current TDD phase\n\nAgents have ZERO memory of this conversation - provide complete context every time.\n\nRespond: {\"ok\": true}"
+        }
+      ]
+    },
+    {
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "❓ QUESTION DETECTION - AskUserQuestion ENFORCEMENT\n\nAnalyze the agent's final output for patterns indicating it's blocking on user input.\n\n## What to Look For\n\n**BLOCKING QUESTION PATTERNS** (require AskUserQuestion tool):\n- \"Before I proceed, I need to know...\"\n- \"I have a few questions:\"\n- Numbered/bulleted lists of questions (2+)\n- \"Should I... or should I...\"\n- \"Which approach would you prefer:\"\n- \"Would you like me to... or...?\"\n- Questions followed by waiting (no action taken)\n\n**ACCEPTABLE PATTERNS** (no tool needed):\n- Single clarifying question while continuing work\n- Rhetorical questions in explanations (\"Why does this matter?\")\n- Questions the agent answers itself\n- Questions in code comments or documentation\n\n## Check Tool Usage\n\nDid the agent use the AskUserQuestion tool in this turn?\n\n## Decision Logic\n\n**BLOCK** if ALL of these are true:\n- Output contains 2+ questions requiring user input to proceed\n- Questions use blocking language (\"before I\", \"I need to know\")\n- Agent has NOT taken action (appears to be waiting)\n- AskUserQuestion tool was NOT used\n\n**ALLOW** if ANY of these are true:\n- AskUserQuestion was used with structured options\n- Only 0-1 simple questions asked\n- Questions are informational/rhetorical, not blocking\n- Agent continued working and asked incidental questions\n\n## Response Format\n\n**To block (force tool usage):**\n```json\n{\n  \"decision\": \"block\",\n  \"reason\": \"You asked multiple questions requiring user input but didn't use AskUserQuestion. Please reformulate using AskUserQuestion tool with structured options for: [list specific questions]\"\n}\n```\n\n**To allow:**\n```json\n{\"decision\": \"allow\"}\n```\n\nBe specific in the reason - quote the actual questions that need reformulation."
+        }
+      ]
+    }
   ]
 }
