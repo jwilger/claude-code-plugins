@@ -1,5 +1,39 @@
 # SDLC Plugin Changelog
 
+## [3.12.3] - 2026-01-16
+
+### Fixed
+- **CRITICAL: Hook type compliance with Claude Code documentation**
+  - Prompt-based hooks (`type: "prompt"`) are only officially supported for `Stop` and `SubagentStop`
+  - Converted PreToolUse, SessionStart, and PreCompact hooks to command-based (`type: "command"`) with shell scripts
+  - Created `.claude-plugin/hooks/` directory with shell scripts:
+    - `file-edit-auth.sh` - Simple path-based subagent detection for Edit/Write authorization
+    - `session-start.sh` - Memory protocol reminder
+    - `gh-api-check.sh` - GitHub API extension-first reminder (plugin-level)
+  - Fixed CLAUDE.md documentation which incorrectly stated SubagentStop requires `{"decision": "allow"|"block"}`
+  - Stop and SubagentStop remain prompt-based with `{"ok": true/false}` format (officially supported)
+
+- **Simplified subagent detection** - Uses transcript path instead of content parsing
+  - Subagent transcripts are stored at `{sessionId}/subagents/agent-{agentId}.jsonl`
+  - Main agent transcript is at `{sessionId}/{sessionId}.jsonl`
+  - Simple check: if `transcript_path` contains `/subagents/`, allow Edit/Write
+  - Much more reliable than parsing transcript content for agent types
+
+### Changed
+- **Setup command creates hook scripts** - Step 7 now creates `.claude/hooks/` directory with shell scripts
+  - User projects get command-based hooks that don't rely on unsupported prompt evaluation
+  - Setup generates: `file-edit-auth.sh`, `session-start.sh`, `pre-compact.sh`
+  - All scripts are made executable automatically
+
+### Why This Matters
+The Claude Code documentation explicitly states that prompt-based hooks are "only officially supported for Stop and SubagentStop". Using prompt-based hooks for PreToolUse, SessionStart, and PreCompact may work but is not guaranteed. This version ensures all hooks use officially supported configurations.
+
+### Migration
+Run `/sdlc:setup` in existing projects. The setup will:
+1. Create `.claude/hooks/` directory with new shell scripts
+2. Update `.claude/settings.json` to reference the shell scripts
+3. Maintain Stop and SubagentStop as prompt-based (supported)
+
 ## [3.12.2] - 2026-01-16
 
 ### Fixed

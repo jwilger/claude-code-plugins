@@ -28,7 +28,22 @@ claude plugin validate bootstrap
 3. **Check return formats** for all hook types (Stop, SubagentStop, PreToolUse, etc.)
 4. **Use the claude-code-guide agent** to fetch current documentation when uncertain
 
-Example: SubagentStop hooks require `{"decision": "allow"|"block", "reason": "..."}`, NOT `{"ok": true}`. This type of schema mistake can cause silent failures or validation errors.
+**Hook format by type:**
+- **Prompt-based hooks** (Stop, SubagentStop only): Use `{"ok": true}` or `{"ok": false, "reason": "..."}`
+- **Command-based hooks** (PreToolUse, SessionStart, etc.): Use `{"decision": "block", "reason": "..."}` or tool-specific `hookSpecificOutput`
+
+**PreToolUse command hooks** must return:
+```json
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "allow" | "deny" | "ask",
+    "permissionDecisionReason": "string"
+  }
+}
+```
+
+**IMPORTANT**: Prompt-based hooks (`type: "prompt"`) are only officially supported for `Stop` and `SubagentStop`. Other hook types (PreToolUse, SessionStart, etc.) must use `type: "command"` with shell scripts.
 
 Official docs: https://code.claude.com/docs
 
