@@ -2,7 +2,15 @@
 #
 # file-edit-auth.sh - PreToolUse hook for Edit/Write authorization
 #
-# Simple subagent detection: if transcript_path contains "/subagents/",
+# STATUS: DISABLED (not registered in hooks.json)
+# REASON: Claude Code doesn't provide subagent context to hooks.
+#         The transcript_path is identical for main orchestrator and subagents,
+#         so there's no reliable way to detect if Edit/Write is being called
+#         from a subagent vs the main orchestrator.
+# FUTURE: Re-enable when Claude Code adds a field like `is_subagent` or
+#         `parent_context` to hook inputs.
+#
+# Original design: if transcript_path contains "/subagents/",
 # we're in a subagent context and file operations are allowed.
 # Otherwise, we're the main orchestrator and must delegate.
 

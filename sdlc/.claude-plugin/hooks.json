@@ -19,24 +19,6 @@
           "command": ".claude-plugin/hooks/gh-api-check.sh"
         }
       ]
-    },
-    {
-      "matcher": "Edit(*)",
-      "hooks": [
-        {
-          "type": "command",
-          "command": ".claude-plugin/hooks/file-edit-auth.sh"
-        }
-      ]
-    },
-    {
-      "matcher": "Write(*)",
-      "hooks": [
-        {
-          "type": "command",
-          "command": ".claude-plugin/hooks/file-edit-auth.sh"
-        }
-      ]
     }
   ],
   "SubagentStop": [
