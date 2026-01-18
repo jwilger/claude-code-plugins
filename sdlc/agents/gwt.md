@@ -91,6 +91,75 @@ Each slice document contains its own GWT scenarios in a `## GWT Scenarios` secti
 
 When a story issue is created later, the GWT scenarios from the event model become its acceptance criteria. There is no separate "acceptance criteria" step - the scenarios define success.
 
+## CRITICAL: Business Rules vs Data Validation
+
+**This distinction is fundamental.** GWT scenarios test BUSINESS RULES, not data validation. Getting this wrong wastes effort on scenarios that belong in the type system.
+
+### Business Rules (GWT Territory) ✅
+
+Business rules are **domain policies that depend on system state or business decisions**:
+
+- **State-dependent**: The rule depends on what has already happened
+  - "Cannot archive a task that is already archived"
+  - "Cannot move an archived task to a new position"
+  - "Cannot withdraw more than current balance"
+  - "Cannot add items to a completed order"
+
+- **Business decisions**: The rule reflects a policy choice
+  - "Maximum 100 items per order"
+  - "Users can only have 3 active projects"
+  - "Transfers over $10,000 require approval"
+
+- **Produces meaningful errors users care about**: The error message has business meaning
+  - "Insufficient funds" - user understands and can act
+  - "Task already archived" - user understands the state conflict
+
+- **Could legitimately differ in another business**: Another company might have different rules
+
+### Data Validation (Type System Territory) ❌
+
+Data validation is **format/structure checking that should be impossible via types**:
+
+- **Structural/syntactic concerns**:
+  - "Email must contain @" → Use `Email` type
+  - "String must not be empty" → Use `NonEmptyString` type
+  - "Amount must be positive" → Use `PositiveAmount` type
+  - "Whitespace must be trimmed" → Parse on construction
+
+- **Parse-don't-validate principle**: Invalid data should be unrepresentable
+  - If a field can't be empty, the TYPE should prevent empty values
+  - The system should never see invalid data - it's rejected at the boundary
+
+- **NEVER a GWT scenario**: If valid types are used, these states are impossible
+
+### Examples
+
+| Scenario | Business Rule or Data Validation? | GWT? |
+|----------|-----------------------------------|------|
+| "Cannot move archived task" | Business rule (state-dependent) | ✅ Yes |
+| "Cannot withdraw more than balance" | Business rule (state-dependent) | ✅ Yes |
+| "Max 100 items per order" | Business rule (policy) | ✅ Yes |
+| "Task title cannot be empty" | Data validation (structural) | ❌ No - use NonEmptyString |
+| "Email must be valid format" | Data validation (syntactic) | ❌ No - use Email type |
+| "Amount must be positive" | Data validation (structural) | ❌ No - use PositiveAmount |
+| "Whitespace should be trimmed" | Data validation (parse concern) | ❌ No - trim on construction |
+
+### The Test
+
+Before writing an error scenario, ask:
+
+1. **Does this error depend on existing system state?** (what events have occurred)
+   - Yes → Business rule → GWT scenario
+   - No → Probably data validation → Type system
+
+2. **Would a different business potentially have different rules here?**
+   - Yes → Business rule → GWT scenario
+   - No (it's universal like "email needs @") → Data validation → Type system
+
+3. **Can the type system make this invalid state unrepresentable?**
+   - Yes → Data validation → Type system handles it
+   - No (depends on runtime state) → Business rule → GWT scenario
+
 ## CRITICAL: Two Types of GWT Scenarios
 
 GWT scenarios have **fundamentally different structures** depending on whether the slice is a Command (State Change) or a View (Projection). Getting this wrong invalidates the entire scenario.
@@ -232,14 +301,21 @@ For Automation pattern slices:
 - LowBalanceAlertSent { accountId: "ACC-001", currentBalance: 40.00, threshold: 50.00, notifiedAt: "2024-01-15T10:31:00Z" }
 ```
 
-### 6. Ask About Edge Cases
+### 6. Ask About Edge Cases (Business Rules Only)
 
-**Do NOT assume edge cases.** Ask the domain expert:
-- "What if the preconditions aren't met?"
-- "What if the input is invalid?"
+**Do NOT assume edge cases.** Ask the domain expert about **business rules**:
+- "What existing system state would make this command invalid?"
 - "What business rules might prevent this action?"
-- "What are the boundary conditions?"
-- "What happens at the edges (zero, max, empty)?"
+- "What are the state-dependent boundary conditions?"
+- "What happens when entities are in different lifecycle states?" (active, archived, completed, etc.)
+
+**Do NOT ask about format validation.** Assume the type system handles:
+- Empty strings, whitespace trimming
+- Invalid email formats, malformed URLs
+- Negative amounts, zero values where prohibited
+- Any structural/syntactic validation
+
+Focus on **state-dependent rules**: "Given these prior events, can this command succeed?"
 
 **Note:** If you find incomplete event models (missing fields, unclear events, etc.), note them in your output. The `sdlc:model-checker` agent validates event models after GWT scenarios are complete.
 
@@ -358,6 +434,8 @@ Before completing, verify each scenario:
 - [ ] When contains exactly ONE command (with all inputs)
 - [ ] Then contains EITHER events produced OR an error message (never both)
 - [ ] Error scenarios produce NO events
+- [ ] **Error cases test BUSINESS RULES** (state-dependent), not data validation (format-dependent)
+- [ ] **No format validation scenarios** - if the error is about empty/invalid format, it belongs in the type system
 
 ### For Projection scenarios:
 - [ ] Given contains the COMPLETE projection state before processing
@@ -374,6 +452,7 @@ Scenarios focus on **business behavior**, NOT:
 - Technical implementation details
 - Performance requirements
 - Infrastructure concerns
+- **Data format validation** (empty strings, email formats, whitespace, etc.) - these are type system concerns. If a value can be invalid, create a domain type that makes invalid values unrepresentable. See "CRITICAL: Business Rules vs Data Validation" above.
 
 If a scenario naturally leads to technical discussion, redirect: "That's an implementation detail - we'll address it during architecture design."
 
