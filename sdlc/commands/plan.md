@@ -124,7 +124,14 @@ gh issue list --label "event-model,<workflow-name>,<slice-name>" --json number  
 
 For each slice, read the document and create:
 
+> **CRITICAL: Sub-issues require TWO commands**
+>
+> GitHub has no `--parent` flag for `gh issue create`. You must:
+> 1. Create the issue with `gh issue create`
+> 2. Link it using `gh issue-ext sub add <epic> <story>`
+
 ```bash
+# Step 1: Create the story issue
 gh issue create \
   --title "<Slice Name>" \
   --label "event-model,<workflow-name>,<pattern-type>" \
@@ -150,7 +157,7 @@ Generated from: docs/event_model/workflows/<workflow>/slices/<slice>.md
 EOF
 )"
 
-# Link as sub-issue
+# Step 2: Link as sub-issue (REQUIRED - there is no --parent flag!)
 gh issue-ext sub add <epic-number> <story-number>
 ```
 

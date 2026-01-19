@@ -66,9 +66,15 @@ Commands are namespaced automatically: `/<plugin-name>:<command-filename>`
 
 ## Version Management
 
-**Critical**: When modifying any plugin, update versions in BOTH locations:
+**Critical**: When modifying any plugin, update versions in ALL THREE locations:
 1. Plugin manifest: `<plugin>/.claude-plugin/plugin.json`
 2. Marketplace entry: `.claude-plugin/marketplace.json`
+3. **For sdlc plugin**: `sdlc/commands/setup.md` (hardcoded version strings throughout)
+
+The sdlc setup command contains hardcoded version numbers used for update detection. Search for the old version and replace all instances:
+```bash
+grep -n "3.12.6" sdlc/commands/setup.md  # Find all version references
+```
 
 Compare against `origin/main` to determine appropriate semver bump. The plugin cache uses version numbers to detect updates - unchanged versions won't refresh the cache.
 

@@ -21,6 +21,24 @@ The SDLC workflow depends on three GitHub CLI extensions. **Always prefer these 
 | `gh-project-ext` | Project board management | `gh project-ext ready`, `gh project-ext move` |
 | `gh-pr-review` | PR review thread handling | `gh pr-review review view`, `gh pr-review comments reply` |
 
+## Sub-Issue Creation (CRITICAL - Two Steps Required)
+
+GitHub does NOT support creating sub-issues in a single command. You MUST:
+
+1. **Create the issue first**:
+   ```bash
+   gh issue create --title "Child Issue" --label "..." --body "..."
+   # Returns: https://github.com/owner/repo/issues/42
+   ```
+
+2. **Then link as sub-issue**:
+   ```bash
+   gh issue-ext sub add <parent-number> <child-number>
+   # Example: gh issue-ext sub add 10 42
+   ```
+
+**DO NOT** attempt to use `--parent`, `--sub-issue`, or similar flags on `gh issue create` - they do not exist.
+
 ## `gh api` Is a LAST RESORT
 
 **NEVER use `gh api` without first exhausting alternatives.**

@@ -47,6 +47,22 @@ Advanced GitHub issue management for sub-issues, blocking relationships, and lin
 | `branch list <issue>` | List linked branches | `gh issue-ext branch list 42` |
 | `show <issue>` | Display all relationships | `gh issue-ext show 10` |
 
+### Sub-Issue Creation Workflow
+
+**Important**: The `sub add` command links an EXISTING issue as a sub-issue. You cannot create a sub-issue directly.
+
+**Correct workflow**:
+```bash
+# Step 1: Create the child issue
+gh issue create --title "Feature: Login Form" --body "..." --label "feature"
+# Output: https://github.com/owner/repo/issues/42
+
+# Step 2: Link to parent
+gh issue-ext sub add 10 42  # Make #42 a sub-issue of #10
+```
+
+**Common mistake**: Trying to use `--parent` or `--sub-issue` flags on `gh issue create`. These flags do not exist.
+
 ### Use Cases in SDLC
 
 - **`/sdlc:work`**: Lists sub-issues of In Progress items with `sub list`
