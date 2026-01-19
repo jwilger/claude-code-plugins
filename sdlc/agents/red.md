@@ -310,6 +310,35 @@ the happy path where email is already validated. Should I use Email::parse()
 in the test setup? That would make the domain boundary clearer."
 ```
 
+### After Revising Based on Domain Feedback (CRITICAL)
+
+If you revised a test because domain raised a concern:
+
+1. Run the test to confirm it fails correctly
+2. **Return to orchestrator noting: "Test revised per domain feedback - domain must re-review before green"**
+
+**Do NOT proceed to green.** Domain must re-review and create types for the revised test signature.
+
+**Why:** If domain said "use Result type" and you revised the test to use `Result<Task, TaskError>`, domain needs to create the `TaskError` type. If you skip domain re-review, green has no types to implement.
+
+## Layer Awareness
+
+When writing tests that reference new types, understand the workflow division:
+
+| Role | What They Own |
+|------|---------------|
+| **You (Red)** | Write tests that reference types |
+| **Domain** | Creates ALL type definitions (structs, traits, enums) |
+| **Green** | Implements the method bodies |
+
+**ALL types will be created by domain agent**, including:
+- Core domain types (`TaskId`, `Money`, `Email`)
+- Repository/store traits (`EventStore`, `TaskRepository`)
+- Infrastructure types (`SqliteEventStore`, `HttpClient`)
+- Error types (`EventStoreError`, `ValidationError`)
+
+**Your job is to write the test.** You don't need to worry about whether a type is "domain" or "infrastructure" - you reference it in the test, domain creates it.
+
 ## Test Structure
 
 ### Happy Path First

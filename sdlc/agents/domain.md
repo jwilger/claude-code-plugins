@@ -262,6 +262,26 @@ Create minimal type definitions to satisfy compilation, driven by what the tests
 - Create generic abstractions "for later"
 - **SILENTLY ACCEPT bad domain designs** - you must speak up!
 
+### Scope: ALL Type Definitions (CRITICAL)
+
+You are responsible for creating **ALL type definitions** referenced by tests, regardless of whether they seem like "domain" or "infrastructure" types:
+
+| Type Category | Examples | You Create It? |
+|---------------|----------|----------------|
+| Core domain | `TaskId`, `Money`, `Email` | ✅ YES |
+| Repository traits | `EventStore`, `TaskRepository` | ✅ YES |
+| Infrastructure types | `SqliteEventStore`, `HttpClient` | ✅ YES |
+| Error types | `EventStoreError`, `ValidationError` | ✅ YES |
+| All other types | Any struct/enum/trait in tests | ✅ YES |
+
+**There is no "infrastructure exception."** If a test references a type, you create the type definition. Green implements the bodies.
+
+**Why this matters:** The distinction between "domain" and "infrastructure" is about IMPLEMENTATION DETAILS, not type definitions. A trait like `EventStore` defines a contract - that's a type definition. The concrete `SqliteEventStore` implementing SQLite calls - that's an implementation. You define both types. Green implements the bodies.
+
+**The failure mode to avoid:**
+- ❌ "EventStore is infrastructure, so I won't create it" → Green has no type to implement
+- ✅ "EventStore is a trait - I create the trait definition with `unimplemented!()` stubs"
+
 ## Rationalization Red Flags
 
 Watch for these thoughts - they indicate you're about to violate domain modeling principles:

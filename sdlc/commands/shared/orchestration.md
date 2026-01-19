@@ -30,6 +30,33 @@ The main conversation is an **orchestrator only**. It coordinates work but never
 
 The ONLY time ADRs should be consulted is when someone is actively considering changing an architectural decision and needs to understand why the original decision was made.
 
+## Git Operation Protocol (MANDATORY)
+
+Before ANY git operation (commit, branch, rebase, merge, push), check if git-spice manages this project.
+
+### Detection
+
+```bash
+# Check if git-spice is installed AND current branch is managed
+command -v gs >/dev/null 2>&1 && gs branch checkout 2>/dev/null && echo "GS_MANAGED" || echo "REGULAR_GIT"
+```
+
+### Protocol
+
+1. **If GS_MANAGED**: Load `sdlc:shared/git-spice` skill and follow its decision tree
+2. **If REGULAR_GIT**: Use standard git commands
+
+### Critical Git-Spice Operations
+
+When using git-spice:
+- **After PR merges**: Run `gs repo sync`, then IMMEDIATELY verify (see git-spice.md Post-Sync Verification)
+- **View stack status**: Use `gs log short` (NOT bare `gs stack` - that doesn't exist)
+- **If sync goes wrong**: Use `gs upstack onto <correct-base>` to recover
+
+### Why This Matters
+
+Git-spice manages branch relationships. Using regular git commands (like `git rebase`) on gs-managed branches can corrupt the stack state, leading to lost work or branches moved to wrong bases.
+
 ## File Operations (MANDATORY DELEGATION)
 
 The main conversation **MUST NEVER** use Write or Edit tools directly. All file modifications go through specialized agents.
@@ -78,6 +105,37 @@ When the user requests a change, classify it:
 Domain review happens TWICE per cycle:
 1. **After Red**: Review test implications, create types, evaluate domain alignment
 2. **After Green**: Review implementation for domain integrity violations
+
+### CRITICAL: The Red → Domain Feedback Loop
+
+When domain raises a concern that causes red to revise the test, **domain MUST re-review after the revision**:
+
+```
+Red writes test → Domain reviews → Domain raises concern
+                                         ↓
+                              Red revises test
+                                         ↓
+                              Domain MUST re-review ← MANDATORY
+                                         ↓
+                              Domain creates types
+                                         ↓
+                              Green implements
+```
+
+**THE RULE:** After red revises a test based on domain feedback, domain MUST be invoked again BEFORE green.
+
+**Why this matters:**
+- Domain's first pass identifies issues with the test design
+- Red revises to address those issues (new test signature, different types needed)
+- Domain's SECOND pass creates the types for the REVISED test
+- **Without the second pass, types don't exist and green is blocked**
+
+**The failure mode:** If you skip domain re-review after red revises:
+1. Red writes test with `fn new(name: String) -> Task`
+2. Domain says: "Use Result for fallible construction"
+3. Red revises to `fn new(name: String) -> Result<Task, TaskError>`
+4. ❌ WRONG: Go to green → green has no `TaskError` type
+5. ✅ RIGHT: Re-invoke domain → domain creates `TaskError` → green implements
 
 ### Domain Review is MANDATORY (NO EXCEPTIONS)
 

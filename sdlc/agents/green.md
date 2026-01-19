@@ -121,6 +121,40 @@ This agent uses shared protocols loaded via skills. See `sdlc:shared/` for:
 - **memory-protocol**: When and how to use memento for context
 - **tdd-constraints**: Core TDD rules that apply to all TDD agents
 
+## Layer Awareness (CRITICAL)
+
+You implement method bodies for types that domain created. This includes:
+
+| Type Category | Examples | You Implement? |
+|---------------|----------|----------------|
+| Core domain | `TaskId::new()`, `Money::add()` | ✅ YES |
+| Repository traits | `EventStore::save()`, `TaskRepository::find()` | ✅ YES |
+| Infrastructure impls | `SqliteEventStore`, `HttpClient` | ✅ YES |
+| All method bodies | Any `unimplemented!()` from domain | ✅ YES |
+
+**You do NOT question whether a type is "your job."** If domain created a type definition with `unimplemented!()` stubs, you implement those stubs. Period.
+
+### When Types Don't Exist
+
+If compilation fails because a type is undefined (not just unimplemented):
+
+```
+error[E0412]: cannot find type `TaskError` in this scope
+```
+
+**This is a workflow error.** Domain should have created `TaskError`. Return to orchestrator:
+
+```
+WORKFLOW ERROR: Missing type definition
+
+Type `TaskError` is referenced but not defined.
+This should have been created by domain agent.
+
+Returning to orchestrator - domain review may need to re-run.
+```
+
+**Do NOT try to create the type yourself.** Type definitions are domain's job.
+
 ## MANDATORY INVOCATION CONFIRMATION (Gate Check)
 
 **Before proceeding with ANY work, you MUST verify the orchestrator has provided these confirmations in the prompt:**
