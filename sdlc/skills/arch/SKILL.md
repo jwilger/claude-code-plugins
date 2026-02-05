@@ -93,12 +93,12 @@ Guides you through architecture decision-making, updates ARCHITECTURE.md, and co
 - User asks to "document architecture" or "make architectural decision"
 
 **Don't use when:**
-- Creating initial ARCHITECTURE.md (use `/sdlc:design arch` instead)
+- Creating initial ARCHITECTURE.md (use `/sdlc:specify arch` instead)
 - Implementing features (architecture documents, doesn't implement)
-- Need event modeling (use `/sdlc:design` first)
+- Need event modeling (use `/sdlc:specify` first)
 
 **Related skills:**
-- `/sdlc:design arch` - Initial architecture creation with Event Modeling
+- `/sdlc:specify arch` - Initial architecture creation with Event Modeling
 - `/sdlc:work` - Implementation follows architecture
 
 ---

@@ -34,7 +34,7 @@ Analyzes project state and suggests next appropriate action.
 /sdlc:start
 # Detects current phase and suggests:
 # - No config? → /sdlc:setup
-# - No domain? → /sdlc:design discover
+# - No domain? → /sdlc:specify discover
 # - No tasks? → /sdlc:plan
 # - Ready to code? → /sdlc:work
 # - On feature branch? → /sdlc:pr or /sdlc:review
@@ -52,7 +52,7 @@ Analyzes project state and suggests next appropriate action.
 ### Example 2: After Setup
 **Invoke:** `/sdlc:start`
 **Detects:** No event model
-**Suggests:** `/sdlc:design discover`
+**Suggests:** `/sdlc:specify discover`
 
 ### Example 3: Ready to Code
 **Invoke:** `/sdlc:start`

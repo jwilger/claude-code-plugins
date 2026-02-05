@@ -5,7 +5,7 @@ graph TB
     setup[First Time?<br/>/sdlc:setup]:::planning
 
     %% Planning phase
-    design{Event Modeling<br/>/sdlc:design}:::planning
+    design{Event Modeling<br/>/sdlc:specify}:::planning
     arch[Architecture<br/>/sdlc:arch]:::planning
     plan[Create Tasks<br/>/sdlc:plan]:::planning
 

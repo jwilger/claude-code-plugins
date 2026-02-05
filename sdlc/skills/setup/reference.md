@@ -44,9 +44,9 @@ mode: unconfigured  # Will be set in Stage 2
 - Multiple bounded contexts
 
 **Workflow:**
-1. Domain Discovery (`/sdlc:design discover`)
-2. Workflow Design (`/sdlc:design workflow`)
-3. GWT Scenarios (`/sdlc:design gwt`)
+1. Domain Discovery (`/sdlc:specify discover`)
+2. Workflow Design (`/sdlc:specify workflow`)
+3. GWT Scenarios (`/sdlc:specify gwt`)
 4. Create Tasks (`/sdlc:plan`)
 5. TDD Implementation (`/sdlc:work`)
 6. PR with Review (`/sdlc:pr`)

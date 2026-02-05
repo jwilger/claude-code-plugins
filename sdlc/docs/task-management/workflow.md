@@ -75,16 +75,16 @@ The orchestrator creates TDD cycle tasks on-demand (when you start implementing)
 
 ```bash
 # 1. Domain Discovery
-/sdlc:design discover
+/sdlc:specify discover
 
 # 2. Design Workflow
-/sdlc:design workflow "User Registration"
+/sdlc:specify workflow "User Registration"
 
 # 3. Generate GWT Scenarios
-/sdlc:design gwt "User Registration"
+/sdlc:specify gwt "User Registration"
 
 # 4. Architecture Decisions
-/sdlc:design arch
+/sdlc:specify arch
 
 # 5. Create Tasks from Slices
 /sdlc:plan

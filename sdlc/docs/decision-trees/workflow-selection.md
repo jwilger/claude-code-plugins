@@ -10,7 +10,7 @@ Do you have a detailed design?
 
 Do you understand the domain well?
 - **YES** → `/sdlc:arch` (document architecture decisions, then work)
-- **NO** → `/sdlc:design discover` (Event Modeling facilitation)
+- **NO** → `/sdlc:specify discover` (Event Modeling facilitation)
 
 ## "I want to continue working"
 
@@ -27,7 +27,7 @@ Do you have PR feedback to address?
 - `/sdlc:recall [search-term]` - Search memory for context
 - Read `docs/ARCHITECTURE.md` - System overview
 - Read `docs/event_model/` - Domain models
-- `/sdlc:design validate` - Check event model consistency
+- `/sdlc:specify validate` - Check event model consistency
 
 ## "I'm stuck on a test/implementation"
 

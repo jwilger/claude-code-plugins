@@ -94,7 +94,7 @@ All workflow functionality provided by 11 skills (invocable as `/sdlc:skill-name
 | `/sdlc:pr` | Create pull request with review gates | After feature complete |
 | `/sdlc:complete` | Complete task after PR merge | After PR merges |
 | `/sdlc:review` | Handle PR review feedback | Review cycle |
-| `/sdlc:design` | Event Modeling facilitation | Design phase |
+| `/sdlc:specify` | Event Modeling facilitation | Design phase |
 | `/sdlc:arch` | Architecture change workflow (portable) | Document architecture decisions |
 | `/sdlc:plan` | Create tasks from event model slices | After design |
 | `/sdlc:start` | Auto-detect phase and route | Entry point |
@@ -407,7 +407,7 @@ impl User {
 
 ```bash
 # 1. Start design session
-/sdlc:design
+/sdlc:specify
 
 # 2. Discovery phase
 # Agent interviews you about domain:

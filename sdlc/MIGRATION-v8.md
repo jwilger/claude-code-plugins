@@ -132,7 +132,7 @@ Ensure it:
 
 If ARCHITECTURE.md doesn't exist or is outdated:
 ```bash
-/sdlc:design arch
+/sdlc:specify arch
 ```
 
 ### Step 5: Test Architecture Change Workflow

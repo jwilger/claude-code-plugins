@@ -24,6 +24,7 @@
     ]
   },
   "enabledPlugins": {
-    "context7@claude-plugins-official": true
+    "context7@claude-plugins-official": true,
+    "plugin-dev@claude-plugins-official": true
   }
 }

@@ -18,7 +18,7 @@ All commands have been replaced by skills with equivalent functionality:
 | `/sdlc:pr` | `/sdlc:pr` | Unchanged |
 | `/sdlc:complete` | `/sdlc:complete` | Unchanged |
 | `/sdlc:review` | `/sdlc:review` | Unchanged |
-| `/sdlc:design` | `/sdlc:design` | Unchanged |
+| `/sdlc:specify` | `/sdlc:specify` | Unchanged |
 | `/sdlc:plan` | `/sdlc:plan` | Unchanged |
 | `/sdlc:adr` | `/sdlc:arch` | **CHANGED** (migrated in v8.0.0) |
 | `/sdlc:remember` | `/sdlc:remember` | Unchanged |

@@ -31,7 +31,7 @@ Create tasks from event model in under 5 minutes.
 Reads event model slices and creates GitHub issues with proper dependencies.
 
 ### Fastest Path
-1. Complete Event Modeling (`/sdlc:design`)
+1. Complete Event Modeling (`/sdlc:specify`)
 2. Run `/sdlc:plan`
 3. Creates issues for each slice
 4. Sets up dependency graph
@@ -80,12 +80,12 @@ Reads event model slices and creates GitHub issues with proper dependencies.
 - User asks to "create tasks" or "plan work"
 
 **Don't use when:**
-- No event model (run `/sdlc:design` first)
+- No event model (run `/sdlc:specify` first)
 - Tasks already exist
 - Not using Event Modeling (create issues manually)
 
 **Related:**
-- `/sdlc:design` - Create event model
+- `/sdlc:specify` - Create event model
 - `/sdlc:work` - Start implementation
 
 ---

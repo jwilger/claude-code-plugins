@@ -19,7 +19,7 @@ The diagram shows:
 - `/sdlc:setup` - First-time project configuration
 
 **Planning Phase:**
-- `/sdlc:design` - Event Modeling facilitation
+- `/sdlc:specify` - Event Modeling facilitation
 - `/sdlc:arch` - Architecture decision documentation
 - `/sdlc:plan` - Convert event model to GitHub issues
 

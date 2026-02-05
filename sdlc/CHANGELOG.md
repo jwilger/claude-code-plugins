@@ -183,7 +183,7 @@ Commands completely removed - all functionality migrated to skills.
 | `/sdlc:pr` | pr skill | ✓ Migrated |
 | `/sdlc:complete` | complete skill | ✓ Migrated |
 | `/sdlc:review` | review skill | ✓ Migrated |
-| `/sdlc:design` | design skill | ✓ Migrated |
+| `/sdlc:specify` | design skill | ✓ Migrated |
 | `/sdlc:plan` | plan skill | ✓ Migrated |
 | `/sdlc:adr` | arch skill | Already migrated in v8.0.0 |
 | `/sdlc:remember` | remember skill | ✓ Migrated |

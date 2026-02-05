@@ -1,9 +1,9 @@
 ---
-name: design
-version: 1.2.0
+name: specify
+version: 2.0.0
 author: jwilger
 repository: jwilger/claude-code-plugins
-description: Event Modeling facilitation with subcommands - discover (domain discovery), workflow (workflow design), gwt (Given-When-Then scenarios), and arch (architecture decisions). Auto-invokes when user mentions discovery, discover, design workflow, model domain, event modeling, or GWT scenarios.
+description: Domain specification with Event Modeling - discover (domain discovery), workflow (workflow design), gwt (Given-When-Then scenarios), and arch (architecture decisions). Auto-invokes when user mentions discovery, discover, specify, specification, model domain, event modeling, or GWT scenarios.
 tags:
   - event-modeling
   - domain-discovery
@@ -25,9 +25,9 @@ hooks:
             Output ONLY: {"ok": true}
 ---
 
-# Design Skill (Event Modeling)
+# Specify Skill (Domain Specification)
 
-**Version:** 1.2.0
+**Version:** 2.0.0
 **Portability:** Tool-specific
 
 ---
@@ -40,14 +40,14 @@ Start Event Modeling in under 5 minutes.
 Facilitates Event Modeling workflow: domain discovery → workflow design → GWT scenarios → architecture.
 
 ### Fastest Path
-1. Run `/sdlc:design discover` - Answer 5 domain questions
-2. Run `/sdlc:design workflow <name>` - Design one workflow
-3. Run `/sdlc:design gwt <workflow>` - Generate acceptance criteria
+1. Run `/sdlc:specify discover` - Answer 5 domain questions
+2. Run `/sdlc:specify workflow <name>` - Design one workflow
+3. Run `/sdlc:specify gwt <workflow>` - Generate acceptance criteria
 4. Ready to plan tasks
 
 ### Basic Example
 ```bash
-/sdlc:design discover
+/sdlc:specify discover
 # Answers 5 questions:
 # 1. What does the business do?
 # 2. Who are the actors?
@@ -57,11 +57,11 @@ Facilitates Event Modeling workflow: domain discovery → workflow design → GW
 #
 # Creates: docs/event_model/domain-overview.md
 
-/sdlc:design workflow user-registration
+/sdlc:specify workflow user-registration
 # Interactive 7-step workflow design
 # Creates: docs/event_model/workflows/user-registration/
 
-/sdlc:design gwt user-registration
+/sdlc:specify gwt user-registration
 # Generates Given-When-Then scenarios
 # Ready for: /sdlc:plan
 ```
@@ -82,7 +82,7 @@ Facilitates Event Modeling workflow: domain discovery → workflow design → GW
 
 ### Example 3: Validating Model
 **When:** Event model complete, verify consistency
-**Invoke:** `/sdlc:design validate`
+**Invoke:** `/sdlc:specify validate`
 **Result:** Checks information flow, GWT coverage
 
 ---
@@ -117,12 +117,12 @@ Claude automatically invokes this skill when you say:
 - "Event modeling"
 - "Model the workflows"
 
-You don't need to type the full `/sdlc:design` command - Claude will detect these requests and invoke the appropriate subcommand.
+You don't need to type the full `/sdlc:specify` command - Claude will detect these requests and invoke the appropriate subcommand.
 - "Create an event model"
 - "Generate GWT scenarios"
 - "Let's do Event Modeling"
 
-You don't need to type `/sdlc:design` explicitly - Claude will detect these requests and invoke the skill for you.
+You don't need to type `/sdlc:specify` explicitly - Claude will detect these requests and invoke the skill for you.
 
 ---
 
@@ -162,6 +162,7 @@ See SKILL-old.md for:
 ## Metadata
 
 **Version History:**
+- v2.0.0 (2026-02-05): **BREAKING** - Renamed from `/sdlc:design` to `/sdlc:specify` (clearer name - domain specification, not UI design)
 - v1.2.0 (2026-02-05): Fix auto-invocation - now triggers on "discovery"/"discover" (prevents sdlc:discovery error)
 - v1.1.0 (2026-02-05): Progressive disclosure, memory integration
 - v1.0.0: Initial extraction

@@ -157,7 +157,7 @@ github:
 | View hierarchy | `gh issue-ext sub list` | `dot tree <task-id>` |
 | Complete task | (auto via "Closes #123") | `/sdlc:complete` |
 
-**Unchanged:** `/sdlc:work`, `/sdlc:pr`, `/sdlc:review`, `/sdlc:design`, `/sdlc:plan`
+**Unchanged:** `/sdlc:work`, `/sdlc:pr`, `/sdlc:review`, `/sdlc:specify`, `/sdlc:plan`
 
 ---
 

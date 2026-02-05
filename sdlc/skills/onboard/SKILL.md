@@ -128,5 +128,5 @@ onboarding:
 
 After tutorial, explore:
 - TDD workflow: `/sdlc:work`
-- Event Modeling: `/sdlc:design`
+- Event Modeling: `/sdlc:specify`
 - Architecture: `/sdlc:arch`
