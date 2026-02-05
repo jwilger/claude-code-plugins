@@ -1,6 +1,7 @@
 ---
 name: status
-version: 1.0.0
+version: 1.1.0
+disable-model-invocation: true
 author: jwilger
 repository: jwilger/claude-code-plugins
 description: Show complete SDLC project state including config, branch, task, TDD cycle, and recent activity. Use when user asks "where am I?" or "what's the status?".
