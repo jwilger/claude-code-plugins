@@ -47,7 +47,7 @@
 - `git` - Version control
 
 **Optional:**
-- `git-spice` - Stacked PR workflow
+- git-spice (`gs` command) - Stacked PR workflow
 - Worktree support - Parallel work
 
 ## Configuration Dependencies

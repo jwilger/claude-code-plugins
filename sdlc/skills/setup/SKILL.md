@@ -1,6 +1,6 @@
 ---
 name: setup
-version: 2.0.0
+version: 2.0.1
 author: jwilger
 repository: jwilger/claude-code-plugins
 description: Interactive multi-stage SDLC configuration with progressive disclosure. Run this first before using any other skills.
@@ -342,7 +342,7 @@ Use AskUserQuestion with multiSelect for optional features:
       },
       {
         "label": "Stacked PRs with git-spice",
-        "description": "Break features into reviewable slices. Requires git-spice installed."
+        "description": "Break features into reviewable slices. Requires git-spice installed (CLI command: `gs`)."
       }
     ]
   }]
@@ -383,6 +383,23 @@ configured_at: "2026-02-05T10:00:00Z"
 configured_by: claude-sonnet-4-5
 ```
 
+#### 4.5. Tool Detection (Advanced Stage)
+
+When git-spice is selected in advanced options, verify installation:
+
+```bash
+# Check if gs command exists
+if command -v gs >/dev/null 2>&1; then
+  echo "✓ git-spice (gs) installed"
+else
+  echo "⚠️  git-spice not found"
+  echo "Installation: https://abhinav.github.io/git-spice/"
+  echo "Note: The CLI command is 'gs', not 'git-spice'"
+fi
+```
+
+**Important:** Check for the `gs` command, NOT `git-spice`.
+
 #### 5. Completion Message
 
 ```
@@ -413,6 +430,6 @@ For complete implementation details, configuration schema, and error handling:
 
 ## Metadata
 
-**Version:** 2.0.0 (2026-02-05): Interactive multi-stage wizard with progressive disclosure
+**Version:** 2.0.1 (2026-02-05): Fix git-spice command detection (use `gs` not `git-spice`)
 **Dependencies:** None
 **Portability:** Tool-specific (gh, git required)

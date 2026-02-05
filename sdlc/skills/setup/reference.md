@@ -127,7 +127,7 @@ git:
 - Break large features into reviewable slices
 - Each slice is a separate PR
 - Manage PR dependencies automatically
-- Requires: `git-spice` installed
+- Requires: git-spice installed (CLI command: `gs`)
 
 **Option 2: No (Single PR per feature)**
 - One PR per complete feature
@@ -166,7 +166,7 @@ output_style: sdlc-rules  # or sdlc-marvin
 1. `gh` extensions:
    - `gh-pr-review` (for PR review workflow)
 2. Optional: `dot` CLI (for task management)
-3. Optional: `git-spice` (if stacked PRs enabled)
+3. Optional: git-spice (check with `command -v gs`) (if stacked PRs enabled)
 
 **Platform-specific installation commands provided**
 
