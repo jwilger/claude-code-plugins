@@ -19,19 +19,19 @@ Review stories/slices from the business value perspective. Ensure they deliver r
 
 ## The Mapping (NON-NEGOTIABLE)
 
-| Event Model Concept | GitHub Issue Equivalent |
-|---------------------|-------------------------|
-| Vertical Slice | Story Issue (1:1) |
+| Event Model Concept | dot Task Equivalent |
+|---------------------|---------------------|
+| Vertical Slice | Story Task (1:1) |
 | GWT Scenarios | Acceptance Criteria |
-| Chapter/Theme | Epic (parent issue) |
+| Chapter/Theme | Epic (parent task) |
 
-**One vertical slice = One story issue.** No exceptions.
+**One vertical slice = One story task.** No exceptions.
 
 **CRITICAL DISTINCTION:**
-- 1 Vertical Slice = 1 Story Issue (NOT 1 workflow = 1 story)
+- 1 Vertical Slice = 1 Story Task (NOT 1 workflow = 1 story)
 - A workflow may contain multiple vertical slices
 - Each slice delivers independent, deployable user value
-- If a workflow has 5 slices, you create 5 story issues
+- If a workflow has 5 slices, you create 5 story tasks
 
 ## Review Criteria
 

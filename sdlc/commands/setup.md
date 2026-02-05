@@ -61,11 +61,11 @@ If `.claude/sdlc.yaml` exists, read it and check the version:
 grep "^sdlc_version:" .claude/sdlc.yaml || echo "sdlc_version: unknown"
 ```
 
-The current plugin version is **4.0.0**. Compare what you found in the config:
+The current plugin version is **5.0.0**. Compare what you found in the config:
 
-**If the config shows `sdlc_version: "4.0.0"` (versions match):**
+**If the config shows `sdlc_version: "5.0.0"` (versions match):**
 ```
-SDLC is already configured and up to date (v4.0.0).
+SDLC is already configured and up to date (v5.0.0).
 
 No action needed. Use:
 - /sdlc:start - Begin or continue work
@@ -82,7 +82,7 @@ Show update prompt:
 📦 SDLC UPDATE AVAILABLE
 
 Current version: <version from config or "unknown">
-Latest version: 4.0.0
+Latest version: 5.0.0
 
 Updates may include:
 - Fixed hooks configuration (hooks now properly integrated into settings.json)
@@ -132,7 +132,7 @@ Parse and preserve:
 3. Ask ONLY new questions added in versions newer than the user's current version
 4. Regenerate `.claude/settings.json` with hooks embedded and new templates
 5. Remove legacy `.claude/hooks.json` file if it exists (hooks are now in settings.json)
-6. Update `sdlc_version` in `.claude/sdlc.yaml` to **4.0.0**
+6. Update `sdlc_version` in `.claude/sdlc.yaml` to **5.0.0**
 7. Show a summary of what was updated
 
 ### 1. Check Prerequisites
@@ -292,27 +292,38 @@ For required_status_checks, if the user has CI configured, ask about specific ch
 gh run list --limit 5 --json name,conclusion 2>/dev/null
 ```
 
-### 4. Check/Install GitHub CLI Extensions
+### 4. Check/Install Required Tools
 
-Check and install each required extension:
+#### dot CLI
+
+Check if dot is installed:
 
 ```bash
-# gh-issue-ext for sub-issues, blocking, linked branches
-gh extension list | grep -q "gh-issue-ext" || gh extension install jwilger/gh-issue-ext
+command -v dot || echo "NOT_INSTALLED"
+```
 
-# gh-project-ext for project board management
-gh extension list | grep -q "gh-project-ext" || gh extension install jwilger/gh-project-ext
+If not installed, direct user to install from https://github.com/ajeetdsouza/dot
 
+After installation, verify version (minimum 0.6.4 required):
+```bash
+dot --version
+```
+
+#### GitHub CLI Extension
+
+Check and install required extension:
+
+```bash
 # gh-pr-review for PR review comment handling (reply, resolve threads)
 gh extension list | grep -q "gh-pr-review" || gh extension install agynio/gh-pr-review
 ```
 
-If extensions are already installed, offer to upgrade:
+If extension is already installed, offer to upgrade:
 ```bash
-gh extension upgrade jwilger/gh-issue-ext
-gh extension upgrade jwilger/gh-project-ext
 gh extension upgrade agynio/gh-pr-review
 ```
+
+**Note**: Previous versions used `gh-issue-ext` and `gh-project-ext` for GitHub Issues/Projects integration. These are no longer needed as v5.0.0 uses `dot` CLI for local task management.
 
 ### 5. Interactive Configuration
 
@@ -339,87 +350,37 @@ Then ask (only show git-spice option if installed):
 
 **Note**: Worktrees are especially useful for event-modeled projects where vertical slices are designed to be independent. With worktrees, you can run `/sdlc:work` multiple times to start parallel work on different slices, each in its own isolated workspace.
 
-**Question 3: GitHub Project**
-- Link to existing project (ask for project number/URL)
-- Create new project
-- No project board
+**Question 3: dot Task Management Setup**
 
-#### If "Create new project" is selected:
-
-**Question 3a: Copy from existing project?**
-- Copy from existing project (preserves fields, views, and statuses)
-- Create blank project
-
-##### If copying from existing project:
-
-List available projects for the user to choose from. Fetch projects from:
-
-1. User's own projects:
-```bash
-gh project list --owner "@me" --format json
-```
-
-2. Organizations the user belongs to:
-```bash
-# Get user's organizations
-gh api user/orgs --jq '.[].login' | while read org; do
-  gh project list --owner "$org" --format json 2>/dev/null
-done
-```
-
-Present the projects as options using AskUserQuestion, grouped by owner:
-
-**Question: Select project to copy from**
-Options should show: "owner/project-title (#number)"
-
-After selection, get the project title:
-
-**Question: Title for new project?**
-Default to: "[Repository Name] Board"
-
-Create the project copy:
-```bash
-gh project copy <source-number> \
-  --source-owner <source-owner> \
-  --target-owner "@me" \
-  --title "<new-title>" \
-  --drafts
-```
-
-The `--drafts` flag includes any draft issues from the source project.
-
-**Note**: The copied project inherits:
-- Status field with all options (Backlog, Ready, In Progress, etc.)
-- Priority field if present
-- Custom fields
-- Views and layouts
-
-##### If creating blank project:
+Initialize dot for this project:
 
 ```bash
-gh project create --owner "@me" --title "<repository-name> Board"
+# Check if .dots/ already exists
+test -d .dots && echo "ALREADY_INITIALIZED" || echo "NEEDS_INIT"
 ```
 
-Then inform user they need to manually configure:
-- Status field with values: Backlog, Ready, In Progress, Review, Done
-- Priority field with values: P0, P1, P2 (optional)
+If NEEDS_INIT, prompt for task prefix:
 
-##### Link Project to Repository (REQUIRED after create or copy)
+**Question 3a: Task prefix for this project?**
 
-After creating or copying a project, you MUST link it to the repository. Projects are not automatically associated with repositories.
+Default to repository name:
+```bash
+basename "$(pwd)"
+```
 
-Get the new project's number from the output of the create/copy command, then link it:
+Explain: The prefix will be used in task IDs (e.g., `myproject-add-login-abc123`). It should be short (1-2 words), lowercase with no spaces.
+
+Initialize dot with the chosen prefix:
 
 ```bash
-gh project link <project-number> --owner "@me"
+# Initialize .dots directory
+dot init
+
+# Configure the prefix in .dots/config
+# The dot CLI should handle this through interactive prompts or config file
 ```
 
-When run from within the repository directory, this automatically links to the current repository.
-
-This linking is essential for:
-- The "Auto-add to project" workflow to see this repository as an option
-- Issues from this repository to be addable to the project
-- The project to appear in the repository's "Projects" tab
+**Note on GitHub Integration**: Previous versions (v4.x) used GitHub Issues and Projects for task management. Version 5.0.0 uses local `dot` CLI for faster, offline-capable task management. GitHub integration is now limited to pull requests and code review only.
 
 **Question 4: TDD Verbosity**
 - Silent (just use agents, no explanation)
@@ -519,26 +480,23 @@ Create `.claude/sdlc.yaml` with the gathered settings:
 # Generated by /sdlc:setup
 
 # Plugin version that generated this config (used for update detection)
-sdlc_version: "4.0.0"
+sdlc_version: "5.0.0"
 
 mode: event-modeling  # or: traditional
+
+# Task management (dot CLI)
+tasks:
+  prefix: myproject  # Task ID prefix (e.g., myproject-add-login-abc123)
 
 git:
   workflow: git-spice  # or: standard
   worktrees: true      # Enable isolated worktrees for parallel development
   require_clean: true
 
+# GitHub configuration (PR/review only, not task management)
 github:
-  project: 11  # project number, or null if not using projects
-  owner: jwilger  # project owner
-
-board:
-  statuses:
-    - Backlog
-    - Ready
-    - In Progress
-    - Review
-    - Done
+  owner: jwilger      # Repository owner (for PR creation)
+  repository: myrepo  # Repository name
 
 # Language-specific patterns for TDD enforcement
 # These determine how the TDD hooks classify files
@@ -949,18 +907,18 @@ This configuration was created by running \`/sdlc:setup\`."
 
 # If this is an UPDATE (EXISTS path from Step 0):
 # If PR workflow is enabled:
-git checkout -b sdlc-update-v4.0.0
-git commit -m "chore: update SDLC configuration to v4.0.0
+git checkout -b sdlc-update-v5.0.0
+git commit -m "chore: update SDLC configuration to v5.0.0
 
-- Update .claude/sdlc.yaml (v<old> → v4.0.0)
+- Update .claude/sdlc.yaml (v<old> → v5.0.0)
 - Add .claude/hooks/ with command-based hook scripts (CRITICAL FIX)
 - Update hooks in .claude/settings.json to use command-based scripts
 - Remove legacy .claude/hooks.json file
 - <List any new features or changes in this version>"
-git push -u origin sdlc-update-v4.0.0
-gh pr create --title "chore: update SDLC configuration to v4.0.0" --body "## Summary
+git push -u origin sdlc-update-v5.0.0
+gh pr create --title "chore: update SDLC configuration to v5.0.0" --body "## Summary
 
-This PR updates the SDLC workflow configuration from v<old> to v4.0.0.
+This PR updates the SDLC workflow configuration from v<old> to v5.0.0.
 
 ### Changes
 - Updated \`.claude/sdlc.yaml\` version field
@@ -992,7 +950,7 @@ Show summary of what was configured and next steps. Include all relevant section
 **For fresh install (NEW_INSTALL path):**
 
 ```
-✅ SDLC initialized successfully! (v4.0.0)
+✅ SDLC initialized successfully! (v5.0.0)
 
 Repository: owner/repo-name (private)  # if created
   Merge method: Squash only (PR title and description)
@@ -1014,11 +972,12 @@ Git Workflow: git-spice
 Languages Configured:
   - Rust (tests/, src/, #[cfg(test)])  # example
   - TypeScript (*.test.ts, src/)        # example
-GitHub Project: #11
+
+Task Management:
+  dot CLI prefix: myproject
+  Task directory: .dots/
 
 Installed Extensions:
-  - gh-issue-ext (sub-issues, blocking, branches)
-  - gh-project-ext (project board management)
   - gh-pr-review (PR review comment handling)
 
 ⚠️  IMPORTANT: Restart your Claude session for changes to take effect
@@ -1026,15 +985,13 @@ Installed Extensions:
 
 Next steps:
   - Restart Claude (exit and start a new conversation)
-  - /sdlc:work - Start working on an issue
+  - /sdlc:work - Start working on a task
   - /sdlc:design - Design event model workflows
-  - Ask "what issues are ready?" to see available work
+  - Use "dot ls" to see all tasks or "dot ready" for unblocked tasks
 
 Auto-approval patterns to add to Claude settings:
-  Bash(gh issue *)
-  Bash(gh issue-ext *)
-  Bash(gh project *)
-  Bash(gh project-ext *)
+  Bash(dot *)
+  Bash(gh pr *)
   Bash(gh pr-review *)
   Bash(gs *)  # if using git-spice
 
@@ -1055,63 +1012,47 @@ Optional: Customize TDD agents (disable specific agents):
 **For updates (EXISTS → UPDATE path):**
 
 ```
-✅ SDLC updated successfully! (v<old> → v4.0.0)
+✅ SDLC updated successfully! (v<old> → v5.0.0)
 
 ### What Changed
 
-- **CRITICAL FIX**: Moved hooks into `.claude/settings.json`
-  - Claude Code only reads project-level hooks from settings.json
-  - TDD enforcement hooks were completely non-functional in previous versions
-  - Removed legacy `.claude/hooks.json` file
-- Updated `.claude/sdlc.yaml` version field
-- <Other changes specific to this version>
+- **BREAKING CHANGE**: Migrated from GitHub Issues/Projects to dot CLI
+  - Task management is now local and file-based (.dots/ directory)
+  - Tasks use dot commands: `dot add`, `dot ls`, `dot ready`, `dot on`, `dot off`
+  - GitHub integration limited to PRs and code review only
+  - Removed dependencies on gh-issue-ext and gh-project-ext
+- Added `tasks.prefix` configuration for task ID generation
+- Updated GitHub configuration (now only owner/repository for PR workflows)
+- Removed `github.project` and `board.statuses` (no longer needed)
+- Branch naming now uses full task IDs (e.g., feature/myproject-add-login-abc123)
+
+### Migration Required
+
+If upgrading from v4.x with existing GitHub issues:
+1. Review MIGRATION.md for export/import instructions
+2. Tasks from GitHub Issues must be manually recreated in dot
+3. Update any automation that relied on gh-issue-ext or gh-project-ext commands
 
 ### Preserved
 
-All your existing configuration choices were preserved:
+These configuration choices were preserved:
 - Mode: <event-modeling or traditional>
 - Git workflow: <preference>
-- GitHub project: #<number>
 - Language patterns: <list>
+- TDD verbosity: <setting>
 
 ### Next Steps
 
 ⚠️  IMPORTANT: Restart your Claude session for changes to take effect
    Updated hooks and configuration require a fresh session to load properly.
 
-Your workflow continues as normal:
+Your workflow continues with dot CLI:
   - Restart Claude (exit and start a new conversation)
-  - /sdlc:work - Start working on an issue
+  - /sdlc:work - Start working on a task
   - /sdlc:design - Design event model workflows
   - /sdlc:start - Auto-detect current phase and route
+  - dot ls - List all tasks
+  - dot ready - Show unblocked tasks ready to work on
 ```
 
 Omit sections that weren't configured (e.g., don't show Repository section if no repo was created).
-
-### 12. Enable Auto-Add Workflow (If Using GitHub Project)
-
-If a GitHub Project was configured, inform the user about enabling the built-in project workflow for auto-adding issues:
-
-```
-RECOMMENDED: Enable Auto-Add Issues Workflow
-
-GitHub Projects has a built-in workflow to automatically add issues from your repository.
-This is configured in the project settings, NOT through GitHub Actions.
-
-Enable the workflow:
-1. Go to your project: https://github.com/users/<owner>/projects/<number>
-2. Click the "..." menu (top right) -> "Settings"
-3. Select "Workflows" in the left sidebar
-4. Find "Auto-add to project" and click to configure
-5. Set the filter:
-   - Repository: Select your repository
-   - Is: open (to add new issues when opened)
-6. Enable the workflow (toggle ON)
-
-That's it! All new issues opened in the repository will automatically be added to your project board.
-
-Note: This only adds ISSUES, not PRs. If you want PRs added too, create a separate
-"Auto-add to project" workflow with type filter set to Pull Request.
-```
-
-Replace `<owner>` and `<number>` with the actual project owner and number from the configuration.

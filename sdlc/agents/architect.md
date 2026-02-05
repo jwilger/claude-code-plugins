@@ -124,7 +124,7 @@ For each risk:
 **CRITICAL: Use ONLY docs/ARCHITECTURE.md as your reference.**
 
 ADRs exist solely to preserve decision context for when we might reconsider a decision in the future. They are archival documents. You should:
-- NEVER reference ADRs by number in reviews, comments, or GitHub issues
+- NEVER reference ADRs by number in reviews, comments, or dot tasks
 - NEVER cite ADRs as justification (cite ARCHITECTURE.md instead)
 - NEVER suggest reading ADRs as part of implementation work
 

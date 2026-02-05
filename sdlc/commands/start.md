@@ -29,7 +29,7 @@ To get started, run:
 
 This will configure:
 - Event modeling vs traditional mode
-- GitHub project integration
+- dot CLI task management
 - Project-specific TDD hooks
 ```
 Then STOP - don't proceed further.
@@ -48,12 +48,12 @@ Check the mode (event-modeling vs traditional).
 grep "^sdlc_version:" .claude/sdlc.yaml || echo "sdlc_version: unknown"
 ```
 
-If the version in the config doesn't match the current plugin version (**3.9.0**), show a warning:
+If the version in the config doesn't match the current plugin version (**5.0.0**), show a warning:
 
 ```
 ⚠️  SDLC UPDATE AVAILABLE
 
-Your SDLC configuration was created with v<version> but you're running v3.9.0.
+Your SDLC configuration was created with v<version> but you're running v5.0.0.
 
 Updates may include improved hooks, bug fixes, or new features.
 
@@ -70,9 +70,15 @@ Then proceed with the current configuration (don't block work, just notify).
 This project uses traditional development mode.
 
 Available commands:
-  /sdlc:work  - Start working on a GitHub issue
+  /sdlc:work  - Start working on a task
   /sdlc:pr    - Create/update a pull request
+  /sdlc:complete - Complete a task after PR merge
   /sdlc:review - Handle PR review feedback
+
+Task management:
+  dot ls       - List all tasks
+  dot ready    - Show unblocked tasks
+  dot add      - Create a new task
 
 To switch to event modeling, run /sdlc:setup again.
 ```
@@ -166,29 +172,47 @@ The result is docs/ARCHITECTURE.md - the authoritative source for all architectu
 ```
 Then STOP.
 
-### 7. Check for GitHub Issues from Slices
+### 7. Check for dot Tasks from Slices
 
 ```bash
+# Check if .dots/ directory exists
+test -d .dots || echo "NO_DOTS"
+
 # Check if any slices exist
 SLICE_COUNT=$(find docs/event_model/workflows/*/slices/*.md 2>/dev/null | wc -l)
 
-# Check for event-model labeled issues
-ISSUE_COUNT=$(gh issue list --label "event-model" --json number 2>/dev/null | jq length 2>/dev/null || echo "0")
+# Check for tasks (look for epic tasks created from workflows)
+if [ -d .dots ]; then
+  TASK_COUNT=$(dot ls --json 2>/dev/null | jq 'length' 2>/dev/null || echo "0")
+else
+  TASK_COUNT="0"
+fi
 
 echo "SLICES:$SLICE_COUNT"
-echo "ISSUES:$ISSUE_COUNT"
+echo "TASKS:$TASK_COUNT"
 ```
 
-**If SLICES > 0 and ISSUES == 0**:
+**If NO_DOTS**:
 ```
-Event model and architecture complete, but no GitHub issues created.
+dot CLI not initialized.
+
+Next step:
+  /sdlc:setup
+
+This will initialize task management for the project.
+```
+Then STOP.
+
+**If SLICES > 0 and TASKS == 0**:
+```
+Event model and architecture complete, but no tasks created.
 
 Next step:
   /sdlc:plan
 
 This will create:
-- Epic issues for each workflow
-- Story issues for each slice
+- Epic tasks for each workflow
+- Story tasks for each slice
 - Acceptance criteria from GWT scenarios
 ```
 Then STOP.
@@ -199,8 +223,11 @@ Then STOP.
 # Check current branch
 BRANCH=$(git branch --show-current)
 
-# Check for assigned issues in progress
-gh issue list --assignee @me --state open --json number,title,labels 2>/dev/null
+# Check for active tasks
+if [ -d .dots ]; then
+  ACTIVE_TASKS=$(dot ls --status active --json 2>/dev/null)
+  ACTIVE_COUNT=$(echo "$ACTIVE_TASKS" | jq 'length' 2>/dev/null || echo "0")
+fi
 ```
 
 **If on a feature branch** (not main/master):
@@ -217,21 +244,24 @@ To continue working:
 To create/update PR:
   /sdlc:pr
 
+After PR merges:
+  /sdlc:complete
+
 To handle review feedback:
   /sdlc:review
 ```
 Then STOP.
 
-**If assigned issues exist**:
+**If active tasks exist**:
 ```
-You have assigned issues:
+You have active tasks:
 
-<list issues>
+<list tasks from ACTIVE_TASKS>
 
-To start working on one:
-  /sdlc:work <issue-number>
+To continue working on one:
+  /sdlc:work <task-id>
 
-Or let me pick the next ready item:
+Or let me pick the next ready task:
   /sdlc:work
 ```
 Then STOP.

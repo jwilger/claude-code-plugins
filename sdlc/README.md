@@ -1,8 +1,8 @@
-# SDLC Plugin v4.0.0
+# SDLC Plugin v5.0.0
 
 **Complete Software Development Lifecycle workflow for Claude Code**
 
-Integrates TDD, Event Modeling, Architecture Decision Records, GitHub workflows, and the Marvin personality into a cohesive development experience.
+Integrates TDD, Event Modeling, Architecture Decision Records, local task management with dot CLI, and the Marvin personality into a cohesive development experience.
 
 ---
 
@@ -21,37 +21,48 @@ Integrates TDD, Event Modeling, Architecture Decision Records, GitHub workflows,
 
 ---
 
-## What's New in v4.0.0
+## What's New in v5.0.0
 
-### ✨ Task-Based Workflow
+### 🚀 Local Task Management with dot CLI
 
-**Before (v3.x):** Manual invocation gates requiring confirmation blocks
+**Before (v4.x):** GitHub Issues and Projects for task management
 
-**Now (v4.0.0):** Mechanical task dependencies enforce TDD cycle:
+**Now (v5.0.0):** Local, file-based task management with dot CLI:
 
-```javascript
-Red task → Domain-after-Red task → Green task → Domain-after-Green task
-```
+- **Offline-first**: No API rate limits, works everywhere
+- **Fast**: Instant responses from file system
+- **Version-controlled**: Commit `.dots/` to git
+- **Hierarchical**: Parent-child tasks with dependencies
+- **Greppable**: Tasks are markdown files
 
-Tasks automatically block until dependencies complete. No human error possible.
+**Breaking Change:** Requires dot CLI installation and `/sdlc:setup` re-run.
 
-### 🎯 Portable Skills
+### 📝 Manual Task Completion
 
-**Before (v3.x):** Protocols inline in agents or loaded via `sdlc:shared/*`
+**Before (v4.x):** GitHub auto-closes issues via "Closes #123"
 
-**Now (v4.0.0):** 9 portable skills installable across frameworks:
+**Now (v5.0.0):** Explicit task completion with `/sdlc:complete`:
 
 ```bash
-npx skills add jwilger/claude-code-plugins
+/sdlc:work          # Start task
+# ... develop ...
+/sdlc:pr            # Create PR
+# ... PR merges ...
+/sdlc:complete      # Close task, check parent
 ```
 
-Skills work in Claude Code, Cursor, Windsurf, and Cline.
+### 🔧 Simplified Dependencies
 
-### 🗑️ Removed Invocation Gates
+**Removed:**
+- `gh-issue-ext` extension
+- `gh-project-ext` extension
+- GitHub Projects integration
 
-Manual confirmation gates (`RED_CONTEXT:`, `DOMAIN_CONTEXT:`, etc.) completely removed. Task dependencies enforce workflow mechanically.
+**Kept:**
+- `gh-pr-review` extension (for PR workflows)
+- GitHub PR/review workflows (unchanged)
 
-**Migration:** See `MIGRATION.md` for v3.x → v4.0.0 upgrade guide.
+**Migration:** See `MIGRATION.md` for v4.x → v5.0.0 upgrade guide.
 
 ---
 
@@ -60,13 +71,14 @@ Manual confirmation gates (`RED_CONTEXT:`, `DOMAIN_CONTEXT:`, etc.) completely r
 | Command | Description | Usage |
 |---------|-------------|-------|
 | `/sdlc:setup` | Initialize project configuration | One-time setup |
-| `/sdlc:work` | Start TDD workflow for a feature | Main development loop |
+| `/sdlc:work` | Start TDD workflow for a task | Main development loop |
 | `/sdlc:pr` | Create pull request with review gates | After feature complete |
-| `/sdlc:review` | Three-stage code review | Before PR creation |
+| `/sdlc:complete` | Complete task after PR merge | After PR merges |
+| `/sdlc:review` | Handle PR review feedback | Review cycle |
 | `/sdlc:design` | Event Modeling facilitation | Design phase |
 | `/sdlc:adr` | Create Architecture Decision Record | Document decisions |
-| `/sdlc:plan` | Plan implementation for a slice | Before coding |
-| `/sdlc:start` | Create GitHub issue from event model | Story creation |
+| `/sdlc:plan` | Create tasks from event model slices | After design |
+| `/sdlc:start` | Auto-detect phase and route | Entry point |
 | `/sdlc:remember` | Store knowledge in Memento | Learning |
 | `/sdlc:recall` | Search Memento knowledge | Context retrieval |
 | `/sdlc:domain-audit` | Audit for primitive obsession | Code review |

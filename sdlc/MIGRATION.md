@@ -1,313 +1,261 @@
-# Migration Guide: sdlc v3.x → v4.0.0
+# Migrating from sdlc v4.x to v5.0.0
 
-**Breaking changes in v4.0.0.** This guide helps you migrate from v3.x to v4.0.0.
+## Overview
 
----
+sdlc v5.0.0 replaces GitHub Issues/Projects with local dot CLI for task management.
 
-## What Changed
+### What Changed
 
-### 1. Invocation Gates Removed ❌
+| Component | v4.x | v5.0.0 |
+|-----------|------|--------|
+| Task Storage | GitHub Issues | Local `.dots/` files |
+| Task IDs | Issue numbers (#123) | Full task IDs (myproject-add-login-abc123) |
+| Task Status | GitHub Project board | dot CLI (`open`/`active`/`closed`) |
+| Required Tools | `gh-issue-ext`, `gh-project-ext` | `dot` CLI |
+| PR Closure | Automatic (via "Closes #123") | Manual (`/sdlc:complete`) |
 
-**v3.x:** Agents had manual confirmation gates requiring orchestrator to pass context blocks:
-
-```
-RED_CONTEXT: FIRST_TEST
-ACCEPTANCE_CRITERIA:
-- User can create account
-```
-
-**v4.0.0:** Task dependencies replace manual gates:
-
-```javascript
-const redTask = await TaskCreate({
-  subject: "Write failing test",
-  metadata: { phase: "red" }
-});
-
-const domainTask = await TaskCreate({
-  subject: "Create domain types",
-  metadata: { phase: "domain-after-red" }
-});
-
-await TaskUpdate({
-  taskId: domainTask.id,
-  addBlockedBy: [redTask.id]  // Mechanical enforcement
-});
-```
-
-**Why:** Task dependencies enforce workflow mechanically, eliminating human error and enabling visual workflow state.
-
----
-
-### 2. Protocols Extracted as Skills ✨
-
-**v3.x:** Protocols were inline in agent files or loaded via `sdlc:shared/*`:
-
-```yaml
-skills:
-  - sdlc:shared/user-input-protocol
-  - sdlc:shared/tdd-constraints
-```
-
-**v4.0.0:** Protocols are portable, installable skills:
-
-```yaml
-skills:
-  - user-input-protocol
-  - tdd-constraints
-```
-
-**Installation:**
-
-```bash
-npx skills add jwilger/claude-code-plugins
-```
+### Why the Change
 
 **Benefits:**
-- Skills work in Cursor, Windsurf, Cline, and other frameworks
-- Versioned independently
-- Discoverable via skills.sh marketplace
-- Framework-agnostic examples
+- Local-first (offline capable, no API limits)
+- Fast (file-based, instant responses)
+- Greppable (tasks are markdown files)
+- Version-controlled (commit `.dots/` to git)
+
+**Trade-offs:**
+- No web UI
+- Single-developer focus
+- Manual task completion
 
 ---
 
-### 3. Skill Enforcement Deprecated 🗑️
+## Prerequisites
 
-**v3.x:** `sdlc:shared/skill-enforcement` protocol with "1% rule" and rationalization checks
+### Install dot CLI
 
-**v4.0.0:** Removed entirely. No backward compatibility shim.
+```bash
+cargo install dot-cli
+dot --version  # Verify >= 0.6.4
+```
 
-**Why:** Task dependencies mechanically enforce workflow. Manual "should I use this skill?" checks are obsolete.
+### Backup GitHub Issues (Optional)
+
+```bash
+gh issue list --limit 1000 --json number,title,body,state > issues-backup.json
+```
 
 ---
 
 ## Migration Steps
 
-### Step 1: Update Plugin
+### 1. Update Plugin
 
 ```bash
-# Pull latest version
-git pull origin main
-
-# Or update via Claude Code
-/plugin
+/plugin  # Force marketplace update
 ```
 
-### Step 2: Install Extracted Skills
+### 2. Run Setup
 
 ```bash
-npx skills add jwilger/claude-code-plugins
+/sdlc:setup
 ```
 
-This installs 9 skills:
-- `user-input-protocol`
-- `debugging-protocol`
-- `atomic-design`
-- `tdd-constraints`
-- `git-spice`
-- `github-issues`
-- `memory-protocol`
-- `event-modeling`
-- `orchestration-protocol`
+Setup will:
+- Detect v4.x → v5.0.0 upgrade
+- Preserve existing settings (mode, git workflow, languages)
+- Initialize dot CLI
+- Prompt for task prefix
+- Update configuration
 
-### Step 3: Update Custom Agents (If Any)
+**Choose task prefix**: Short identifier (1-2 words, lowercase)
+- Example: `myapp` → `myapp-add-login-abc123`
 
-If you created custom agents that referenced old shared protocols:
+### 3. Recreate Active Tasks
 
-**Before:**
+**Option A: Manual (Recommended for Active Work)**
+
+```bash
+# For each active GitHub issue
+gh issue view 123
+
+# Create dot task
+dot add "<title>" -p 2 -d "<body from issue>"
+```
+
+**Option B: Fresh Start (Event Modeling)**
+
+```bash
+# Recreate from slices
+/sdlc:plan
+```
+
+### 4. Update Branch Naming
+
+| Old | New |
+|-----|-----|
+| `feature/123-add-login` | `feature/myproject-add-login-abc123` |
+
+**Options:**
+1. Finish current branches with old naming, use new naming for new work
+2. Rename: `git branch -m old-name new-name`
+
+### 5. Learn New Workflow
+
+**Old (v4.x):**
+```bash
+/sdlc:work          # Pick issue #123
+# ... work ...
+/sdlc:pr            # PR with "Closes #123"
+# PR merges → Issue auto-closes
+```
+
+**New (v5.0.0):**
+```bash
+/sdlc:work          # Pick task
+# ... work ...
+/sdlc:pr            # PR references task
+# PR merges → Manual completion:
+/sdlc:complete      # Close task
+```
+
+---
+
+## Configuration Changes
+
+### Old (v4.x)
 ```yaml
-skills:
-  - sdlc:shared/user-input-protocol
-  - sdlc:shared/tdd-constraints
+sdlc_version: "4.0.0"
+github:
+  project: 11
+  owner: jwilger
+board:
+  statuses: [Backlog, Ready, In Progress, Review, Done]
 ```
 
-**After:**
+### New (v5.0.0)
 ```yaml
-skills:
-  - user-input-protocol
-  - tdd-constraints
+sdlc_version: "5.0.0"
+tasks:
+  prefix: myproject
+github:
+  owner: jwilger
+  repository: myrepo
+# board removed (dot manages statuses)
 ```
 
-### Step 4: Remove Invocation Gate Confirmations
+---
 
-If you have custom workflows or scripts that generated gate confirmations:
+## Command Reference
 
-**Remove this pattern:**
-```
-RED_CONTEXT: FIRST_TEST
-ACCEPTANCE_CRITERIA:
-- ...
-```
+| Task | v4.x | v5.0.0 |
+|------|------|--------|
+| List tasks | `gh issue list` | `dot ls` |
+| Ready tasks | `gh project-ext ready` | `dot ready` |
+| Create task | `gh issue create` | `dot add "<title>"` |
+| Start work | (auto-assign + move) | `dot on <task-id>` |
+| View task | `gh issue view <num>` | `dot show <task-id>` |
+| View hierarchy | `gh issue-ext sub list` | `dot tree <task-id>` |
+| Complete task | (auto via "Closes #123") | `/sdlc:complete` |
 
-**Replace with task creation:**
-```javascript
-const task = await TaskCreate({
-  subject: "Write test for user creation",
-  description: "Test should verify email validation",
-  metadata: { phase: "red", feature: "auth" }
-});
-```
+**Unchanged:** `/sdlc:work`, `/sdlc:pr`, `/sdlc:review`, `/sdlc:design`, `/sdlc:plan`
 
-### Step 5: Test TDD Workflow
+---
 
-Run through a complete TDD cycle to verify:
+## Workflow Examples
+
+### Starting Work
 
 ```bash
-# Start a new feature
+# v5.0.0
 /sdlc:work
-
-# When prompted, describe feature
-# Observe automatic task creation and dependencies
-# Verify agents complete tasks in sequence
+# Shows: dot tasks (unblocked, open)
+# Select: myproject-add-login-abc123
+# Branch: feature/myproject-add-login-abc123
+# Status: active
 ```
 
-Expected behavior:
-- Red agent creates failing test
-- Domain agent reviews and creates types (blocked until red completes)
-- Green agent implements (blocked until domain completes)
-- Domain agent reviews implementation (blocked until green completes)
+### Creating PR
 
----
+```bash
+# v5.0.0
+/sdlc:pr
+# Extracts task ID from branch
+# PR body: "Task: myproject-add-login-abc123"
+# Task stays active
+```
 
-## Breaking Changes Summary
+### Completing Work
 
-| Feature | v3.x | v4.0.0 | Action Required |
-|---------|------|--------|-----------------|
-| **Invocation Gates** | Manual confirmations | Task dependencies | Update workflows to use TaskCreate |
-| **Skill References** | `sdlc:shared/*` | Skill names | Update agent YAML |
-| **Skill Enforcement** | Explicit protocol | Removed | Remove references |
-| **Protocol Files** | `sdlc/commands/shared/*.md` | `skills/*/SKILL.md` | None (auto-loaded) |
-
----
-
-## What Stayed the Same
-
-### ✅ TDD Workflow
-
-Red → Domain → Green → Domain cycle unchanged. Same principles, mechanical enforcement.
-
-### ✅ Agent Specialization
-
-Same agents with same responsibilities:
-- `sdlc:red` - Test code only
-- `sdlc:green` - Implementation only
-- `sdlc:domain` - Type definitions only
-- All other agents unchanged
-
-### ✅ File Ownership Patterns
-
-Agents still enforce file type restrictions via hooks.
-
-### ✅ Event Modeling
-
-Discovery, workflow design, GWT, and model checking workflows unchanged.
-
-### ✅ GitHub Integration
-
-PR workflow, issue linking, and git-spice patterns unchanged.
+```bash
+# v5.0.0
+# After PR merges:
+/sdlc:complete
+# Verifies PR merged
+# Closes task: "Completed via PR #125"
+# Prompts to close parent if all children done
+```
 
 ---
 
 ## Troubleshooting
 
-### "Skill not found: sdlc:shared/user-input-protocol"
-
-**Problem:** Agent still references old shared protocol path
-
-**Solution:** Update agent YAML to use skill name:
-
-```yaml
-# Wrong
-skills:
-  - sdlc:shared/user-input-protocol
-
-# Right
-skills:
-  - user-input-protocol
-```
-
-### "INVOCATION GATE FAILED"
-
-**Problem:** Using v3.x workflow with v4.0.0 plugin
-
-**Solution:** Stop passing manual confirmation blocks. Use TaskCreate instead:
-
-```javascript
-const task = await TaskCreate({
-  subject: "Your task description",
-  metadata: { phase: "red" }
-});
-```
-
-### Skills don't load in agent
-
-**Problem:** Skills not installed
-
-**Solution:**
-
+### "dot: command not found"
 ```bash
-npx skills add jwilger/claude-code-plugins
-npx skills list  # Verify installation
+cargo install dot-cli
 ```
 
-### Agent can't see skill content
-
-**Problem:** Skill file missing or malformed
-
-**Solution:** Verify skill file exists:
-
+### ".dots/ doesn't exist"
 ```bash
-ls skills/user-input-protocol/SKILL.md
-# Should exist and have YAML frontmatter
+/sdlc:setup  # Runs dot init
+```
+
+### "Can't find old issues"
+GitHub issues still exist, just not used for task management:
+```bash
+gh issue list  # View
+gh issue list --json number,title > backup.json  # Export
+```
+
+### "How to check blocked tasks?"
+```bash
+dot ready  # Shows only unblocked tasks
+```
+
+### "Parent won't close"
+```bash
+/sdlc:complete <last-child-id>
+# Will prompt to close parent
 ```
 
 ---
 
 ## FAQ
 
-### Q: Can I still use v3.x?
+**Q: What happens to my GitHub Issues?**
+A: They remain unchanged. Keep as reference or close manually.
 
-**A:** Yes, but v3.x is no longer maintained. No security updates or bug fixes.
+**Q: Can I still use GitHub Projects?**
+A: No longer integrated. Use dot for tasks, GitHub for PRs only.
 
-### Q: Do I need to reinstall the plugin?
+**Q: Must I migrate all issues?**
+A: No. Migrate only active work. Use `/sdlc:plan` for new work from slices.
 
-**A:** No. `/plugin` or `git pull` updates in place.
+**Q: Can I switch back to v4.x?**
+A: Yes, but you'll lose dot tasks. Pin v4.x in plugin settings.
 
-### Q: Will my existing projects break?
+**Q: Why manual task completion?**
+A: Gives control: verify PR merged, close parent epics, better audit trail.
 
-**A:** No. TDD workflow unchanged. Task system is backward compatible.
-
-### Q: Can I use the skills in other frameworks?
-
-**A:** Yes! Skills are framework-agnostic. Install via `npx skills` in Cursor, Windsurf, or Cline.
-
-### Q: What if I don't want to use tasks?
-
-**A:** Tasks are central to v4.0.0. If you prefer v3.x manual workflow, stay on v3.x.
-
-### Q: Are the extracted skills versioned separately?
-
-**A:** Yes. Each skill has independent semver in its SKILL.md frontmatter.
-
-### Q: How do I contribute to a skill?
-
-**A:** Submit PR to `skills/<skill-name>/SKILL.md`. Follow contribution guidelines in `skills/README.md`.
+**Q: Can teams use dot CLI?**
+A: dot is single-developer. For teams:
+- Each dev has own `.dots/` (not committed)
+- Use GitHub PRs for collaboration
+- Or stay on v4.x for team task management
 
 ---
 
-## Support
+## Getting Help
 
-**Issues:** https://github.com/jwilger/claude-code-plugins/issues
-**Discussions:** https://github.com/jwilger/claude-code-plugins/discussions
-**Email:** john@johnwilger.com
-
----
-
-## Version History
-
-- **v3.12.8** (2026-02-04): Last v3.x release
-- **v4.0.0** (2026-02-04): Task-based workflow, extracted skills, removed invocation gates
-
----
-
-**Migration complete!** You should now have a fully functional v4.0.0 setup with portable skills and task-based workflow enforcement.
+- **Issues**: https://github.com/jwilger/claude-code-plugins/issues (tag: `sdlc`, `migration`)
+- **Docs**: `sdlc/README.md`, `sdlc/skills/task-management/SKILL.md`
+- **dot CLI**: https://github.com/ajeetdsouza/dot

@@ -1,5 +1,142 @@
 # SDLC Plugin Changelog
 
+## [5.0.0] - 2026-02-04
+
+### 🚀 BREAKING CHANGES
+
+This is a major rewrite replacing GitHub Issues/Projects with local dot CLI task management. See `MIGRATION.md` for upgrade guide.
+
+#### Task Management: GitHub → dot CLI
+
+**BREAKING:** Task management moved from GitHub Issues/Projects to local dot CLI.
+
+**Before (v4.x):**
+```bash
+gh issue list
+gh project-ext ready
+gh issue create --title "Task"
+gh issue-ext sub add 10 42  # Create sub-issue
+```
+
+**After (v5.0.0):**
+```bash
+dot ls
+dot ready
+dot add "Task"
+dot add "Child" -P parent-id  # Create child task
+```
+
+**Why:** Local-first task management offers:
+- Offline capability (no API rate limits)
+- Instant performance (file-based)
+- Version control (commit `.dots/` to git)
+- Simplicity (no external service dependencies)
+
+**Migration:** Install dot CLI, run `/sdlc:setup`, recreate active tasks. See `MIGRATION.md`.
+
+#### Configuration Schema Changes
+
+**BREAKING:** Configuration updated for dot CLI.
+
+**Removed:**
+- `github.project` (no longer using GitHub Projects)
+- `board.statuses` (dot manages statuses)
+
+**Added:**
+- `tasks.prefix` (task ID prefix like "myproject")
+
+**Updated:**
+- `github.owner` + `github.repository` (for PR workflows only)
+
+#### Manual Task Completion
+
+**BREAKING:** Tasks must be manually completed after PR merge.
+
+**Before (v4.x):**
+```bash
+/sdlc:pr  # Creates PR with "Closes #123"
+# PR merges → Issue auto-closes
+```
+
+**After (v5.0.0):**
+```bash
+/sdlc:pr  # Creates PR referencing task
+# PR merges → Manual completion:
+/sdlc:complete  # Closes task, checks parent
+```
+
+**Why:** Explicit completion gives control to:
+- Verify PR actually merged (not just closed)
+- Close parent epics when all children done
+- Better audit trail with completion reasons
+
+#### Removed Dependencies
+
+**BREAKING:** GitHub-specific extensions removed.
+
+**Removed:**
+- `gh-issue-ext` extension
+- `gh-project-ext` extension
+
+**Kept:**
+- `gh-pr-review` extension (still needed for PR workflows)
+
+### ✨ New Features
+
+#### `/sdlc:complete` Command
+
+New command for explicit task completion after PR merge:
+
+```bash
+/sdlc:complete [task-id]  # Auto-detects from branch if omitted
+```
+
+Features:
+- Verifies PR was merged
+- Closes task with completion reason
+- Checks if parent epic should close
+- Prompts to close parent if all children done
+
+#### Branch Naming with Full Task IDs
+
+Branch names now use full task IDs instead of issue numbers:
+
+```bash
+# v4.x: feature/123-add-login
+# v5.0.0: feature/myproject-add-login-abc123
+```
+
+Benefits:
+- Self-contained (no external lookup needed)
+- Greppable (find tasks by ID in git history)
+- No conflicts (hash ensures uniqueness)
+
+#### Task Management Skill
+
+New comprehensive skill for dot CLI patterns:
+
+```bash
+# Skill: sdlc/skills/task-management/
+- Parent-child hierarchies
+- Blocking dependencies
+- Status lifecycle
+- Branch integration patterns
+```
+
+### 📚 Documentation
+
+- Added `MIGRATION.md` - Complete v4.x → v5.0.0 upgrade guide
+- Added `docs/task-management/dot-cli.md` - dot CLI reference
+- Added `docs/task-management/workflow.md` - Task workflow patterns
+- Updated all agent files to reference "dot task" instead of "GitHub issue"
+
+### 🔧 Updated
+
+- All commands updated for dot CLI integration
+- Configuration schema updated to v5.0.0
+- Agent instructions updated to use task terminology
+- Skill renamed: `github-issues` → `task-management`
+
 ## [4.0.0] - 2026-02-04
 
 ### 🎯 BREAKING CHANGES

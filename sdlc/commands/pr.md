@@ -23,7 +23,7 @@ hooks:
           prompt: |
             Before completing, store the PR context in memento:
             - PR URL and number
-            - Issue it closes
+            - Task it addresses
             - Mutation testing results
 
             Output ONLY: {"ok": true}
@@ -35,8 +35,8 @@ Create or update a pull request for the current work. This command:
 1. Performs three-stage code review (spec compliance, code quality, domain integrity)
 2. Runs mutation testing to verify test quality
 3. Creates or updates the PR
-4. Links PR to the issue
-5. Keeps issue in "In Progress" (PR goes to Review)
+4. References the task in PR body
+5. Task remains active (must be manually completed with /sdlc:complete after PR merge)
 
 ## Steps
 
@@ -44,16 +44,16 @@ Create or update a pull request for the current work. This command:
 
 Read `.claude/sdlc.yaml` for git workflow settings.
 
-### 2. Detect Current Issue
+### 2. Detect Current Task
 
-From the current branch name, extract the issue number:
+From the current branch name, extract the full task ID:
 ```bash
 git branch --show-current
 ```
 
-Parse issue number from branch name (e.g., `feature/123-add-login` → `123`).
+Parse task ID from branch name (e.g., `feature/myproject-add-login-abc123` → `myproject-add-login-abc123`).
 
-If no issue number in branch, ask user which issue this PR is for.
+If no task ID in branch, ask user which task this PR is for.
 
 ### 3. Run Three-Stage Code Review
 
@@ -66,12 +66,12 @@ Task tool with subagent_type="sdlc:code-reviewer":
   Perform a three-stage code review:
 
   Context:
-  - Issue: #<issue-number>
-  - Branch: <branch-name>
+  - Task: <task-id>
+  - Branch: feature/<task-id>
   - Base: main (or configured base branch)
 
   Acceptance Criteria:
-  <fetch from issue body or GWT scenarios>
+  <fetch from task description via 'dot show <task-id>' or GWT scenarios>
 
   Files Changed:
   <output of git diff --name-only main..HEAD>
@@ -137,16 +137,16 @@ git push -u origin $(git branch --show-current)
 
 #### If creating new PR:
 
-Get issue details for PR body:
+Get task details for PR body:
 ```bash
-gh issue view <issue-number> --json title,body
+dot show <task-id> --json | jq -r '.title, .description'
 ```
 
-Create PR with link to issue:
+Create PR with reference to task:
 ```bash
 gh pr create \
-  --title "<issue-title>" \
-  --body "Closes #<issue-number>
+  --title "<task-title>" \
+  --body "Task: <task-id>
 
 ## Summary
 <brief summary of changes>
@@ -159,9 +159,13 @@ gh pr create \
 - Mutation score: <score>%
 
 ---
-Related: #<issue-number>" \
+**Note:** After merging, run `/sdlc:complete <task-id>` to close the task.
+
+Related task: <task-id>" \
   --assignee @me
 ```
+
+**Important:** Unlike GitHub Issues with `Closes #123` syntax, dot tasks must be manually completed with `/sdlc:complete` after PR merge.
 
 #### If updating existing PR:
 
@@ -170,42 +174,31 @@ Related: #<issue-number>" \
 gh pr view --json url
 ```
 
-### 8. Branch-Issue Linking
+### 8. Task Status
 
-The branch should already be linked to the issue from `/sdlc:work`. If not, you can verify/create the link:
+The task remains in `active` status during PR review. It must be manually completed after merge using `/sdlc:complete <task-id>`.
 
-```bash
-# Check if branch is linked
-gh issue-ext branch list <issue-number>
+This manual step allows you to:
+- Verify the PR was actually merged (not just closed)
+- Check if the parent task should also be closed (all children done?)
+- Add any final notes to memento about the work
 
-# If not linked, create link (note: creates branch if it doesn't exist)
-gh issue-ext branch create <issue-number> --name <branch-name>
-```
-
-The `Closes #<issue-number>` in the PR body also creates an automatic link that will close the issue when the PR merges.
-
-### 9. Update Project Status
-
-The PR should show in Review status. If using projects:
-- PR status tracks separately from issue
-- Issue stays in "In Progress" until PR is merged
-
-### 10. Display Result
+### 9. Display Result
 
 ```
 Pull Request created/updated!
 
 PR: <url>
-Issue: #<number> - <title>
+Task: <task-id> - <title>
 Mutation Score: <score>%
 
 Status:
-  - PR: In Review
-  - Issue: In Progress (will close when PR merges)
+  - Task: active (complete with /sdlc:complete after merge)
 
 Next steps:
   - Wait for review feedback
   - Run /sdlc:review when you have comments to address
+  - After PR merges, run: /sdlc:complete <task-id>
 ```
 
 ## Error Handling

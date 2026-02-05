@@ -220,7 +220,7 @@ Create `docs/event_model/domain/overview.md` with:
 
 ## Open Items
 
-<Any deferred questions with GitHub issue links>
+<Any deferred questions with dot task links>
 ```
 
 ## When to Request User Input
@@ -252,7 +252,7 @@ When you have a question:
 2. **Wait for an answer** before proceeding
 
 If the user explicitly defers ("I'll answer that later", "Let's skip that"):
-1. Create a GitHub issue to track the deferred question
+1. Create a dot task to track the deferred question
 2. Note the deferral in the document with issue reference
 3. Continue, but remind at session end about open questions
 

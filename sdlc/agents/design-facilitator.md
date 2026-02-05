@@ -182,7 +182,7 @@ Key Decisions Summary:
     - Error Handling: <approach>
 
 Next step:
-  /sdlc:plan - Create GitHub issues from event model slices
+  /sdlc:plan - Create dot tasks from event model slices
 
 Note: ADRs were created in docs/adr/ to preserve decision context.
       These are archival records - consult only when reconsidering decisions.

@@ -82,7 +82,7 @@ ADRs focus on WHY. ARCHITECTURE.md shows WHAT (current state).
 ## CRITICAL: ADR Isolation
 
 **ADRs are for archival purposes only.** They should NEVER be referenced in:
-- GitHub issues or PRs
+- dot tasks or PRs
 - Code reviews or comments
 - Implementation guidance
 - Day-to-day work documentation

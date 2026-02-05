@@ -33,15 +33,16 @@ hooks:
 
 # SDLC Work
 
-Start or continue working on a GitHub issue. This command:
+Start or continue working on a task. This command:
 1. Checks for clean git state
-2. Shows issues ready for work (including any currently in progress)
-3. Lets you select which issue to work on
-4. Assigns the issue, moves to In Progress, creates branch
+2. Shows tasks ready for work (unblocked and open status)
+3. Shows active tasks with their child tasks
+4. Lets you select which task to work on
+5. Marks task as active, creates branch
 
 ## Arguments
 
-`$ARGUMENTS` - Optional issue number to work on directly (e.g., `/sdlc:work 123`)
+`$ARGUMENTS` - Optional task ID to work on directly (e.g., `/sdlc:work myproject-add-login-abc123`)
 
 ## Steps
 
@@ -61,12 +62,12 @@ If config doesn't exist, inform user to run `/sdlc:setup` first.
 grep "^sdlc_version:" .claude/sdlc.yaml || echo "sdlc_version: unknown"
 ```
 
-If the version in the config doesn't match the current plugin version (**3.9.0**), show a warning:
+If the version in the config doesn't match the current plugin version (**5.0.0**), show a warning:
 
 ```
 ⚠️  SDLC UPDATE AVAILABLE
 
-Your SDLC configuration was created with v<version> but you're running v3.9.0.
+Your SDLC configuration was created with v<version> but you're running v5.0.0.
 
 To update (preserves your configuration choices):
   /sdlc:setup
@@ -92,10 +93,10 @@ If pull fails due to diverged history, inform user and suggest resolution.
 Also detect current work context:
 ```bash
 git branch --show-current
-gh issue list --assignee @me --state open
+dot ls --status active --json
 ```
 
-If branch name contains an issue number (e.g., `feature/123-add-login`), that issue becomes the default selection.
+If branch name contains a task ID (e.g., `feature/myproject-add-login-abc123`), that task becomes the default selection.
 
 ### 3. Search Memento for Context
 
@@ -107,75 +108,63 @@ mcp__memento__semantic_search({ "query": "current work in progress [project-name
 
 This helps identify if there's already work in progress that should be the default.
 
-### 4. Get Available Issues
+### 4. Get Available Tasks
 
-If using GitHub Projects:
+Get tasks ready for work (unblocked, open status):
 ```bash
-gh project-ext ready  # Shows Ready items sorted by priority
+dot ready --json
 ```
 
-Also get In Progress items:
+This shows all tasks that:
+- Have `status: open`
+- Are not blocked by any other tasks
+- Are sorted by priority
+
+Also get active tasks:
 ```bash
-gh project item-list <project-number> --owner <owner> --format json | \
-  jq '.items[] | select(.status == "In Progress")'
+dot ls --status active --json
 ```
 
-If not using projects, fall back to:
+### 4a. Get Child Tasks of Active Parents
+
+For each active task, fetch child tasks to show sub-task progress:
 ```bash
-gh issue list --state open --json number,title,labels,assignees
+for parent_id in $(echo "$ACTIVE_TASKS" | jq -r '.[].id'); do
+  dot tree "$parent_id" --json
+done
 ```
 
-### 4a. Get Sub-Issues of In Progress Items
-
-For each In Progress issue (only), fetch non-closed sub-issues:
-```bash
-gh issue-ext sub list <issue-number> --json
-```
-Include sub-issues where state is NOT "CLOSED". Collect with parent context for presentation.
+This shows the hierarchy and helps identify if parent tasks have remaining children to complete.
 
 ### 5. Present Options
 
 Use AskUserQuestion to show available work:
 
-Format issues as options:
-- **Currently working on** (if detected): "#123 - Issue title [In Progress]"
-- **Sub-issues of In Progress items**: "#789 - Sub-issue title [sub-issue of #123: Parent title]"
-- **Ready items** (sorted by priority): "#456 - Issue title [P0]"
+Format tasks as options:
+- **Currently working on** (if detected): "myproject-add-login-abc123 - Task title [Active]"
+- **Child tasks of active parents**: "myproject-validate-form-def456 - Child task title [child of: Parent title]"
+- **Ready tasks** (sorted by priority): "myproject-new-feature-ghi789 - Task title [P1]"
 
-**Sub-issue Priority**: Sub-issues of In Progress items should be shown prominently (after any "Currently working on" item but before general Ready items) since they represent work that's already been scoped and is blocking completion of the parent.
+**Child Task Priority**: Child tasks of active parents should be shown prominently (after any "Currently working on" item but before general Ready tasks) since they represent work that's already been scoped and is blocking completion of the parent.
 
 Include context from memento search if relevant.
 
-Let user select an issue or enter a custom issue number.
+Let user select a task or enter a custom task ID.
 
-### 6. Start Work on Selected Issue
+### 6. Start Work on Selected Task
 
-#### a. Assign to self (if not already assigned)
+#### a. Mark task as active
 ```bash
-gh issue edit <number> --add-assignee @me
+dot on <task-id>
 ```
 
-#### b. Move to In Progress (if using projects)
+This changes the task status from `open` to `active`, indicating work has begun.
 
-Load the project configuration from `.claude/sdlc.yaml`:
-```bash
-owner=$(yq '.github.owner' .claude/sdlc.yaml)
-project=$(yq '.github.project' .claude/sdlc.yaml)
-```
+**Note**: Unlike GitHub Issues, dot tasks don't have assignment - all tasks in .dots/ belong to the current user/project.
 
-If project is not null/empty:
-```bash
-gh project-ext move <number> "In Progress" --owner "$owner" --project "$project"
-```
+#### b. Create branch (or worktree)
 
-If project is null or not configured, skip the move step with an informational message:
-```
-Note: No GitHub Project configured. To configure, run: /sdlc:setup
-```
-
-#### c. Create branch (or worktree)
-
-Generate slug from issue title (lowercase, hyphens, max 50 chars).
+Use the full task ID as the branch name (e.g., `feature/myproject-add-login-abc123`). The task ID already contains a slug from the title, so no need to generate one.
 
 **If worktrees enabled (`git.worktrees: true`):**
 
@@ -187,11 +176,11 @@ Worktrees enable parallel development of independent vertical slices. Each workt
 worktree_base="../$(basename $(pwd))-worktrees"
 mkdir -p "$worktree_base"
 
-# Create worktree with new branch
-git worktree add "$worktree_base/<issue-number>-<slug>" -b feature/<issue-number>-<slug>
+# Create worktree with new branch using task ID
+git worktree add "$worktree_base/<task-id>" -b feature/<task-id>
 
 # Verify worktree location
-echo "Worktree created at: $worktree_base/<issue-number>-<slug>"
+echo "Worktree created at: $worktree_base/<task-id>"
 ```
 
 After creating the worktree:
@@ -204,16 +193,16 @@ After creating the worktree:
 
 **If using standard git (no worktrees):**
 ```bash
-git checkout -b feature/<issue-number>-<slug>
+git checkout -b feature/<task-id>
 ```
 
 **Parallel Development Note**: With worktrees enabled, you can work on multiple independent slices simultaneously. Each slice gets its own isolated worktree directory.
 
 **How to work in parallel:**
-1. In your main project, run `/sdlc:work 123` → creates worktree at `../myproject-worktrees/123-slice-name`
+1. In your main project, run `/sdlc:work myproject-slice-one-abc123` → creates worktree at `../myproject-worktrees/myproject-slice-one-abc123`
 2. Open a **new terminal window**, `cd` to the worktree directory
 3. Launch a **separate Claude Code instance** there (`claude`)
-4. Back in your main project, run `/sdlc:work 456` for another slice
+4. Back in your main project, run `/sdlc:work myproject-slice-two-def456` for another slice
 5. Repeat for each parallel slice
 
 **Why separate instances?**
@@ -227,7 +216,7 @@ git checkout -b feature/<issue-number>-<slug>
 - Integration points are spec'd BEFORE dependent work begins
 - Shared code (integration points) should be merged to main before dependent slices start
 
-#### d. Store in memento
+#### c. Store in memento
 
 Create a memory noting the current work:
 ```
@@ -236,9 +225,9 @@ mcp__memento__create_entities({
     "name": "Current Work Session [date]",
     "entityType": "work_session",
     "observations": [
-      "Working on issue #<number>: <title>",
+      "Working on task <task-id>: <title>",
       "Project: <project-name> | Path: <repo-path>",
-      "Branch: <branch-name>"
+      "Branch: feature/<task-id>"
     ]
   }]
 })
@@ -246,15 +235,15 @@ mcp__memento__create_entities({
 
 ### 7. Display Work Context
 
-Show the issue details and acceptance criteria:
+Show the task details and acceptance criteria:
 
 ```bash
-gh issue view <number>
+dot show <task-id>
 ```
 
-If the issue has sub-issues:
+If the task has child tasks:
 ```bash
-gh issue-ext sub list <number>
+dot tree <task-id>
 ```
 
 ### 8. Ready to Work
@@ -262,16 +251,16 @@ gh issue-ext sub list <number>
 Display:
 
 ```
-Ready to work on #<number>: <title>
+Ready to work on <task-id>: <title>
 
-Branch: <branch-name>
-Status: In Progress
+Branch: feature/<task-id>
+Status: active
 
-Acceptance Criteria:
-<from issue body>
+Description:
+<from task description>
 
-Sub-issues:
-<if any>
+Child tasks:
+<if any, from dot tree>
 
 The SDLC will guide your TDD workflow. Just describe what you want to implement.
 ```
@@ -279,8 +268,9 @@ The SDLC will guide your TDD workflow. Just describe what you want to implement.
 ## Error Handling
 
 - **No config**: Direct to `/sdlc:setup`
+- **No .dots/ directory**: Direct to `/sdlc:setup` to initialize dot
 - **Dirty git state**: Show cleanup options
 - **Pull fails (diverged)**: Inform user of conflict, suggest `git pull --rebase` or manual resolution
-- **No ready issues**: Suggest creating issues or checking project board
-- **Issue not found**: Show error with issue number
+- **No ready tasks**: Suggest using `/sdlc:plan` to create tasks from event model slices, or manually creating tasks with `dot add`
+- **Task not found**: Show error with task ID, suggest `dot ls` to see all tasks
 - **Git-spice branching issues**: See `sdlc:shared/git-spice` skill for handling stacking scenarios

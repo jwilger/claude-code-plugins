@@ -30,7 +30,7 @@ Handle PR review feedback. This command:
 
 ## Steps
 
-### 1. Detect Current PR
+### 1. Detect Current PR and Task
 
 From current branch, find the associated PR:
 ```bash
@@ -42,6 +42,14 @@ If no PR exists:
 No PR found for current branch.
 Run /sdlc:pr first to create a pull request.
 ```
+
+Also extract task ID from branch name for context:
+```bash
+BRANCH=$(git branch --show-current)
+TASK_ID=$(echo "$BRANCH" | sed 's/^feature\///')
+```
+
+This helps track which task the review work relates to.
 
 ### 2. Fetch and Organize Comments
 
