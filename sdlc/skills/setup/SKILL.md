@@ -1,6 +1,6 @@
 ---
 name: setup
-version: 2.0.1
+version: 2.1.0
 author: jwilger
 repository: jwilger/claude-code-plugins
 description: Interactive multi-stage SDLC configuration with progressive disclosure. Run this first before using any other skills.
@@ -16,7 +16,7 @@ allowed-tools: Bash, Write, AskUserQuestion, Read
 
 # Setup Skill
 
-**Version:** 2.0.0
+**Version:** 2.1.0
 **Portability:** Tool-specific
 
 ---
@@ -134,7 +134,19 @@ Issues → TDD → PR
 - Standard GitHub workflow
 - Simpler review process
 
-#### Question 3: Output Style?
+#### Question 3: GitHub Repository Setup?
+
+**Yes (Recommended for team workflows):**
+- Configure repository rulesets (branch protection)
+- Set up automatic PR branch deletion
+- Configure default PR title/message templates
+- Set allowed merge types (squash/merge/rebase)
+
+**No (Skip repository configuration):**
+- Use default GitHub settings
+- Configure manually later
+
+#### Question 4: Output Style?
 
 **sdlc-rules (Professional):**
 - Clear, directive guidance
@@ -186,6 +198,7 @@ Select: Event Modeling
 Stage 3:
 Worktrees? → Yes
 Stacked PRs? → No (skip git-spice)
+GitHub setup? → Yes
 Output style? → sdlc-rules
 
 ✅ Setup complete! Run /sdlc:start to begin.
@@ -215,6 +228,7 @@ User: /sdlc:setup --reconfigure
 Current:
   Mode: event-modeling
   Worktrees: yes
+  GitHub: configured
   Output: sdlc-rules
 
 Change? → Output style only
@@ -349,6 +363,56 @@ Use AskUserQuestion with multiSelect for optional features:
 }
 ```
 
+GitHub repository setup question:
+```javascript
+{
+  "questions": [{
+    "question": "Would you like to configure GitHub repository settings?",
+    "header": "GitHub",
+    "multiSelect": false,
+    "options": [
+      {
+        "label": "Yes (Recommended for team workflows)",
+        "description": "Configure rulesets, PR branch deletion, default PR templates, and allowed merge types."
+      },
+      {
+        "label": "No (Skip for now)",
+        "description": "Use default GitHub settings. You can configure manually later."
+      }
+    ]
+  }]
+}
+```
+
+If user selects "Yes", configure repository settings:
+```bash
+# Get repository name
+REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+
+# Configure repository settings
+gh api -X PATCH "repos/$REPO" \
+  -f delete_branch_on_merge=true \
+  -f allow_squash_merge=true \
+  -f allow_merge_commit=true \
+  -f allow_rebase_merge=true
+
+# Set default PR title/body templates (create .github/pull_request_template.md if needed)
+mkdir -p .github
+cat > .github/pull_request_template.md <<'EOF'
+## Summary
+<!-- Brief description of changes -->
+
+## Test Plan
+<!-- How to verify these changes work -->
+
+## Related Issues
+<!-- Link to related issues/tickets -->
+EOF
+
+# Create branch protection ruleset (requires rulesets API)
+# Note: User needs admin access to configure rulesets
+```
+
 Separate question for output style (always choose one):
 ```javascript
 {
@@ -370,12 +434,25 @@ Separate question for output style (always choose one):
 }
 ```
 
+If worktrees are selected, create directory and gitignore:
+```bash
+mkdir -p .worktrees
+echo ".worktrees/" >> .gitignore
+```
+
 Update config with selections:
 ```yaml
 git:
   worktrees: true  # if selected
-  worktree_parent: ../worktrees
+  worktree_parent: .worktrees
   stacked_prs: true  # if selected
+
+github:
+  repository_configured: true  # if GitHub setup was selected
+  delete_branch_on_merge: true
+  allow_squash_merge: true
+  allow_merge_commit: true
+  allow_rebase_merge: true
 
 output_style: sdlc-rules  # or sdlc-marvin
 
@@ -407,8 +484,9 @@ fi
 
 Configuration:
   Mode: event-modeling
-  Worktrees: enabled
+  Worktrees: enabled (.worktrees/ directory created)
   Stacked PRs: disabled
+  GitHub: configured (branch deletion, PR templates, merge types)
   Output style: sdlc-rules
 
 Next steps:
@@ -430,6 +508,11 @@ For complete implementation details, configuration schema, and error handling:
 
 ## Metadata
 
+**Version:** 2.1.0 (2026-02-05):
+- Fix worktrees directory location: now uses `.worktrees/` (gitignored) instead of `../worktrees`
+- Add GitHub repository configuration option (rulesets, PR settings, branch deletion, merge types)
+
 **Version:** 2.0.1 (2026-02-05): Fix git-spice command detection (use `gs` not `git-spice`)
+
 **Dependencies:** None
 **Portability:** Tool-specific (gh, git required)

@@ -113,11 +113,20 @@ require_domain_review: true
 - Simpler mental model
 - Standard git workflow
 
+**Implementation (if Yes):**
+```bash
+# Create worktrees directory
+mkdir -p .worktrees
+
+# Add to .gitignore
+echo ".worktrees/" >> .gitignore
+```
+
 **Config:**
 ```yaml
 git:
   worktrees: true  # or false
-  worktree_parent: ../worktrees  # if true
+  worktree_parent: .worktrees  # if true
 ```
 
 #### Question 2: Git-Spice
@@ -141,7 +150,60 @@ git:
   spice_branch_prefix: slice/  # if true
 ```
 
-#### Question 3: Output Style
+#### Question 3: GitHub Repository Setup
+"Would you like to configure GitHub repository settings?"
+
+**Option 1: Yes (Recommended for team workflows)**
+- Configure repository rulesets (branch protection)
+- Set up automatic PR branch deletion
+- Configure default PR title/message templates
+- Set allowed merge types (squash/merge/rebase)
+- Requires: Admin access to repository
+
+**Option 2: No (Skip repository configuration)**
+- Use default GitHub settings
+- Configure manually later via GitHub UI
+
+**Implementation:**
+```bash
+# Get repository name
+REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+
+# Configure repository settings
+gh api -X PATCH "repos/$REPO" \
+  -f delete_branch_on_merge=true \
+  -f allow_squash_merge=true \
+  -f allow_merge_commit=true \
+  -f allow_rebase_merge=true
+
+# Create PR template
+mkdir -p .github
+cat > .github/pull_request_template.md <<'EOF'
+## Summary
+<!-- Brief description of changes -->
+
+## Test Plan
+<!-- How to verify these changes work -->
+
+## Related Issues
+<!-- Link to related issues/tickets -->
+EOF
+
+# Note: Branch protection rulesets require GitHub API rulesets endpoint
+# and admin permissions on the repository
+```
+
+**Config:**
+```yaml
+github:
+  repository_configured: true  # or false
+  delete_branch_on_merge: true
+  allow_squash_merge: true
+  allow_merge_commit: true
+  allow_rebase_merge: true
+```
+
+#### Question 4: Output Style
 "Which output style do you prefer?"
 
 **Option 1: sdlc-rules (Professional)**
@@ -214,8 +276,16 @@ require_domain_review: true
 # Git configuration
 git:
   worktrees: true
-  worktree_parent: ../worktrees
+  worktree_parent: .worktrees
   stacked_prs: false
+
+# GitHub repository configuration
+github:
+  repository_configured: true
+  delete_branch_on_merge: true
+  allow_squash_merge: true
+  allow_merge_commit: true
+  allow_rebase_merge: true
 
 # Output style
 output_style: sdlc-rules  # or: sdlc-marvin
