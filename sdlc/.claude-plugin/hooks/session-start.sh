@@ -18,6 +18,28 @@ source "$SCRIPT_DIR/lib/check-prerequisites.sh" || {
   echo "Warning: Could not load prerequisite checking utilities" >&2
 }
 
+# Write environment variables to CLAUDE_ENV_FILE (if provided)
+if [[ -n "${CLAUDE_ENV_FILE:-}" ]]; then
+  # Determine project root
+  PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+  echo "export PROJECT_ROOT='$PROJECT_ROOT'" >> "$CLAUDE_ENV_FILE"
+
+  # Load sdlc config if exists
+  if [[ -f "$PROJECT_ROOT/.claude/sdlc.yaml" ]] && command -v yq &>/dev/null; then
+    WORKFLOW=$(yq eval '.workflow_mode' "$PROJECT_ROOT/.claude/sdlc.yaml" 2>/dev/null || echo "")
+    if [[ -n "$WORKFLOW" ]]; then
+      echo "export SDLC_WORKFLOW='$WORKFLOW'" >> "$CLAUDE_ENV_FILE"
+    fi
+  fi
+
+  # Detect active task from branch
+  BRANCH=$(git branch --show-current 2>/dev/null || echo "")
+  if [[ -n "$BRANCH" ]] && [[ "$BRANCH" == feature/* ]]; then
+    TASK_ID="${BRANCH#feature/}"
+    echo "export SDLC_ACTIVE_TASK='$TASK_ID'" >> "$CLAUDE_ENV_FILE"
+  fi
+fi
+
 # Build context message
 CONTEXT="🚀 SESSION START - Work Context\n\n"
 

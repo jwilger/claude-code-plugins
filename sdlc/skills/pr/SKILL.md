@@ -100,10 +100,18 @@ Runs three-stage code review, enforces mutation testing, and creates/updates Git
 **Invoke:** `/sdlc:pr`
 **Result:** Shows CRITICAL/IMPORTANT findings, blocks PR until fixed
 
-### Example 4: Mutation Score < 100%
-**When:** Tests exist but don't catch all mutations
+### Example 4: Mutation Testing (Async)
+**When:** Tests exist but mutation testing runs slowly
 **Invoke:** `/sdlc:pr`
-**Result:** Reports surviving mutants, suggests additional tests
+**Result:** PR created, mutation tests run in background
+**Note:** Mutation test results appear in next conversation turn (non-blocking)
+
+**Benefits:**
+- PR creation doesn't wait 5-30 minutes for mutation tests
+- Continue working while tests execute
+- Results stored in `.claude/projects/<project>/memory/mutation-reports/latest.txt`
+
+**Trade-off:** Can't block PR creation on mutation score (info-only)
 
 ### Example 5: Updating Existing PR
 **When:** PR exists, pushed new commits

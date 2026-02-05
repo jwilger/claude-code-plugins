@@ -23,6 +23,7 @@
     "./agents/model-checker.md",
     "./agents/design-facilitator.md",
     "./agents/gwt.md",
-    "./agents/file-updater.md"
+    "./agents/file-updater.md",
+    "./agents/hook-verifier.md"
   ]
 }

@@ -104,6 +104,41 @@ hooks:
           prompt: |
             Before completing, if you discovered any test patterns worth remembering,
             use /sdlc:remember to store them. Output ONLY: {"ok": true}
+  PostToolUseFailure:
+    - matcher: Bash
+      hooks:
+        - type: prompt
+          prompt: |
+            🔴 TEST COMMAND FAILED - Recovery Guidance
+
+            Common causes and solutions:
+
+            1. **Missing test framework**
+               - Error: "command not found: pytest" or "cargo test: command not found"
+               - Fix: Run setup (npm install, cargo build --tests, pip install -r requirements.txt)
+               - Check: Look for package.json, Cargo.toml, requirements.txt
+
+            2. **Syntax error in test**
+               - Error: "SyntaxError", "expected `;`", "unexpected token"
+               - Fix: Read the test file at the line shown in error, check syntax carefully
+               - Tip: Common issues - missing semicolons, unclosed braces, typos
+
+            3. **Wrong test command**
+               - Error: "No such file or directory", "cannot find test"
+               - Fix: Verify test command in .claude/sdlc.yaml matches project setup
+               - Check: Does the test file path in error message exist?
+
+            4. **Missing dependencies**
+               - Error: "module not found", "cannot import"
+               - Fix: Install dependencies (npm install, cargo add, pip install)
+               - Check: Are imports correct? Do dependencies exist in package manifest?
+
+            ## Recovery Steps
+            1. **Read error output carefully** - error message usually points to exact issue
+            2. **Search memory** - Use Grep to search memory for similar past issues
+            3. **Ask user if needed** - If setup incomplete, use AskUserQuestion pattern
+
+            Output ONLY: {"ok": true}
 ---
 
 # SDLC Red Phase Agent

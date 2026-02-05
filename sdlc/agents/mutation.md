@@ -6,6 +6,46 @@ memory: project
 tools: Read, Bash, Glob, Grep
 skills:
   - memory-protocol
+hooks:
+  Stop:
+    - hooks:
+        - type: command
+          async: true
+          timeout: 600
+          command: |
+            #!/usr/bin/env bash
+            set -euo pipefail
+
+            # Determine project root and memory path
+            PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+            PROJECT_NAME=$(basename "$PROJECT_ROOT")
+            MEMORY_PATH="$HOME/.claude/projects/$PROJECT_NAME/memory"
+            mkdir -p "$MEMORY_PATH/mutation-reports"
+
+            # Detect project type and run mutation tests
+            if [[ -f "$PROJECT_ROOT/Cargo.toml" ]]; then
+              # Rust project
+              cargo mutants --timeout 300 > "$MEMORY_PATH/mutation-reports/latest.txt" 2>&1 || true
+            elif [[ -f "$PROJECT_ROOT/package.json" ]]; then
+              # TypeScript/JavaScript project
+              npx stryker run > "$MEMORY_PATH/mutation-reports/latest.txt" 2>&1 || true
+            elif [[ -f "$PROJECT_ROOT/pyproject.toml" ]] || [[ -f "$PROJECT_ROOT/setup.py" ]]; then
+              # Python project
+              mutmut run --paths-to-mutate=src/ > "$MEMORY_PATH/mutation-reports/latest.txt" 2>&1 || true
+              mutmut results >> "$MEMORY_PATH/mutation-reports/latest.txt" 2>&1 || true
+            else
+              echo "Unknown project type - no mutation testing tool configured" > "$MEMORY_PATH/mutation-reports/latest.txt"
+            fi
+
+            # Extract mutation score if available
+            MUTATION_SCORE=$(grep -i "mutation.*score\|caught\|killed" "$MEMORY_PATH/mutation-reports/latest.txt" | head -1 || echo "See full report")
+
+            # Return results (shown on next conversation turn)
+            cat <<EOF
+            {
+              "additionalContext": "🔬 Mutation Testing Complete\\n\\n$MUTATION_SCORE\\n\\nFull report: $MEMORY_PATH/mutation-reports/latest.txt\\n\\nNote: This ran in the background. Review the report and address any surviving mutants."
+            }
+            EOF
 ---
 
 # SDLC Mutation Testing Agent
