@@ -180,16 +180,39 @@ fi
 If no remote exists, present three options:
 
 1. **Create new GitHub repository:**
+
+**Step 1: Ask for repository name**
+Present options:
+- Use directory name (default/recommended)
+- Specify custom name
+
+If custom name chosen, prompt for text input.
+
+**Step 2: Ask for visibility**
+Present options:
+- Public repository
+- Private repository
+
+**Step 3: Create repository**
 ```bash
-# Get current directory name as default
-DEFAULT_NAME=$(basename "$PWD")
+# Use chosen name and visibility
+gh repo create "$REPO_NAME" --source=. --remote=origin --public  # or --private
 
-# Create repository using gh CLI
-gh repo create "$DEFAULT_NAME" --source=. --remote=origin
-
-# Verify creation
-gh repo view >/dev/null 2>&1 && echo "✓ Repository created"
+# Check result
+if [ $? -eq 0 ]; then
+  echo "✓ Repository created and remote added"
+else
+  # Creation failed - handle conflict
+fi
 ```
+
+**Step 4: Handle creation failure (name conflict)**
+If creation fails (typically "name already exists"), ask user:
+- **Associate with existing repository**: Connect to the existing repo with that name
+- **Try a different name**: Loop back to Step 1 with different name
+- **Skip GitHub configuration**: Exit without configuring remote
+
+Do NOT automatically assume the user wants to associate with existing repo.
 
 2. **Associate with existing repository:**
 ```bash

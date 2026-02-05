@@ -1,6 +1,6 @@
 ---
 name: setup
-version: 2.2.0
+version: 2.2.1
 author: jwilger
 repository: jwilger/claude-code-plugins
 description: Interactive multi-stage SDLC configuration with progressive disclosure. Run this first before using any other skills.
@@ -16,7 +16,7 @@ allowed-tools: Bash, Write, AskUserQuestion, Read
 
 # Setup Skill
 
-**Version:** 2.2.0
+**Version:** 2.2.1
 **Portability:** Tool-specific
 
 ---
@@ -419,25 +419,77 @@ If no remote exists, ask user:
 ```
 
 **If "Create new GitHub repository" selected:**
+
+First, ask for repository name:
+```javascript
+{
+  "questions": [{
+    "question": "What should the GitHub repository be named? (Suggested: [directory-name])",
+    "header": "Repo Name",
+    "multiSelect": false,
+    "options": [
+      {
+        "label": "[directory-name] (Recommended)",
+        "description": "Use the current directory name as the repository name."
+      },
+      {
+        "label": "Different name",
+        "description": "Specify a custom repository name."
+      }
+    ]
+  }]
+}
+```
+
+If "Different name" selected, prompt for custom name using AskUserQuestion with text input.
+
+Then create repository:
 ```bash
-# Get current directory name as default repo name
-DEFAULT_NAME=$(basename "$PWD")
+# Get the chosen name (either directory name or custom)
+REPO_NAME="[chosen-name]"
 
-# Ask for repository details
-echo "Creating GitHub repository..."
-echo "Default name: $DEFAULT_NAME"
+# Ask about visibility
+# Use AskUserQuestion to choose between public/private
 
-# Create repository (gh will prompt for details)
-gh repo create "$DEFAULT_NAME" --source=. --remote=origin
-
-# Verify creation
-if gh repo view >/dev/null 2>&1; then
+# Create repository
+if gh repo create "$REPO_NAME" --source=. --remote=origin --public; then
   echo "✓ Repository created and remote added"
 else
-  echo "❌ Repository creation failed"
-  exit 1
+  # Creation failed - likely name already exists
+  echo "⚠️  Repository creation failed"
 fi
 ```
+
+**If repository creation fails (name exists):**
+
+Ask user what to do next:
+```javascript
+{
+  "questions": [{
+    "question": "Repository name already exists. What would you like to do?",
+    "header": "Conflict",
+    "multiSelect": false,
+    "options": [
+      {
+        "label": "Associate with existing repository",
+        "description": "Connect this project to the existing [repo-name] repository."
+      },
+      {
+        "label": "Try a different name",
+        "description": "Choose a different repository name and create a new one."
+      },
+      {
+        "label": "Skip GitHub configuration",
+        "description": "Continue without configuring GitHub remote."
+      }
+    ]
+  }]
+}
+```
+
+- If "Associate with existing": Use the associate flow (add remote, verify)
+- If "Try a different name": Loop back to name selection
+- If "Skip": Exit GitHub configuration
 
 **If "Associate with existing repository" selected:**
 ```bash
@@ -583,6 +635,11 @@ For complete implementation details, configuration schema, and error handling:
 ---
 
 ## Metadata
+
+**Version:** 2.2.1 (2026-02-05):
+- Fix: Ask for repository name instead of assuming directory name
+- Fix: Ask before associating with existing repo when name conflicts
+- Add visibility choice (public/private) for new repositories
 
 **Version:** 2.2.0 (2026-02-05):
 - Add GitHub remote creation/association when no remote exists
