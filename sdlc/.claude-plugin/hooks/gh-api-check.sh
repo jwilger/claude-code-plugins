@@ -6,11 +6,30 @@
 
 set -euo pipefail
 
+# Load prerequisite checking utilities
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=./lib/check-prerequisites.sh
+source "$SCRIPT_DIR/lib/check-prerequisites.sh" 2>/dev/null || true
+
 # Read hook input from stdin
 INPUT=$(cat)
 
 # Extract the command from tool_input
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
+
+# Check if gh CLI is available (informational only, doesn't block)
+if [[ "$COMMAND" == *"gh"* ]] && ! command -v gh &>/dev/null; then
+    cat <<'EOF'
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "deny",
+    "permissionDecisionReason": "gh CLI not installed. Install from https://cli.github.com/"
+  }
+}
+EOF
+    exit 0
+fi
 
 # Check if this is a gh api command
 if [[ "$COMMAND" != *"gh api"* ]]; then

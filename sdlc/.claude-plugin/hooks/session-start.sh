@@ -11,6 +11,13 @@
 
 set -euo pipefail
 
+# Load prerequisite checking utilities
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=./lib/check-prerequisites.sh
+source "$SCRIPT_DIR/lib/check-prerequisites.sh" || {
+  echo "Warning: Could not load prerequisite checking utilities" >&2
+}
+
 # Build context message
 CONTEXT="🚀 SESSION START - Work Context\n\n"
 
@@ -26,6 +33,10 @@ if [[ -n "$BRANCH" ]]; then
     if [[ -n "$TASK_INFO" ]]; then
       CONTEXT+="📋 Active Task:\n$TASK_INFO\n"
     fi
+  else
+    # dot CLI not available - add helpful note
+    CONTEXT+="💡 Note: Install dot CLI for task management integration\n"
+    CONTEXT+="   cargo install dot-task (https://github.com/jwilger/dot-task)\n"
   fi
 fi
 
@@ -36,10 +47,16 @@ if [[ -n "$COMMITS" ]]; then
 fi
 
 # 3. PR status if on feature branch
-if [[ -n "$BRANCH" ]] && [[ "$BRANCH" == feature/* ]] && command -v gh &>/dev/null; then
-  PR_INFO=$(gh pr view --json number,title,reviewDecision 2>/dev/null | jq -r '"  PR #\(.number): \(.title)\n  Status: \(.reviewDecision // \"Pending\")"' || echo "")
-  if [[ -n "$PR_INFO" ]]; then
-    CONTEXT+="\n🔀 Pull Request:\n$PR_INFO\n"
+if [[ -n "$BRANCH" ]] && [[ "$BRANCH" == feature/* ]]; then
+  if command -v gh &>/dev/null; then
+    PR_INFO=$(gh pr view --json number,title,reviewDecision 2>/dev/null | jq -r '"  PR #\(.number): \(.title)\n  Status: \(.reviewDecision // \"Pending\")"' || echo "")
+    if [[ -n "$PR_INFO" ]]; then
+      CONTEXT+="\n🔀 Pull Request:\n$PR_INFO\n"
+    fi
+  else
+    # gh CLI not available - add helpful note
+    CONTEXT+="\n💡 Note: Install gh CLI for GitHub integration\n"
+    CONTEXT+="   https://cli.github.com/\n"
   fi
 fi
 

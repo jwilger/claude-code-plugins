@@ -114,8 +114,9 @@ cd sdlc/output-styles && ./.build-output-styles.sh
 
 ## Plugin-Specific Notes
 
-### sdlc Plugin (v9.0.0)
-- **Skills (11 total):** setup, start, work, pr, complete, review, design, plan, arch, remember, recall, domain-audit
+### sdlc Plugin (v10.0.0)
+- **Workflow Skills (13 total):** setup, start, work, pr, complete, review, design, plan, arch, remember, recall, status, domain-audit
+- **Portable Skills (9 bundled):** tdd-constraints, user-input-protocol, debugging-protocol, memory-protocol, orchestration-protocol, event-modeling, git-spice, atomic-design, task-management
 - **Output styles:**
   - `sdlc-rules` - Orchestration and coding guidelines (no personality)
   - `sdlc-marvin` - Same rules with Marvin the Paranoid Android personality
@@ -128,7 +129,6 @@ cd sdlc/output-styles && ./.build-output-styles.sh
   - Story planning agents: story, ux
   - Utility agents: file-updater
 - **Workflow:** Task-based TDD cycle with mechanical dependency enforcement
-- **Portable skills (9 bundled):** tdd-constraints, user-input-protocol, debugging-protocol, etc.
 - **Requires:** gh CLI, dot CLI, gh-pr-review extension
 - **Optional:** git-spice for stacked PRs
 - **Breaking changes in v9.0.0:** Commands removed (replaced by skills), see `sdlc/MIGRATION-v9.md`

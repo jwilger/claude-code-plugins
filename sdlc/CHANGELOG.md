@@ -684,10 +684,10 @@ Run `/sdlc:setup` in existing projects to get corrected hook templates. The doma
   - Enforces TDD cycle discipline: RED → DOMAIN → GREEN → DOMAIN
   - No more skipping domain review for "trivial" changes or "obvious" fixes
 
-- **SessionStart Memory Reminder** - Gentle reminder to check memento for relevant context at session start
+- **SessionStart Memory Reminder** - Gentle reminder to check memory for relevant context at session start
   - Suggests checking for debugging insights, architecture patterns, tool quirks, project conventions
   - Non-blocking - just a helpful nudge to use the memory system
-  - Helps prevent reinventing solutions already documented in memento
+  - Helps prevent reinventing solutions already documented in memory
 
 - **TDD/Event Modeling State Schema** - Added state tracking infrastructure to sdlc.yaml
   - `tdd_state` section for tracking TDD workflow phases (future enhancement foundation)

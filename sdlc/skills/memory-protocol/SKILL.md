@@ -407,38 +407,7 @@ useEffect(() => {
 EOF
 ```
 
-### Example 2: Legacy Memento MCP Implementation (Deprecated)
-
-**Note:** The sdlc plugin v6.0.0+ no longer uses Memento MCP. This example is kept for reference only.
-
-**Tool:** Memento MCP server (knowledge graph) - **NO LONGER SUPPORTED**
-
-**Recall pattern:**
-```bash
-# Search for error fix
-grep -r "CERTIFICATE_VERIFY_FAILED" .memories/
-
-# Output: .memories/python-ssl.md
-# Solution: Install certificates.command
-```
-
-**Remember pattern:**
-```bash
-# Store new discovery
-cat >> .memories/python-ssl.md << 'EOF'
-## SSL Certificate Error (macOS)
-
-**Problem:** `ssl.SSLError: [SSL: CERTIFICATE_VERIFY_FAILED]`
-
-**Solution:** Python on macOS doesn't use system certificates.
-Run: `/Applications/Python 3.x/Install Certificates.command`
-
-**Date:** 2026-02-04
-**Context:** Encountered when using requests library
-EOF
-```
-
-### Example 3: Database Implementation
+### Example 2: Database Implementation
 
 **Tool:** PostgreSQL or SQLite with full-text search
 
@@ -477,7 +446,7 @@ VALUES (
 );
 ```
 
-### Example 4: Integration with Task Workflow
+### Example 3: Integration with Task Workflow
 
 **Scenario:** Agent working through TDD cycle.
 

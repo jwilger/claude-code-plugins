@@ -270,34 +270,61 @@ Options:
 
 ## Examples
 
-### Example 1: Mutation Testing Agent (MCP/Memento Implementation)
+### Example 1: Mutation Testing Agent (File-Based Implementation)
 
-**Context:** Agent using Memento MCP server for state preservation
+**Context:** Agent using file-based state persistence (sdlc plugin pattern)
 
 **Step 1: Create Checkpoint**
-```javascript
-// Save state to Memento
-await mcp__memento__create_entities({
-  entities: [{
-    name: "mutation-agent Checkpoint 2026-02-04T10:30:00Z",
-    entityType: "agent_checkpoint",
-    observations: [
-      "Agent: mutation-agent | Task: mutation testing for auth module",
-      "Progress: Testing complete, 97% mutation score",
-      "Files analyzed: src/auth.rs, tests/auth_test.rs",
-      "Next step: Handle 3 surviving mutants",
-      "Pending decision: Create individual tasks or just report?"
-    ]
-  }]
-});
+```bash
+# Determine memory path
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+MEMORY_PATH="$HOME/.claude/projects/$(basename "$PROJECT_ROOT")/memory"
+mkdir -p "$MEMORY_PATH/checkpoints"
+
+# Create checkpoint file
+TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+STATE_FILE="$MEMORY_PATH/checkpoints/mutation-agent-${TIMESTAMP}.md"
+
+cat > "$STATE_FILE" << 'EOF'
+# mutation-agent Checkpoint
+
+**Timestamp:** 2026-02-04T10:30:00Z
+**Task:** Mutation testing for auth module
+**Agent:** mutation-agent
+
+## Progress Summary
+
+Testing complete, 97% mutation score achieved.
+
+## Files Analyzed
+
+- src/auth.rs
+- tests/auth_test.rs
+
+## Next Step
+
+Handle 3 surviving mutants - need user decision on approach.
+
+## Pending Decision
+
+Should I create individual fix tasks for each surviving mutant or just report?
+
+## Context for Continuation
+
+Three specific mutants survived:
+1. Line 45: Boundary condition in token expiry
+2. Line 78: Error message text change (no behavior impact)
+3. Line 103: Default timeout value change
+EOF
 ```
 
 **Step 2: Signal Pause**
-```json
-AWAITING_USER_INPUT
+```bash
+echo "AWAITING_USER_INPUT"
+cat << 'EOF'
 {
   "context": "Mutation testing found 3 surviving mutants (97% score overall)",
-  "checkpoint": "mutation-agent Checkpoint 2026-02-04T10:30:00Z",
+  "stateFile": "/home/user/.claude/projects/myapp/memory/checkpoints/mutation-agent-2026-02-04T10:30:00Z.md",
   "questions": [{
     "id": "q1",
     "question": "Should I create individual fix tasks for each surviving mutant?",
@@ -309,6 +336,7 @@ AWAITING_USER_INPUT
     "multiSelect": false
   }]
 }
+EOF
 ```
 
 **Step 3: Main Conversation Intermediates**
@@ -319,23 +347,22 @@ AWAITING_USER_INPUT
 ```
 
 **Step 4: Resume Agent**
-```javascript
-// Main conversation resumes agent
-await Task({
+```bash
+# Main conversation launches NEW agent (not resume)
+Task({
   subagent_type: "mutation",
-  resume: agentId,
   prompt: `USER_INPUT_RESPONSE
 {"q1": "Yes - create tasks"}
 
-Continue from checkpoint: mutation-agent Checkpoint 2026-02-04T10:30:00Z`
+Continue from state file: /home/user/.claude/projects/myapp/memory/checkpoints/mutation-agent-2026-02-04T10:30:00Z.md`
 });
 
-// Agent retrieves checkpoint and continues
-const checkpoint = await mcp__memento__open_nodes({
-  node_ids: ["mutation-agent Checkpoint 2026-02-04T10:30:00Z"]
-});
+# Agent reads checkpoint file and continues
+STATE_FILE="/home/user/.claude/projects/myapp/memory/checkpoints/mutation-agent-2026-02-04T10:30:00Z.md"
+STATE_CONTENT=$(cat "$STATE_FILE")
 
-// Create 3 tasks for the surviving mutants...
+# Parse context and continue work
+# Create 3 tasks for the surviving mutants...
 ```
 
 ### Example 2: Task Metadata Implementation (Claude Code)
@@ -484,24 +511,30 @@ Use this checklist to verify you're applying this pattern correctly:
 ## References
 
 **Source Documentation:**
-- sdlc plugin: commands/shared/user-input-protocol.md (Memento MCP implementation)
+- sdlc plugin: docs/SUBAGENT_QUESTION_PROTOCOL.md (file-based implementation)
 
 **Related Skills:**
 - orchestration-protocol - How main conversation detects and handles pauses
 - debugging-protocol - When debugging needs user input to disambiguate
+- memory-protocol - File-based knowledge management patterns
 
 **External Resources:**
 - Agent resumption patterns in Claude Code documentation
-- MCP (Model Context Protocol) for state preservation
+- Claude Code auto memory directory: ~/.claude/projects/<project-path>/memory/
 
 ---
 
 ## Version History
 
+### v1.0.1 (2026-02-05)
+- Updated Example 1 to use file-based state persistence (removed Memento MCP)
+- Updated references to point to SUBAGENT_QUESTION_PROTOCOL.md
+- Removed obsolete Memento MCP references from metadata
+
 ### v1.0.0 (2026-02-04)
 - Initial extraction from sdlc plugin
-- Generalized from Memento-specific to framework-agnostic pattern
-- Added three implementation examples (Memento MCP, Claude Code tasks, file-based)
+- Generalized from framework-specific to framework-agnostic pattern
+- Added three implementation examples (file-based, task metadata, generic)
 - Core principle: pause → save state → ask → resume
 
 ---

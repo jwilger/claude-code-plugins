@@ -1,7 +1,7 @@
 {
   "name": "sdlc",
   "version": "10.0.0",
-  "description": "Complete SDLC workflow with TDD, Event Modeling, commit-based ADRs, and GitHub integration (12 workflow skills, 14 agents with persistent memory)",
+  "description": "Complete SDLC workflow with TDD, Event Modeling, commit-based ADRs, and GitHub integration (13 workflow skills, 9 portable skills bundled, 14 agents)",
   "author": {
     "name": "John Wilger",
     "email": "john@johnwilger.com"

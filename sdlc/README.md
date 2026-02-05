@@ -352,7 +352,7 @@ The SDLC plugin uses Claude Code's built-in **auto memory** for knowledge persis
 
 ### Limitations
 
-Compared to semantic search systems (like Memento MCP):
+File-based memory trade-offs:
 - **No semantic search** - Only exact keyword matching via grep
 - **No relationship graph** - Manual markdown links between files
 - **No automatic capture** - Must manually use `/sdlc:remember`
