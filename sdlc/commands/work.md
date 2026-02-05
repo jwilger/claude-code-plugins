@@ -5,6 +5,8 @@ allowed-tools:
   - Read
   - AskUserQuestion
   - Grep
+  - TaskCreate
+  - TaskUpdate
 hooks:
   PreToolUse:
     - matcher: Read
@@ -61,12 +63,12 @@ If config doesn't exist, inform user to run `/sdlc:setup` first.
 grep "^sdlc_version:" .claude/sdlc.yaml || echo "sdlc_version: unknown"
 ```
 
-If the version in the config doesn't match the current plugin version (**5.0.0**), show a warning:
+If the version in the config doesn't match the current plugin version (**7.0.0**), show a warning:
 
 ```
 ⚠️  SDLC UPDATE AVAILABLE
 
-Your SDLC configuration was created with v<version> but you're running v5.0.0.
+Your SDLC configuration was created with v<version> but you're running v7.0.0.
 
 To update (preserves your configuration choices):
   /sdlc:setup
@@ -163,7 +165,108 @@ This changes the task status from `open` to `active`, indicating work has begun.
 
 **Note**: Unlike GitHub Issues, dot tasks don't have assignment - all tasks in .dots/ belong to the current user/project.
 
-#### b. Create branch (or worktree)
+#### b. Initialize worktree coordination (v7.0.0)
+
+**If worktree coordination enabled (`features.worktree_coordination: true` in `.claude/sdlc.yaml`):**
+
+Before creating the worktree, register it to prevent conflicts with parallel Claude instances:
+
+```bash
+TASK_ID="<selected-task-id>"
+WORKTREE_REGISTRY=".dots/.worktrees"
+TASK_REGISTRY="$WORKTREE_REGISTRY/$TASK_ID"
+LOCK_FILE="$WORKTREE_REGISTRY/lock"
+
+# Ensure registry directory exists
+mkdir -p "$WORKTREE_REGISTRY"
+
+# Acquire lock for coordination (simple file lock with timeout)
+attempt=0
+while ! mkdir "$LOCK_FILE" 2>/dev/null; do
+  attempt=$((attempt + 1))
+  if [ $attempt -gt 30 ]; then
+    echo "⚠️  Failed to acquire coordination lock after 30 seconds"
+    echo "Another instance may be starting work. Try again in a moment."
+    exit 1
+  fi
+  sleep 1
+done
+
+# Cleanup stale registrations (> 2 hours old)
+find "$WORKTREE_REGISTRY" -maxdepth 1 -type d -name "*-*-*" | while read -r reg; do
+  if [ -f "$reg/last_heartbeat" ]; then
+    HB_TIME=$(cat "$reg/last_heartbeat")
+    CURRENT_TIME=$(date +%s)
+    AGE=$((CURRENT_TIME - HB_TIME))
+    if [ $AGE -gt 7200 ]; then
+      echo "Cleaning stale registration: $(basename $reg)"
+      rm -rf "$reg"
+    fi
+  fi
+done
+
+# Check if task already has active worktree
+if [ -d "$TASK_REGISTRY" ] && [ -f "$TASK_REGISTRY/last_heartbeat" ]; then
+  HB_TIME=$(cat "$TASK_REGISTRY/last_heartbeat")
+  CURRENT_TIME=$(date +%s)
+  AGE=$((CURRENT_TIME - HB_TIME))
+
+  if [ $AGE -lt 1800 ]; then
+    # Active within last 30 minutes
+    WORKTREE_LOC=$(cat "$TASK_REGISTRY/location" 2>/dev/null || echo "unknown")
+    SESSION_ID=$(cat "$TASK_REGISTRY/session_id" 2>/dev/null || echo "unknown")
+    rmdir "$LOCK_FILE"
+    echo "⚠️  Task $TASK_ID is already being worked on"
+    echo ""
+    echo "Worktree: $WORKTREE_LOC"
+    echo "Session:  $SESSION_ID"
+    echo "Last activity: $((AGE / 60)) minutes ago"
+    echo ""
+    echo "This task is active in another Claude instance. To avoid conflicts:"
+    echo "  - Work on a different task, or"
+    echo "  - Close the other Claude instance first"
+    exit 1
+  else
+    # Stale (> 30 min), offer to reclaim
+    echo "⚠️  Task $TASK_ID has a stale worktree registration"
+    echo "Last activity: $((AGE / 60)) minutes ago"
+    echo ""
+    # Use AskUserQuestion to confirm reclaim
+    # If user confirms: rm -rf "$TASK_REGISTRY"
+  fi
+fi
+
+# Check if blockers are in progress elsewhere
+BLOCKERS=$(dot show "$TASK_ID" --json | jq -r '.blockers[]? // empty')
+for blocker in $BLOCKERS; do
+  if [ -d "$WORKTREE_REGISTRY/$blocker" ] && [ -f "$WORKTREE_REGISTRY/$blocker/last_heartbeat" ]; then
+    HB_TIME=$(cat "$WORKTREE_REGISTRY/$blocker/last_heartbeat")
+    CURRENT_TIME=$(date +%s)
+    AGE=$((CURRENT_TIME - HB_TIME))
+
+    if [ $AGE -lt 1800 ]; then
+      BLOCKER_TITLE=$(dot show "$blocker" --json | jq -r '.title')
+      rmdir "$LOCK_FILE"
+      echo "⚠️  Blocker task is being worked on in parallel"
+      echo ""
+      echo "Task:     $blocker"
+      echo "Title:    $BLOCKER_TITLE"
+      echo "Activity: $((AGE / 60)) minutes ago"
+      echo ""
+      echo "This blocker is active in another Claude instance."
+      echo "Wait for it to complete or coordinate with the other instance."
+      exit 1
+    fi
+  fi
+done
+
+# Release lock (will register after worktree creation)
+rmdir "$LOCK_FILE"
+```
+
+**If coordination not enabled:** Skip this section, proceed to branch/worktree creation.
+
+#### c. Create branch (or worktree)
 
 Use the full task ID as the branch name (e.g., `feature/myproject-add-login-abc123`). The task ID already contains a slug from the title, so no need to generate one.
 
@@ -185,10 +288,46 @@ echo "Worktree created at: $worktree_base/<task-id>"
 ```
 
 After creating the worktree:
-1. Note the worktree path for the user
-2. Run any project setup (npm install, cargo build, etc.)
-3. Run baseline tests to ensure clean starting state
-4. Optionally store worktree path in auto memory using /sdlc:remember if needed for context
+1. **Register the worktree** (if coordination enabled - v7.0.0)
+2. Note the worktree path for the user
+3. Run any project setup (npm install, cargo build, etc.)
+4. Run baseline tests to ensure clean starting state
+5. Optionally store worktree path in auto memory using /sdlc:remember if needed for context
+
+**Worktree Registration (v7.0.0):**
+
+If coordination is enabled, register the worktree immediately after creation:
+
+```bash
+if grep -q "worktree_coordination: true" .claude/sdlc.yaml 2>/dev/null; then
+  WORKTREE_PATH="$worktree_base/$TASK_ID"
+  TASK_REGISTRY=".dots/.worktrees/$TASK_ID"
+  LOCK_FILE=".dots/.worktrees/lock"
+
+  # Acquire lock
+  while ! mkdir "$LOCK_FILE" 2>/dev/null; do sleep 1; done
+
+  # Create registration
+  mkdir -p "$TASK_REGISTRY"
+  echo "$WORKTREE_PATH" > "$TASK_REGISTRY/location"
+  echo "$CLAUDE_SESSION_ID" > "$TASK_REGISTRY/session_id"
+  date +%s > "$TASK_REGISTRY/started_at"
+  date +%s > "$TASK_REGISTRY/last_heartbeat"
+
+  # Store task list ID for session resumability
+  TASK_LIST_ID="sdlc-$TASK_ID-$(date +%s)"
+  echo "$TASK_LIST_ID" > "$TASK_REGISTRY/task_list_id"
+  echo "$TASK_LIST_ID" > "$WORKTREE_PATH/.claude-task-list-id"
+
+  # Set for current session
+  export CLAUDE_CODE_TASK_LIST_ID="$TASK_LIST_ID"
+
+  # Release lock
+  rmdir "$LOCK_FILE"
+
+  echo "✓ Worktree registered for coordination"
+fi
+```
 
 **If using git-spice (no worktrees):** For git-spice workflow guidance, invoke the `sdlc:shared/git-spice` skill or see its documentation.
 
@@ -217,7 +356,13 @@ git checkout -b feature/<task-id>
 - Integration points are spec'd BEFORE dependent work begins
 - Shared code (integration points) should be merged to main before dependent slices start
 
-#### c. Store in auto memory
+**Worktree Coordination (v7.0.0):**
+- With `worktree_coordination: true`, the system prevents conflicts automatically
+- Attempting to work on the same task in two instances will be blocked
+- Working on a task while its blocker is in progress elsewhere will warn you
+- Stale registrations (> 30 min inactive) can be reclaimed
+
+#### d. Store in auto memory
 
 Use /sdlc:remember to note the current work session:
 
@@ -227,6 +372,39 @@ Project: <project-name> | Path: <repo-path>
 Branch: feature/<task-id>
 Date: $(date +%Y-%m-%d)"
 ```
+
+#### e. Create session task tracking (v7.0.0)
+
+**If session task tracking enabled (`features.session_task_tracking: true` in `.claude/sdlc.yaml`):**
+
+Create a story-level task in TaskTools to track "what's next?" for this session:
+
+**IMPORTANT:** Use the TaskCreate tool with these parameters:
+
+```
+subject: "Work on: <task-title>"
+description: "
+Story: <task-id>
+Worktree: <worktree-path-or-branch>
+
+Acceptance Criteria:
+<from dot show output>
+"
+activeForm: "Working on story"
+metadata: {
+  dotTaskId: "<task-id>",
+  worktreePath: "<worktree-path-if-applicable>",
+  type: "story-session"
+}
+```
+
+Then immediately mark it as in_progress:
+
+```
+TaskUpdate with taskId and status: "in_progress"
+```
+
+**Note:** TDD cycle tasks (Red → Domain → Green → Domain) will be created on-demand when starting a TDD cycle, not upfront. They will be nested under this story task.
 
 ### 7. Display Work Context
 

@@ -1,8 +1,24 @@
 ---
 
-## Task-Based Workflow
+## Task-Based Workflow (v7.0.0)
 
-Use task dependencies to enforce TDD cycle mechanically:
+### Session Task Creation
+
+**Story-level task:** Created by `/sdlc:work` if `session_task_tracking: true`
+
+```javascript
+const storyTask = await TaskCreate({
+  subject: "Work on: Add user authentication",
+  description: "Story: myproject-add-auth-abc123\nWorktree: ../worktrees/myproject-add-auth-abc123\n\nAcceptance Criteria:\n...",
+  activeForm: "Working on story",
+  metadata: { dotTaskId: "myproject-add-auth-abc123", type: "story-session" }
+});
+await TaskUpdate({ taskId: storyTask.id, status: "in_progress" });
+```
+
+### TDD Cycle Tasks (On-Demand)
+
+**Create these when user is ready to implement**, not upfront:
 
 ```javascript
 // Red phase
@@ -10,14 +26,14 @@ const redTask = await TaskCreate({
   subject: "Write failing test for user auth",
   description: "ONE test, ONE assertion",
   activeForm: "Writing failing test",
-  metadata: { phase: "red", feature: "auth" }
+  metadata: { phase: "red", storyTaskId: storyTask.id }
 });
 
 // Domain review (blocked by red)
 const domainTask = await TaskCreate({
-  subject: "Create domain types",
+  subject: "Review test and create types",
   description: "Review test, create needed types with unimplemented!() stubs",
-  activeForm: "Creating domain types",
+  activeForm: "Reviewing test design",
   metadata: { phase: "domain-after-red" }
 });
 await TaskUpdate({
@@ -27,7 +43,7 @@ await TaskUpdate({
 
 // Green phase (blocked by domain)
 const greenTask = await TaskCreate({
-  subject: "Implement minimal solution",
+  subject: "Implement user auth",
   description: "Make test pass, nothing more",
   activeForm: "Implementing minimal code",
   metadata: { phase: "green" }
@@ -48,6 +64,35 @@ await TaskUpdate({
   taskId: domainAfterGreen.id,
   addBlockedBy: [greenTask.id]
 });
+```
+
+### Session State Display
+
+After completing any phase, display "what's next?":
+
+```javascript
+const tasks = await TaskList();
+const storyTask = tasks.find(t => t.metadata?.type === "story-session" && t.status === "in_progress");
+const tddTasks = tasks.filter(t => t.metadata?.storyTaskId === storyTask?.id);
+
+// Format output:
+console.log(`
+## Current Session State
+
+Story: ${storyTask.metadata.dotTaskId}
+Worktree: ${storyTask.metadata.worktreePath}
+
+### Active TDD Cycle
+
+${tddTasks.map(t => {
+  const icon = t.status === "completed" ? "✅" : t.status === "in_progress" ? "🔄" : "⏳";
+  return `${icon} ${t.subject}`;
+}).join("\n")}
+
+### What's Next?
+
+${determineNextAction(tddTasks)}
+`);
 ```
 
 ---

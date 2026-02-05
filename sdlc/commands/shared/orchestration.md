@@ -404,6 +404,109 @@ git worktree remove <path>
 git worktree prune
 ```
 
+## Session State Display (v7.0.0)
+
+**If session task tracking enabled (`features.session_task_tracking: true`):**
+
+After completing any agent phase (RED, DOMAIN, GREEN), display "what's next?" using TaskList.
+
+### When to Display
+
+Display session state:
+- After domain review completes
+- After test passes (green phase done)
+- When user asks "what's next?" or "where are we?"
+- At natural breakpoints in the workflow
+
+### How to Display
+
+Query the task list and format the output:
+
+```
+Use TaskList tool to get current tasks
+```
+
+Format the output as:
+
+```
+## Current Session State
+
+Story: <dot-task-id> - <dot-task-title>
+Worktree: <worktree-path-or-branch>
+
+### Active TDD Cycle
+
+<if TDD cycle tasks exist>
+✅ Red: <subject> (if completed)
+✅ Domain (after red): <subject> (if completed)
+🔄 Green: <subject> (if in_progress)
+⏳ Domain (after green): <subject> (if pending/blocked)
+
+### What's Next?
+
+<determine from task statuses what phase we're in>
+You are in <PHASE> phase.
+<next-action-guidance>
+</if>
+
+<if no TDD cycle tasks>
+Ready to start TDD cycle. Describe what you want to implement.
+</if>
+```
+
+### Visual Indicators
+
+- ✅ Completed phase
+- 🔄 Currently in progress
+- ⏳ Waiting / blocked
+
+### Next Action Guidance by Phase
+
+| Current Phase | Status Pattern | Guidance |
+|---------------|---------------|----------|
+| RED | Red in_progress | Write a failing test that specifies ONE behavior |
+| DOMAIN (after red) | Red completed, Domain in_progress | Review test, create needed types |
+| GREEN | Domain (after red) completed, Green in_progress | Implement minimal code to make test pass. Run tests after each change. |
+| DOMAIN (after green) | Green completed, Domain in_progress | Review implementation for domain integrity |
+| Ready for next cycle | All tasks completed | TDD cycle complete. Start next test or complete story. |
+
+### On-Demand TDD Cycle Creation
+
+**Do NOT create TDD cycle tasks upfront.** Create them when the user is ready to start implementing:
+
+1. User says "let's implement X" or describes what to build
+2. Create the TDD cycle task chain:
+
+```
+TaskCreate Red task:
+  subject: "Write test for <feature>"
+  activeForm: "Writing failing test"
+  metadata: { type: "tdd-red", storyTaskId: <story-task-id> }
+
+TaskCreate Domain (after red) task:
+  subject: "Review test and create types"
+  activeForm: "Reviewing test design"
+  metadata: { type: "tdd-domain-after-red" }
+  blockedBy: [<red-task-id>]
+
+TaskCreate Green task:
+  subject: "Implement <feature>"
+  activeForm: "Implementing to pass test"
+  metadata: { type: "tdd-green" }
+  blockedBy: [<domain-after-red-task-id>]
+
+TaskCreate Domain (after green) task:
+  subject: "Review implementation"
+  activeForm: "Reviewing domain integrity"
+  metadata: { type: "tdd-domain-after-green" }
+  blockedBy: [<green-task-id>]
+```
+
+3. Mark the first task (Red) as in_progress
+4. Display session state
+
+This keeps the task list focused on current work rather than cluttered with future tasks.
+
 ## Code Review Gate
 
 Before creating PRs, the **three-stage code review** must pass:

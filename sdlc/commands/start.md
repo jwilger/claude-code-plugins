@@ -48,12 +48,12 @@ Check the mode (event-modeling vs traditional).
 grep "^sdlc_version:" .claude/sdlc.yaml || echo "sdlc_version: unknown"
 ```
 
-If the version in the config doesn't match the current plugin version (**5.0.0**), show a warning:
+If the version in the config doesn't match the current plugin version (**7.0.0**), show a warning:
 
 ```
 ⚠️  SDLC UPDATE AVAILABLE
 
-Your SDLC configuration was created with v<version> but you're running v5.0.0.
+Your SDLC configuration was created with v<version> but you're running v7.0.0.
 
 Updates may include improved hooks, bug fixes, or new features.
 
@@ -64,6 +64,43 @@ To update, run:
 ```
 
 Then proceed with the current configuration (don't block work, just notify).
+
+### 2a. Check for Orphaned Worktree Session (v7.0.0)
+
+**If worktree coordination enabled (`features.worktree_coordination: true`):**
+
+Check if we're currently in a worktree with a completed or closed task:
+
+```bash
+# Detect if in a worktree
+WORKTREE_PATH=$(git rev-parse --show-toplevel)
+MAIN_REPO=$(git worktree list --porcelain | grep "^worktree" | head -n1 | cut -d' ' -f2)
+
+if [ "$WORKTREE_PATH" != "$MAIN_REPO" ]; then
+  # We're in a worktree
+  BRANCH=$(git branch --show-current)
+  TASK_ID=$(echo "$BRANCH" | sed 's/^feature\///')
+
+  # Check task status in dot (need to run from main repo)
+  TASK_STATUS=$(cd "$MAIN_REPO" && dot show "$TASK_ID" --json 2>/dev/null | jq -r '.status')
+
+  if [ "$TASK_STATUS" = "closed" ]; then
+    echo "⚠️  You're in a worktree for a completed task"
+    echo ""
+    echo "Task:     $TASK_ID"
+    echo "Status:   $TASK_STATUS"
+    echo "Worktree: $WORKTREE_PATH"
+    echo ""
+    echo "Options:"
+    echo "  1. Return to main repo:  cd $MAIN_REPO"
+    echo "  2. Clean up worktree:    cd $MAIN_REPO && git worktree remove $WORKTREE_PATH"
+    echo "  3. Start new work:       cd $MAIN_REPO && /sdlc:work"
+    exit 0
+  fi
+fi
+```
+
+If the task is closed, STOP and show the options above. The user needs to navigate back to the main repository or clean up the worktree.
 
 **If mode is `traditional`**:
 ```

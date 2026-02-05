@@ -164,7 +164,46 @@ Use /sdlc:remember:
     - "Parent also closed: <yes/no if applicable>"
 ```
 
-### 7. Clean Up Branch (Optional)
+### 7. Clean Up Worktree Registration (v7.0.0)
+
+**If worktree coordination enabled:**
+
+Remove the worktree registration to free up the task for future work:
+
+```bash
+if grep -q "worktree_coordination: true" .claude/sdlc.yaml 2>/dev/null; then
+  TASK_REGISTRY=".dots/.worktrees/$TASK_ID"
+  LOCK_FILE=".dots/.worktrees/lock"
+
+  if [ -d "$TASK_REGISTRY" ]; then
+    # Acquire lock
+    attempt=0
+    while ! mkdir "$LOCK_FILE" 2>/dev/null; do
+      attempt=$((attempt + 1))
+      if [ $attempt -gt 30 ]; then
+        echo "⚠️  Warning: Could not acquire lock to clean up registration"
+        break
+      fi
+      sleep 1
+    done
+
+    # Remove registration
+    if [ -d "$LOCK_FILE" ]; then
+      rm -rf "$TASK_REGISTRY"
+      rmdir "$LOCK_FILE"
+      echo "✓ Worktree registration cleaned up"
+    fi
+  fi
+
+  # Clear task list ID from worktree if still there
+  WORKTREE_PATH=$(git worktree list --porcelain | grep -A2 "branch.*$TASK_ID" | grep "worktree" | cut -d' ' -f2)
+  if [ -n "$WORKTREE_PATH" ] && [ -f "$WORKTREE_PATH/.claude-task-list-id" ]; then
+    rm -f "$WORKTREE_PATH/.claude-task-list-id"
+  fi
+fi
+```
+
+### 8. Clean Up Branch (Optional)
 
 If the PR was merged and branch is no longer needed:
 
@@ -174,10 +213,18 @@ if [ "$(git branch --show-current)" != "feature/$TASK_ID" ]; then
   git branch -d "feature/$TASK_ID" 2>/dev/null || echo "Branch already deleted or still checked out"
 fi
 
+# If worktree exists, suggest removal
+WORKTREE_PATH=$(git worktree list --porcelain | grep -A2 "branch.*$TASK_ID" | grep "worktree" | cut -d' ' -f2 | head -n1)
+if [ -n "$WORKTREE_PATH" ] && [ -d "$WORKTREE_PATH" ]; then
+  echo ""
+  echo "Worktree still exists at: $WORKTREE_PATH"
+  echo "To remove it: git worktree remove $WORKTREE_PATH"
+fi
+
 # Note: Remote branch should be auto-deleted by GitHub if configured in /sdlc:setup
 ```
 
-### 8. Display Result
+### 9. Display Result
 
 ```
 ✅ Task completed!
