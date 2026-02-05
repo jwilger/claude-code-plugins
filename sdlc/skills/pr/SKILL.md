@@ -71,6 +71,16 @@ Runs three-stage code review, enforces mutation testing, and creates/updates Git
 # ✓ Ready for review
 ```
 
+### Current Context
+
+!`bash -c "echo '**Branch:** ' && git branch --show-current 2>/dev/null || echo 'No branch'"`!
+
+!`bash -c "echo '**Commits since base:** ' && BASE=\\$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null | sed 's|origin/||') && git log \\$BASE..HEAD --oneline 2>/dev/null | wc -l || echo '0'"`!
+
+!`bash -c "echo '**Recent commits:** ' && git log --oneline -3 2>/dev/null || echo 'No commits'"`!
+
+!`bash -c "echo '**PR Status:** ' && gh pr view --json number,title,url 2>/dev/null | jq -r '\"#\\(.number) - \\(.title)\\n\\(.url)\"' || echo 'No PR yet (will be created)'"`!
+
 ---
 
 ## Common Examples
@@ -120,6 +130,20 @@ Runs three-stage code review, enforces mutation testing, and creates/updates Git
 - `/sdlc:work` - Start implementation
 - `/sdlc:review` - Address PR feedback
 - `/sdlc:complete` - After PR merged
+
+---
+
+## Auto-Invocation
+
+Claude automatically invokes this skill when you say:
+- "Create a pull request"
+- "I'm ready to submit for review"
+- "Let's make a PR"
+- "Submit this for review"
+- "Create PR for this branch"
+- "Ready for code review"
+
+You don't need to type `/sdlc:pr` explicitly - Claude will detect these requests and invoke the skill for you.
 
 ---
 

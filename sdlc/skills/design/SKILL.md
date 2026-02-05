@@ -106,6 +106,20 @@ Facilitates Event Modeling workflow: domain discovery → workflow design → GW
 
 ---
 
+## Auto-Invocation
+
+Claude automatically invokes this skill when you say:
+- "Let's do domain discovery"
+- "Design a workflow for user registration"
+- "I need to model the domain"
+- "Create an event model"
+- "Generate GWT scenarios"
+- "Let's do Event Modeling"
+
+You don't need to type `/sdlc:design` explicitly - Claude will detect these requests and invoke the skill for you.
+
+---
+
 ## Subcommands
 
 - `discover` - Domain discovery (5 questions)

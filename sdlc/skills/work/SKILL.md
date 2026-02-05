@@ -85,6 +85,14 @@ Helps you select and begin work on a task, creating the proper git branch/worktr
 # Next: Start TDD cycle with /sdlc:red
 ```
 
+### Current Context
+
+!`bash -c "echo '**Branch:** ' && git branch --show-current 2>/dev/null || echo 'No branch'"`!
+
+!`bash -c "echo '**PR Status:** ' && gh pr view --json number,title,url 2>/dev/null | jq -r '\"#\\(.number) - \\(.title)\\n\\(.url)\"' || echo 'No active PR'"`!
+
+!`bash -c "BRANCH=\\$(git branch --show-current 2>/dev/null) && if [[ -n \\\"\\$BRANCH\\\" ]]; then TASK_ID=\\\"\\${BRANCH#feature/}\\\"; echo '**Active Task:** ' && dot task show \\\"\\$TASK_ID\\\" 2>/dev/null | grep -E '^(ID|Title|Status):' || echo 'No task found'; fi"`!
+
 ---
 
 ## Common Examples
@@ -135,6 +143,20 @@ Helps you select and begin work on a task, creating the proper git branch/worktr
 - `/sdlc:pr` - Create pull request
 - `/sdlc:review` - Address PR feedback
 - `/sdlc:complete` - Mark task done
+
+---
+
+## Auto-Invocation
+
+Claude automatically invokes this skill when you say:
+- "Start working on the authentication feature"
+- "Let's begin implementing the next task"
+- "What should I work on?"
+- "Show me the ready tasks"
+- "I want to start coding"
+- "Let's work on [feature name]"
+
+You don't need to type `/sdlc:work` explicitly - Claude will detect these requests and invoke the skill for you.
 
 ---
 

@@ -82,6 +82,19 @@ Searches auto memory for relevant patterns, conventions, and solutions.
 
 ---
 
+## Auto-Invocation
+
+Claude automatically invokes this skill when you say:
+- "Check memory for similar issues"
+- "What did we learn about X?"
+- "Search auto memory"
+- "Have we solved this before?"
+- "Look up our conventions"
+
+You don't need to type `/sdlc:recall` explicitly - Claude will detect these requests and invoke the skill for you.
+
+---
+
 ## Metadata
 
 **Version:** 1.1.0 (2026-02-05): Progressive disclosure

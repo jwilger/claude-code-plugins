@@ -55,6 +55,14 @@ Fetches PR comments, categorizes feedback, and guides systematic response.
 # Address feedback, then run: /sdlc:pr
 ```
 
+### Current Context
+
+!`bash -c "echo '**Branch:** ' && git branch --show-current 2>/dev/null || echo 'No branch'"`!
+
+!`bash -c "echo '**PR Status:** ' && gh pr view --json number,title,url,reviewDecision 2>/dev/null | jq -r '\"#\\(.number) - \\(.title)\\nDecision: \\(.reviewDecision // \\\"Pending\\\")\\n\\(.url)\"' || echo 'No active PR'"`!
+
+!`bash -c "echo '**Review Comments:** ' && gh pr view --json comments 2>/dev/null | jq '[.comments[] | select(.author.login != \\\"github-actions\\\")] | length' || echo '0'"`!
+
 ---
 
 ## Common Examples
@@ -89,6 +97,20 @@ Fetches PR comments, categorizes feedback, and guides systematic response.
 **Related:**
 - `/sdlc:pr` - Create/update PR
 - `/sdlc:complete` - After merge
+
+---
+
+## Auto-Invocation
+
+Claude automatically invokes this skill when you say:
+- "Address the PR feedback"
+- "Let's respond to review comments"
+- "Fix the review issues"
+- "Check PR comments"
+- "What did the reviewer say?"
+- "Respond to code review"
+
+You don't need to type `/sdlc:review` explicitly - Claude will detect these requests and invoke the skill for you.
 
 ---
 

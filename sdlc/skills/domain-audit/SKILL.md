@@ -69,6 +69,19 @@ Reviews domain types for primitive obsession, invalid state representability, an
 
 ---
 
+## Auto-Invocation
+
+Claude automatically invokes this skill when you say:
+- "Review the domain types"
+- "Check for primitive obsession"
+- "Audit type safety"
+- "Is the domain model sound?"
+- "Scan for domain issues"
+
+You don't need to type `/sdlc:domain-audit` explicitly - Claude will detect these requests and invoke the skill for you.
+
+---
+
 ## Metadata
 
 **Version:** 1.1.0 (2026-02-05): Progressive disclosure

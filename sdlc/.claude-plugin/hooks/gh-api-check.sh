@@ -57,7 +57,7 @@ cat <<'EOF'
   "hookSpecificOutput": {
     "hookEventName": "PreToolUse",
     "permissionDecision": "allow",
-    "additionalContext": "REMINDER: gh api should be a last resort. Before proceeding, ensure you have checked: (1) Installed extensions via 'gh extension list' (gh-issue-ext, gh-project-ext, gh-pr-review), (2) Native gh subcommands (gh issue, gh pr, gh project), (3) Available extensions via 'gh extension search'. If an extension can perform this operation, prefer using it over gh api."
+    "additionalContext": "⚠️ gh api LAST RESORT CHECK\n\n📚 Why avoid? gh api is low-level and error-prone. Extensions provide:\n- Better error messages\n- Validation and safety checks\n- Simpler command syntax\n\n🔧 Before proceeding, check:\n1. Installed extensions: gh extension list\n   - gh-issue-ext, gh-project-ext, gh-pr-review\n2. Native gh commands: gh issue, gh pr, gh project\n3. Available extensions: gh extension search\n\n✅ Proceed only if no extension exists for this operation.\n\n📖 See: github-issues skill for patterns"
   }
 }
 EOF

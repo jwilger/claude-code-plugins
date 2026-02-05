@@ -78,6 +78,19 @@ Saves patterns, conventions, and insights to auto memory for future reference.
 
 ---
 
+## Auto-Invocation
+
+Claude automatically invokes this skill when you say:
+- "Remember this pattern"
+- "Save this solution"
+- "Store this in memory"
+- "I want to remember this approach"
+- "Add this to our conventions"
+
+You don't need to type `/sdlc:remember` explicitly - Claude will detect these requests and invoke the skill for you.
+
+---
+
 ## Metadata
 
 **Version:** 1.1.0 (2026-02-05): Progressive disclosure

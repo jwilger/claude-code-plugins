@@ -72,6 +72,19 @@ Analyzes project state and suggests next appropriate action.
 
 ---
 
+## Auto-Invocation
+
+Claude automatically invokes this skill when you say:
+- "Let's start working"
+- "What should I do next?"
+- "I'm ready to begin"
+- "Where do I start?"
+- "Let's get started"
+
+You don't need to type `/sdlc:start` explicitly - Claude will detect these requests and invoke the skill for you.
+
+---
+
 ## Metadata
 
 **Version:** 1.1.0 (2026-02-05): Progressive disclosure

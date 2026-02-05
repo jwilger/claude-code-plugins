@@ -156,6 +156,19 @@ See SKILL-old.md for:
 
 ---
 
+## Auto-Invocation
+
+Claude automatically invokes this skill when you say:
+- "Let's make an architecture decision"
+- "Document this ADR"
+- "Record this design choice"
+- "Create an architecture decision record"
+- "Update the architecture"
+
+You don't need to type `/sdlc:arch` explicitly - Claude will detect these requests and invoke the skill for you.
+
+---
+
 ## Metadata
 
 **Version History:**

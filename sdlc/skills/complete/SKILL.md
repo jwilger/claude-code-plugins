@@ -69,6 +69,19 @@ Marks task complete, verifies PR merged, evaluates parent task completion.
 
 ---
 
+## Auto-Invocation
+
+Claude automatically invokes this skill when you say:
+- "Mark the task as done"
+- "The PR is merged"
+- "Complete this task"
+- "Close this issue"
+- "Finish this work"
+
+You don't need to type `/sdlc:complete` explicitly - Claude will detect these requests and invoke the skill for you.
+
+---
+
 ## Metadata
 
 **Version:** 1.1.0 (2026-02-05): Progressive disclosure

@@ -90,6 +90,19 @@ Reads event model slices and creates GitHub issues with proper dependencies.
 
 ---
 
+## Auto-Invocation
+
+Claude automatically invokes this skill when you say:
+- "Create tasks from the event model"
+- "Let's plan the implementation"
+- "Generate GitHub issues"
+- "Convert workflows to tasks"
+- "I'm ready to create tasks"
+
+You don't need to type `/sdlc:plan` explicitly - Claude will detect these requests and invoke the skill for you.
+
+---
+
 ## Metadata
 
 **Version:** 1.1.0 (2026-02-05): Progressive disclosure
