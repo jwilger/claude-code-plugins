@@ -1,9 +1,9 @@
 ---
 name: design
-version: 1.1.0
+version: 1.2.0
 author: jwilger
 repository: jwilger/claude-code-plugins
-description: Event Modeling facilitation for domain discovery, workflow design, GWT scenarios, and architecture decisions. Use for event-sourced system design or when user asks about domain modeling.
+description: Event Modeling facilitation with subcommands - discover (domain discovery), workflow (workflow design), gwt (Given-When-Then scenarios), and arch (architecture decisions). Auto-invokes when user mentions discovery, discover, design workflow, model domain, event modeling, or GWT scenarios.
 tags:
   - event-modeling
   - domain-discovery
@@ -27,7 +27,7 @@ hooks:
 
 # Design Skill (Event Modeling)
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 **Portability:** Tool-specific
 
 ---
@@ -109,9 +109,15 @@ Facilitates Event Modeling workflow: domain discovery → workflow design → GW
 ## Auto-Invocation
 
 Claude automatically invokes this skill when you say:
+- "discovery" or "discover" (triggers discover subcommand)
 - "Let's do domain discovery"
 - "Design a workflow for user registration"
 - "I need to model the domain"
+- "Create GWT scenarios"
+- "Event modeling"
+- "Model the workflows"
+
+You don't need to type the full `/sdlc:design` command - Claude will detect these requests and invoke the appropriate subcommand.
 - "Create an event model"
 - "Generate GWT scenarios"
 - "Let's do Event Modeling"
@@ -156,6 +162,7 @@ See SKILL-old.md for:
 ## Metadata
 
 **Version History:**
+- v1.2.0 (2026-02-05): Fix auto-invocation - now triggers on "discovery"/"discover" (prevents sdlc:discovery error)
 - v1.1.0 (2026-02-05): Progressive disclosure, memory integration
 - v1.0.0: Initial extraction
 
