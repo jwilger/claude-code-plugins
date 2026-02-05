@@ -1,13 +1,23 @@
 {
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c '\nINPUT=$(cat)\nFILE_PATH=$(echo \"$INPUT\" | jq -r \".tool_input.file_path // empty\")\n\nif [[ \"$FILE_PATH\" == */sdlc/output-styles/sdlc-marvin.md ]] || [[ \"$FILE_PATH\" == */sdlc/output-styles/sdlc-rules.md ]]; then\n  jq -n \"{\n    hookSpecificOutput: {\n      hookEventName: \\\"PreToolUse\\\",\n      permissionDecision: \\\"deny\\\",\n      permissionDecisionReason: \\\"❌ Do not edit generated output style files directly. Edit the templates instead:\\n\\n- For Marvin personality: sdlc/output-styles/.templates/personality-marvin.md\\n- For rules header: sdlc/output-styles/.templates/personality-rules.md\\n- For orchestration rules: sdlc/output-styles/.templates/orchestration-rules.md\\n\\nThe output styles are automatically regenerated when you edit templates.\\\"\n    }\n  }\"\nelse\n  echo \"{}\"\nfi\n'"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write",
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "Check the tool arguments: $ARGUMENTS\n\nIf the file path contains 'sdlc/output-styles/', respond:\n{\"ok\": false, \"reason\": \"⚠️  Output style edited. If you modified orchestration rules (sections like 'SDLC Workflow Orchestration', 'Task-Based Workflow', 'Agent Selection', etc.), ensure ALL output styles in sdlc/output-styles/ have identical orchestration content. Only personality sections should differ between output styles.\"}\n\nOtherwise respond:\n{\"ok\": true}",
-            "model": "claude-haiku-4-5-20251001"
+            "type": "command",
+            "command": "bash -c '\nINPUT=$(cat)\nFILE_PATH=$(echo \"$INPUT\" | jq -r \".tool_input.file_path // empty\")\n\nif [[ \"$FILE_PATH\" == */sdlc/output-styles/.templates/* ]]; then\n  echo \"🔄 Template edited, rebuilding output styles...\" >&2\n  cd \"$(dirname \"$FILE_PATH\")/..\"\n  ./.build-output-styles.sh >&2\n  echo \"{}\"\nelse\n  echo \"{}\"\nfi\n'"
           }
         ]
       }

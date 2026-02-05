@@ -1,3 +1,5 @@
 
-.claude/
+# Ignore local Claude settings but allow project-wide hooks
+.claude/*
+!.claude/settings.json
 

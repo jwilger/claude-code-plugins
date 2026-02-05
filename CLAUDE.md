@@ -85,22 +85,36 @@ Compare against `origin/main` to determine appropriate semver bump. The plugin c
 
 ## Output Style Synchronization
 
-**CRITICAL**: The sdlc plugin has TWO output styles that share orchestration rules:
-- `sdlc/output-styles/sdlc-rules.md` - Orchestration rules without personality
-- `sdlc/output-styles/sdlc-marvin.md` - Orchestration rules WITH Marvin personality
+**CRITICAL**: The sdlc plugin has TWO output styles that are generated from templates:
+- `sdlc/output-styles/sdlc-rules.md` - Generated (no personality)
+- `sdlc/output-styles/sdlc-marvin.md` - Generated (with Marvin personality)
 
-**Both files contain identical orchestration rules sections.** When editing one, you MUST update the other in lockstep:
-1. The orchestration rules start after the personality section (in marvin) or immediately after frontmatter (in rules)
-2. Everything from "# SDLC Workflow Orchestration" to the end must be identical in both files
-3. Only the personality section at the top of sdlc-marvin.md differs
+**These files are AUTO-GENERATED from templates. DO NOT EDIT THEM DIRECTLY.**
 
-**Process for editing orchestration rules:**
-1. Edit the rules in ONE file (either one)
-2. Copy the entire orchestration section
-3. Paste into the OTHER file, preserving the personality section if present
-4. Verify both files have identical orchestration content
+**Template Structure:**
+```
+sdlc/output-styles/
+├── .templates/
+│   ├── personality-marvin.md      # Marvin personality + frontmatter
+│   ├── personality-rules.md       # No personality + frontmatter
+│   └── orchestration-rules.md     # Shared orchestration rules (single source of truth)
+├── .build-output-styles.sh        # Build script (auto-runs on template edits)
+├── sdlc-marvin.md                 # Generated = personality-marvin + orchestration-rules
+└── sdlc-rules.md                  # Generated = personality-rules + orchestration-rules
+```
 
-A PreToolUse hook will remind you of this when editing either file.
+**Editing Process:**
+1. Edit the appropriate template file:
+   - Marvin personality → `.templates/personality-marvin.md`
+   - Rules header → `.templates/personality-rules.md`
+   - Orchestration rules → `.templates/orchestration-rules.md`
+2. Output styles are automatically regenerated via PostToolUse hook
+3. PreToolUse hook blocks direct edits to generated files
+
+**Manual Rebuild:**
+```bash
+cd sdlc/output-styles && ./.build-output-styles.sh
+```
 
 ## Plugin-Specific Notes
 
@@ -109,7 +123,7 @@ A PreToolUse hook will remind you of this when editing either file.
 - **Output styles:**
   - `sdlc-rules` - Orchestration and coding guidelines (no personality)
   - `sdlc-marvin` - Same rules with Marvin the Paranoid Android personality
-  - **WARNING:** These files must be kept synchronized (see "Output Style Synchronization" above)
+  - **NOTE:** Auto-generated from templates (see "Output Style Synchronization" above)
 - **Agents:** 15 specialized agents for TDD, Event Modeling, and architecture
   - TDD agents: red, green, domain (with hooks to enforce file type restrictions)
   - Event Modeling agents: discovery, workflow-designer, gwt, model-checker
