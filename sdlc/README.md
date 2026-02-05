@@ -1,8 +1,28 @@
-# SDLC Plugin v5.0.0
+# SDLC Plugin v8.0.0
 
 **Complete Software Development Lifecycle workflow for Claude Code**
 
-Integrates TDD, Event Modeling, Architecture Decision Records, local task management with dot CLI, and the Marvin personality into a cohesive development experience.
+Integrates TDD, Event Modeling, commit-based Architecture Decision Records, local task management with dot CLI, and the Marvin personality into a cohesive development experience.
+
+---
+
+## ⚠️ Version 8.0.0 Breaking Changes
+
+**IMPORTANT:** v8.0.0 introduces fundamental changes to ADR workflow. Read `MIGRATION-v8.md` before upgrading.
+
+### What Changed
+
+- **ADRs now in commit messages**: Decision context lives in git history, not separate files
+- **ARCHITECTURE.md is living document**: Edit directly, not generated from ADR files
+- **Git hooks required**: pre-commit framework enforces architecture isolation
+- **New `/arch` skill**: Portable architecture change workflow (works in Cursor, Windsurf, Cline, etc.)
+- **Removed `/sdlc:adr` command**: Replaced by `/arch` skill
+
+### Migration Steps
+
+1. **Re-run setup**: `/sdlc:setup` to install hooks and migrate existing ADRs
+2. **Review docs**: See `MIGRATION-v8.md` for complete guide
+3. **Update references**: Change ADR file references to ARCHITECTURE.md
 
 ---
 
@@ -76,7 +96,7 @@ Integrates TDD, Event Modeling, Architecture Decision Records, local task manage
 | `/sdlc:complete` | Complete task after PR merge | After PR merges |
 | `/sdlc:review` | Handle PR review feedback | Review cycle |
 | `/sdlc:design` | Event Modeling facilitation | Design phase |
-| `/sdlc:adr` | Create Architecture Decision Record | Document decisions |
+| `/arch` or `/sdlc:arch` | Architecture change workflow (portable skill) | Document architecture decisions |
 | `/sdlc:plan` | Create tasks from event model slices | After design |
 | `/sdlc:start` | Auto-detect phase and route | Entry point |
 | `/sdlc:remember` | Store knowledge in auto memory | Learning |

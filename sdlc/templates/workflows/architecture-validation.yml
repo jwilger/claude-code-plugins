@@ -1,0 +1,200 @@
+name: Architecture Validation
+
+on:
+  pull_request:
+    paths:
+      - 'docs/ARCHITECTURE.md'
+      - '**'
+
+jobs:
+  validate-architecture-isolation:
+    name: Validate Architecture Commit Isolation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history to check commits
+
+      - name: Check architecture isolation
+        run: |
+          #!/usr/bin/env bash
+          set -e
+
+          echo "🔍 Checking architecture commit isolation..."
+
+          # Get base and head refs
+          base_sha="${{ github.event.pull_request.base.sha }}"
+          head_sha="${{ github.event.pull_request.head.sha }}"
+
+          # Get all commits in PR
+          commits=$(git rev-list "$base_sha..$head_sha")
+
+          violation_found=false
+
+          while IFS= read -r commit; do
+            files=$(git show --name-only --format="" "$commit")
+
+            arch_in_commit=false
+            other_in_commit=false
+
+            while IFS= read -r file; do
+              if [[ "$file" == "docs/ARCHITECTURE.md" ]] || [[ "$file" == *"/ARCHITECTURE.md" ]]; then
+                arch_in_commit=true
+              else
+                other_in_commit=true
+              fi
+            done <<< "$files"
+
+            # If both ARCHITECTURE.md and other files are in same commit, fail
+            if [[ "$arch_in_commit" == "true" ]] && [[ "$other_in_commit" == "true" ]]; then
+              commit_subject=$(git show -s --format=%s "$commit")
+              echo "❌ VIOLATION: Commit $commit: $commit_subject"
+              echo "   Files changed:"
+              echo "$files" | sed 's/^/     /'
+              echo ""
+              violation_found=true
+            fi
+          done <<< "$commits"
+
+          if [[ "$violation_found" == "true" ]]; then
+            echo ""
+            echo "❌ Architecture isolation violated."
+            echo "Architecture changes must be committed separately from implementation changes."
+            exit 1
+          fi
+
+          echo "✅ Architecture isolation check passed."
+
+  validate-adr-format:
+    name: Validate ADR Format in Commits
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check ADR format
+        run: |
+          #!/usr/bin/env bash
+          set -e
+
+          echo "🔍 Checking ADR format in architecture commits..."
+
+          # Get base and head refs
+          base_sha="${{ github.event.pull_request.base.sha }}"
+          head_sha="${{ github.event.pull_request.head.sha }}"
+
+          # Get all commits in PR
+          commits=$(git rev-list "$base_sha..$head_sha")
+
+          violation_found=false
+
+          while IFS= read -r commit; do
+            files=$(git show --name-only --format="" "$commit")
+
+            # Check if ARCHITECTURE.md is in this commit
+            if echo "$files" | grep -q "ARCHITECTURE.md"; then
+              commit_subject=$(git show -s --format=%s "$commit")
+              commit_body=$(git show -s --format=%b "$commit")
+
+              # Check 1: Subject must use (arch) scope
+              if ! echo "$commit_subject" | grep -qE '^\(feat|fix|refactor|docs|chore|style|test|perf|ci|build|revert\)\(arch\):'; then
+                echo "❌ VIOLATION: Commit $commit"
+                echo "   Subject: $commit_subject"
+                echo "   Missing (arch) scope in subject line"
+                echo ""
+                violation_found=true
+              fi
+
+              # Check 2: Body must contain ADR structure
+              if ! echo "$commit_body" | grep -q "## Context and Problem Statement"; then
+                echo "❌ VIOLATION: Commit $commit"
+                echo "   Subject: $commit_subject"
+                echo "   Missing ADR structure in commit body"
+                echo "   Required: '## Context and Problem Statement'"
+                echo ""
+                violation_found=true
+              fi
+            fi
+          done <<< "$commits"
+
+          if [[ "$violation_found" == "true" ]]; then
+            echo ""
+            echo "❌ ADR format validation failed."
+            echo "Architecture commits must use ADR-formatted messages."
+            echo "See: https://adr.github.io/madr/"
+            exit 1
+          fi
+
+          echo "✅ ADR format check passed."
+
+  validate-branch-consistency:
+    name: Validate Branch Consistency
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check branch consistency
+        run: |
+          #!/usr/bin/env bash
+          set -e
+
+          echo "🔍 Checking branch consistency..."
+
+          # Get base and head refs
+          base_sha="${{ github.event.pull_request.base.sha }}"
+          head_sha="${{ github.event.pull_request.head.sha }}"
+
+          # Get all commits in PR
+          commits=$(git rev-list "$base_sha..$head_sha")
+
+          # Check if any commit touches ARCHITECTURE.md
+          arch_commits=()
+          mixed_commits=()
+
+          while IFS= read -r commit; do
+            files=$(git show --name-only --format="" "$commit")
+
+            arch_in_commit=false
+            other_in_commit=false
+
+            while IFS= read -r file; do
+              if [[ "$file" == "docs/ARCHITECTURE.md" ]] || [[ "$file" == *"/ARCHITECTURE.md" ]]; then
+                arch_in_commit=true
+              else
+                other_in_commit=true
+              fi
+            done <<< "$files"
+
+            if [[ "$arch_in_commit" == "true" ]]; then
+              arch_commits+=("$commit")
+
+              if [[ "$other_in_commit" == "true" ]]; then
+                mixed_commits+=("$commit")
+              fi
+            fi
+          done <<< "$commits"
+
+          # If branch has architecture commits, check consistency
+          if [[ ${#arch_commits[@]} -gt 0 ]] && [[ ${#mixed_commits[@]} -gt 0 ]]; then
+            echo "❌ VIOLATION: Branch has mixed architecture and implementation commits"
+            echo ""
+            echo "Commits with mixed changes:"
+            for commit in "${mixed_commits[@]}"; do
+              commit_subject=$(git show -s --format=%s "$commit")
+              echo "  $commit: $commit_subject"
+            done
+            echo ""
+            echo "Architecture branches must contain ONLY ARCHITECTURE.md commits."
+            exit 1
+          fi
+
+          echo "✅ Branch consistency check passed."

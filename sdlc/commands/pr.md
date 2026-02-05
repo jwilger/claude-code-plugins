@@ -55,6 +55,68 @@ Parse task ID from branch name (e.g., `feature/myproject-add-login-abc123` → `
 
 If no task ID in branch, ask user which task this PR is for.
 
+### 2.5. Detect Architecture-Only Branch (v8.0.0+)
+
+Check if this is an architecture-only branch:
+
+```bash
+# Get all files changed in branch (compared to base)
+git diff --name-only main..HEAD
+```
+
+**If output is ONLY `docs/ARCHITECTURE.md` (or `*/ARCHITECTURE.md`):**
+
+This is an **ARCHITECTURE PR**. Special handling applies:
+
+1. **Skip code review** (step 3) - Not applicable to architecture changes
+2. **Skip mutation testing** (step 4) - No code changes to test
+3. **Set PR label**: Add `architecture` label
+4. **PR title/body**: Use latest commit subject and body
+
+**Check for existing PR:**
+```bash
+PR_NUMBER=$(gh pr view --json number -q .number 2>/dev/null || echo "")
+```
+
+**If PR exists:**
+```bash
+# Offer to update PR with latest commit
+COMMIT_SUBJECT=$(git log -1 --format=%s)
+COMMIT_BODY=$(git log -1 --format=%b)
+
+echo "Existing architecture PR found: #$PR_NUMBER"
+echo ""
+echo "Latest commit:"
+echo "  Subject: $COMMIT_SUBJECT"
+echo ""
+echo "Update PR title and description to match latest commit?"
+```
+
+Use AskUserQuestion:
+- "Yes (Recommended)" - Update PR to match latest commit
+- "No" - Keep existing PR title/description
+
+**If user chooses "Yes":**
+```bash
+gh pr edit "$PR_NUMBER" \
+  --title "$COMMIT_SUBJECT" \
+  --body "$COMMIT_BODY"
+
+echo "✅ PR #$PR_NUMBER updated"
+```
+
+**If no PR exists:**
+```bash
+# Will create PR in step 7 with commit subject/body
+ARCH_PR=true
+```
+
+**Then SKIP to step 5** (check for existing PR is already done, skip to push).
+
+**If files changed include other files (not architecture-only):**
+
+Continue with normal PR workflow (steps 3, 4, etc.).
+
 ### 3. Run Three-Stage Code Review
 
 **Before mutation testing**, run the code reviewer to catch issues early.
@@ -135,7 +197,27 @@ git push -u origin $(git branch --show-current)
 
 ### 7. Create/Update PR
 
-#### If creating new PR:
+#### If Architecture PR (ARCH_PR=true from step 2.5):
+
+**PR already handled in step 2.5** (either updated or flagged for creation).
+
+If creating new architecture PR:
+```bash
+COMMIT_SUBJECT=$(git log -1 --format=%s)
+COMMIT_BODY=$(git log -1 --format=%b)
+
+gh pr create \
+  --title "$COMMIT_SUBJECT" \
+  --body "$COMMIT_BODY" \
+  --label "architecture" \
+  --assignee @me
+```
+
+**Skip mutation testing and code review sections in PR body** (not applicable).
+
+**Then SKIP to step 9** (display result).
+
+#### If Standard PR (not architecture):
 
 Get task details for PR body:
 ```bash

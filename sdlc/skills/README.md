@@ -50,6 +50,7 @@ The skills will be available as long as the sdlc plugin is installed.
 
 | Skill | Description | Portability | Version |
 |-------|-------------|-------------|---------|
+| **arch** | Architecture change workflow with ADR-formatted commits (dual-purpose: command + agent instructions) | Universal | 1.0.0 |
 | **tdd-constraints** | Red/green/domain phase boundaries and TDD workflow discipline | Universal | 1.0.0 |
 | **user-input-protocol** | Checkpoint format for pausing work and asking questions | Universal | 1.0.0 |
 | **debugging-protocol** | Systematic debugging methodology with verification steps | Universal | 1.0.0 |
@@ -61,9 +62,10 @@ The skills will be available as long as the sdlc plugin is installed.
 |-------|-------------|-------------|---------|
 | **git-spice** | Stacked PR workflow patterns using git-spice | Tool-specific | 1.0.0 |
 | **github-issues** | GitHub CLI patterns for issue/PR management | Tool-specific | 1.0.0 |
-| **memory-protocol** | Memento MCP integration for semantic memory | MCP-specific | 1.0.0 |
+| **memory-protocol** | File-based auto memory integration | Universal | 1.0.0 |
 | **event-modeling** | Event Modeling facilitation and diagram generation | High | 1.0.0 |
 | **orchestration-protocol** | Agent delegation and coordination rules | Medium | 1.0.0 |
+| **task-management** | Task list coordination for multi-agent workflows | High | 1.0.0 |
 
 ---
 
