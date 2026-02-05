@@ -32,12 +32,31 @@ fi
 
 # 2. Capture TDD cycle state from task list
 if command -v dot &>/dev/null && [[ -n "$BRANCH" ]]; then
-  TASK_STATE=$(dot task show "$TASK_ID" 2>/dev/null || echo "")
-  if [[ -n "$TASK_STATE" ]]; then
-    # Extract just the phase indicators from task list
-    PHASE_INFO=$(echo "$TASK_STATE" | grep -E "^\s*(✅|🔄|⏳)" | head -5 || echo "")
-    if [[ -n "$PHASE_INFO" ]]; then
-      add_section "TDD Cycle State" "$PHASE_INFO"
+  # Try JSON format first (more reliable)
+  if dot task show "$TASK_ID" --format=json &>/dev/null; then
+    TASK_JSON=$(dot task show "$TASK_ID" --format=json 2>/dev/null || echo "")
+    if [[ -n "$TASK_JSON" ]]; then
+      # Extract structured data with jq
+      TITLE=$(echo "$TASK_JSON" | jq -r '.title // empty')
+      STATUS=$(echo "$TASK_JSON" | jq -r '.status // empty')
+      PHASE=$(echo "$TASK_JSON" | jq -r '.metadata.phase // empty')
+
+      if [[ -n "$TITLE" ]]; then
+        PHASE_INFO="Task: $TITLE\nStatus: $STATUS"
+        if [[ -n "$PHASE" ]]; then
+          PHASE_INFO+="\nPhase: $PHASE"
+        fi
+        add_section "TDD Cycle State" "$PHASE_INFO"
+      fi
+    fi
+  else
+    # Fallback to text parsing for older dot CLI versions
+    TASK_STATE=$(dot task show "$TASK_ID" 2>/dev/null || echo "")
+    if [[ -n "$TASK_STATE" ]]; then
+      PHASE_INFO=$(echo "$TASK_STATE" | grep -E "^\s*(✅|🔄|⏳)" | head -5 || echo "")
+      if [[ -n "$PHASE_INFO" ]]; then
+        add_section "TDD Cycle State" "$PHASE_INFO"
+      fi
     fi
   fi
 fi
