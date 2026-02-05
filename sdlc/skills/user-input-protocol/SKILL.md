@@ -1,4 +1,5 @@
 ---
+user-invocable: false
 name: user-input-protocol
 version: 1.0.0
 author: jwilger

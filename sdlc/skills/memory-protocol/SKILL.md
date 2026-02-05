@@ -1,4 +1,5 @@
 ---
+user-invocable: false
 name: memory-protocol
 version: 2.0.0
 author: jwilger

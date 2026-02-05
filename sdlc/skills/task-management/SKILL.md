@@ -1,4 +1,5 @@
 ---
+user-invocable: false
 name: task-management
 version: 2.0.0
 author: jwilger
