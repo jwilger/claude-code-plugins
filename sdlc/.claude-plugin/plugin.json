@@ -1,6 +1,6 @@
 {
   "name": "sdlc",
-  "version": "11.1.0",
+  "version": "12.0.0",
   "description": "Complete SDLC workflow with TDD, Event Modeling, commit-based ADRs, and GitHub integration (13 workflow skills, 9 portable skills bundled, 15 agents)",
   "author": {
     "name": "John Wilger",
@@ -10,20 +10,20 @@
   "outputStyles": "./output-styles/",
   "skills": "./skills/",
   "agents": [
-    "./agents/red.md",
-    "./agents/green.md",
-    "./agents/domain.md",
-    "./agents/mutation.md",
-    "./agents/code-reviewer.md",
-    "./agents/story.md",
-    "./agents/architect.md",
-    "./agents/ux.md",
-    "./agents/discovery.md",
-    "./agents/workflow-designer.md",
-    "./agents/model-checker.md",
-    "./agents/design-facilitator.md",
-    "./agents/gwt.md",
-    "./agents/file-updater.md",
-    "./agents/hook-verifier.md"
+    "./.claude/agents/red.md",
+    "./.claude/agents/green.md",
+    "./.claude/agents/domain.md",
+    "./.claude/agents/mutation.md",
+    "./.claude/agents/code-reviewer.md",
+    "./.claude/agents/story.md",
+    "./.claude/agents/architect.md",
+    "./.claude/agents/ux.md",
+    "./.claude/agents/discovery.md",
+    "./.claude/agents/workflow-designer.md",
+    "./.claude/agents/model-checker.md",
+    "./.claude/agents/design-facilitator.md",
+    "./.claude/agents/gwt.md",
+    "./.claude/agents/file-updater.md",
+    "./.claude/agents/hook-verifier.md"
   ]
 }
