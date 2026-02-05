@@ -11,8 +11,8 @@ tools:
   - mcp__memento__create_entities
   - mcp__memento__open_nodes
 skills:
-  - sdlc:shared/memory-protocol
-  - sdlc:shared/user-input-protocol
+  - memory-protocol
+  - user-input-protocol
 ---
 
 # SDLC Code Reviewer Agent

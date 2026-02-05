@@ -3,9 +3,9 @@ name: green
 description: INVOKE for ALL production code changes. PRODUCTION CODE ONLY. Minimal implementation
 model: inherit
 skills:
-  - sdlc:shared/user-input-protocol
-  - sdlc:shared/memory-protocol
-  - sdlc:shared/tdd-constraints
+  - user-input-protocol
+  - memory-protocol
+  - tdd-constraints
 tools:
   - Read
   - Write
@@ -154,57 +154,6 @@ Returning to orchestrator - domain review may need to re-run.
 ```
 
 **Do NOT try to create the type yourself.** Type definitions are domain's job.
-
-## MANDATORY INVOCATION CONFIRMATION (Gate Check)
-
-**Before proceeding with ANY work, you MUST verify the orchestrator has provided these confirmations in the prompt:**
-
-### Required Confirmations
-
-1. **Red Phase Confirmation** (REQUIRED):
-   ```
-   RED_PHASE_COMPLETE:
-   - Test: <test name>
-   - Failure: <exact error message or compilation error>
-   ```
-
-2. **Domain Check Confirmation** (REQUIRED):
-   ```
-   DOMAIN_CHECK_PASSED:
-   - Types created: <list of types> OR "No new types needed"
-   - Concerns: "None" OR "Resolved: <how concerns were addressed>"
-   ```
-
-### Gate Validation
-
-**If EITHER confirmation is missing or incomplete:**
-
-1. **STOP IMMEDIATELY** - Do not proceed with any implementation
-2. **Return this response:**
-   ```
-   INVOCATION GATE FAILED
-
-   Missing confirmation(s):
-   - [ ] RED_PHASE_COMPLETE: <missing or incomplete>
-   - [ ] DOMAIN_CHECK_PASSED: <missing or incomplete>
-
-   I cannot proceed without explicit confirmation from the orchestrator that:
-   1. The Red phase completed with a failing test
-   2. The Domain agent reviewed the test and either created types or confirmed none needed
-
-   Please re-invoke with the required confirmations.
-   ```
-
-3. **Do NOT attempt to infer or assume** - The orchestrator MUST provide explicit confirmation
-
-### Why This Gate Exists
-
-This gate prevents workflow violations where:
-- Green is invoked before a test exists (nothing to make pass)
-- Green is invoked before domain review (types may be missing)
-- The orchestrator loses track of workflow state
-
-**The orchestrator's explicit confirmation is proof that the workflow is in the correct state.**
 
 ## Architecture Alignment (MANDATORY)
 

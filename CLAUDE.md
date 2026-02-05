@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Repository Overview
 
 This is a Claude Code plugin marketplace containing plugins:
-- **sdlc** - Complete SDLC workflow with TDD, Event Modeling, ADRs, GitHub integration, and Marvin personality
+- **sdlc** - Complete SDLC workflow with TDD, Event Modeling, ADRs, and GitHub integration (includes 9 portable agent skills and 2 output styles)
 - **bootstrap** - Project scaffolding with Nix-based development environments
 
 ## Commands
@@ -29,8 +29,8 @@ claude plugin validate bootstrap
 4. **Use the claude-code-guide agent** to fetch current documentation when uncertain
 
 **Hook format by type:**
-- **Prompt-based hooks** (Stop, SubagentStop only): Use `{"ok": true}` or `{"ok": false, "reason": "..."}`
-- **Command-based hooks** (PreToolUse, SessionStart, etc.): Use `{"decision": "block", "reason": "..."}` or tool-specific `hookSpecificOutput`
+- **Prompt-based hooks** (PreToolUse, PostToolUse, PostToolUseFailure, PermissionRequest, UserPromptSubmit, Stop, SubagentStop): Use `{"ok": true}` or `{"ok": false, "reason": "..."}`
+- **Command-based hooks** (All event types): Use tool-specific `hookSpecificOutput` format
 
 **PreToolUse command hooks** must return:
 ```json
@@ -42,8 +42,6 @@ claude plugin validate bootstrap
   }
 }
 ```
-
-**IMPORTANT**: Prompt-based hooks (`type: "prompt"`) are only officially supported for `Stop` and `SubagentStop`. Other hook types (PreToolUse, SessionStart, etc.) must use `type: "command"` with shell scripts.
 
 Official docs: https://code.claude.com/docs
 
@@ -58,6 +56,13 @@ Official docs: https://code.claude.com/docs
 - `agents/` - Specialized subagents with `subagent_type` identifiers
 - `output-styles/` - Output style definitions
 - `docs/` - Reference documentation
+
+### Skills Structure
+- `skills/` - Portable agent skills (skills.sh format)
+- Each skill has `SKILL.md` with YAML frontmatter + markdown content
+- Skills are framework-agnostic (work in Claude Code, Cursor, Windsurf, Cline)
+- Installation: `npx skills add jwilger/claude-code-plugins`
+- Documentation: `skills/README.md`
 
 ### Command Namespacing
 Commands are namespaced automatically: `/<plugin-name>:<command-filename>`
@@ -78,14 +83,45 @@ grep -n "3.12.6" sdlc/commands/setup.md  # Find all version references
 
 Compare against `origin/main` to determine appropriate semver bump. The plugin cache uses version numbers to detect updates - unchanged versions won't refresh the cache.
 
+## Output Style Synchronization
+
+**CRITICAL**: The sdlc plugin has TWO output styles that share orchestration rules:
+- `sdlc/output-styles/sdlc-rules.md` - Orchestration rules without personality
+- `sdlc/output-styles/sdlc-marvin.md` - Orchestration rules WITH Marvin personality
+
+**Both files contain identical orchestration rules sections.** When editing one, you MUST update the other in lockstep:
+1. The orchestration rules start after the personality section (in marvin) or immediately after frontmatter (in rules)
+2. Everything from "# SDLC Workflow Orchestration" to the end must be identical in both files
+3. Only the personality section at the top of sdlc-marvin.md differs
+
+**Process for editing orchestration rules:**
+1. Edit the rules in ONE file (either one)
+2. Copy the entire orchestration section
+3. Paste into the OTHER file, preserving the personality section if present
+4. Verify both files have identical orchestration content
+
+A PreToolUse hook will remind you of this when editing either file.
+
 ## Plugin-Specific Notes
 
-### sdlc Plugin
-- Commands: setup, work, pr, review, design, adr, plan, start
-- Output style: marvin-sdlc (Marvin the Paranoid Android personality)
-- 10 specialized agents for TDD, planning, and event modeling
-- Requires: gh CLI, gh extensions (gh-issue-ext, gh-project-ext, gh-pr-review)
-- Optional: git-spice for stacked PRs, Memento MCP for memory
+### sdlc Plugin (v4.0.0)
+- **Commands:** setup, work, pr, review, design, adr, plan, start, remember, recall, domain-audit
+- **Output styles:**
+  - `sdlc-rules` - Orchestration and coding guidelines (no personality)
+  - `sdlc-marvin` - Same rules with Marvin the Paranoid Android personality
+  - **WARNING:** These files must be kept synchronized (see "Output Style Synchronization" above)
+- **Agents:** 15 specialized agents for TDD, Event Modeling, and architecture
+  - TDD agents: red, green, domain (with hooks to enforce file type restrictions)
+  - Event Modeling agents: discovery, workflow-designer, gwt, model-checker
+  - Architecture agents: architect, design-facilitator, adr
+  - Review agents: code-reviewer, mutation
+  - Story planning agents: story, ux
+  - Utility agents: file-updater
+- **Workflow:** Task-based TDD cycle with mechanical dependency enforcement (v4.0.0+)
+- **Skills:** Auto-loads 9 portable skills (tdd-constraints, user-input-protocol, debugging-protocol, etc.)
+- **Requires:** gh CLI, gh extensions (gh-issue-ext, gh-project-ext, gh-pr-review)
+- **Optional:** git-spice for stacked PRs, Memento MCP for memory
+- **Breaking changes in v4.0.0:** See `sdlc/MIGRATION.md`
 
 ### bootstrap Plugin
 - Commands: rust (bootstraps Rust projects with Nix flake)

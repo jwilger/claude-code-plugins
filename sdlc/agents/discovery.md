@@ -13,8 +13,9 @@ tools:
   - mcp__memento__open_nodes
   - mcp__memento__create_relations
 skills:
-  - sdlc:shared/user-input-protocol
-  - sdlc:shared/memory-protocol
+  - user-input-protocol
+  - memory-protocol
+  - event-modeling
 hooks:
   PreToolUse:
     - matcher: Edit

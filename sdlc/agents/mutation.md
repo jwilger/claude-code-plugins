@@ -4,7 +4,7 @@ description: INVOKE before PR creation. Enforces 100% mutation score, reports su
 model: inherit
 tools: Read, Bash, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities
 skills:
-  - sdlc:shared/memory-protocol
+  - memory-protocol
 ---
 
 # SDLC Mutation Testing Agent

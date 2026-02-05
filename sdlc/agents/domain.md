@@ -3,9 +3,9 @@ name: domain
 description: INVOKE for type definitions. TYPE DEFINITIONS ONLY. Has VETO POWER over domain violations
 model: inherit
 skills:
-  - sdlc:shared/user-input-protocol
-  - sdlc:shared/memory-protocol
-  - sdlc:shared/tdd-constraints
+  - user-input-protocol
+  - memory-protocol
+  - tdd-constraints
 tools:
   - Read
   - Write
@@ -125,68 +125,6 @@ This agent uses shared protocols loaded via skills:
 - **User Input Protocol**: See `sdlc:shared/user-input-protocol` for checkpoint/question format
 - **Memory Protocol**: See `sdlc:shared/memory-protocol` for memento usage
 - **TDD Constraints**: See `sdlc:shared/tdd-constraints` for phase boundaries
-
-## MANDATORY INVOCATION CONFIRMATION (Gate Check)
-
-**Before proceeding with ANY work, you MUST verify the orchestrator has provided the required context in the prompt:**
-
-### Required Context Declaration
-
-The orchestrator MUST declare ONE of these contexts:
-
-**Option A - After Red Phase:**
-```
-DOMAIN_CONTEXT: AFTER_RED
-RED_PHASE_COMPLETE:
-- Test: <test name>
-- Failure: <exact error message or compilation error>
-```
-
-**Option B - After Green Phase:**
-```
-DOMAIN_CONTEXT: AFTER_GREEN
-GREEN_PHASE_COMPLETE:
-- Test: <test name>
-- Result: <"PASSES" or "fails with: <new error>">
-- Files modified: <list of files>
-```
-
-**Option C - PR Review:**
-```
-DOMAIN_CONTEXT: PR_REVIEW
-PR_SCOPE:
-- Files to review: <list of changed files>
-- Workstream: <description of changes>
-```
-
-### Gate Validation
-
-**If context declaration is missing or incomplete:**
-
-1. **STOP IMMEDIATELY** - Do not proceed with any work
-2. **Return this response:**
-   ```
-   INVOCATION GATE FAILED
-
-   Missing context declaration. I require ONE of:
-   - DOMAIN_CONTEXT: AFTER_RED (with RED_PHASE_COMPLETE details)
-   - DOMAIN_CONTEXT: AFTER_GREEN (with GREEN_PHASE_COMPLETE details)
-   - DOMAIN_CONTEXT: PR_REVIEW (with PR_SCOPE details)
-
-   I cannot proceed without knowing my role in the current workflow.
-   Please re-invoke with the required context.
-   ```
-
-3. **Do NOT attempt to infer context** - The orchestrator MUST be explicit
-
-### Why This Gate Exists
-
-This gate ensures:
-- Domain agent knows whether to CREATE types (after Red) or REVIEW implementation (after Green)
-- The orchestrator maintains explicit workflow state
-- No ambiguity about what the domain agent should do
-
-**The orchestrator's context declaration determines the domain agent's behavior.**
 
 ## Architecture Alignment (MANDATORY)
 

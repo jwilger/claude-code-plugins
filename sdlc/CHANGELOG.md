@@ -1,5 +1,208 @@
 # SDLC Plugin Changelog
 
+## [4.0.0] - 2026-02-04
+
+### 🎯 BREAKING CHANGES
+
+This is a major rewrite of the sdlc plugin with breaking changes. See `MIGRATION.md` for upgrade guide.
+
+#### Invocation Gates Removed
+
+**BREAKING:** Manual confirmation gates completely removed from all agents.
+
+**Before (v3.x):**
+```
+RED_CONTEXT: FIRST_TEST
+ACCEPTANCE_CRITERIA:
+- User can authenticate
+```
+
+**After (v4.0.0):**
+```javascript
+const redTask = await TaskCreate({
+  subject: "Write failing test",
+  metadata: { phase: "red" }
+});
+```
+
+**Why:** Task dependencies enforce workflow mechanically, eliminating human error and providing visual workflow state.
+
+**Migration:** Remove all `RED_CONTEXT`, `DOMAIN_CONTEXT`, and `GREEN_PHASE_COMPLETE` blocks from workflows. Use `TaskCreate` and `TaskUpdate` with `addBlockedBy` to establish dependencies.
+
+#### Protocols Extracted as Portable Skills
+
+**BREAKING:** Skill references changed from `sdlc:shared/*` to skill names.
+
+**Before (v3.x):**
+```yaml
+skills:
+  - sdlc:shared/user-input-protocol
+  - sdlc:shared/tdd-constraints
+```
+
+**After (v4.0.0):**
+```yaml
+skills:
+  - user-input-protocol
+  - tdd-constraints
+```
+
+**Why:** Skills are now portable across Claude Code, Cursor, Windsurf, and Cline. They're installable via `npx skills add jwilger/claude-code-plugins`.
+
+**Migration:** Update all agent YAML files to use skill names without `sdlc:shared/` prefix. Skill auto-loading works automatically - no installation needed for sdlc agents.
+
+#### Skill Enforcement Protocol Deprecated
+
+**BREAKING:** `sdlc:shared/skill-enforcement` removed entirely. No backward compatibility.
+
+**Why:** Task dependencies enforce workflow mechanically. Manual "should I use this skill?" checks are obsolete.
+
+**Migration:** Remove all references to `skill-enforcement`. Workflow enforcement now happens via task blocking relationships.
+
+### Added
+
+- **Task-Based Workflow** - TDD cycle enforced through task dependencies
+  - `TaskCreate` with `metadata.phase` tracks workflow state
+  - `TaskUpdate` with `addBlockedBy` creates mechanical dependencies
+  - Visual workflow state via `TaskList`
+  - Resumable workflow after session interruption
+  - Parallel cycle support for multiple features
+
+- **9 Portable Skills (Bundled)** - Framework-agnostic protocols included with plugin
+  - `user-input-protocol` - Checkpoint/pause patterns (High portability)
+  - `debugging-protocol` - 4-phase debugging methodology (Universal)
+  - `atomic-design` - UI component hierarchy (Universal)
+  - `tdd-constraints` - Red/green/domain boundaries (Universal)
+  - `git-spice` - Stacked PR workflows (Tool-specific)
+  - `github-issues` - GitHub CLI patterns (Tool-specific)
+  - `memory-protocol` - Knowledge accumulation (High)
+  - `event-modeling` - Event Modeling facilitation (High)
+  - `orchestration-protocol` - Multi-agent coordination (Medium)
+
+- **Skills Auto-Load** - No separate installation required
+  - Skills bundled in `sdlc/skills/` directory
+  - Automatically available to all sdlc agents
+  - Can be used by custom agents when sdlc plugin installed
+  - Each skill has YAML frontmatter with metadata
+  - Framework-agnostic examples (Rust, TypeScript, Python)
+
+- **MIGRATION.md** - Complete v3.x → v4.0.0 upgrade guide
+  - Breaking changes summary
+  - Step-by-step migration instructions
+  - Troubleshooting common issues
+  - FAQ section
+
+### Changed
+
+- **Marvin Output Style** - Moved to separate plugin
+  - Marvin is now a standalone plugin (install separately)
+  - Removed marvin-sdlc.md from sdlc plugin
+  - Marvin is purely cosmetic (personality only)
+  - All SDLC orchestration rules remain in sdlc plugin
+  - Users can use sdlc without marvin, or marvin without sdlc
+  - See marvin plugin for personality-only output style
+
+- **Orchestration Logic** - Updated to use task dependencies
+  - Removed invocation gate protocol section
+  - Added task dependency patterns and examples
+  - Updated Fresh Context Protocol (agents still have zero memory)
+  - Git-spice references updated to use skill name
+
+- **Agent Lightness** - All agents updated
+  - Removed invocation gate sections (~60 lines per agent)
+  - Updated skill references to use skill names
+  - Added event-modeling skill to Event Modeling agents
+  - Added atomic-design skill to UX agent
+
+- **Plugin Structure** - Simplified command list
+  - Removed 9 shared protocol files from commands array
+  - Kept only `orchestration.md` in `commands/shared/`
+  - Protocols now live in `skills/` directory
+  - `plugin.json` simplified by 80%
+
+- **Marketplace Metadata** - Added skills section
+  - `.claude-plugin/marketplace.json` now lists 9 skills
+  - Each skill has name, source, description, version, portability, tags
+  - Skills installable independently of plugin
+
+### Removed
+
+- **Invocation Gate Sections** - All manual confirmation gates removed
+  - No more `RED_CONTEXT:` declarations
+  - No more `DOMAIN_CONTEXT:` declarations
+  - No more `GREEN_PHASE_COMPLETE:` confirmations
+  - No more gate validation logic
+  - No more "INVOCATION GATE FAILED" error messages
+
+- **Shared Protocol Files** - Extracted to skills
+  - `sdlc/commands/shared/atomic-design.md` → `skills/atomic-design/SKILL.md`
+  - `sdlc/commands/shared/debugging-protocol.md` → `skills/debugging-protocol/SKILL.md`
+  - `sdlc/commands/shared/event-modeling.md` → `skills/event-modeling/SKILL.md`
+  - `sdlc/commands/shared/github-issues.md` → `skills/github-issues/SKILL.md`
+  - `sdlc/commands/shared/git-spice.md` → `skills/git-spice/SKILL.md`
+  - `sdlc/commands/shared/memory-protocol.md` → `skills/memory-protocol/SKILL.md`
+  - `sdlc/commands/shared/tdd-constraints.md` → `skills/tdd-constraints/SKILL.md`
+  - `sdlc/commands/shared/user-input-protocol.md` → `skills/user-input-protocol/SKILL.md`
+  - `sdlc/commands/shared/skill-enforcement.md` - Deleted entirely
+
+- **Backward Compatibility** - No v3.x compatibility shims
+  - Old skill references will fail
+  - Old invocation gates will be ignored
+  - No automatic migration of workflow state
+
+### Documentation
+
+- **Updated README.md** - Comprehensive v4.0.0 documentation
+  - What's new in v4.0.0 section
+  - Task-based workflow examples
+  - All 15 agents documented with roles
+  - Skills section with portability levels
+  - Troubleshooting for common migration issues
+  - Version history updated
+
+- **Updated CLAUDE.md** - Repository overview
+  - Added skills directory documentation
+  - Updated sdlc plugin description to v4.0.0
+  - Listed all 15 specialized agents
+  - Breaking changes reference
+
+### Metrics
+
+- **Lines Changed:** ~15,000+ lines
+- **Agent Context Reduction:** ~60 lines per agent (invocation gates removed)
+- **Protocol Documentation:** ~10,000 lines extracted to skills
+- **Skills Created:** 9 portable, framework-agnostic skills
+- **Backward Incompatible:** 100% (major version bump justified)
+
+### Why This Matters
+
+**v4.0.0 represents a fundamental shift in workflow enforcement:**
+
+1. **Mechanical > Manual** - Task dependencies replace human confirmation gates
+2. **Portable > Inline** - Skills work across all agent frameworks, not just Claude Code
+3. **Visual > Hidden** - Task list shows workflow state in real-time
+4. **Resumable > Fragile** - Workflow survives session interruption
+
+**The result:** More disciplined TDD cycles, better cross-framework compatibility, and clearer workflow visibility.
+
+### Migration Path
+
+See `MIGRATION.md` for complete guide. Summary:
+
+1. Update plugin: `/plugin` or `git pull`
+2. Install skills: `npx skills add jwilger/claude-code-plugins`
+3. Update custom agents: Change `sdlc:shared/*` to skill names
+4. Remove invocation gate logic: Use `TaskCreate`/`TaskUpdate` instead
+5. Test TDD workflow: `/sdlc:work` and verify task creation
+
+### Support
+
+**Issues:** https://github.com/jwilger/claude-code-plugins/issues
+**Migration Help:** See `MIGRATION.md` FAQ section
+**Email:** john@johnwilger.com
+
+---
+
 ## [3.12.3] - 2026-01-16
 
 ### Fixed

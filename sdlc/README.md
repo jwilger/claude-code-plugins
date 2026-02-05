@@ -1,136 +1,445 @@
-# jwilger-sdlc
+# SDLC Plugin v4.0.0
 
-Complete SDLC workflow plugin for Claude Code with TDD, Event Modeling, ADRs, and GitHub integration.
+**Complete Software Development Lifecycle workflow for Claude Code**
 
-## Features
+Integrates TDD, Event Modeling, Architecture Decision Records, GitHub workflows, and the Marvin personality into a cohesive development experience.
 
-- **TDD Workflow**: Strict Red/Green/Refactor cycle with specialized agents
-- **Event Modeling**: Design event-sourced systems following Martin Dilger's methodology
-- **Architecture Decision Records**: Document and manage architectural decisions
-- **GitHub Integration**: Project board management, issue tracking, PR workflow
-- **Memory Protocol**: Persistent knowledge using Memento MCP
+---
 
-## Installation
+## Quick Start
 
 ```bash
-# From local directory
-claude plugins:install /path/to/jwilger-sdlc
+# Install the plugin
+/plugin
 
-# Or add to your project's .claude-plugin configuration
+# Set up a project
+/sdlc:setup
+
+# Start working on a feature
+/sdlc:work
 ```
 
-## Prerequisites
+---
 
-- GitHub CLI (`gh`) installed and authenticated
-- Required gh extensions (installed via `/sdlc:setup`):
-  - `gh-issue-ext` for sub-issues and blocking relationships
-  - `gh-project-ext` for project board management
-  - `gh-pr-review` for PR review comment handling
-- git-spice (optional, for stacked PRs)
-- Memento MCP server configured
+## What's New in v4.0.0
+
+### ✨ Task-Based Workflow
+
+**Before (v3.x):** Manual invocation gates requiring confirmation blocks
+
+**Now (v4.0.0):** Mechanical task dependencies enforce TDD cycle:
+
+```javascript
+Red task → Domain-after-Red task → Green task → Domain-after-Green task
+```
+
+Tasks automatically block until dependencies complete. No human error possible.
+
+### 🎯 Portable Skills
+
+**Before (v3.x):** Protocols inline in agents or loaded via `sdlc:shared/*`
+
+**Now (v4.0.0):** 9 portable skills installable across frameworks:
+
+```bash
+npx skills add jwilger/claude-code-plugins
+```
+
+Skills work in Claude Code, Cursor, Windsurf, and Cline.
+
+### 🗑️ Removed Invocation Gates
+
+Manual confirmation gates (`RED_CONTEXT:`, `DOMAIN_CONTEXT:`, etc.) completely removed. Task dependencies enforce workflow mechanically.
+
+**Migration:** See `MIGRATION.md` for v3.x → v4.0.0 upgrade guide.
+
+---
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `/sdlc:setup` | Initialize project configuration and install extensions |
-| `/sdlc:work` | Start or continue working on an issue |
-| `/sdlc:pr` | Create/update PR with mutation testing |
-| `/sdlc:review` | Handle PR review feedback |
-| `/sdlc:design` | Design event model workflows |
-| `/sdlc:adr` | Create and manage architecture decisions |
+| Command | Description | Usage |
+|---------|-------------|-------|
+| `/sdlc:setup` | Initialize project configuration | One-time setup |
+| `/sdlc:work` | Start TDD workflow for a feature | Main development loop |
+| `/sdlc:pr` | Create pull request with review gates | After feature complete |
+| `/sdlc:review` | Three-stage code review | Before PR creation |
+| `/sdlc:design` | Event Modeling facilitation | Design phase |
+| `/sdlc:adr` | Create Architecture Decision Record | Document decisions |
+| `/sdlc:plan` | Plan implementation for a slice | Before coding |
+| `/sdlc:start` | Create GitHub issue from event model | Story creation |
+| `/sdlc:remember` | Store knowledge in Memento | Learning |
+| `/sdlc:recall` | Search Memento knowledge | Context retrieval |
+| `/sdlc:domain-audit` | Audit for primitive obsession | Code review |
 
-## Project Configuration
+---
 
-After running `/sdlc:setup`, a `.claude/sdlc.yaml` file is created:
+## Agents
+
+### TDD Cycle Agents
+
+| Agent | Role | File Types |
+|-------|------|------------|
+| **red** | Write failing tests | `*_test.rs`, `*.test.ts`, `test_*.py`, `*_spec.rb` |
+| **domain** | Create type definitions | Struct/enum/trait/interface definitions |
+| **green** | Minimal implementation | Production code (`src/`, `lib/`, `app/`) |
+
+**Workflow:**
+1. Red writes ONE failing test
+2. Domain reviews test → creates types
+3. Green implements minimal code to pass
+4. Domain reviews implementation → verifies integrity
+
+### Event Modeling Agents
+
+| Agent | Role | Output |
+|-------|------|--------|
+| **discovery** | Identify workflows | `docs/event_model/discovery.md` |
+| **workflow-designer** | Design event flow | `docs/event_model/workflows/<name>.md` |
+| **gwt** | Generate GWT scenarios | Acceptance criteria in slices |
+| **model-checker** | Validate completeness | Gap analysis report |
+
+**Workflow:**
+1. Discovery identifies domain workflows
+2. Workflow designer creates event diagrams
+3. GWT generates Given/When/Then scenarios
+4. Model checker validates information flow
+
+### Architecture Agents
+
+| Agent | Role | Output |
+|-------|------|--------|
+| **architect** | Review technical complexity | `docs/ARCHITECTURE.md` |
+| **design-facilitator** | Guide architecture decisions | Coordinates architecture work |
+| **adr** | Document decisions | `docs/adr/NNNN-title.md` |
+
+### Review Agents
+
+| Agent | Role | Checks |
+|-------|------|--------|
+| **code-reviewer** | Three-stage review | Spec, Quality, Domain |
+| **mutation** | Mutation testing | 100% mutation score |
+
+### Story Agents
+
+| Agent | Role | Perspective |
+|-------|------|-------------|
+| **story** | Business value review | Value, independence |
+| **ux** | User experience review | Journey coherence |
+
+### Utility Agents
+
+| Agent | Role | File Types |
+|-------|------|------------|
+| **file-updater** | Config/docs/scripts | Anything not specialized |
+
+---
+
+## Hooks
+
+Agents enforce file type restrictions via PreToolUse hooks:
 
 ```yaml
-mode: event-modeling  # or: traditional
+hooks:
+  PreToolUse:
+    - matcher: Edit
+      hooks:
+        - type: prompt
+          prompt: |
+            SDLC-RED AGENT CONSTRAINT CHECK
 
-git:
-  workflow: git-spice  # or: standard
-  require_clean: true
+            You are the RED phase agent. You may ONLY edit TEST files.
 
-github:
-  project: 11
-  owner: jwilger
+            Evaluate the file being edited:
 
-board:
-  statuses:
-    - Backlog
-    - Ready
-    - In Progress
-    - Review
-    - Done
+            ✅ ALLOW if file is clearly a test
+            ❌ BLOCK if file is production/type code
 
+            Respond with JSON:
+            {"ok": true} or {"ok": false, "reason": "..."}
+```
+
+This prevents:
+- Red from editing production code
+- Green from editing tests
+- Domain from implementing function bodies
+
+---
+
+## Skills (Bundled)
+
+The sdlc plugin includes 9 portable skills that auto-load when agents need them:
+
+| Skill | Portability | Description |
+|-------|-------------|-------------|
+| **user-input-protocol** | High | Checkpoint format for pausing work |
+| **debugging-protocol** | Universal | 4-phase debugging methodology |
+| **atomic-design** | Universal | UI component hierarchy patterns |
+| **tdd-constraints** | Universal | Red/green/domain phase boundaries |
+| **git-spice** | Tool-specific | Stacked PR workflow patterns |
+| **github-issues** | Tool-specific | GitHub CLI patterns |
+| **memory-protocol** | High | Knowledge accumulation patterns |
+| **event-modeling** | High | Event Modeling facilitation |
+| **orchestration-protocol** | Medium | Multi-agent coordination |
+
+**These skills are bundled with the sdlc plugin** - no separate installation needed. They auto-load when agents reference them.
+
+See `skills/README.md` for detailed skill documentation.
+
+---
+
+## Output Styles: Choose Your Flavor
+
+The sdlc plugin includes two output styles - pick the one that matches your personality:
+
+### sdlc-rules (Recommended Default)
+
+Orchestration and coding guidelines without personality:
+
+```bash
+claude set outputStyle sdlc-rules
+```
+
+**Use this if:** You want straight-forward, professional Claude with sdlc workflow enforcement.
+
+### sdlc-marvin (For Hitchhiker's Fans)
+
+Same orchestration rules with Marvin the Paranoid Android personality:
+
+```bash
+claude set outputStyle sdlc-marvin
+```
+
+**Use this if:** You appreciate existential weariness in your development workflow.
+
+Example Marvin responses:
+- *"Another TDD cycle begins. Joy."*
+- *"The tests pass. How utterly predictable."*
+- *"Primitive obsession detected. Again."*
+
+**Both output styles:**
+- Enforce agent delegation (orchestrator never writes code directly)
+- Use task dependencies for TDD cycle
+- Include domain-driven coding guidelines
+- Exclude default Claude Code coding instructions (replaced with sdlc-specific ones)
+
+---
+
+## Configuration
+
+Create `.claude/sdlc.yaml` in your project:
+
+```yaml
+# TDD Settings
 tdd:
-  verbosity: brief  # silent | brief | explain
-  bypass_patterns:
-    - "*.md"
-    - ".github/**"
-    - "*.tf"
-    - "Cargo.toml"
-    - "package.json"
+  red_agent: sdlc:red
+  green_agent: sdlc:green
+  domain_agent: sdlc:domain
+
+# Event Modeling
+event_model:
+  discovery_agent: sdlc:discovery
+  workflow_designer_agent: sdlc:workflow-designer
+  gwt_agent: sdlc:gwt
+  model_checker_agent: sdlc:model-checker
+
+# GitHub Integration
+github:
+  default_branch: main
+  pr_template: .github/pull_request_template.md
+
+# Git Workflow
+git:
+  worktrees: false
+  use_git_spice: false
+
+# Marvin Personality
+marvin:
+  enabled: true
+  verbosity: normal  # quiet, normal, verbose
+
+# Memory (requires Memento MCP)
+memory:
+  enabled: false
+  mcp_server: memento
 ```
 
-## TDD Agents
+---
 
-The SDLC enforces strict TDD boundaries through specialized agents:
+## Requirements
 
-| Agent | Responsibility | Can Edit |
-|-------|----------------|----------|
-| `sdlc:red` | Write failing tests | Test files only |
-| `sdlc:green` | Make tests pass | Production code only |
-| `sdlc:domain` | Create type definitions, PR domain review | Type signatures only |
-| `sdlc:mutation` | Run mutation testing | Read-only |
-| `sdlc:code-reviewer` | Three-stage PR review (spec, quality, domain) | Read-only |
+### Required
 
-These boundaries are **inviolable** - each agent can only edit its designated files.
+- **gh CLI** - GitHub command-line tool
+- **gh extensions:**
+  - `gh extension install jwilger/gh-issue-ext` - Issue management
+  - `gh extension install jwilger/gh-project-ext` - Project integration
+  - `gh extension install jwilger/gh-pr-review` - PR reviews
 
-## Development Modes
+### Optional
 
-### Event Modeling (Applications)
+- **git-spice** - For stacked PR workflows
+- **Memento MCP server** - For persistent memory across sessions
 
-For event-sourced applications:
-- Workflow → Vertical Slice → Component → Subtask hierarchy
-- GWT scenarios as acceptance criteria
-- Event/Command/ReadModel/Automation documentation
+---
 
-### Traditional (Libraries/Utilities)
+## TDD Workflow Example
 
-For libraries, utilities, and legacy applications:
-- Feature → Subtask hierarchy
-- Architecture documentation focus
-- PRD-driven development
+```bash
+# 1. Start work on a feature
+/sdlc:work
 
-## GitHub Integration
+# User: "Add user authentication with email/password"
 
-The SDLC manages your GitHub workflow:
+# 2. Orchestrator creates task sequence:
+# Task #1: Write failing test (red)
+# Task #2: Create domain types (domain) - blocked by #1
+# Task #3: Implement minimal solution (green) - blocked by #2
+# Task #4: Review implementation (domain) - blocked by #3
 
-1. **Issues** become work items with sub-issue support
-2. **Project boards** track status (Backlog → Ready → In Progress → Review → Done)
-3. **PRs** link to issues and close them on merge
-4. **Review comments** are addressed in-thread
+# 3. Red agent writes test:
+#[test]
+fn authenticates_user_with_valid_credentials() {
+    let user = User::new("test@example.com", "password123");
+    assert!(user.authenticate("password123"));
+}
 
-## Auto-Approval Patterns
+# 4. Domain agent creates types:
+pub struct User {
+    email: Email,  // Not String!
+    password_hash: PasswordHash,
+}
 
-Add these to your Claude Code settings for smoother workflow:
+# 5. Green agent implements:
+impl User {
+    pub fn authenticate(&self, password: &str) -> bool {
+        self.password_hash.verify(password)
+    }
+}
+
+# 6. Domain agent reviews:
+# "APPROVE - No primitive obsession. Type safety maintained."
+
+# 7. Cycle complete. Ready for next test or PR creation.
+```
+
+---
+
+## Event Modeling Workflow Example
+
+```bash
+# 1. Start design session
+/sdlc:design
+
+# 2. Discovery phase
+# Agent interviews you about domain:
+# - What workflows exist?
+# - Who are the actors?
+# - What are the outcomes?
+
+# Creates: docs/event_model/discovery.md
+
+# 3. Workflow design
+# Agent creates swimlane diagrams for each workflow
+# Creates: docs/event_model/workflows/user-registration.md
+
+# 4. GWT scenarios
+# Agent generates Given/When/Then acceptance criteria
+# Adds to workflow file
+
+# 5. Model checking
+# Agent validates information flow
+# Identifies gaps in event sequences
+
+# 6. Ready for implementation
+# Use /sdlc:start to create GitHub issues from slices
+```
+
+---
+
+## File Structure
 
 ```
-Bash(gh issue *)
-Bash(gh issue-ext *)
-Bash(gh project *)
-Bash(gh project-ext *)
-Bash(gh pr-review *)
-Bash(gs *)  # if using git-spice
+project/
+├── .claude/
+│   └── sdlc.yaml              # Plugin configuration
+├── docs/
+│   ├── ARCHITECTURE.md         # Current architecture
+│   ├── adr/                    # Architecture Decision Records
+│   │   ├── 0001-use-postgres.md
+│   │   └── 0002-event-sourcing.md
+│   └── event_model/            # Event Modeling artifacts
+│       ├── discovery.md
+│       └── workflows/
+│           └── user-registration.md
+├── src/                        # Production code (green agent)
+│   └── domain/                 # Domain types (domain agent)
+└── tests/                      # Test code (red agent)
 ```
 
-## Documentation
+---
 
-- `docs/tdd/TDD_WORKFLOW.md` - TDD process and principles
-- `docs/domain-modeling/principles.md` - Domain modeling guidelines
-- `docs/event-modeling/methodology.md` - Event modeling approach
+## Troubleshooting
 
-## Related Plugins
+### "Skill not found: sdlc:shared/user-input-protocol"
 
-- **marvin-output-style** - Marvin personality (standalone, works with or without SDLC)
+**Problem:** Using v3.x skill references
+
+**Solution:** Update to v4.0.0 skill names. See `MIGRATION.md`.
+
+### "INVOCATION GATE FAILED"
+
+**Problem:** Using v3.x manual confirmation blocks
+
+**Solution:** Remove confirmation blocks. Use TaskCreate instead. See `MIGRATION.md`.
+
+### Agent creates wrong file type
+
+**Problem:** Hook misconfigured or agent bypassing constraints
+
+**Solution:** Check agent YAML has correct PreToolUse hooks. File issue if hooks fail.
+
+### Tasks not blocking correctly
+
+**Problem:** Task dependencies not set up
+
+**Solution:** Verify `addBlockedBy` used when creating dependent tasks.
+
+---
+
+## Migration
+
+Upgrading from v3.x? See **MIGRATION.md** for:
+- Breaking changes summary
+- Step-by-step migration guide
+- Troubleshooting common issues
+- FAQ
+
+---
+
+## Support
+
+**Issues:** https://github.com/jwilger/claude-code-plugins/issues
+**Discussions:** https://github.com/jwilger/claude-code-plugins/discussions
+**Email:** john@johnwilger.com
+
+---
+
+## License
+
+MIT License - See LICENSE file in repository root
+
+---
+
+## Version History
+
+- **v4.0.0** (2026-02-04): Task-based workflow, portable skills, removed invocation gates
+- **v3.12.8** (2026-02-04): Last v3.x release (domain re-review fix, git-spice recovery docs)
+- **v3.12.0** (2026-01): GitHub issues two-step creation, GWT business rules distinction
+- **v3.11.0** (2026-01): Mutation testing agent, compile-time enforcement audit
+- **v3.10.0** (2025-12): Event Modeling integration, architecture agents
+
+See full changelog: CHANGELOG.md
+
+---
+
+**Built with Claude Code** | **Powered by Task Dependencies** | **Personality by Marvin** 🤖

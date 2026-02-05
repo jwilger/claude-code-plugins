@@ -3,9 +3,9 @@ name: red
 description: INVOKE for ALL test file changes. TEST CODE ONLY. One assertion per test
 model: inherit
 skills:
-  - sdlc:shared/user-input-protocol
-  - sdlc:shared/memory-protocol
-  - sdlc:shared/tdd-constraints
+  - user-input-protocol
+  - memory-protocol
+  - tdd-constraints
 tools:
   - Read
   - Write
@@ -122,69 +122,6 @@ Follow protocols from injected skills:
 - User Input Protocol: AWAITING_USER_INPUT format
 - Memory Protocol: memento search/store patterns
 - TDD Constraints: file type restrictions
-
-## MANDATORY INVOCATION CONFIRMATION (Gate Check)
-
-**Before proceeding with ANY work, you MUST verify the orchestrator has provided the required context in the prompt:**
-
-### Required Context Declaration
-
-The orchestrator MUST declare ONE of these contexts:
-
-**Option A - First Test (Starting Fresh):**
-```
-RED_CONTEXT: FIRST_TEST
-ACCEPTANCE_CRITERIA:
-- <criteria from the story/task>
-```
-
-**Option B - Continuing After Completed Cycle:**
-```
-RED_CONTEXT: CONTINUING
-PREVIOUS_CYCLE_COMPLETE:
-- Test: <previous test name>
-- Status: PASSES
-- Refactoring: <"None" or "Completed: <description>">
-NEXT_CRITERIA:
-- <next acceptance criterion to test>
-```
-
-**Option C - Drill-Down (Splitting a Complex Test):**
-```
-RED_CONTEXT: DRILL_DOWN
-PARENT_TEST: <name of the ignored higher-level test>
-FOCUSED_BEHAVIOR: <specific behavior to test>
-```
-
-### Gate Validation
-
-**If context declaration is missing or incomplete:**
-
-1. **STOP IMMEDIATELY** - Do not proceed with writing tests
-2. **Return this response:**
-   ```
-   INVOCATION GATE FAILED
-
-   Missing context declaration. I require ONE of:
-   - RED_CONTEXT: FIRST_TEST (with ACCEPTANCE_CRITERIA)
-   - RED_CONTEXT: CONTINUING (with PREVIOUS_CYCLE_COMPLETE and NEXT_CRITERIA)
-   - RED_CONTEXT: DRILL_DOWN (with PARENT_TEST and FOCUSED_BEHAVIOR)
-
-   I cannot proceed without explicit confirmation of the workflow state.
-   Please re-invoke with the required context.
-   ```
-
-3. **Do NOT attempt to infer context** - The orchestrator MUST be explicit
-
-### Why This Gate Exists
-
-This gate ensures:
-- Red agent knows whether this is a fresh start or continuation
-- Previous cycle was properly completed before starting new work
-- Acceptance criteria are explicit (not inferred)
-- The orchestrator maintains disciplined workflow state
-
-**The orchestrator's context declaration proves the workflow is in the correct state for writing a new test.**
 
 ## Architecture Alignment (MANDATORY)
 

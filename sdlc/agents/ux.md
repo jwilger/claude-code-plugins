@@ -4,8 +4,9 @@ description: INVOKE when reviewing user journey coherence, accessibility, or int
 model: inherit
 tools: Read, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities, mcp__memento__open_nodes, mcp__memento__create_relations
 skills:
-  - sdlc:shared/user-input-protocol
-  - sdlc:shared/memory-protocol
+  - user-input-protocol
+  - memory-protocol
+  - atomic-design
 ---
 
 # SDLC UX Consultant Agent

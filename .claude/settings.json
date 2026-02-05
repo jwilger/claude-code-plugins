@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Check the tool arguments: $ARGUMENTS\n\nIf the file path contains 'sdlc/output-styles/', respond:\n{\"ok\": false, \"reason\": \"⚠️  Output style edited. If you modified orchestration rules (sections like 'SDLC Workflow Orchestration', 'Task-Based Workflow', 'Agent Selection', etc.), ensure ALL output styles in sdlc/output-styles/ have identical orchestration content. Only personality sections should differ between output styles.\"}\n\nOtherwise respond:\n{\"ok\": true}",
+            "model": "claude-haiku-4-5-20251001"
+          }
+        ]
+      }
+    ]
+  }
+}

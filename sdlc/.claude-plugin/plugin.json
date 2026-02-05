@@ -1,24 +1,16 @@
 {
   "name": "sdlc",
-  "version": "3.12.8",
-  "description": "Complete SDLC workflow with TDD, Event Modeling, ADRs, GitHub integration, and Marvin personality",
+  "version": "4.0.0",
+  "description": "Complete SDLC workflow with TDD, Event Modeling, ADRs, and GitHub integration",
   "author": {
     "name": "John Wilger",
     "email": "john@johnwilger.com"
   },
-  "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow", "marvin", "output-style", "code-review", "debugging", "hooks", "todo-enforcement"],
+  "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow", "code-review", "debugging", "hooks", "todo-enforcement", "marvin", "output-style"],
   "outputStyles": "./output-styles/",
+  "skills": "./skills/",
   "commands": [
     "./commands/shared/orchestration.md",
-    "./commands/shared/memory-protocol.md",
-    "./commands/shared/event-modeling.md",
-    "./commands/shared/atomic-design.md",
-    "./commands/shared/github-issues.md",
-    "./commands/shared/user-input-protocol.md",
-    "./commands/shared/tdd-constraints.md",
-    "./commands/shared/git-spice.md",
-    "./commands/shared/skill-enforcement.md",
-    "./commands/shared/debugging-protocol.md",
     "./commands/setup.md",
     "./commands/start.md",
     "./commands/work.md",

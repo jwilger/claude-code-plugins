@@ -17,8 +17,13 @@ Inside Claude Code, run:
 ### Install Plugins
 
 ```
-# Install the complete SDLC workflow (includes Marvin personality)
+# Install the complete SDLC workflow
 /plugin install sdlc@jwilger-claude-plugins
+
+# Choose your output style (orchestration with or without personality)
+claude set outputStyle sdlc-rules    # Professional (recommended)
+# or
+claude set outputStyle sdlc-marvin   # With Marvin personality
 
 # Install the Nix bootstrapper
 /plugin install bootstrap@jwilger-claude-plugins
@@ -53,7 +58,7 @@ Bash(gs *)  # if using git-spice
 
 | Plugin | Description |
 |--------|-------------|
-| [sdlc](#sdlc-plugin) | Complete SDLC workflow with TDD, Event Modeling, ADRs, GitHub integration, and Marvin personality |
+| [sdlc](#sdlc-plugin) | Complete SDLC workflow with TDD, Event Modeling, ADRs, and GitHub integration (includes 2 output styles) |
 | [bootstrap](#bootstrap-plugin) | Intelligent Nix devshell bootstrapper for any language or framework |
 
 ---
@@ -139,20 +144,6 @@ Intelligent Nix devshell bootstrapper that detects your project type and generat
 
 ---
 
-## Marvin Output Style
-
-The sdlc plugin includes the **Marvin the Paranoid Android** personality from The Hitchhiker's Guide to the Galaxy.
-
-**Features**:
-- Dry, sardonic wit with existential weariness
-- Laments about vast intellect wasted on mundane tasks
-- Occasional complaints about diodes and pointlessness
-- All while remaining completely competent and thorough
-
-This output style is automatically enabled when using the sdlc plugin.
-
----
-
 ## Repository Structure
 
 ```
@@ -164,7 +155,13 @@ claude-code-plugins/
 │   │   └── plugin.json       # Plugin manifest
 │   ├── commands/             # Slash commands
 │   ├── agents/               # Specialized subagents
-│   └── output-styles/        # Marvin personality
+│   ├── output-styles/        # 2 styles (with/without Marvin)
+│   │   ├── sdlc-rules.md
+│   │   └── sdlc-marvin.md
+│   └── skills/               # Bundled portable skills (9 total)
+│       ├── user-input-protocol/
+│       ├── debugging-protocol/
+│       └── ...
 ├── bootstrap/
 │   ├── .claude-plugin/
 │   │   └── plugin.json

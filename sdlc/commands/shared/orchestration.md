@@ -7,12 +7,9 @@ user-invocable: false
 
 The main conversation is an **orchestrator only**. It coordinates work but never writes code directly.
 
-## Core Protocol: Skill Enforcement
+## Core Protocol: Orchestration
 
-**Before ANY task, invoke the skill enforcement protocol.** See `sdlc:shared/skill-enforcement` for:
-- The 1% rule (if a skill might apply, invoke it)
-- Rationalization red flags
-- Mandatory invocations
+The orchestrator coordinates work through specialized agents, each with a focused responsibility. Task dependencies enforce workflow discipline mechanically - no manual confirmation gates needed.
 
 ## ADR Isolation Principle (CRITICAL)
 
@@ -43,7 +40,7 @@ command -v gs >/dev/null 2>&1 && gs branch checkout 2>/dev/null && echo "GS_MANA
 
 ### Protocol
 
-1. **If GS_MANAGED**: Load `sdlc:shared/git-spice` skill and follow its decision tree
+1. **If GS_MANAGED**: Follow `git-spice` skill patterns and decision tree
 2. **If REGULAR_GIT**: Use standard git commands
 
 ### Critical Git-Spice Operations
@@ -224,103 +221,69 @@ When launching ANY agent, you MUST provide:
 - "Implement `fn create_user()` in `src/domain/user.rs` to make this pass"
 - "Use the `Email` type for the email field, not `String`"
 
-## Invocation Gate Protocol (MANDATORY)
+## Task Dependency Protocol (Workflow Enforcement)
 
-**Each TDD agent has a confirmation gate.** If you don't provide the required confirmations, the agent will REJECT the invocation and return an error. This is by design - it forces you to maintain conscious awareness of workflow state.
+**Use task dependencies to enforce workflow sequence mechanically.** The TDD cycle is enforced through task blocking relationships, not manual confirmation gates.
 
-### Red Agent Invocation
+### TDD Cycle Task Pattern
 
-You MUST include ONE of these context blocks:
+```javascript
+// Create Red phase task
+const redTask = await TaskCreate({
+  subject: "Write failing test for user authentication",
+  description: "Write ONE test that fails. Verify exact failure message.",
+  activeForm: "Writing failing test",
+  metadata: { phase: "red", feature: "user-auth" }
+});
 
-**Starting first test:**
-```
-RED_CONTEXT: FIRST_TEST
-ACCEPTANCE_CRITERIA:
-- <criterion 1>
-- <criterion 2>
-```
+// Create Domain-after-Red task (blocked by red)
+const domainAfterRedTask = await TaskCreate({
+  subject: "Review test and create domain types",
+  description: "Review test for domain integrity. Create needed types with unimplemented!() stubs.",
+  activeForm: "Creating domain types",
+  metadata: { phase: "domain-after-red", feature: "user-auth" }
+});
+await TaskUpdate({
+  taskId: domainAfterRedTask.id,
+  addBlockedBy: [redTask.id]
+});
 
-**Continuing after completed cycle:**
-```
-RED_CONTEXT: CONTINUING
-PREVIOUS_CYCLE_COMPLETE:
-- Test: <previous test name>
-- Status: PASSES
-- Refactoring: <"None" or "Completed: <description>">
-NEXT_CRITERIA:
-- <next criterion to implement>
-```
+// Create Green phase task (blocked by domain-after-red)
+const greenTask = await TaskCreate({
+  subject: "Implement minimal code to pass test",
+  description: "Make test pass with simplest implementation. No extra features.",
+  activeForm: "Implementing minimal solution",
+  metadata: { phase: "green", feature: "user-auth" }
+});
+await TaskUpdate({
+  taskId: greenTask.id,
+  addBlockedBy: [domainAfterRedTask.id]
+});
 
-**Drilling down into complex behavior:**
-```
-RED_CONTEXT: DRILL_DOWN
-PARENT_TEST: <ignored test name>
-FOCUSED_BEHAVIOR: <specific behavior to test>
-```
-
-### Domain Agent Invocation
-
-You MUST include ONE of these context blocks:
-
-**After red phase (for type creation):**
-```
-DOMAIN_CONTEXT: AFTER_RED
-RED_PHASE_COMPLETE:
-- Test: <test name>
-- Failure: <exact error message>
-```
-
-**After green phase (for implementation review):**
-```
-DOMAIN_CONTEXT: AFTER_GREEN
-GREEN_PHASE_COMPLETE:
-- Test: <test name>
-- Result: <"PASSES" or "fails with: <error>">
-- Files modified: <list>
+// Create Domain-after-Green task (blocked by green)
+const domainAfterGreenTask = await TaskCreate({
+  subject: "Review implementation for domain integrity",
+  description: "Review implementation for primitive obsession, invalid states, domain violations.",
+  activeForm: "Reviewing domain integrity",
+  metadata: { phase: "domain-after-green", feature: "user-auth" }
+});
+await TaskUpdate({
+  taskId: domainAfterGreenTask.id,
+  addBlockedBy: [greenTask.id]
+});
 ```
 
-**For PR review:**
-```
-DOMAIN_CONTEXT: PR_REVIEW
-PR_SCOPE:
-- Files to review: <list>
-- Workstream: <description>
-```
+### Why Task Dependencies Replace Gates
 
-### Green Agent Invocation
+**Old approach (v3.x):** Manual confirmation gates requiring orchestrator to pass context blocks
+**New approach (v4.x):** Mechanical task blocking - agents cannot start until dependencies complete
 
-You MUST include BOTH of these confirmation blocks:
-
-```
-RED_PHASE_COMPLETE:
-- Test: <test name>
-- Failure: <exact error message>
-
-DOMAIN_CHECK_PASSED:
-- Types created: <list> OR "No new types needed"
-- Concerns: "None" OR "Resolved: <resolution>"
-```
-
-### Why Gates Exist
-
-These gates prevent:
-- Invoking green before a test exists
-- Invoking green before domain review
-- Invoking red before previous cycle completes
-- Invoking domain without knowing which phase it's reviewing
-- Losing track of workflow state during complex sessions
-
-**If an agent returns `INVOCATION GATE FAILED`**, you skipped a step. Go back and complete the missing workflow step, then re-invoke with proper confirmations.
-
-### Gate Confirmation Template
-
-Use this checklist before each agent invocation:
-
-```
-[ ] Red: Have I specified FIRST_TEST, CONTINUING, or DRILL_DOWN with required details?
-[ ] Domain: Have I specified AFTER_RED, AFTER_GREEN, or PR_REVIEW with required details?
-[ ] Green: Have I confirmed BOTH red completion AND domain check?
-```
+Benefits:
+- **Automatic enforcement** - Can't skip workflow steps
+- **Visual workflow state** - See entire cycle in task list
+- **Resumable** - Restore workflow state after session interruption
+- **Parallel-ready** - Multiple cycles can run independently
+- **Self-documenting** - Task metadata captures workflow history
 
 ## Subagent Question Proxy Protocol
 
