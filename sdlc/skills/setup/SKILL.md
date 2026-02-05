@@ -1,6 +1,6 @@
 ---
 name: setup
-version: 3.1.0
+version: 3.1.1
 author: jwilger
 repository: jwilger/claude-code-plugins
 description: Interactive multi-stage SDLC configuration with progressive disclosure. Run this first before using any other skills.
@@ -16,7 +16,7 @@ allowed-tools: Bash, Write, AskUserQuestion, Read
 
 # Setup Skill
 
-**Version:** 3.1.0
+**Version:** 3.1.1
 **Portability:** Tool-specific
 
 ---
@@ -933,7 +933,79 @@ fi
 ```
 
 **6d. Create comprehensive ruleset (if branch protection enabled):**
+
+**CRITICAL: Check if main branch exists first**
 ```bash
+if [ "$CONFIGURE_PROTECTION" = "yes" ]; then
+  # Check if main branch exists on remote
+  if ! git ls-remote origin main 2>/dev/null | grep -q 'refs/heads/main'; then
+    echo "⚠️  Bootstrap Issue: Main branch doesn't exist on remote yet"
+    echo ""
+    # Ask user what to do
+  fi
+fi
+```
+
+**If main doesn't exist, ask user:**
+```javascript
+{
+  "questions": [{
+    "question": "Main branch doesn't exist yet. How should we proceed?",
+    "header": "Bootstrap",
+    "multiSelect": false,
+    "options": [
+      {
+        "label": "Push initial commit now (Recommended)",
+        "description": "Push .claude/sdlc.yaml and any created files to main, then set up protection"
+      },
+      {
+        "label": "Defer branch protection",
+        "description": "Save config and set up protection later (run /sdlc:setup --reconfigure after first push)"
+      },
+      {
+        "label": "Skip branch protection for now",
+        "description": "Don't configure branch protection at this time"
+      }
+    ]
+  }]
+}
+```
+
+**If "Push initial commit now" selected:**
+```bash
+# Stage setup files
+git add .claude/sdlc.yaml
+[ -f .github/workflows/ci.yml ] && git add .github/workflows/ci.yml
+[ -f .github/pull_request_template.md ] && git add .github/pull_request_template.md
+[ -f .worktrees/.gitignore ] && git add .worktrees/.gitignore
+
+# Commit
+git commit -m "chore: configure SDLC workflow
+
+- Add SDLC plugin configuration
+- Configure GitHub repository settings
+- Set up branch protection (pending)
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
+
+# Push to main
+git push -u origin main
+
+# Now create rulesets since main exists
+echo "✓ Main branch created, setting up protection..."
+CONFIGURE_PROTECTION="yes"
+```
+
+**If "Defer" or "Skip", mark in config:**
+```yaml
+github:
+  # ... other settings ...
+  branch_protection:
+    main:
+      status: deferred  # or: skipped
+      # ... saved settings for later ...
+```
+
 if [ "$CONFIGURE_PROTECTION" = "yes" ]; then
   # Build ruleset JSON based on user selections
   cat > /tmp/ruleset.json <<EOF
@@ -1098,6 +1170,16 @@ For complete implementation details, configuration schema, and error handling:
 ---
 
 ## Metadata
+
+**Version:** 3.1.1 (2026-02-05) - Fix bootstrap issue
+- **CRITICAL FIX**: Check if main branch exists before creating rulesets
+- Prevent "branch protection on non-existent branch" bootstrap problem
+- When main doesn't exist, offer three options:
+  1. **Push initial commit now** (recommended) - commit setup files, push to main, then create protection
+  2. **Defer protection** - save config, set up after first push via --reconfigure
+  3. **Skip protection** - don't configure at this time
+- Mark deferred/skipped protection status in .claude/sdlc.yaml
+- Fixes issue where new repos couldn't push to protected non-existent main
 
 **Version:** 3.1.0 (2026-02-05) - Comprehensive branch protection
 - Add comprehensive ruleset configuration questions:

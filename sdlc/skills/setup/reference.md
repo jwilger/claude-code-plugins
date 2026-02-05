@@ -347,8 +347,31 @@ fi
 ```
 
 **Comprehensive branch protection rulesets:**
+
+**CRITICAL: Bootstrap check**
 ```bash
 if [ "$USER_CONFIGURE_PROTECTION" = "yes" ]; then
+  # Check if main branch exists on remote (bootstrap issue)
+  if ! git ls-remote origin main 2>/dev/null | grep -q 'refs/heads/main'; then
+    echo "⚠️  Main branch doesn't exist on remote yet"
+
+    # Present options:
+    # 1. Push initial commit now (recommended)
+    # 2. Defer protection setup until after first push
+    # 3. Skip protection setup
+
+    # If user chooses "Push initial commit now":
+    # - Stage .claude/sdlc.yaml and any created files
+    # - Commit with setup message
+    # - Push to origin main
+    # - Then proceed with ruleset creation
+
+    # If user chooses "Defer" or "Skip":
+    # - Mark status in config as "deferred" or "skipped"
+    # - Save configuration for later
+    # - User can run /sdlc:setup --reconfigure after first push
+  fi
+
   # Build comprehensive ruleset JSON
   cat > /tmp/ruleset.json <<EOF
 {
