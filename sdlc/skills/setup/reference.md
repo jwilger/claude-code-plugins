@@ -165,6 +165,49 @@ git:
 - Configure manually later via GitHub UI
 
 **Implementation:**
+
+**Step 1: Check for GitHub remote**
+```bash
+# Check if repository has a GitHub remote
+if ! git remote get-url origin >/dev/null 2>&1; then
+  echo "⚠️  No GitHub remote found"
+  # Prompt user for action (see below)
+fi
+```
+
+**Step 2: Handle missing remote (if needed)**
+
+If no remote exists, present three options:
+
+1. **Create new GitHub repository:**
+```bash
+# Get current directory name as default
+DEFAULT_NAME=$(basename "$PWD")
+
+# Create repository using gh CLI
+gh repo create "$DEFAULT_NAME" --source=. --remote=origin
+
+# Verify creation
+gh repo view >/dev/null 2>&1 && echo "✓ Repository created"
+```
+
+2. **Associate with existing repository:**
+```bash
+# Prompt for repository (owner/repo format or URL)
+echo "Enter GitHub repository (owner/repo or URL):"
+read REPO_INPUT
+
+# Add remote
+git remote add origin "https://github.com/$REPO_INPUT.git" 2>/dev/null || \
+  git remote add origin "$REPO_INPUT"
+
+# Verify remote
+gh repo view >/dev/null 2>&1 && echo "✓ Remote added"
+```
+
+3. **Skip GitHub configuration:** Exit this step, continue with rest of setup.
+
+**Step 3: Configure repository settings (after remote confirmed)**
 ```bash
 # Get repository name
 REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)

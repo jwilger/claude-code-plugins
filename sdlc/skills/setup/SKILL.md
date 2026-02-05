@@ -1,6 +1,6 @@
 ---
 name: setup
-version: 2.1.0
+version: 2.2.0
 author: jwilger
 repository: jwilger/claude-code-plugins
 description: Interactive multi-stage SDLC configuration with progressive disclosure. Run this first before using any other skills.
@@ -16,7 +16,7 @@ allowed-tools: Bash, Write, AskUserQuestion, Read
 
 # Setup Skill
 
-**Version:** 2.1.0
+**Version:** 2.2.0
 **Portability:** Tool-specific
 
 ---
@@ -384,7 +384,83 @@ GitHub repository setup question:
 }
 ```
 
-If user selects "Yes", configure repository settings:
+If user selects "Yes", first check for GitHub remote:
+```bash
+# Check if repository has a GitHub remote
+if ! git remote get-url origin >/dev/null 2>&1; then
+  echo "⚠️  No GitHub remote found"
+  # Ask user to create or associate repository
+fi
+```
+
+If no remote exists, ask user:
+```javascript
+{
+  "questions": [{
+    "question": "No GitHub remote found. What would you like to do?",
+    "header": "Remote",
+    "multiSelect": false,
+    "options": [
+      {
+        "label": "Create new GitHub repository",
+        "description": "Create a new repository on GitHub and set it as remote. Uses gh CLI."
+      },
+      {
+        "label": "Associate with existing repository",
+        "description": "Add an existing GitHub repository as remote. You'll need the repo URL."
+      },
+      {
+        "label": "Skip GitHub configuration",
+        "description": "Continue without GitHub remote. You can configure this later."
+      }
+    ]
+  }]
+}
+```
+
+**If "Create new GitHub repository" selected:**
+```bash
+# Get current directory name as default repo name
+DEFAULT_NAME=$(basename "$PWD")
+
+# Ask for repository details
+echo "Creating GitHub repository..."
+echo "Default name: $DEFAULT_NAME"
+
+# Create repository (gh will prompt for details)
+gh repo create "$DEFAULT_NAME" --source=. --remote=origin
+
+# Verify creation
+if gh repo view >/dev/null 2>&1; then
+  echo "✓ Repository created and remote added"
+else
+  echo "❌ Repository creation failed"
+  exit 1
+fi
+```
+
+**If "Associate with existing repository" selected:**
+```bash
+# Ask for repository URL or owner/name
+echo "Enter GitHub repository (format: owner/repo or full URL):"
+read REPO_INPUT
+
+# Add remote
+git remote add origin "https://github.com/$REPO_INPUT.git" 2>/dev/null || \
+  git remote add origin "$REPO_INPUT"
+
+# Verify remote
+if gh repo view >/dev/null 2>&1; then
+  echo "✓ Remote added successfully"
+else
+  echo "❌ Failed to verify remote. Check the repository URL."
+  exit 1
+fi
+```
+
+**If "Skip" selected:** Exit GitHub configuration, continue with rest of setup.
+
+After remote is confirmed, configure repository settings:
 ```bash
 # Get repository name
 REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
@@ -507,6 +583,10 @@ For complete implementation details, configuration schema, and error handling:
 ---
 
 ## Metadata
+
+**Version:** 2.2.0 (2026-02-05):
+- Add GitHub remote creation/association when no remote exists
+- Offer to create new repo via `gh repo create` or associate with existing repo
 
 **Version:** 2.1.0 (2026-02-05):
 - Fix worktrees directory location: now uses `.worktrees/` (gitignored) instead of `../worktrees`
