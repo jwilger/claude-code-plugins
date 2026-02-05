@@ -1,6 +1,6 @@
 ---
 name: setup
-version: 3.2.0
+version: 3.3.0
 author: jwilger
 repository: jwilger/claude-code-plugins
 description: Interactive multi-stage SDLC configuration with progressive disclosure. Run this first before using any other skills.
@@ -16,7 +16,7 @@ allowed-tools: Bash, Write, AskUserQuestion, Read
 
 # Setup Skill
 
-**Version:** 3.2.0
+**Version:** 3.3.0
 **Portability:** Tool-specific
 
 ---
@@ -1007,8 +1007,36 @@ github:
 ```
 
 if [ "$CONFIGURE_PROTECTION" = "yes" ]; then
-  # Build ruleset JSON based on user selections
-  cat > /tmp/ruleset.json <<EOF
+  # Ruleset 1: Signed Commits (ALL branches, if enabled)
+  if [ "$REQUIRE_SIGNED" = "yes" ]; then
+    cat > /tmp/ruleset-signed.json <<EOF
+{
+  "name": "Require Signed Commits",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": ["refs/heads/*"],
+      "exclude": []
+    }
+  },
+  "rules": [
+    {
+      "type": "required_signatures",
+      "parameters": {}
+    }
+  ]
+}
+EOF
+
+    # Create signed commits ruleset (applies to ALL branches)
+    gh api -X POST "repos/$REPO/rulesets" --input /tmp/ruleset-signed.json
+    echo "✓ Created signed commits ruleset (all branches)"
+    rm /tmp/ruleset-signed.json
+  fi
+
+  # Ruleset 2: Main Branch Protection
+  cat > /tmp/ruleset-main.json <<EOF
 {
   "name": "Main Branch Protection",
   "target": "branch",
@@ -1047,30 +1075,24 @@ if [ "$CONFIGURE_PROTECTION" = "yes" ]; then
 }
 EOF
 
-  # Add signed commits rule if enabled (applies to all branches)
-  if [ "$REQUIRE_SIGNED" = "yes" ]; then
-    # Add to ruleset rules
-    jq '.rules += [{"type": "required_signatures", "parameters": {}}]' /tmp/ruleset.json > /tmp/ruleset-updated.json
-    mv /tmp/ruleset-updated.json /tmp/ruleset.json
-  fi
-
   # Add deletion protection if enabled
   if [ "$BLOCK_DELETION" = "yes" ]; then
-    jq '.rules += [{"type": "deletion", "parameters": {}}]' /tmp/ruleset.json > /tmp/ruleset-updated.json
-    mv /tmp/ruleset-updated.json /tmp/ruleset.json
+    jq '.rules += [{"type": "deletion", "parameters": {}}]' /tmp/ruleset-main.json > /tmp/ruleset-updated.json
+    mv /tmp/ruleset-updated.json /tmp/ruleset-main.json
   fi
 
   # Add linear history if enabled
   if [ "$REQUIRE_LINEAR" = "yes" ]; then
-    jq '.rules += [{"type": "required_linear_history", "parameters": {}}]' /tmp/ruleset.json > /tmp/ruleset-updated.json
-    mv /tmp/ruleset-updated.json /tmp/ruleset.json
+    jq '.rules += [{"type": "required_linear_history", "parameters": {}}]' /tmp/ruleset-main.json > /tmp/ruleset-updated.json
+    mv /tmp/ruleset-updated.json /tmp/ruleset-main.json
   fi
 
-  # Create ruleset via API
-  gh api -X POST "repos/$REPO/rulesets" --input /tmp/ruleset.json
+  # Create main branch protection ruleset
+  gh api -X POST "repos/$REPO/rulesets" --input /tmp/ruleset-main.json
+  echo "✓ Created main branch protection ruleset"
 
   # Clean up
-  rm /tmp/ruleset.json
+  rm /tmp/ruleset-main.json
 fi
 ```
 
@@ -1248,6 +1270,14 @@ For complete implementation details, configuration schema, and error handling:
 ---
 
 ## Metadata
+
+**Version:** 3.3.0 (2026-02-05) - Split rulesets for proper scoping
+- Create TWO separate rulesets instead of one:
+  - **Ruleset 1**: "Require Signed Commits" - targets ALL branches (`refs/heads/*`)
+  - **Ruleset 2**: "Main Branch Protection" - targets main only (`refs/heads/main`)
+- Signed commits now properly apply repository-wide, not just to main
+- Better separation of concerns: signing vs branch protection
+- Follows GitHub best practices for ruleset organization
 
 **Version:** 3.2.0 (2026-02-05) - Add team marketplace configuration
 - Automatically configure `.claude/settings.json` with marketplace definition

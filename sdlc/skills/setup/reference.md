@@ -372,8 +372,36 @@ if [ "$USER_CONFIGURE_PROTECTION" = "yes" ]; then
     # - User can run /sdlc:setup --reconfigure after first push
   fi
 
-  # Build comprehensive ruleset JSON
-  cat > /tmp/ruleset.json <<EOF
+  # Create TWO separate rulesets for proper scoping
+
+  # Ruleset 1: Signed Commits (ALL branches)
+  if [ "$REQUIRE_SIGNED" = "yes" ]; then
+    cat > /tmp/ruleset-signed.json <<EOF
+{
+  "name": "Require Signed Commits",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": ["refs/heads/*"],
+      "exclude": []
+    }
+  },
+  "rules": [
+    {
+      "type": "required_signatures",
+      "parameters": {}
+    }
+  ]
+}
+EOF
+
+    gh api -X POST "repos/$REPO/rulesets" --input /tmp/ruleset-signed.json
+    rm /tmp/ruleset-signed.json
+  fi
+
+  # Ruleset 2: Main Branch Protection
+  cat > /tmp/ruleset-main.json <<EOF
 {
   "name": "Main Branch Protection",
   "target": "branch",
@@ -410,25 +438,37 @@ if [ "$USER_CONFIGURE_PROTECTION" = "yes" ]; then
 }
 EOF
 
-  # Add optional rules based on user selections
-  # - required_signatures (if signed commits enabled)
+  # Add optional rules for main branch only
   # - deletion (if block deletion enabled)
   # - required_linear_history (if linear history enabled)
 
-  # Create ruleset
-  gh api -X POST "repos/$REPO/rulesets" --input /tmp/ruleset.json
-  rm /tmp/ruleset.json
+  gh api -X POST "repos/$REPO/rulesets" --input /tmp/ruleset-main.json
+  rm /tmp/ruleset-main.json
 fi
 ```
 
-**Ruleset features based on user selections:**
-- **Signed commits** (all branches): `required_signatures` rule
-- **Pull request requirements**: Number of reviews, dismiss stale, code owners
-- **Branch updates**: Require up-to-date before merge
-- **CI/status checks**: Required checks to pass
-- **Force push protection**: `non_fast_forward` rule
-- **Deletion protection**: `deletion` rule
-- **Linear history**: `required_linear_history` rule
+**Two-ruleset architecture:**
+
+**Ruleset 1: "Require Signed Commits"**
+- **Target**: `refs/heads/*` (ALL branches)
+- **Rules**: `required_signatures` only
+- **Purpose**: Enforce signed commits repository-wide
+
+**Ruleset 2: "Main Branch Protection"**
+- **Target**: `refs/heads/main` (main branch only)
+- **Rules**:
+  - Pull request requirements (reviews, dismiss stale, code owners)
+  - Required status checks (CI)
+  - Branch up-to-date requirement
+  - Force push protection (`non_fast_forward`)
+  - Deletion protection (optional)
+  - Linear history (optional)
+- **Purpose**: Protect main branch with comprehensive rules
+
+**Why two rulesets?**
+- Signed commits should apply to ALL branches (feature, bugfix, etc.)
+- PR requirements only make sense for protected branches like main
+- Proper separation of concerns and scoping
 
 Note: Rulesets API requires admin permissions on repository
 
