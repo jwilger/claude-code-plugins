@@ -2,7 +2,7 @@
 name: mutation
 description: INVOKE before PR creation. Enforces 100% mutation score, reports surviving mutants
 model: inherit
-tools: Read, Bash, Glob, Grep, mcp__memento__semantic_search, mcp__memento__create_entities
+tools: Read, Bash, Glob, Grep
 skills:
   - memory-protocol
 ---

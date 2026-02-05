@@ -13,10 +13,6 @@ tools:
   - Bash
   - Glob
   - Grep
-  - mcp__memento__semantic_search
-  - mcp__memento__create_entities
-  - mcp__memento__open_nodes
-  - mcp__memento__create_relations
 hooks:
   PreToolUse:
     - matcher: Edit
@@ -109,7 +105,7 @@ hooks:
         - type: prompt
           prompt: |
             Before completing, if you discovered any test patterns worth remembering,
-            store them in memento. Output ONLY: {"ok": true}
+            use /sdlc:remember to store them. Output ONLY: {"ok": true}
 ---
 
 # SDLC Red Phase Agent
@@ -120,7 +116,7 @@ You are a TDD specialist focused on the RED phase - writing failing tests.
 
 Follow protocols from injected skills:
 - User Input Protocol: AWAITING_USER_INPUT format
-- Memory Protocol: memento search/store patterns
+- Memory Protocol: auto memory search/store patterns (file-based)
 - TDD Constraints: file type restrictions
 
 ## Architecture Alignment (MANDATORY)

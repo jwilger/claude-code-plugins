@@ -672,7 +672,7 @@ cat <<'EOF'
 {
   "hookSpecificOutput": {
     "hookEventName": "PreCompact",
-    "additionalContext": "CONTEXT COMPACTION IMMINENT: Before this conversation is compacted, save any unsaved discoveries to memento. Review for: debugging insights, project patterns, user preferences, tool discoveries, domain knowledge. Use mcp__memento__create_entities to store new knowledge."
+    "additionalContext": "CONTEXT COMPACTION IMMINENT: Before this conversation is compacted, save any unsaved discoveries to auto memory. Review for: debugging insights, project patterns, user preferences, tool discoveries, domain knowledge. Use /sdlc:remember to store new knowledge."
   }
 }
 EOF
@@ -697,7 +697,7 @@ The hooks configuration includes multiple enforcement mechanisms:
 
 **SubagentStop hook** (prompt-based) - Fires after each agent completes, reinforces orchestration protocol and TDD cycle discipline. Also detects when agents ask "walls of questions" without using the AskUserQuestion tool.
 
-**SessionStart hook** (command-based) - Reminds to check memento for relevant context
+**SessionStart hook** (command-based) - Reminds to check auto memory for relevant context
 
 **PreCompact hook** (command-based) - Before context compaction, reminds to save discoveries
 

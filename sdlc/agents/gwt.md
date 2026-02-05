@@ -7,10 +7,6 @@ tools:
   - Write
   - Edit
   - Glob
-  - mcp__memento__semantic_search
-  - mcp__memento__create_entities
-  - mcp__memento__open_nodes
-  - mcp__memento__create_relations
 skills:
   - user-input-protocol
   - memory-protocol

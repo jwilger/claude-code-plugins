@@ -79,8 +79,8 @@ Integrates TDD, Event Modeling, Architecture Decision Records, local task manage
 | `/sdlc:adr` | Create Architecture Decision Record | Document decisions |
 | `/sdlc:plan` | Create tasks from event model slices | After design |
 | `/sdlc:start` | Auto-detect phase and route | Entry point |
-| `/sdlc:remember` | Store knowledge in Memento | Learning |
-| `/sdlc:recall` | Search Memento knowledge | Context retrieval |
+| `/sdlc:remember` | Store knowledge in auto memory | Learning |
+| `/sdlc:recall` | Search auto memory knowledge | Context retrieval |
 | `/sdlc:domain-audit` | Audit for primitive obsession | Code review |
 
 ---
@@ -269,10 +269,10 @@ marvin:
   enabled: true
   verbosity: normal  # quiet, normal, verbose
 
-# Memory (requires Memento MCP)
+# Memory (built-in auto memory)
 memory:
-  enabled: false
-  mcp_server: memento
+  enabled: true
+  # Auto memory is built into Claude Code - no configuration needed
 ```
 
 ---
@@ -290,7 +290,53 @@ memory:
 ### Optional
 
 - **git-spice** - For stacked PR workflows
-- **Memento MCP server** - For persistent memory across sessions
+
+---
+
+## Memory System
+
+The SDLC plugin uses Claude Code's built-in **auto memory** for knowledge persistence across sessions.
+
+### Features
+
+- **File-based storage** - Markdown files in `~/.claude/projects/<project-path>/memory/`
+- **Organized by category** - debugging/, architecture/, conventions/, tools/, patterns/
+- **Keyword search** - Use `/sdlc:recall "<keywords>"` to grep through memory
+- **Manual capture** - Use `/sdlc:remember "<what>"` to store discoveries
+- **Zero configuration** - No external servers or dependencies required
+
+### Directory Structure
+
+```
+~/.claude/projects/<project-path>/memory/
+├── MEMORY.md              # Quick references (always loaded, <200 lines)
+├── debugging/             # Solutions to past problems
+├── architecture/          # Architecture decisions
+├── conventions/           # Project conventions
+├── tools/                 # Tool quirks and discoveries
+└── patterns/              # General reusable patterns
+```
+
+### Usage
+
+**Store a discovery:**
+```bash
+/sdlc:remember "cargo test hangs with RUST_TEST_THREADS unset"
+```
+
+**Recall knowledge:**
+```bash
+/sdlc:recall "cargo test timeout"
+```
+
+### Limitations
+
+Compared to semantic search systems (like Memento MCP):
+- **No semantic search** - Only exact keyword matching via grep
+- **No relationship graph** - Manual markdown links between files
+- **No automatic capture** - Must manually use `/sdlc:remember`
+
+**Trade-off:** Simplicity and zero configuration vs. sophisticated search capabilities.
 
 ---
 

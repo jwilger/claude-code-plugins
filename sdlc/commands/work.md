@@ -4,8 +4,7 @@ allowed-tools:
   - Bash
   - Read
   - AskUserQuestion
-  - mcp__memento__semantic_search
-  - mcp__memento__open_nodes
+  - Grep
 hooks:
   PreToolUse:
     - matcher: Read
@@ -23,7 +22,7 @@ hooks:
     - hooks:
         - type: prompt
           prompt: |
-            Before completing, store the current work context in memento:
+            Before completing, store the current work context in auto memory using /sdlc:remember:
             - Issue being worked on
             - Branch name
             - Any decisions or discoveries made
@@ -98,12 +97,14 @@ dot ls --status active --json
 
 If branch name contains a task ID (e.g., `feature/myproject-add-login-abc123`), that task becomes the default selection.
 
-### 3. Search Memento for Context
+### 3. Check Auto Memory for Context
 
-Before showing issues, search memento for relevant project context:
+Before showing issues, check auto memory for relevant project context using Grep:
 
-```
-mcp__memento__semantic_search({ "query": "current work in progress [project-name]" })
+```bash
+# Search for current work context
+MEMORY_PATH="$HOME/.claude/projects/$(pwd | sed 's/\//-/g' | sed 's/^-//')/memory"
+grep -r -i "current work\|in progress" "$MEMORY_PATH" --include="*.md" 2>/dev/null || true
 ```
 
 This helps identify if there's already work in progress that should be the default.
@@ -147,7 +148,7 @@ Format tasks as options:
 
 **Child Task Priority**: Child tasks of active parents should be shown prominently (after any "Currently working on" item but before general Ready tasks) since they represent work that's already been scoped and is blocking completion of the parent.
 
-Include context from memento search if relevant.
+Include context from auto memory search if relevant.
 
 Let user select a task or enter a custom task ID.
 
@@ -187,7 +188,7 @@ After creating the worktree:
 1. Note the worktree path for the user
 2. Run any project setup (npm install, cargo build, etc.)
 3. Run baseline tests to ensure clean starting state
-4. Store worktree path in memento for reference
+4. Optionally store worktree path in auto memory using /sdlc:remember if needed for context
 
 **If using git-spice (no worktrees):** For git-spice workflow guidance, invoke the `sdlc:shared/git-spice` skill or see its documentation.
 
@@ -216,21 +217,15 @@ git checkout -b feature/<task-id>
 - Integration points are spec'd BEFORE dependent work begins
 - Shared code (integration points) should be merged to main before dependent slices start
 
-#### c. Store in memento
+#### c. Store in auto memory
 
-Create a memory noting the current work:
-```
-mcp__memento__create_entities({
-  "entities": [{
-    "name": "Current Work Session [date]",
-    "entityType": "work_session",
-    "observations": [
-      "Working on task <task-id>: <title>",
-      "Project: <project-name> | Path: <repo-path>",
-      "Branch: feature/<task-id>"
-    ]
-  }]
-})
+Use /sdlc:remember to note the current work session:
+
+```bash
+/sdlc:remember "Working on task <task-id>: <title>
+Project: <project-name> | Path: <repo-path>
+Branch: feature/<task-id>
+Date: $(date +%Y-%m-%d)"
 ```
 
 ### 7. Display Work Context

@@ -1,21 +1,22 @@
 ---
 name: memory-protocol
-version: 1.0.0
+version: 2.0.0
 author: jwilger
 repository: jwilger/claude-code-plugins
-description: Knowledge accumulation and retrieval patterns for agent memory systems
+description: Knowledge accumulation and retrieval patterns for file-based agent memory
 tags:
   - memory
-  - knowledge-graph
+  - file-based
   - learning
   - context
+  - grep
 portability: high
 dependencies: []
 ---
 
 # Memory Protocol
 
-**Version:** 1.0.0
+**Version:** 2.0.0
 **Portability:** High
 
 ---
@@ -310,8 +311,8 @@ Store: "Architecture: Order system uses event sourcing. Rationale: Audit require
 - **orchestration-protocol:** Orchestrator recalls workflow state and conventions
 
 **Prerequisites:**
-- Memory/knowledge system (Memento MCP, database, file-based, or similar)
-- Consistent search interface
+- Memory/knowledge system (file-based markdown, database, or similar)
+- Consistent search interface (grep, full-text search, etc.)
 - Persistent storage (survives session restarts)
 
 ---
@@ -357,55 +358,60 @@ Store: "Architecture: Order system uses event sourcing. Rationale: Audit require
 
 ## Examples
 
-### Example 1: Memento MCP Implementation
+### Example 1: File-Based Implementation (Primary)
 
-**Tool:** Memento MCP server (knowledge graph)
+**Tool:** Markdown files in auto memory directory
 
 **Recall pattern:**
-```javascript
-// Search before task
-const memories = await mcp__memento__semantic_search({
-  query: "authentication jwt token",
-  limit: 5
-});
+```bash
+# Search for authentication patterns
+MEMORY_PATH="$HOME/.claude/projects/<project-path>/memory"
+grep -r -i "jwt token" "$MEMORY_PATH" --include="*.md"
 
-// Use results
-console.log(memories);
-// [
-//   "JWT tokens stored in localStorage",
-//   "Token refresh happens every 15 minutes",
-//   "Auth header format: Bearer <token>"
-// ]
+# Read relevant files
+cat "$MEMORY_PATH/architecture/jwt-authentication.md"
 ```
 
 **Remember pattern:**
-```javascript
-// Store discovery
-await mcp__memento__create_entities({
-  entities: [{
-    name: "JWT token expiration handling",
-    entityType: "solution",
-    observations: [
-      "Problem: Token expires mid-session, causing auth failures",
-      "Solution: Refresh token proactively every 15 minutes",
-      "Implementation: setInterval in App.tsx"
-    ]
-  }]
-});
+```bash
+# Create new memory file
+cat > "$MEMORY_PATH/architecture/jwt-token-refresh.md" << 'EOF'
+# JWT Token Refresh Pattern
 
-// Link to related memory
-await mcp__memento__create_relations({
-  relations: [{
-    from: "JWT token expiration handling",
-    to: "Authentication system architecture",
-    type: "implements"
-  }]
-});
+**Date:** 2026-02-04
+**Category:** architecture
+**Project:** MyApp
+
+## Problem / Context
+
+JWT tokens expire after 1 hour, causing mid-session auth failures that disrupt user experience.
+
+## Solution / Discovery
+
+Implement proactive token refresh every 15 minutes to prevent expiration during active sessions.
+
+## Details
+
+```javascript
+// In App.tsx
+useEffect(() => {
+  const refreshInterval = setInterval(refreshToken, 15 * 60 * 1000);
+  return () => clearInterval(refreshInterval);
+}, []);
 ```
 
-### Example 2: File-Based Implementation
+## Related
 
-**Tool:** Simple JSON files in project
+- See also: [JWT Authentication](jwt-authentication.md)
+- Token storage: [Local Storage Patterns](../tools/localstorage-patterns.md)
+EOF
+```
+
+### Example 2: Legacy Memento MCP Implementation (Deprecated)
+
+**Note:** The sdlc plugin v6.0.0+ no longer uses Memento MCP. This example is kept for reference only.
+
+**Tool:** Memento MCP server (knowledge graph) - **NO LONGER SUPPORTED**
 
 **Recall pattern:**
 ```bash
@@ -531,21 +537,29 @@ Use this checklist to verify you're following the memory protocol:
 ## References
 
 **Source Documentation:**
-- sdlc plugin: commands/shared/memory-protocol.md
-- Memento MCP server: https://github.com/skydeckai/memento
+- sdlc plugin: commands/remember.md and commands/recall.md
+- Claude Code auto memory: ~/.claude/projects/<project-path>/memory/
 
 **Related Skills:**
 - debugging-protocol - Search for fixes before 4-phase debugging
 - user-input-protocol - Store user answers to avoid re-asking
 
 **External Resources:**
-- Knowledge graphs and semantic search
-- RAG (Retrieval-Augmented Generation) patterns
-- MCP (Model Context Protocol) specification
+- File-based knowledge management
+- Grep and text search patterns
+- Markdown linking and organization
 
 ---
 
 ## Version History
+
+### v2.0.0 (2026-02-04)
+- **BREAKING:** Migrated from Memento MCP to file-based auto memory
+- Updated primary example to use markdown files and grep
+- Deprecated Memento MCP examples (kept for reference)
+- Simplified prerequisites (no external MCP server required)
+- Updated recall pattern to use grep-based search
+- Updated remember pattern to use markdown file creation
 
 ### v1.0.0 (2026-02-04)
 - Initial extraction from sdlc plugin
@@ -558,8 +572,29 @@ Use this checklist to verify you're following the memory protocol:
 
 ## Metadata
 
-**Extraction Source:** sdlc/commands/shared/memory-protocol.md
+**Extraction Source:** sdlc/commands/remember.md and sdlc/commands/recall.md
 **Extraction Date:** 2026-02-04
-**Last Updated:** 2026-02-04
-**Compatibility:** High portability (pattern is universal, multiple implementations possible)
+**Last Updated:** 2026-02-04 (v2.0.0 - migrated to file-based)
+**Compatibility:** High portability (pattern is universal, file-based implementation is simple and portable)
 **License:** MIT
+
+## Migration Notes (v2.0.0)
+
+**For users upgrading from Memento MCP:**
+- Semantic search replaced with keyword-based grep
+- Graph relationships replaced with manual markdown links
+- Structured entities replaced with markdown files
+- No external MCP server required
+- Trade-off: Simpler setup, but less sophisticated search
+
+**Advantages of file-based:**
+- Zero configuration (built into Claude Code)
+- Transparent storage (easy to read/edit manually)
+- Version control friendly (can commit memory to git)
+- Portable (just markdown files)
+
+**Limitations of file-based:**
+- No semantic similarity search (only exact keyword matching)
+- No automatic relationship traversal
+- Manual organization required
+- Slower search on large memory bases

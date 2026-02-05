@@ -7,9 +7,6 @@ tools:
   - Bash
   - Glob
   - Grep
-  - mcp__memento__semantic_search
-  - mcp__memento__create_entities
-  - mcp__memento__open_nodes
 skills:
   - memory-protocol
   - user-input-protocol

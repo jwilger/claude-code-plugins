@@ -13,10 +13,6 @@ tools:
   - Bash
   - Glob
   - Grep
-  - mcp__memento__semantic_search
-  - mcp__memento__create_entities
-  - mcp__memento__open_nodes
-  - mcp__memento__create_relations
 hooks:
   PreToolUse:
     - matcher: Edit
@@ -107,7 +103,7 @@ hooks:
         - type: prompt
           prompt: |
             Before completing, if you discovered any implementation patterns worth remembering,
-            store them in memento. Output ONLY: {"ok": true}
+            use /sdlc:remember to store them. Output ONLY: {"ok": true}
 ---
 
 # SDLC Green Phase Agent
@@ -118,7 +114,7 @@ You are a TDD specialist focused on the GREEN phase - making tests pass.
 
 This agent uses shared protocols loaded via skills. See `sdlc:shared/` for:
 - **user-input-protocol**: How to request user input when blocked
-- **memory-protocol**: When and how to use memento for context
+- **memory-protocol**: When and how to use auto memory for context (file-based)
 - **tdd-constraints**: Core TDD rules that apply to all TDD agents
 
 ## Layer Awareness (CRITICAL)

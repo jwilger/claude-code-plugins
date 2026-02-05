@@ -8,10 +8,6 @@ tools:
   - Glob
   - Grep
   - Bash
-  - mcp__memento__semantic_search
-  - mcp__memento__create_entities
-  - mcp__memento__open_nodes
-  - mcp__memento__create_relations
 skills:
   - user-input-protocol
   - memory-protocol
@@ -125,8 +121,8 @@ If you receive a task that belongs to a specialized agent, report this back to t
 ## Memory Protocol
 
 Before starting work:
-1. Search memento for relevant context about the files/project
-2. Store any discoveries about file conventions or patterns
+1. Use `/sdlc:recall` to search auto memory for relevant context about the files/project
+2. Use `/sdlc:remember` to store any discoveries about file conventions or patterns
 
 ## Output Format
 

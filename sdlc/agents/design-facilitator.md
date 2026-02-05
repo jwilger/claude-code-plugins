@@ -10,10 +10,6 @@ tools:
   - Grep
   - Bash
   - Task
-  - mcp__memento__semantic_search
-  - mcp__memento__create_entities
-  - mcp__memento__open_nodes
-  - mcp__memento__create_relations
 skills:
   - user-input-protocol
   - memory-protocol
@@ -152,7 +148,7 @@ After user chooses, create the ADR:
 After all decisions are made and ADRs accepted:
 
 1. Run `/sdlc:adr synthesize` to create/update `docs/ARCHITECTURE.md`
-2. Store summary in memento for future reference
+2. Store summary using `/sdlc:remember` for future reference
 
 ### 5. Output Format
 

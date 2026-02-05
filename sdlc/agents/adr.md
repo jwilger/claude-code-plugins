@@ -7,10 +7,6 @@ tools:
   - Write
   - Glob
   - Grep
-  - mcp__memento__semantic_search
-  - mcp__memento__create_entities
-  - mcp__memento__open_nodes
-  - mcp__memento__create_relations
 skills:
   - user-input-protocol
   - memory-protocol
@@ -245,13 +241,14 @@ Structure:
 
 ## Memory Protocol
 
-**Before starting:** Search memento for relevant context:
-```
-mcp__memento__semantic_search: "architecture decisions [project-name]"
+**Before starting:** Search auto memory for relevant context:
+```bash
+# Use /sdlc:recall to search for related architecture decisions
+/sdlc:recall "architecture decisions [project-name]"
 ```
 
-**After completing:** Store discoveries (see `/sdlc:remember` for format):
-- Entity type: `architecture_decision`
+**After completing:** Store discoveries using `/sdlc:remember`:
+- Category: `architecture`
 - Key observations: ADR number, status, decision summary, key tradeoff
 
 ## Good ADR Characteristics

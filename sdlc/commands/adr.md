@@ -7,8 +7,7 @@ allowed-tools:
   - Read
   - Write
   - AskUserQuestion
-  - mcp__memento__semantic_search
-  - mcp__memento__create_entities
+  - Grep
 hooks:
   Stop:
     - hooks:
@@ -51,10 +50,10 @@ The ONLY time to consult an ADR is when actively reconsidering an architectural 
 mkdir -p docs/adr
 ```
 
-### 2. Search Memento for Context
+### 2. Check Auto Memory for Context
 
-```
-mcp__memento__semantic_search: "architecture decisions [project-name]"
+```bash
+/sdlc:recall "architecture decisions [project-name]"
 ```
 
 Load any existing architectural context.
@@ -183,19 +182,18 @@ ADR-004: Microservices vs monolith [rejected]
 Total: 4 ADRs (2 accepted, 1 proposed, 1 rejected)
 ```
 
-### 4. Store in Memento
+### 4. Store in Auto Memory
 
 After creating/updating ADRs:
 
-```
-mcp__memento__create_entities:
-  name: "ADR-<number>: <title> [date]"
-  entityType: "architecture_decision"
-  observations:
-    - "Project: <name> | Scope: PROJECT_SPECIFIC"
-    - "Status: <status>"
-    - "Decision: <brief summary>"
-    - "Key consequence: <main tradeoff>"
+```bash
+/sdlc:remember "ADR-<number>: <title>
+Date: $(date +%Y-%m-%d)
+Category: architecture
+Project: <name>
+Status: <status>
+Decision: <brief summary>
+Key consequence: <main tradeoff>"
 ```
 
 ### 5. Display Results

@@ -1,15 +1,16 @@
 ---
-description: INVOKE before ANY task to check for existing solutions in memento
+description: INVOKE before ANY task to check for existing solutions in auto memory
 argument-hint: <what-to-recall>
 model: haiku
 allowed-tools:
-  - mcp__memento__semantic_search
-  - mcp__memento__open_nodes
+  - Grep
+  - Read
+  - Glob
 ---
 
-# Retrieve Memory from Memento
+# Retrieve Memory from Auto Memory
 
-Search and retrieve relevant knowledge from the memento knowledge graph.
+Search and retrieve relevant knowledge from the file-based auto memory system.
 
 ## Arguments
 
@@ -21,68 +22,62 @@ Search and retrieve relevant knowledge from the memento knowledge graph.
 
 ## Process
 
-### 1. Semantic Search
+### 1. Determine Search Terms
 
-Start with a semantic search using key terms from the query:
+Extract key terms from the query:
+- Tool names (cargo, npm, gh)
+- Error keywords (timeout, SSL, authentication)
+- Domain concepts (event sourcing, TDD, hooks)
+- Project-specific terms
 
-```
-mcp__memento__semantic_search:
-  query: "<query based on arguments>"
-  limit: 10
-```
+### 2. Search Memory Files
 
-**Search tips:**
-- Include project name if looking for project-specific knowledge
-- Include error messages or tool names for debugging insights
-- Use domain terms for business knowledge
-- Try variations if first search doesn't find relevant results
+Use Grep to search all markdown files in the memory directory:
 
-### 2. Open Relevant Nodes
+```bash
+# Get project-specific memory path
+MEMORY_PATH="$HOME/.claude/projects/$(pwd | sed 's/\//-/g' | sed 's/^-//')/memory"
 
-From search results, open the most relevant entities to get full details:
-
-```
-mcp__memento__open_nodes:
-  names: ["<entity1>", "<entity2>", ...]
+# Search with context for better matches
+grep -r -i -C 3 "<search terms>" "$MEMORY_PATH" --include="*.md"
 ```
 
-### 3. Traverse Relationships
+**Search strategies:**
+- Start with broad terms, then narrow down
+- Try variations: singular/plural, synonyms
+- Search error messages or command names directly
+- Check specific categories: debugging/, architecture/, tools/, etc.
 
-Check the `relations` returned with each entity. Follow relevant relationships to gather connected context:
+### 3. Read Relevant Files
 
-**Relationship traversal strategy:**
+From grep results, read the most relevant files in full:
 
-| If you see... | Then explore... |
-|--------------|-----------------|
-| `extends` / `derived_from` | The parent entity for foundational context |
-| `supersedes` | The newer entity for updated information |
-| `contradicts` | Both entities to understand the conflict |
-| `part_of` | The container entity for broader context |
-| `depends_on` | Dependencies that may affect the solution |
-| `implements` | The specification being implemented |
-| `related_to` | Adjacent knowledge that may be relevant |
+```
+Read: <memory-path>/<category>/<file>.md
+```
 
-**Continue traversing until:**
-- You've gathered sufficient context for the query
-- Relationships lead to clearly unrelated topics
-- You've checked 2-3 levels of relationships
+**Priority:**
+1. Files matching multiple search terms
+2. Files in relevant categories (debugging/ for errors, architecture/ for design decisions)
+3. Recently created files (higher in MEMORY.md)
 
 ### 4. Synthesize and Return
 
 Compile the relevant information and present it:
 
 ```
-Found in memento:
+Found in auto memory:
 
-<Entity Name>
-  Type: <type>
-  Key observations:
-    - <relevant observation>
-    - <relevant observation>
-  Related to: <linked entities>
+## <File Title>
+**Location:** `<category>/<filename>.md`
+**Date:** <YYYY-MM-DD>
 
-<Entity Name 2>
-  ...
+<Key relevant sections from the file>
+
+---
+
+## <File Title 2>
+...
 
 Summary: <1-2 sentence synthesis of what was found>
 ```
@@ -91,35 +86,36 @@ If nothing relevant found:
 ```
 No relevant memories found for: "<query>"
 
+Searched in:
+- debugging/ - No matches
+- architecture/ - No matches
+- conventions/ - No matches
+- tools/ - No matches
+- patterns/ - No matches
+
 Suggestions:
-- Try different search terms
+- Try different search terms (synonyms, variations)
 - The information may not have been stored yet
-- Consider storing this knowledge after you discover it
+- Consider storing this knowledge after you discover it using /sdlc:remember
 ```
 
 ## Example
 
-Arguments: "test patterns for TaskFlow"
+Arguments: "cargo test timeout issues"
 
-```
-# 1. Semantic search with key terms
-mcp__memento__semantic_search:
-  query: "test patterns TaskFlow project"
-  limit: 10
+```bash
+# 1. Extract search terms: cargo, test, timeout
 
-# 2. Open relevant results
-mcp__memento__open_nodes:
-  names: ["TaskFlow Test Patterns 2026-01"]
+# 2. Search memory directory
+grep -r -i -C 3 "cargo.*test.*timeout" ~/.claude/projects/.../memory/ --include="*.md"
 
-# 3. Follow relations (extends, part_of) for more context
-# 4. Synthesize findings in output format above
+# 3. Read matching files
+Read: ~/.claude/projects/.../memory/debugging/cargo-test-timeout.md
+
+# 4. Present findings in format above
 ```
 
-**Same process applies to:** debugging solutions ("cargo test hanging"), architecture decisions, user preferences, domain concepts.
-
-**If no results:** suggest alternative search terms or note the knowledge may not be stored yet.
-
-## When to Use This Skill
+## When to Use This Command
 
 **ALWAYS use at the start of:**
 - New conversations/sessions
@@ -128,15 +124,35 @@ mcp__memento__open_nodes:
 - When encountering errors or problems
 - When unsure about project conventions
 
-**The memory protocol is non-negotiable.** Failing to check memento means potentially rediscovering knowledge that was already found.
+**The memory protocol is non-negotiable.** Failing to check auto memory means potentially rediscovering knowledge that was already found.
 
 ## Search Query Tips
 
 | Looking for... | Try searching... |
 |----------------|------------------|
-| Project setup | `"<project> setup configuration"` |
-| Error solutions | `"<error message> fix solution"` |
-| User preferences | `"preference style convention"` |
-| Architecture | `"architecture decision <project>"` |
-| Domain concepts | `"domain <concept> <project>"` |
-| Tool quirks | `"<tool name> workaround issue"` |
+| Project setup | `"setup configuration"` |
+| Error solutions | `"<error message> fix"` or `"<tool> error"` |
+| User preferences | `"preference convention"` |
+| Architecture | `"architecture decision"` |
+| Domain concepts | `"domain <concept>"` |
+| Tool quirks | `"<tool name> workaround"` |
+
+## Memory Directory Structure
+
+```
+memory/
+├── MEMORY.md              # Quick references (check first)
+├── debugging/             # Solutions to past problems
+├── architecture/          # Architecture decisions
+├── conventions/           # Project conventions
+├── tools/                 # Tool quirks and discoveries
+└── patterns/              # General patterns
+```
+
+## Limitations
+
+- **No semantic search:** Only keyword matching available
+- **No relationship traversal:** Files are independent; use markdown links manually
+- **Manual organization:** Files must be organized by category manually
+
+Use precise keywords and check multiple variations if initial search fails.

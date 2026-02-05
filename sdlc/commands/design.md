@@ -8,15 +8,13 @@ allowed-tools:
   - Write
   - Task
   - AskUserQuestion
-  - mcp__memento__semantic_search
-  - mcp__memento__create_entities
-  - mcp__memento__create_relations
+  - Grep
 hooks:
   Stop:
     - hooks:
         - type: prompt
           prompt: |
-            Before completing, store event model discoveries in memento:
+            Before completing, store event model discoveries in auto memory using /sdlc:remember:
             - Domain concepts discovered
             - Events, commands, and views identified
             - GWT scenarios created
@@ -85,10 +83,13 @@ Create `docs/event_model/README.md` explaining the structure:
 - `workflows/<name>/overview.md` - Workflow overview with master diagram
 - `workflows/<name>/slices/` - Individual slice documents (each self-contained with GWT scenarios)
 
-### 3. Search Memento for Context
+### 3. Check Auto Memory for Context
 
-```
-mcp__memento__semantic_search: "event model [project-name] domain discovery"
+Use Grep to search for existing event modeling decisions:
+
+```bash
+MEMORY_PATH="$HOME/.claude/projects/$(pwd | sed 's/\//-/g' | sed 's/^-//')/memory"
+grep -r -i "event model\|domain" "$MEMORY_PATH" --include="*.md" 2>/dev/null || true
 ```
 
 Load any existing event modeling decisions or domain understanding.
@@ -250,19 +251,18 @@ gh pr create --title "Event Model: <Workflow Name>" \
 
 For git-spice workflow, see the `shared/git-spice` skill.
 
-### 6. Store in Memento
+### 6. Store in Auto Memory
 
-After design work:
+After design work, use /sdlc:remember:
 
-```
-mcp__memento__create_entities:
-  name: "<Project> <Workflow-Name> Event Model [date]"
-  entityType: "event_model"
-  observations:
-    - "Project: <name> | Path: <path> | Scope: PROJECT_SPECIFIC"
-    - "Events: <list of events>"
-    - "Vertical Slices: <list of slices>"
-    - "Status: <discovery|designed|scenarios-complete>"
+```bash
+/sdlc:remember "<Project> <Workflow-Name> Event Model
+Date: $(date +%Y-%m-%d)
+Category: architecture
+Project: <name> | Path: <path>
+Events: <list of events>
+Vertical Slices: <list of slices>
+Status: <discovery|designed|scenarios-complete>"
 ```
 
 ### 7. Display Results

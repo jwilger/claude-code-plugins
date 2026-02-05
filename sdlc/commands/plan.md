@@ -8,8 +8,7 @@ allowed-tools:
   - Write
   - Task
   - AskUserQuestion
-  - mcp__memento__semantic_search
-  - mcp__memento__create_entities
+  - Grep
 hooks:
   PreToolUse:
     - matcher: Read
@@ -89,7 +88,7 @@ done
 ### 3. Search Memento for Context
 
 ```
-mcp__memento__semantic_search: "planning session [project-name] [workflow-name]"
+Use /sdlc:recall: "planning session [project-name] [workflow-name]"
 ```
 
 ### 4. For Each Workflow - Create Epic Task
@@ -192,7 +191,7 @@ STORY_IDS=$(dot tree "$EPIC_ID" --json | jq -r '.children[].id')
 ### 7. Store in Memento
 
 ```
-mcp__memento__create_entities:
+Use /sdlc:remember:
   name: "<Workflow> Planning Session [date]"
   entityType: "planning_session"
   observations:

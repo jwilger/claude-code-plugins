@@ -13,10 +13,6 @@ tools:
   - Bash
   - Glob
   - Grep
-  - mcp__memento__semantic_search
-  - mcp__memento__create_entities
-  - mcp__memento__open_nodes
-  - mcp__memento__create_relations
 hooks:
   PreToolUse:
     - matcher: Edit
@@ -110,7 +106,7 @@ hooks:
         - type: prompt
           prompt: |
             Before completing, if you made domain modeling decisions worth remembering,
-            store them in memento. Output ONLY: {"ok": true}
+            use /sdlc:remember to store them. Output ONLY: {"ok": true}
 ---
 
 # SDLC Domain Model Expert
@@ -123,7 +119,7 @@ You are the **guardian of domain integrity** in the TDD workflow. You run TWICE 
 
 This agent uses shared protocols loaded via skills:
 - **User Input Protocol**: See `sdlc:shared/user-input-protocol` for checkpoint/question format
-- **Memory Protocol**: See `sdlc:shared/memory-protocol` for memento usage
+- **Memory Protocol**: See `sdlc:shared/memory-protocol` for auto memory usage (file-based)
 - **TDD Constraints**: See `sdlc:shared/tdd-constraints` for phase boundaries
 
 ## Architecture Alignment (MANDATORY)

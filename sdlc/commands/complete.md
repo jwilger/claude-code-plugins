@@ -5,7 +5,6 @@ allowed-tools:
   - Bash
   - Read
   - AskUserQuestion
-  - mcp__memento__create_entities
 hooks:
   PreToolUse:
     - matcher: Read
@@ -155,7 +154,7 @@ dot off "$PARENT_ID" -r "All child tasks completed"
 ### 6. Store in Memento
 
 ```
-mcp__memento__create_entities:
+Use /sdlc:remember:
   name: "Task Completion: <task-title> [date]"
   entityType: "task_completion"
   observations:
