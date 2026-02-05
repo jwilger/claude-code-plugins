@@ -1,61 +1,24 @@
----
-description: INVOKE to start or continue work on an issue. Shows ready items, creates branch
-allowed-tools:
-  - Bash
-  - Read
-  - AskUserQuestion
-  - Grep
-  - TaskCreate
-  - TaskUpdate
-hooks:
-  PreToolUse:
-    - matcher: Read
-      once: true
-      hooks:
-        - type: prompt
-          prompt: |
-            SDLC CONFIG CHECK (runs once per session)
+# Work Skill - Reference Documentation
 
-            Verify .claude/sdlc.yaml exists before proceeding.
-            If it doesn't exist, stop and tell user to run /sdlc:setup first.
+This document provides detailed implementation steps for the work skill.
 
-            Respond with: {"ok": true}
-  Stop:
-    - hooks:
-        - type: prompt
-          prompt: |
-            Before completing, store the current work context in auto memory using /sdlc:remember:
-            - Issue being worked on
-            - Branch name
-            - Any decisions or discoveries made
+## Complete Workflow Steps
 
-            Output ONLY: {"ok": true}
----
-
-# SDLC Work
-
-Start or continue working on a task. This command:
-1. Checks for clean git state
-2. Shows tasks ready for work (unblocked and open status)
-3. Shows active tasks with their child tasks
-4. Lets you select which task to work on
-5. Marks task as active, creates branch
-
-## Arguments
-
-`$ARGUMENTS` - Optional task ID to work on directly (e.g., `/sdlc:work myproject-add-login-abc123`)
-
-## Steps
-
-### 1. Load Configuration
+### Step 1: Load Configuration
 
 Read `.claude/sdlc.yaml` to get:
-- Git workflow preference (git-spice vs standard)
-- **Worktree mode** (`git.worktrees: true` enables parallel development)
+- Git workflow preference (git-spice vs standard vs worktrees)
+- Worktree mode (`git.worktrees: true` enables parallel development)
+- Worktree coordination (`features.worktree_coordination: true` enables conflict prevention)
+- Session task tracking (`features.session_task_tracking: true`)
 - GitHub project settings
 - Board status names
 
-If config doesn't exist, inform user to run `/sdlc:setup` first.
+```bash
+cat .claude/sdlc.yaml
+```
+
+If config doesn't exist, inform user to run `/sdlc:setup` first and STOP.
 
 **Version check:**
 
@@ -63,12 +26,12 @@ If config doesn't exist, inform user to run `/sdlc:setup` first.
 grep "^sdlc_version:" .claude/sdlc.yaml || echo "sdlc_version: unknown"
 ```
 
-If the version in the config doesn't match the current plugin version (**7.0.0**), show a warning:
+If the version in the config doesn't match the current plugin version (**9.0.0**), show a warning:
 
 ```
 ⚠️  SDLC UPDATE AVAILABLE
 
-Your SDLC configuration was created with v<version> but you're running v7.0.0.
+Your SDLC configuration was created with v<version> but you're running v9.0.0.
 
 To update (preserves your configuration choices):
   /sdlc:setup
@@ -76,9 +39,7 @@ To update (preserves your configuration choices):
 
 Then proceed with the current configuration (don't block work, just notify).
 
-**Worktree Detection**: If `git.worktrees: true`, this command will create isolated worktrees for parallel development of independent vertical slices.
-
-### 2. Check Git State
+### Step 2: Check Git State
 
 Verify clean state and sync with remote:
 
@@ -99,7 +60,7 @@ dot ls --status active --json
 
 If branch name contains a task ID (e.g., `feature/myproject-add-login-abc123`), that task becomes the default selection.
 
-### 3. Check Auto Memory for Context
+### Step 3: Check Auto Memory for Context
 
 Before showing issues, check auto memory for relevant project context using Grep:
 
@@ -111,7 +72,7 @@ grep -r -i "current work\|in progress" "$MEMORY_PATH" --include="*.md" 2>/dev/nu
 
 This helps identify if there's already work in progress that should be the default.
 
-### 4. Get Available Tasks
+### Step 4: Get Available Tasks
 
 Get tasks ready for work (unblocked, open status):
 ```bash
@@ -128,7 +89,7 @@ Also get active tasks:
 dot ls --status active --json
 ```
 
-### 4a. Get Child Tasks of Active Parents
+### Step 4a: Get Child Tasks of Active Parents
 
 For each active task, fetch child tasks to show sub-task progress:
 ```bash
@@ -139,7 +100,7 @@ done
 
 This shows the hierarchy and helps identify if parent tasks have remaining children to complete.
 
-### 5. Present Options
+### Step 5: Present Options
 
 Use AskUserQuestion to show available work:
 
@@ -154,9 +115,10 @@ Include context from auto memory search if relevant.
 
 Let user select a task or enter a custom task ID.
 
-### 6. Start Work on Selected Task
+### Step 6: Start Work on Selected Task
 
 #### a. Mark task as active
+
 ```bash
 dot on <task-id>
 ```
@@ -292,7 +254,7 @@ After creating the worktree:
 2. Note the worktree path for the user
 3. Run any project setup (npm install, cargo build, etc.)
 4. Run baseline tests to ensure clean starting state
-5. Optionally store worktree path in auto memory using /sdlc:remember if needed for context
+5. Optionally store worktree path in auto memory if needed for context
 
 **Worktree Registration (v7.0.0):**
 
@@ -329,9 +291,16 @@ if grep -q "worktree_coordination: true" .claude/sdlc.yaml 2>/dev/null; then
 fi
 ```
 
-**If using git-spice (no worktrees):** For git-spice workflow guidance, invoke the `sdlc:shared/git-spice` skill or see its documentation.
+**If using git-spice (no worktrees):**
+
+```bash
+gs branch create feature/<task-id>
+```
+
+For git-spice workflow guidance, see the `git-spice` skill documentation.
 
 **If using standard git (no worktrees):**
+
 ```bash
 git checkout -b feature/<task-id>
 ```
@@ -339,10 +308,10 @@ git checkout -b feature/<task-id>
 **Parallel Development Note**: With worktrees enabled, you can work on multiple independent slices simultaneously. Each slice gets its own isolated worktree directory.
 
 **How to work in parallel:**
-1. In your main project, run `/sdlc:work myproject-slice-one-abc123` → creates worktree at `../myproject-worktrees/myproject-slice-one-abc123`
+1. In your main project, run `/work myproject-slice-one-abc123` → creates worktree at `../myproject-worktrees/myproject-slice-one-abc123`
 2. Open a **new terminal window**, `cd` to the worktree directory
 3. Launch a **separate Claude Code instance** there (`claude`)
-4. Back in your main project, run `/sdlc:work myproject-slice-two-def456` for another slice
+4. Back in your main project, run `/work myproject-slice-two-def456` for another slice
 5. Repeat for each parallel slice
 
 **Why separate instances?**
@@ -364,13 +333,13 @@ git checkout -b feature/<task-id>
 
 #### d. Store in auto memory
 
-Use /sdlc:remember to note the current work session:
+Note the current work session in auto memory:
 
-```bash
-/sdlc:remember "Working on task <task-id>: <title>
+```
+Working on task <task-id>: <title>
 Project: <project-name> | Path: <repo-path>
 Branch: feature/<task-id>
-Date: $(date +%Y-%m-%d)"
+Date: $(date +%Y-%m-%d)
 ```
 
 #### e. Create session task tracking (v7.0.0)
@@ -406,7 +375,7 @@ TaskUpdate with taskId and status: "in_progress"
 
 **Note:** TDD cycle tasks (Red → Domain → Green → Domain) will be created on-demand when starting a TDD cycle, not upfront. They will be nested under this story task.
 
-### 7. Display Work Context
+### Step 7: Display Work Context
 
 Show the task details and acceptance criteria:
 
@@ -419,7 +388,7 @@ If the task has child tasks:
 dot tree <task-id>
 ```
 
-### 8. Ready to Work
+### Step 8: Ready to Work
 
 Display:
 
@@ -446,4 +415,12 @@ The SDLC will guide your TDD workflow. Just describe what you want to implement.
 - **Pull fails (diverged)**: Inform user of conflict, suggest `git pull --rebase` or manual resolution
 - **No ready tasks**: Suggest using `/sdlc:plan` to create tasks from event model slices, or manually creating tasks with `dot add`
 - **Task not found**: Show error with task ID, suggest `dot ls` to see all tasks
-- **Git-spice branching issues**: See `sdlc:shared/git-spice` skill for handling stacking scenarios
+- **Git-spice branching issues**: See `git-spice` skill for handling stacking scenarios
+- **Worktree coordination conflict**: Show active session details, offer to wait or switch tasks
+- **Stale worktree registration**: Offer to reclaim with confirmation
+
+## Arguments
+
+`$ARGUMENTS` - Optional task ID to work on directly (e.g., `/work myproject-add-login-abc123`)
+
+If task ID provided, skip task selection and proceed directly to that task.

@@ -1,29 +1,14 @@
 {
   "name": "sdlc",
-  "version": "8.0.0",
-  "description": "Complete SDLC workflow with TDD, Event Modeling, commit-based ADRs, and GitHub integration",
+  "version": "9.0.0",
+  "description": "Complete SDLC workflow with TDD, Event Modeling, commit-based ADRs, and GitHub integration (11 workflow skills, 14 agents)",
   "author": {
     "name": "John Wilger",
     "email": "john@johnwilger.com"
   },
-  "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow", "code-review", "debugging", "hooks", "todo-enforcement", "marvin", "output-style"],
+  "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow", "code-review", "debugging", "hooks", "todo-enforcement", "marvin", "output-style", "skills"],
   "outputStyles": "./output-styles/",
   "skills": "./skills/",
-  "commands": [
-    "./commands/shared/orchestration.md",
-    "./commands/setup.md",
-    "./commands/start.md",
-    "./commands/work.md",
-    "./commands/pr.md",
-    "./commands/complete.md",
-    "./commands/review.md",
-    "./commands/design.md",
-    "./commands/plan.md",
-    "./commands/adr.md",
-    "./commands/remember.md",
-    "./commands/recall.md",
-    "./commands/domain-audit.md"
-  ],
   "agents": [
     "./agents/red.md",
     "./agents/green.md",

@@ -1,5 +1,108 @@
 # SDLC Plugin Changelog
 
+## [9.0.0] - 2026-02-05
+
+### 🚀 BREAKING CHANGES
+
+Commands completely removed - all functionality migrated to skills.
+
+#### Commands → Skills Migration
+
+**BREAKING:** All 12 commands replaced by skills (invocation syntax unchanged).
+
+| Command | Skill | Status |
+|---------|-------|--------|
+| `/sdlc:setup` | setup skill | ✓ Migrated |
+| `/sdlc:start` | start skill | ✓ Migrated |
+| `/sdlc:work` | work skill | ✓ Migrated |
+| `/sdlc:pr` | pr skill | ✓ Migrated |
+| `/sdlc:complete` | complete skill | ✓ Migrated |
+| `/sdlc:review` | review skill | ✓ Migrated |
+| `/sdlc:design` | design skill | ✓ Migrated |
+| `/sdlc:plan` | plan skill | ✓ Migrated |
+| `/sdlc:adr` | arch skill | Already migrated in v8.0.0 |
+| `/sdlc:remember` | remember skill | ✓ Migrated |
+| `/sdlc:recall` | recall skill | ✓ Migrated |
+| `/sdlc:domain-audit` | domain-audit skill | ✓ Migrated |
+
+**Why:** January 2026 Claude Code update merged commands into skills, making skills functionally equivalent with additional capabilities (supporting files, better portability).
+
+**Migration:** None required - invocation syntax unchanged (`/sdlc:work`, `/sdlc:pr`, etc.).
+
+### ✨ Added
+
+- **11 new workflow skills** - Complete command→skill transformation
+  - work - Start/continue work with clean state enforcement
+  - pr - Three-stage review + mutation testing + architecture PR fast path
+  - review - Systematic PR feedback handling with in-thread responses
+  - start - Smart workflow phase detection and routing
+  - design - Event Modeling facilitation (discovery → workflows → GWT → arch)
+  - plan - Event model → dot tasks mapping (epic/story/acceptance criteria)
+  - setup - One-time SDLC config initialization
+  - complete - Task completion with PR merge verification + parent evaluation
+  - remember - File-based auto memory storage with categorization
+  - recall - Auto memory search and retrieval
+  - domain-audit - On-demand domain type safety audit
+
+- **Auto-invocation support** - Skills invokable by Claude based on context
+  - Enhanced descriptions with "what AND when" for better matching
+  - Claude can apply skills without user requesting slash commands
+  - Example: "start working on a task" → auto-invokes work skill
+
+- **Progressive disclosure** - Context budget optimization
+  - SKILL.md - Core principles and usage patterns (<500 lines recommended)
+  - reference.md - Detailed implementation steps (loaded on-demand)
+  - examples.md - Extended examples (loaded on-demand)
+  - Zero token cost until supporting files needed
+
+- **MIGRATION-v9.md** - Complete upgrade guide
+  - Breaking changes summary with command→skill mapping table
+  - Auto-invocation explanation
+  - Progressive disclosure benefits
+  - Rationale for skills-only architecture
+
+### Changed
+
+- **Plugin description** - Now mentions "11 workflow skills, 14 agents"
+- **Version** - Bumped to 9.0.0 (major breaking change)
+- **Keywords** - Added "skills" keyword
+
+### Removed
+
+- **Commands infrastructure** - `/sdlc/commands/` directory deleted
+- **Shared orchestration** - `commands/shared/orchestration.md` deleted (already in output styles)
+- **Deprecated ADR command** - `commands/adr.md` deleted (use `/sdlc:arch` from v8.0.0)
+
+### Documentation
+
+- Added MIGRATION-v9.md - Complete v8→v9 upgrade guide
+- Updated CHANGELOG.md - v9.0.0 entry with breaking changes
+- Updated README.md - Skills-only architecture documentation
+- Updated CLAUDE.md - Skills structure and conventions
+
+### Why This Matters
+
+**Skills-only architecture offers:**
+1. **Unified system** - One concept (skills) instead of two (commands + skills)
+2. **Progressive disclosure** - Supporting files reduce context usage
+3. **Auto-invocation** - Claude applies skills based on user intent, not explicit commands
+4. **Framework portability** - Skills work across Claude Code, Cursor, Windsurf, Cline
+5. **Better organization** - Clear structure with SKILL.md + reference.md pattern
+
+**Plugin namespace** - Skills use `/sdlc:<skill-name>` to prevent conflicts with personal/project skills.
+
+### Migration Path
+
+None required - invocation syntax unchanged. See MIGRATION-v9.md for details.
+
+### Support
+
+- **Issues**: https://github.com/jwilger/claude-code-plugins/issues
+- **Migration Guide**: See MIGRATION-v9.md
+- **Documentation**: See README.md
+
+---
+
 ## [5.0.0] - 2026-02-04
 
 ### 🚀 BREAKING CHANGES

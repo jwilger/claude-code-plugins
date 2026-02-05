@@ -12,9 +12,9 @@
     {
       "name": "sdlc",
       "source": "./sdlc",
-      "description": "Complete SDLC workflow with TDD, Event Modeling, commit-based ADRs, and GitHub integration (includes Marvin personality option)",
-      "version": "8.0.0",
-      "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow", "domain-modeling", "mutation-testing", "code-review", "debugging", "worktrees", "compile-time-enforcement", "hooks", "todo-enforcement", "marvin", "output-style", "worktree-coordination", "task-tracking", "commit-based-adr", "architecture-isolation"]
+      "description": "Complete SDLC workflow with TDD, Event Modeling, commit-based ADRs, and GitHub integration (11 workflow skills, 14 agents, includes Marvin personality option)",
+      "version": "9.0.0",
+      "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow", "domain-modeling", "mutation-testing", "code-review", "debugging", "worktrees", "compile-time-enforcement", "hooks", "todo-enforcement", "marvin", "output-style", "worktree-coordination", "task-tracking", "commit-based-adr", "architecture-isolation", "skills"]
     },
     {
       "name": "bootstrap",

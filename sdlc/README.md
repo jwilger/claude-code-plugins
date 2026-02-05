@@ -1,4 +1,4 @@
-# SDLC Plugin v8.0.0
+# SDLC Plugin v9.0.0
 
 **Complete Software Development Lifecycle workflow for Claude Code**
 
@@ -6,23 +6,20 @@ Integrates TDD, Event Modeling, commit-based Architecture Decision Records, loca
 
 ---
 
-## ⚠️ Version 8.0.0 Breaking Changes
+## ⚠️ Version 9.0.0 Breaking Changes
 
-**IMPORTANT:** v8.0.0 introduces fundamental changes to ADR workflow. Read `MIGRATION-v8.md` before upgrading.
+**IMPORTANT:** v9.0.0 completes transformation to skills-only architecture. Read `MIGRATION-v9.md` for details.
 
 ### What Changed
 
-- **ADRs now in commit messages**: Decision context lives in git history, not separate files
-- **ARCHITECTURE.md is living document**: Edit directly, not generated from ADR files
-- **Git hooks required**: pre-commit framework enforces architecture isolation
-- **New `/arch` skill**: Portable architecture change workflow (works in Cursor, Windsurf, Cline, etc.)
-- **Removed `/sdlc:adr` command**: Replaced by `/arch` skill
+- **Commands removed**: All 12 commands replaced by skills
+- **Invocation unchanged**: Same syntax (`/sdlc:work`, `/sdlc:pr`, etc.)
+- **Auto-invocation**: Skills can now be invoked by Claude based on context
+- **Progressive disclosure**: Skills use reference files loaded on-demand
 
 ### Migration Steps
 
-1. **Re-run setup**: `/sdlc:setup` to install hooks and migrate existing ADRs
-2. **Review docs**: See `MIGRATION-v8.md` for complete guide
-3. **Update references**: Change ADR file references to ARCHITECTURE.md
+None required - invocation syntax unchanged. See `MIGRATION-v9.md` for details.
 
 ---
 
@@ -86,22 +83,26 @@ Integrates TDD, Event Modeling, commit-based Architecture Decision Records, loca
 
 ---
 
-## Commands
+## Skills
 
-| Command | Description | Usage |
-|---------|-------------|-------|
+All workflow functionality provided by 11 skills (invocable as `/sdlc:skill-name`):
+
+| Skill | Description | Usage |
+|-------|-------------|-------|
 | `/sdlc:setup` | Initialize project configuration | One-time setup |
 | `/sdlc:work` | Start TDD workflow for a task | Main development loop |
 | `/sdlc:pr` | Create pull request with review gates | After feature complete |
 | `/sdlc:complete` | Complete task after PR merge | After PR merges |
 | `/sdlc:review` | Handle PR review feedback | Review cycle |
 | `/sdlc:design` | Event Modeling facilitation | Design phase |
-| `/arch` or `/sdlc:arch` | Architecture change workflow (portable skill) | Document architecture decisions |
+| `/sdlc:arch` | Architecture change workflow (portable) | Document architecture decisions |
 | `/sdlc:plan` | Create tasks from event model slices | After design |
 | `/sdlc:start` | Auto-detect phase and route | Entry point |
 | `/sdlc:remember` | Store knowledge in auto memory | Learning |
 | `/sdlc:recall` | Search auto memory knowledge | Context retrieval |
 | `/sdlc:domain-audit` | Audit for primitive obsession | Code review |
+
+**Note:** Skills can also be auto-invoked by Claude based on user intent (no slash command needed).
 
 ---
 
