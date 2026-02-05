@@ -1,6 +1,6 @@
 ---
 name: setup
-version: 3.1.1
+version: 3.2.0
 author: jwilger
 repository: jwilger/claude-code-plugins
 description: Interactive multi-stage SDLC configuration with progressive disclosure. Run this first before using any other skills.
@@ -16,7 +16,7 @@ allowed-tools: Bash, Write, AskUserQuestion, Read
 
 # Setup Skill
 
-**Version:** 3.1.1
+**Version:** 3.2.0
 **Portability:** Tool-specific
 
 ---
@@ -1140,7 +1140,77 @@ fi
 
 **Important:** Check for the `gs` command, NOT `git-spice`.
 
-#### 5. Completion Message
+#### 5. Ensure Team Marketplace Configuration
+
+**Add marketplace to .claude/settings.json for team sharing:**
+```bash
+# Ensure .claude/settings.json exists
+mkdir -p .claude
+[ ! -f .claude/settings.json ] && echo '{}' > .claude/settings.json
+
+# Check if marketplace configuration exists
+if ! grep -q "jwilger-claude-plugins" .claude/settings.json 2>/dev/null; then
+  # Read current settings
+  CURRENT_SETTINGS=$(cat .claude/settings.json)
+
+  # Add marketplace configuration using jq (or Python if jq not available)
+  if command -v jq >/dev/null 2>&1; then
+    echo "$CURRENT_SETTINGS" | jq '.extraKnownMarketplaces["jwilger-claude-plugins"] = {
+      "source": {
+        "source": "github",
+        "repo": "jwilger/claude-code-plugins"
+      }
+    }' > .claude/settings.json
+  else
+    # Fallback: use Python
+    python3 <<'EOF'
+import json
+with open('.claude/settings.json', 'r') as f:
+    settings = json.load(f)
+if 'extraKnownMarketplaces' not in settings:
+    settings['extraKnownMarketplaces'] = {}
+settings['extraKnownMarketplaces']['jwilger-claude-plugins'] = {
+    'source': {
+        'source': 'github',
+        'repo': 'jwilger/claude-code-plugins'
+    }
+}
+with open('.claude/settings.json', 'w') as f:
+    json.dump(settings, f, indent=2)
+EOF
+  fi
+
+  echo "✓ Added marketplace configuration to .claude/settings.json"
+  echo "  Teammates can now use the plugin without manual marketplace setup"
+fi
+
+# Ensure plugin is enabled
+if command -v jq >/dev/null 2>&1; then
+  CURRENT_SETTINGS=$(cat .claude/settings.json)
+  echo "$CURRENT_SETTINGS" | jq '.enabledPlugins["sdlc@jwilger-claude-plugins"] = true' > .claude/settings.json
+else
+  python3 <<'EOF'
+import json
+with open('.claude/settings.json', 'r') as f:
+    settings = json.load(f)
+if 'enabledPlugins' not in settings:
+    settings['enabledPlugins'] = {}
+settings['enabledPlugins']['sdlc@jwilger-claude-plugins'] = True
+with open('.claude/settings.json', 'w') as f:
+    json.dump(settings, f, indent=2)
+EOF
+fi
+
+echo "✓ Plugin enabled in project settings"
+```
+
+**What this does:**
+- Adds the `jwilger-claude-plugins` marketplace to `extraKnownMarketplaces`
+- Enables the `sdlc` plugin in `enabledPlugins`
+- Creates a portable configuration that works for all team members
+- Teammates just need to trust the project folder - no manual setup required
+
+#### 6. Completion Message
 
 ```
 ✅ SDLC Setup Complete!
@@ -1151,8 +1221,16 @@ Configuration:
   Stacked PRs: disabled
   GitHub: configured (branch deletion, PR templates, merge types)
   Output style: sdlc-rules
+  Plugin: Enabled for project (teammates get it automatically)
+
+Files created/updated:
+  • .claude/sdlc.yaml - SDLC configuration
+  • .claude/settings.json - Plugin marketplace and enablement
+  • .github/workflows/ci.yml - Placeholder CI (if requested)
+  • .worktrees/.gitignore - Worktrees directory (if enabled)
 
 Next steps:
+  • Commit these files to share configuration with your team
   • Run /sdlc:start to begin working
   • Run /sdlc:status to see project state
   • Run /sdlc:setup --reconfigure to change settings
@@ -1170,6 +1248,14 @@ For complete implementation details, configuration schema, and error handling:
 ---
 
 ## Metadata
+
+**Version:** 3.2.0 (2026-02-05) - Add team marketplace configuration
+- Automatically configure `.claude/settings.json` with marketplace definition
+- Add `extraKnownMarketplaces` for `jwilger-claude-plugins`
+- Enable plugin in `enabledPlugins`
+- Teammates get plugin automatically when they trust project folder
+- No manual `claude plugin marketplace add` or `install` commands needed
+- Creates portable, team-friendly configuration
 
 **Version:** 3.1.1 (2026-02-05) - Fix bootstrap issue
 - **CRITICAL FIX**: Check if main branch exists before creating rulesets

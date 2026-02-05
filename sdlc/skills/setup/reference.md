@@ -438,6 +438,47 @@ Note: Rulesets API requires admin permissions on repository
 - Lower maintenance burden
 - Always current with GitHub API
 
+### Stage 4: Team Plugin Configuration
+
+**Ensure marketplace configuration for team sharing:**
+
+After completing the setup, ensure `.claude/settings.json` has the marketplace configuration so teammates can use the plugin without manual setup:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "jwilger-claude-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "jwilger/claude-code-plugins"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "sdlc@jwilger-claude-plugins": true
+  }
+}
+```
+
+**Implementation:**
+```bash
+# Create settings file if needed
+mkdir -p .claude
+[ ! -f .claude/settings.json ] && echo '{}' > .claude/settings.json
+
+# Add marketplace configuration (using jq or Python)
+# Add plugin enablement
+
+# Result: Teammates just trust the project folder - no manual setup needed
+```
+
+**What this enables:**
+- Team members clone the repository
+- Trust the project folder when prompted
+- Claude Code automatically installs the SDLC plugin
+- No manual `claude plugin marketplace add` or `claude plugin install` commands needed
+- Consistent tooling across the entire team
+
 **Config:**
 ```yaml
 github:
