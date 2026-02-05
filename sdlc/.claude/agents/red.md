@@ -2,7 +2,6 @@
 name: red
 description: INVOKE for ALL test file changes. TEST CODE ONLY. One assertion per test
 model: inherit
-memory: user
 skills:
   - user-input-protocol
   - memory-protocol

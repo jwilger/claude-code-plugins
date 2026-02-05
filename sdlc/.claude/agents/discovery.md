@@ -2,7 +2,6 @@
 name: discovery
 description: INVOKE at project start for broad domain understanding. Identifies workflows to model
 model: inherit
-memory: user
 tools:
   - Read
   - Write

@@ -2,7 +2,7 @@
 name: code-reviewer
 description: INVOKE before PRs and after major implementation. Three-stage review (spec, quality, domain)
 model: inherit
-memory: user
+memory: project
 tools:
   - Read
   - Bash

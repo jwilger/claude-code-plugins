@@ -2,7 +2,6 @@
 name: green
 description: INVOKE for ALL production code changes. PRODUCTION CODE ONLY. Minimal implementation
 model: inherit
-memory: user
 skills:
   - user-input-protocol
   - memory-protocol

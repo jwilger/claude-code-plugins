@@ -2,7 +2,6 @@
 name: domain
 description: INVOKE for type definitions. TYPE DEFINITIONS ONLY. Has VETO POWER over domain violations
 model: inherit
-memory: user
 skills:
   - user-input-protocol
   - memory-protocol

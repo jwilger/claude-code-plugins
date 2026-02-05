@@ -2,7 +2,7 @@
 name: architect
 description: INVOKE for architecture changes. Edits ARCHITECTURE.md and creates ADR-formatted commits
 model: inherit
-memory: user
+memory: project
 tools:
   - Read
   - Write
