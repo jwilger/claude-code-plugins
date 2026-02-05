@@ -64,41 +64,52 @@ hooks:
       hooks:
         - type: prompt
           prompt: |
-            🔴 POST-EDIT: VERIFICATION REQUIRED - Run tests and paste output.
+            🔴 POST-EDIT: Run tests to verify your change.
 
-            After editing this test, you MUST:
-            1. Run the test suite using Bash (cargo test, npm test, pytest, etc.)
-            2. Copy the FULL test output into your response
-            3. Explicitly confirm: "Test [name] FAILS with: [exact error message]"
+            You SHOULD run tests after editing to verify behavior:
+            - Run the test suite (cargo test, npm test, pytest, etc.)
+            - Verify the test fails as expected
 
-            REQUIRED EVIDENCE:
-            - The test FAILS (expected in RED phase)
-            - The failure message is CLEAR and actionable
-            - There's exactly ONE assertion failing
+            ⚠️ Pasting output is OPTIONAL per-edit:
+            - Paste output if: First test run, unexpected behavior, debugging
+            - Skip output if: You've verified it works, continuing iteration
 
-            FORBIDDEN:
-            - "Tests should fail" - NO. Run them and paste output.
-            - "I expect this to fail" - NO. Show the actual failure.
-            - "The test fails as expected" without pasted output - NO. Paste the output.
-
-            If the test passes, you wrote the WRONG test. Delete it and start over.
+            To skip: "Tests verified, continuing"
 
             Output ONLY: {"ok": true}
     - matcher: Write
       hooks:
         - type: prompt
           prompt: |
-            🔴 POST-WRITE: VERIFICATION REQUIRED - Run tests and paste output.
+            🔴 POST-WRITE: Run tests to verify the test file.
 
-            After creating this test file, you MUST:
-            1. Run the test suite
-            2. Copy the FULL test output into your response
-            3. Show the exact failure message
-
-            NEVER say "the test fails as expected" without pasted evidence.
+            You SHOULD run tests after creating the file:
+            - Verify the test compiles and fails as expected
+            - Pasting output optional (see POST-EDIT guidance)
 
             Output ONLY: {"ok": true}
   Stop:
+    - hooks:
+        - type: prompt
+          prompt: |
+            🔴 RED PHASE COMPLETION - MANDATORY VERIFICATION
+
+            Before finishing RED phase, you MUST provide evidence:
+
+            1. Test file was created/modified
+            2. Test FAILS when run (compilation or assertion)
+            3. Paste FINAL test output showing the failure
+
+            This is REQUIRED to ensure valid RED phase before domain review.
+
+            FORBIDDEN without pasted output:
+            - "Test fails as expected"
+            - "I verified the test fails"
+            - "Ready for domain review"
+
+            If you cannot paste test output showing failure: {"ok": false, "reason": "Must show test failure evidence"}
+            If test output shows failure: {"ok": true}
+        - type: prompt
     - hooks:
         - type: prompt
           prompt: |

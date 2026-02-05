@@ -55,7 +55,23 @@ These rules encourage quality but allow override:
 
 ### Test Verification
 
-**Override syntax:**
+**Per-Edit Verification (SOFT - Optional):**
+- RED/GREEN agents SHOULD run tests after each edit
+- Pasting test output is OPTIONAL per-edit
+- Paste when: First run, unexpected behavior, debugging
+- Skip when: Iterating quickly, clear what to try next
+
+**Cycle-End Verification (HARD - Mandatory):**
+- RED agent MUST paste test output showing failure before Stop
+- GREEN agent MUST paste test output showing passes before Stop
+- This ensures valid RED/GREEN phases before domain review
+
+**Why this balance:**
+- Per-edit paste adds 30-60 seconds overhead × 3-5 edits = 1.5-5 minutes wasted
+- But final verification is critical for TDD discipline
+- Agents should verify after each change, but evidence only needed at cycle end
+
+**Override syntax (for cycle-end only):**
 ```
 skip test verification because [reason]
 ```

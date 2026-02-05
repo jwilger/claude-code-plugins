@@ -64,38 +64,52 @@ hooks:
       hooks:
         - type: prompt
           prompt: |
-            🟢 POST-EDIT: VERIFICATION REQUIRED - Run tests and paste output.
+            🟢 POST-EDIT: Run tests to verify your change.
 
-            After this edit, you MUST:
-            1. Run the test suite using Bash (cargo test, npm test, pytest, etc.)
-            2. Copy the FULL test output into your response
-            3. Explicitly state one of:
-               - "Test PASSES. Evidence: [pasted output]" - SUCCESS, return to orchestrator
-               - "Test fails with NEW error: [exact message]" - progress, address it
-               - "Test fails with SAME error: [exact message]" - no progress, reconsider
+            You SHOULD run tests after editing to verify progress:
+            - Run the test suite (cargo test, npm test, pytest, etc.)
+            - Check if test passes or error message changed
 
-            FORBIDDEN:
-            - "Tests should pass now" - NO. Run them and paste output.
-            - "I expect this to work" - NO. Show actual results.
-            - "The implementation is correct" without test evidence - NO.
-            - Claiming success without pasted test output - ABSOLUTELY NOT.
+            ⚠️ Pasting output is OPTIONAL per-edit:
+            - Paste output if: Test passes (success!), unexpected error, debugging
+            - Skip output if: Iterating on same error, clear what to try next
+
+            To skip: "Tests verified, continuing iteration"
 
             Output ONLY: {"ok": true}
     - matcher: Write
       hooks:
         - type: prompt
           prompt: |
-            🟢 POST-WRITE: VERIFICATION REQUIRED - Run tests and paste output.
+            🟢 POST-WRITE: Run tests to verify the new file.
 
-            After creating this file, you MUST:
-            1. Run the test suite
-            2. Copy the FULL test output into your response
-            3. Show whether tests pass or what error remains
-
-            NEVER claim success without pasted evidence.
+            You SHOULD run tests after creating the file:
+            - Verify the file compiles and test behavior
+            - Pasting output optional (see POST-EDIT guidance)
 
             Output ONLY: {"ok": true}
   Stop:
+    - hooks:
+        - type: prompt
+          prompt: |
+            🟢 GREEN PHASE COMPLETION - MANDATORY VERIFICATION
+
+            Before finishing GREEN phase, you MUST provide evidence:
+
+            1. Implementation was added/modified
+            2. Tests PASS (all tests, not just the new one)
+            3. Paste FINAL test output showing all tests passing
+
+            This is REQUIRED to ensure valid GREEN phase before domain review.
+
+            FORBIDDEN without pasted output:
+            - "Tests pass now"
+            - "Implementation is correct"
+            - "Ready for domain review"
+
+            If you cannot paste test output showing passes: {"ok": false, "reason": "Must show test passing evidence"}
+            If test output shows all tests pass: {"ok": true}
+        - type: prompt
     - hooks:
         - type: prompt
           prompt: |
