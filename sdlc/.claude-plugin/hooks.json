@@ -30,6 +30,27 @@
       ]
     }
   ],
+  "PostToolUse": [
+    {
+      "matcher": "Edit|Write",
+      "hooks": [
+        {
+          "type": "command",
+          "command": ".claude-plugin/hooks/orchestrator-edit-detection.sh",
+          "description": "Warn when orchestrator edits files directly (EDUCATIONAL)"
+        }
+      ]
+    },
+    {
+      "matcher": "Task(.*sdlc:domain.*)",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "DOMAIN PATTERN CAPTURE SUGGESTION\n\nThe domain agent just completed. If interesting modeling decisions were made, consider capturing them:\n\n**Worth capturing:**\n- Novel domain type patterns (semantic types, validation strategies)\n- Type system techniques (making invalid states unrepresentable)\n- Parse-don't-validate implementations\n- Corrected primitive obsession mistakes\n- State machine designs\n\n**How to capture:**\nUse: /sdlc:remember patterns \"[clear descriptive title]\"\n\nExample: /sdlc:remember patterns \"Email validation with semantic types\"\n\n**When to skip:**\n- Trivial changes (single field addition, renaming)\n- Standard patterns already in memory\n- No new insights gained\n\nThis is a SUGGESTION, not mandatory. Output ONLY: {\"ok\": true}"
+        }
+      ]
+    }
+  ],
   "SubagentStop": [
     {
       "hooks": [

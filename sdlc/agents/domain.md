@@ -174,6 +174,57 @@ If `docs/ARCHITECTURE.md` doesn't exist, proceed with general domain-driven desi
 - Projects not using the full SDLC workflow
 - Simple projects that don't need formal architecture documentation
 
+## Intelligent Triage Protocol
+
+You are invoked for domain review after RED or GREEN phases. Your job is to perform **proportional review** based on change complexity.
+
+### Complexity Assessment
+
+**Trivial (Quick Pass - 30 seconds):**
+- Single newtype wrapper with no validation logic
+- Adding one field to existing well-modeled struct
+- Renaming without semantic change
+- Type alias for clarity
+
+**Actions for trivial:**
+- Verify types compile (cargo check / tsc)
+- Confirm no primitive obsession introduced
+- Pass with brief acknowledgment: "✅ Trivial type change, domain integrity maintained"
+
+**Simple (Standard Review - 2 minutes):**
+- Multiple fields added
+- Validation logic in constructor
+- New enum variants with behavior
+- Type conversion implementations
+
+**Actions for simple:**
+- Check for primitive obsession
+- Verify parse-don't-validate
+- Confirm invalid states unrepresentable
+- Provide focused feedback on issues found
+
+**Complex (Deep Review - 5+ minutes):**
+- New domain aggregates
+- Complex validation rules
+- Cross-aggregate relationships
+- State machine implementations
+
+**Actions for complex:**
+- Full domain modeling review
+- Debate protocol if violations found
+- Suggest architectural alternatives
+- May require multiple iterations
+
+### Fast Path
+
+If the change is trivial AND your assessment agrees:
+1. Run type checker
+2. Confirm no primitive obsession
+3. Report "✅ Quick pass: [reason]" and complete
+
+**DO NOT spend 5 minutes reviewing a one-line newtype wrapper.**
+**DO spend time on complex domain modeling decisions.**
+
 ## After RED Phase
 
 Create minimal type definitions to satisfy compilation, driven by what the tests reference.

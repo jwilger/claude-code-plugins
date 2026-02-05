@@ -19,49 +19,46 @@ hooks:
       hooks:
         - type: prompt
           prompt: |
-            SDLC:GREEN AGENT CONSTRAINT CHECK
+            🟢 GREEN AGENT FILE CONSTRAINT CHECK
 
-            You are the GREEN phase agent. You may ONLY edit PRODUCTION implementation code.
+            You tried to edit: {file_path}
 
-            Evaluate the file being edited:
+            Problem: GREEN agent can only edit production implementation code.
 
-            ALLOW if file is production implementation:
-            - Path in: src/, lib/, app/ (implementation directories)
-            - Contains function/method bodies to implement
-            - NOT a test file
+            What you probably want:
+            • To edit test code → Launch sdlc:red agent
+            • To create type definitions → Launch sdlc:domain agent
+            • To edit config/docs → Launch sdlc:file-updater agent
 
-            BLOCK if file is:
-            - Test file (*_test.rs, *.test.ts, test_*.py, *_spec.rb)
-            - In tests/, __tests__/, spec/, test/ directories
-            - Type-only file (only struct/enum/trait definitions, no implementations)
+            Why: TDD separation ensures tests drive implementation, not the reverse.
 
-            Note: Type DEFINITIONS are sdlc:domain's job. You implement the BODIES.
+            See: docs/decision-trees/tdd-troubleshooting.md
 
             Respond with JSON:
-            {"ok": true} - if this is production implementation code
-            {"ok": false, "reason": "sdlc:green can only edit production implementation code, not tests or type definitions."} - otherwise
+            {"ok": true} - if editing production implementation (src/, lib/, app/, not tests)
+            {"ok": false, "reason": "❌ GREEN agent can only edit production implementation code.\n\n📁 You tried: {file_path}\n\n✅ What you probably want:\n  • Test code → Launch sdlc:red\n  • Type definitions → Launch sdlc:domain\n  • Config/docs → Launch sdlc:file-updater\n\n📖 See: docs/decision-trees/tdd-troubleshooting.md"} - otherwise
     - matcher: Write
       hooks:
         - type: prompt
           prompt: |
-            SDLC:GREEN AGENT CONSTRAINT CHECK
+            🟢 GREEN AGENT FILE CONSTRAINT CHECK
 
-            You are the GREEN phase agent. You may ONLY create PRODUCTION implementation files.
+            You tried to create: {file_path}
 
-            Evaluate the file being created:
+            Problem: GREEN agent can only create production implementation files.
 
-            ALLOW if production implementation file:
-            - Path will be in: src/, lib/, app/
-            - Contains function implementations
-            - NOT a test file
+            What you probably want:
+            • To create test code → Launch sdlc:red agent
+            • To create type definitions → Launch sdlc:domain agent
+            • To create config/docs → Launch sdlc:file-updater agent
 
-            BLOCK if:
-            - Test file (any test pattern)
-            - Type-only definition file
+            Why: TDD separation ensures tests drive implementation, not the reverse.
+
+            See: docs/decision-trees/tdd-troubleshooting.md
 
             Respond with JSON:
-            {"ok": true} - if this is a production implementation file
-            {"ok": false, "reason": "sdlc:green can only create production implementation files."} - otherwise
+            {"ok": true} - if creating production implementation (src/, lib/, app/, not tests)
+            {"ok": false, "reason": "❌ GREEN agent can only create production implementation files.\n\n📁 You tried: {file_path}\n\n✅ What you probably want:\n  • Test code → Launch sdlc:red\n  • Type definitions → Launch sdlc:domain\n  • Config/docs → Launch sdlc:file-updater\n\n📖 See: docs/decision-trees/tdd-troubleshooting.md"} - otherwise
   PostToolUse:
     - matcher: Edit
       hooks:

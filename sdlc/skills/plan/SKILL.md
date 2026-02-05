@@ -1,144 +1,97 @@
 ---
 name: plan
-version: 1.0.0
+version: 1.1.0
 author: jwilger
 repository: jwilger/claude-code-plugins
-description: Create dot tasks from event model slices. Maps workflows to epics, slices to stories, GWT to acceptance criteria. Use after event model and architecture complete.
+description: Convert event model slices to GitHub issues with dependencies. Use after Event Modeling to create implementation tasks.
 tags:
+  - workflow
   - planning
-  - task-management
+  - github
   - event-modeling
 portability: tool-specific
 dependencies:
   - event-modeling
-  - orchestration-protocol
-allowed-tools: Bash, Read, Glob, Write, Task, AskUserQuestion, Grep
-hooks:
-  PreToolUse:
-    - matcher: Read
-      once: true
-      hooks:
-        - type: prompt
-          prompt: |
-            SDLC PLAN PREREQUISITES CHECK
-
-            Before creating tasks, verify:
-            1. .claude/sdlc.yaml exists
-            2. docs/ARCHITECTURE.md exists
-            3. At least one workflow with slices exists
-
-            If ARCHITECTURE.md is missing, stop and direct user to:
-              /design arch
-
-            Respond with: {"ok": true}
+  - github-issues
+allowed-tools: Bash, Read, Grep
 ---
 
 # Plan Skill
 
-**Version:** 1.0.0
-**Portability:** Tool-specific (requires dot CLI, event model)
+**Version:** 1.1.0
+**Portability:** Tool-specific (requires gh CLI, dot CLI)
 
 ---
 
-## Objective
+## Quick Start
 
-Create dot tasks from event model slices, mapping workflows to epics and slices to stories.
+Create tasks from event model in under 5 minutes.
 
-**Purpose:** Bridge design phase (event model + architecture) to actionable work items.
+### What This Does
+Reads event model slices and creates GitHub issues with proper dependencies.
 
-**Scope:**
-- **Included:** Epic/story creation, dependency ordering, GWT as acceptance criteria
-- **Excluded:** Event modeling (use design skill), implementation (use work skill)
+### Fastest Path
+1. Complete Event Modeling (`/sdlc:design`)
+2. Run `/sdlc:plan`
+3. Creates issues for each slice
+4. Sets up dependency graph
+5. Ready for `/sdlc:work`
 
----
-
-## Core Principles
-
-### Principle 1: NON-NEGOTIABLE Mapping
-
-| Event Model | dot Task |
-|-------------|----------|
-| Workflow | Epic (parent) |
-| Slice | Story (child) |
-| GWT Scenarios | Acceptance Criteria |
-| Pattern Type | Metadata tag |
-
-### Principle 2: Dependency Ordering
-
-Slice dependencies from event model become task blockers.
-
-### Principle 3: Prerequisites Required
-
-- Event model with slices
-- ARCHITECTURE.md (technical context)
-- dot CLI initialized
-
----
-
-## Usage Pattern
-
-**Standard Planning:**
-
+### Basic Example
 ```bash
-/plan user-registration
-# or
-/plan  # Plans all unplanned workflows
-```
+/sdlc:plan
 
-**Steps:**
-1. Verify prerequisites (config, architecture, event model)
-2. Find workflows to plan
-3. For each workflow:
-   - Create epic task (workflow name)
-   - For each slice:
-     - Create story task (child of epic)
-     - Add GWT scenarios as acceptance criteria
-     - Add dependencies from slice metadata
-4. Display task hierarchy
-
-**Example:**
-```bash
-# Find workflows
-ls -d docs/event_model/workflows/*/
-
-# Create epic
-EPIC_ID=$(dot add "Epic: User Registration" \
-  --description "User registration workflow from event model" \
-  --priority 1)
-
-# Create stories from slices
-for slice in docs/event_model/workflows/user-registration/slices/*.md; do
-  TITLE=$(grep "^# " "$slice" | head -1 | sed 's/^# //')
-  GWT=$(sed -n '/## GWT Scenarios/,/^## /p' "$slice")
-
-  STORY_ID=$(dot add "$TITLE" \
-    --description "$GWT" \
-    --parent "$EPIC_ID")
-done
+# Reads: docs/event_model/workflows/*/slices/*.md
+#
+# Creates issues:
+# - myproject-user-registration-slice1
+# - myproject-user-registration-slice2
+# - myproject-user-registration-slice3
+#
+# Sets dependencies (slice2 blocks slice3, etc.)
+#
+# Output:
+# ✓ Created 12 issues
+# ✓ Dependencies configured
+# Ready: /sdlc:work
 ```
 
 ---
 
-## Integration
+## Common Examples
 
-**Works well with:**
-- event-modeling (source of slices)
-- work skill (consumes created tasks)
+### Example 1: Full Event Model
+**When:** Complete event model, need tasks
+**Invoke:** `/sdlc:plan`
+**Result:** All slices → issues with dependencies
 
-**Prerequisites:**
-- Event model complete with GWT scenarios
-- ARCHITECTURE.md exists
-- dot CLI initialized
-
----
-
-## Version History
-
-### v1.0.0 (2026-02-05)
-- Initial extraction from sdlc plugin v8.0.0
-- Epic/story mapping
-- GWT as acceptance criteria
+### Example 2: Single Workflow
+**When:** One workflow designed
+**Invoke:** `/sdlc:plan <workflow-name>`
+**Result:** Issues for that workflow only
 
 ---
 
-**Extraction Source:** sdlc plugin v8.0.0 /sdlc:plan command
+## When to Use
+
+**Use when:**
+- Event model complete
+- Need implementation tasks
+- User asks to "create tasks" or "plan work"
+
+**Don't use when:**
+- No event model (run `/sdlc:design` first)
+- Tasks already exist
+- Not using Event Modeling (create issues manually)
+
+**Related:**
+- `/sdlc:design` - Create event model
+- `/sdlc:work` - Start implementation
+
+---
+
+## Metadata
+
+**Version:** 1.1.0 (2026-02-05): Progressive disclosure
+**Dependencies:** event-modeling, github-issues
+**Portability:** Tool-specific (gh, dot required)

@@ -1,98 +1,75 @@
 ---
 name: complete
-version: 1.0.0
+version: 1.1.0
 author: jwilger
 repository: jwilger/claude-code-plugins
-description: Mark task complete after PR merge. Verifies merge, closes task, checks parent completion, cleans up worktree registration. Use after PR merges.
+description: Mark task complete after PR merge. Use when PR merged or when user asks to close/complete task.
 tags:
   - workflow
   - task-management
-  - completion
 portability: tool-specific
 dependencies:
-  - memory-protocol
-allowed-tools: Bash, Read, AskUserQuestion
-hooks:
-  PreToolUse:
-    - matcher: Read
-      once: true
-      hooks:
-        - type: prompt
-          prompt: |
-            SDLC CONFIG CHECK (runs once per session)
-
-            Verify .claude/sdlc.yaml and .dots/ exist.
-            If missing, tell user to run /setup first.
-
-            Respond with: {"ok": true}
+  - github-issues
+allowed-tools: Bash, Read
 ---
 
 # Complete Skill
 
-**Version:** 1.0.0
-**Portability:** Tool-specific (requires gh CLI, dot CLI)
+**Version:** 1.1.0
+**Portability:** Tool-specific (requires dot CLI, gh CLI)
 
 ---
 
-## Objective
+## Quick Start
 
-Mark task complete after PR merge, with verification and parent task checking.
+Close task in under 1 minute.
 
-**Purpose:** Manual completion ensures PR was merged (not just closed) and triggers parent task evaluation.
+### What This Does
+Marks task complete, verifies PR merged, evaluates parent task completion.
 
-**Scope:**
-- **Included:** PR merge verification, task closure, parent checking, worktree cleanup
-- **Excluded:** PR merging (manual), task creation
-
----
-
-## Core Principles
-
-### Principle 1: Verify Merge, Not Just Close
-
-Check PR state is "merged", not just "closed".
-
-### Principle 2: Parent Task Evaluation
-
-If all sibling tasks complete, offer to close parent epic.
-
-### Principle 3: Worktree Registration Cleanup (v7.0.0)
-
-Remove `.dots/.worktrees/<task-id>` registry when task completes.
-
----
-
-## Usage Pattern
-
-**From Feature Branch:**
+### Fastest Path
 ```bash
-/complete  # Auto-detects task from branch
+/sdlc:complete <task-id>
+# Verifies PR merged
+# Marks task complete
+# Checks if parent can complete
+# Cleans up worktree (if applicable)
 ```
 
-**Explicit Task ID:**
-```bash
-/complete myproject-add-login-abc123
-```
+---
 
-**Steps:**
-1. Determine task ID (from args or branch)
-2. Verify PR was merged
-3. Close task with `dot off <task-id>`
-4. Check parent task children status
-5. If all children done, offer to close parent
-6. Clean up worktree registration
-7. Store completion in auto memory
+## Common Examples
+
+### Example 1: Single Task
+**After:** PR merged
+**Invoke:** `/sdlc:complete myproject-feature-abc123`
+**Result:** Task marked complete
+
+### Example 2: Child Task (Parent Evaluation)
+**After:** Child task PR merged
+**Invoke:** `/sdlc:complete myproject-child-abc`
+**Result:** Checks if all siblings complete → parent completes
 
 ---
 
-## Version History
+## When to Use
 
-### v1.0.0 (2026-02-05)
-- Initial extraction from sdlc plugin v8.0.0
-- PR merge verification
-- Parent task evaluation
-- Worktree cleanup
+**Use when:**
+- PR merged
+- Task finished
+- User asks to "complete" or "close task"
+
+**Don't use when:**
+- PR not merged yet
+- Work still in progress
+
+**Related:**
+- `/sdlc:pr` - Create PR first
+- `/sdlc:work` - Start next task
 
 ---
 
-**Extraction Source:** sdlc plugin v8.0.0 /sdlc:complete command
+## Metadata
+
+**Version:** 1.1.0 (2026-02-05): Progressive disclosure
+**Dependencies:** github-issues

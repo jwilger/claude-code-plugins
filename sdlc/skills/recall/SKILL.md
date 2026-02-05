@@ -1,81 +1,88 @@
 ---
 name: recall
-version: 1.0.0
+version: 1.1.0
 author: jwilger
 repository: jwilger/claude-code-plugins
-description: Search and retrieve knowledge from auto memory. Use before ANY task to check for existing solutions.
+description: Search auto memory for patterns, conventions, and past solutions. Use before starting work or when facing problems.
 tags:
   - memory
+  - knowledge-management
   - search
-  - knowledge-retrieval
 portability: universal
 dependencies:
   - memory-protocol
-model: haiku
-allowed-tools: Grep, Read, Glob
+allowed-tools: Bash, Grep, Read
 ---
 
 # Recall Skill
 
-**Version:** 1.0.0
-**Portability:** Universal (file-based patterns)
+**Version:** 1.1.0
+**Portability:** Universal
 
 ---
 
-## Objective
+## Quick Start
 
-Search and retrieve relevant knowledge from auto memory.
+Search memory in under 30 seconds.
 
-**Purpose:** Find existing solutions before starting work, avoid reinventing.
+### What This Does
+Searches auto memory for relevant patterns, conventions, and solutions.
 
-**Scope:**
-- **Included:** Keyword extraction, recursive search, file reading
-- **Excluded:** Storage (use remember skill)
-
----
-
-## Core Principles
-
-### Principle 1: Extract Key Terms
-
-Identify tool names, error keywords, domain concepts from query.
-
-### Principle 2: Search with Context
-
-Use `grep -r -i -C 3` for better match quality.
-
-### Principle 3: Read Relevant Files
-
-From grep results, read most relevant files in full.
-
----
-
-## Usage Pattern
-
+### Fastest Path
 ```bash
-/recall "test patterns for this project"
+/sdlc:recall email validation
+# Searches across all memory categories
+# Displays matching files with context
 ```
 
-**Steps:**
-1. Extract search terms from query
-2. Search memory directory with grep
-3. Read matching files
-4. Present findings
+### Search Scope
+- patterns/
+- conventions/
+- debugging/
+- architecture/
+- tools/
 
-**Example:**
+---
+
+## Common Examples
+
+### Example 1: Find Pattern
 ```bash
-MEMORY_PATH="$HOME/.claude/projects/$(pwd | sed 's/\//-/g' | sed 's/^-//')/memory"
-grep -r -i -C 3 "test patterns" "$MEMORY_PATH" --include="*.md"
+/sdlc:recall domain types
+# Shows domain modeling patterns
+```
+
+### Example 2: Find Convention
+```bash
+/sdlc:recall test naming
+# Shows test file naming conventions
+```
+
+### Example 3: Find Solution
+```bash
+/sdlc:recall rate limit
+# Shows past debugging solutions
 ```
 
 ---
 
-## Version History
+## When to Use
 
-### v1.0.0 (2026-02-05)
-- Initial extraction from sdlc plugin v8.0.0
-- File-based auto memory search
+**Use when:**
+- Starting new work
+- Facing familiar problem
+- Need project context
+
+**Auto-invoked by:**
+- work skill (before showing tasks)
+- arch skill (before decisions)
+- design skill (before modeling)
+
+**Related:** `/sdlc:remember` - Store knowledge
 
 ---
 
-**Extraction Source:** sdlc plugin v8.0.0 /sdlc:recall command
+## Metadata
+
+**Version:** 1.1.0 (2026-02-05): Progressive disclosure
+**Dependencies:** memory-protocol

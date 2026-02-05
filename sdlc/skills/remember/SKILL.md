@@ -1,81 +1,84 @@
 ---
 name: remember
-version: 1.0.0
+version: 1.1.0
 author: jwilger
 repository: jwilger/claude-code-plugins
-description: Store discoveries, insights, and knowledge in auto memory for future retrieval. Use after solving problems or learning conventions.
+description: Store patterns, conventions, and insights in auto memory. Use when you solve problems, learn conventions, or discover patterns worth remembering.
 tags:
   - memory
   - knowledge-management
+  - patterns
 portability: universal
 dependencies:
   - memory-protocol
-model: haiku
-allowed-tools: Read, Write, Glob, Grep
+allowed-tools: Bash, Write, Read
 ---
 
 # Remember Skill
 
-**Version:** 1.0.0
-**Portability:** Universal (file-based patterns)
+**Version:** 1.1.0
+**Portability:** Universal
 
 ---
 
-## Objective
+## Quick Start
 
-Store knowledge in file-based auto memory system.
+Store knowledge in under 1 minute.
 
-**Purpose:** Preserve discoveries for future sessions, avoid repeating research.
+### What This Does
+Saves patterns, conventions, and insights to auto memory for future reference.
 
-**Scope:**
-- **Included:** Categorization, file naming, duplicate checking, content storage
-- **Excluded:** Retrieval (use recall skill)
-
----
-
-## Core Principles
-
-### Principle 1: Category-Based Organization
-
-| Category | Use For |
-|----------|---------|
-| debugging | Problem solutions, error fixes |
-| architecture | Design decisions, patterns |
-| conventions | Coding standards, preferences |
-| tools | CLI quirks, API behaviors |
-| patterns | Reusable general knowledge |
-
-### Principle 2: Check for Duplicates
-
-Search existing files before creating new ones. Update existing files when related.
-
-### Principle 3: Descriptive Filenames
-
-Use kebab-case: `cargo-test-timeout.md`, `postgres-jsonb-queries.md`
-
----
-
-## Usage Pattern
-
+### Fastest Path
 ```bash
-/remember "Found workaround for cargo test timeout issue"
+/sdlc:remember patterns "Email validation with semantic types"
+# Prompts: Describe the pattern
+# Saves to: ~/.claude/projects/<project>/memory/patterns/
 ```
 
-**Steps:**
-1. Categorize knowledge (debugging/architecture/conventions/tools/patterns)
-2. Search for existing related files
-3. Create descriptive filename
-4. Write markdown content
-5. Update MEMORY.md if critical
+### Categories
+- `patterns` - Reusable design patterns
+- `conventions` - Project conventions
+- `debugging` - Problem solutions
+- `architecture` - Architecture decisions (use `/sdlc:arch` for formal ADRs)
+- `tools` - Tool discoveries and workarounds
 
 ---
 
-## Version History
+## Common Examples
 
-### v1.0.0 (2026-02-05)
-- Initial extraction from sdlc plugin v8.0.0
-- File-based auto memory
+### Example 1: Design Pattern
+```bash
+/sdlc:remember patterns "Parse-don't-validate with Email type"
+```
+
+### Example 2: Convention
+```bash
+/sdlc:remember conventions "Test file naming: <feature>_test.rs"
+```
+
+### Example 3: Debug Solution
+```bash
+/sdlc:remember debugging "Fixing gh CLI rate limit with GH_TOKEN"
+```
 
 ---
 
-**Extraction Source:** sdlc plugin v8.0.0 /sdlc:remember command
+## When to Use
+
+**Use when:**
+- Solved non-trivial problem
+- Discovered project convention
+- Found useful pattern
+
+**Don't use for:**
+- Trivial info
+- Temporary notes
+
+**Related:** `/sdlc:recall` - Search memory
+
+---
+
+## Metadata
+
+**Version:** 1.1.0 (2026-02-05): Progressive disclosure
+**Dependencies:** memory-protocol

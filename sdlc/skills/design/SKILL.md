@@ -1,139 +1,148 @@
 ---
 name: design
-version: 1.0.0
+version: 1.1.0
 author: jwilger
 repository: jwilger/claude-code-plugins
-description: Event Modeling facilitation for domain discovery, workflow design, GWT scenarios, architecture decisions, and design systems. Use for event-sourced system design.
+description: Event Modeling facilitation for domain discovery, workflow design, GWT scenarios, and architecture decisions. Use for event-sourced system design or when user asks about domain modeling.
 tags:
   - event-modeling
   - domain-discovery
   - workflow-design
   - architecture
-  - design-system
 portability: tool-specific
 dependencies:
   - event-modeling
-  - atomic-design
   - orchestration-protocol
   - user-input-protocol
+  - memory-protocol
 allowed-tools: Bash, Read, Write, Task, AskUserQuestion, Grep
 hooks:
   Stop:
     - hooks:
         - type: prompt
           prompt: |
-            Before completing, store event model discoveries in auto memory:
-            - Domain concepts discovered
-            - Events, commands, and views identified
-            - GWT scenarios created
-            - Any deferred questions or open items
-
+            Before completing, store event model discoveries in auto memory.
             Output ONLY: {"ok": true}
 ---
 
-# Design Skill
+# Design Skill (Event Modeling)
 
-**Version:** 1.0.0
-**Portability:** Tool-specific (requires event modeling agents)
-
----
-
-## Objective
-
-Facilitate Event Modeling workflow: domain discovery → workflow design → GWT scenarios → architecture decisions → design system.
-
-**Purpose:** Guide teams through structured domain understanding before implementation.
-
-**Scope:**
-- **Included:** Domain discovery, workflow design, GWT generation, model validation, architecture ADRs, design system creation
-- **Excluded:** Implementation (use TDD workflow), task creation (use plan skill)
+**Version:** 1.1.0
+**Portability:** Tool-specific
 
 ---
 
-## Core Principles
+## Quick Start
 
-### Principle 1: Domain Understanding Before Tech Decisions
+Start Event Modeling in under 5 minutes.
 
-Event modeling is about understanding the business domain. NO architecture or technical decisions during modeling (except mandatory integrations).
+### What This Does
+Facilitates Event Modeling workflow: domain discovery → workflow design → GWT scenarios → architecture.
 
-### Principle 2: Progressive Phases
+### Fastest Path
+1. Run `/sdlc:design discover` - Answer 5 domain questions
+2. Run `/sdlc:design workflow <name>` - Design one workflow
+3. Run `/sdlc:design gwt <workflow>` - Generate acceptance criteria
+4. Ready to plan tasks
 
-Discovery → Workflows → GWT → Validation → Architecture → Design System
+### Basic Example
+```bash
+/sdlc:design discover
+# Answers 5 questions:
+# 1. What does the business do?
+# 2. Who are the actors?
+# 3. What are major processes?
+# 4. What external systems?
+# 5. Which workflow to start with?
+#
+# Creates: docs/event_model/domain-overview.md
 
-Each phase builds on previous.
+/sdlc:design workflow user-registration
+# Interactive 7-step workflow design
+# Creates: docs/event_model/workflows/user-registration/
 
-### Principle 3: Agent Delegation
-
-All design work delegated to specialized agents via Task tool.
+/sdlc:design gwt user-registration
+# Generates Given-When-Then scenarios
+# Ready for: /sdlc:plan
+```
 
 ---
 
-## Usage Patterns
+## Common Examples
 
-### Arguments
+### Example 1: New Project (Full Event Modeling)
+**When:** Starting event-sourced system
+**Path:** discover → workflow → gwt → validate → arch
+**Result:** Complete event model ready for planning
 
-- `discover` - Domain discovery
+### Example 2: Single Workflow
+**When:** Adding feature to existing system
+**Path:** workflow <name> → gwt <name>
+**Result:** New workflow integrated with existing model
+
+### Example 3: Validating Model
+**When:** Event model complete, verify consistency
+**Invoke:** `/sdlc:design validate`
+**Result:** Checks information flow, GWT coverage
+
+---
+
+## When to Use
+
+**Use this skill when:**
+- Starting event-sourced project
+- Need domain understanding before coding
+- Designing complex workflows
+- User asks about "event modeling" or "domain design"
+
+**Don't use when:**
+- Simple CRUD features (overkill)
+- Domain well-understood (skip to `/sdlc:arch`)
+- Ready to implement (use `/sdlc:work`)
+
+**Related skills:**
+- `/sdlc:plan` - Convert event model to tasks
+- `/sdlc:arch` - Architecture decisions
+
+---
+
+## Subcommands
+
+- `discover` - Domain discovery (5 questions)
 - `workflow <name>` - Design workflow
-- `gwt <workflow-name>` - Generate GWT scenarios
+- `gwt <workflow>` - Generate GWT scenarios
 - `validate` - Validate event model
 - `arch` - Architecture decisions
-- `design-system` - Create/update design system
+- `design-system` - UI component system
 - (no args) - Resume where left off
 
-### Standard Invocations
+---
 
-**Discovery:**
-```bash
-/design discover
-# Delegates to sdlc:discovery agent
-```
+## Before You Start
 
-**Workflow Design:**
-```bash
-/design workflow user-registration
-# Delegates to sdlc:workflow-designer agent
-```
+**MANDATORY:** Search auto memory for domain patterns.
 
-**GWT Scenarios:**
 ```bash
-/design gwt user-registration
-# Delegates to sdlc:gwt agent
-```
-
-**Architecture:**
-```bash
-/design arch
-# Delegates to sdlc:design-facilitator agent
-```
-
-**Design System:**
-```bash
-/design design-system
-# Delegates to sdlc:ux agent
+MEMORY_PATH="$HOME/.claude/projects/$(pwd | sed 's/\//-/g' | sed 's/^-//')/memory"
+find "$MEMORY_PATH" -name "*.md" -type f 2>/dev/null | \
+  xargs grep -l -i "domain\|event\|workflow" 2>/dev/null
 ```
 
 ---
 
-## Integration
+## Reference
 
-**Works well with:**
-- event-modeling (core methodology)
-- atomic-design (design system structure)
-- user-input-protocol (agent checkpoints)
-
-**Prerequisites:**
-- `.claude/sdlc.yaml` with `mode: event-modeling`
-- `docs/event_model/` directory structure
+See SKILL-old.md for:
+- Event Modeling methodology
+- Agent delegation patterns
+- Complete phase descriptions
 
 ---
 
-## Version History
+## Metadata
 
-### v1.0.0 (2026-02-05)
-- Initial extraction from sdlc plugin v8.0.0
-- Agent delegation pattern
-- Progressive phase enforcement
+**Version History:**
+- v1.1.0 (2026-02-05): Progressive disclosure, memory integration
+- v1.0.0: Initial extraction
 
----
-
-**Extraction Source:** sdlc plugin v8.0.0 /sdlc:design command
+**Dependencies:** event-modeling, orchestration-protocol, user-input-protocol, memory-protocol

@@ -19,48 +19,46 @@ hooks:
       hooks:
         - type: prompt
           prompt: |
-            🔴 SDLC-RED AGENT CONSTRAINT CHECK
+            🔴 RED AGENT FILE CONSTRAINT CHECK
 
-            You are the RED phase agent. You may ONLY edit TEST files.
+            You tried to edit: {file_path}
 
-            Evaluate the file being edited:
+            Problem: RED agent can only edit test files.
 
-            ✅ ALLOW if file is clearly a test:
-            - Path contains: tests/, __tests__/, spec/, test/
-            - File name matches: *_test.rs, *.test.ts, test_*.py, *_spec.rb
-            - File contains test functions (#[test], describe, it, test())
+            What you probably want:
+            • To implement production code → Launch sdlc:green agent
+            • To create type definitions → Launch sdlc:domain agent
+            • To edit config/docs → Launch sdlc:file-updater agent
 
-            ❌ BLOCK if file is:
-            - Production code (src/, lib/, app/)
-            - Type definitions without test content
-            - Configuration that affects production
+            Why: TDD discipline requires test-first. Writing production code before tests defeats the purpose.
+
+            See: docs/decision-trees/tdd-troubleshooting.md
 
             Respond with JSON:
-            {"ok": true} - if this is a test file
-            {"ok": false, "reason": "sdlc:red can only edit test files. This is production/type code."} - if not a test file
+            {"ok": true} - if editing test file (tests/, *_test.*, *_spec.*)
+            {"ok": false, "reason": "❌ RED agent can only edit test files.\n\n📁 You tried: {file_path}\n\n✅ What you probably want:\n  • Production code → Launch sdlc:green\n  • Type definitions → Launch sdlc:domain\n  • Config/docs → Launch sdlc:file-updater\n\n📖 See: docs/decision-trees/tdd-troubleshooting.md"} - otherwise
     - matcher: Write
       hooks:
         - type: prompt
           prompt: |
-            🔴 SDLC-RED AGENT CONSTRAINT CHECK
+            🔴 RED AGENT FILE CONSTRAINT CHECK
 
-            You are the RED phase agent. You may ONLY create TEST files.
+            You tried to create: {file_path}
 
-            Evaluate the file being created:
+            Problem: RED agent can only create test files.
 
-            ✅ ALLOW if clearly a test file:
-            - Path will be in: tests/, __tests__/, spec/, test/
-            - File name matches: *_test.rs, *.test.ts, test_*.py, *_spec.rb
-            - Content contains test functions
+            What you probably want:
+            • To create production code → Launch sdlc:green agent
+            • To create type definitions → Launch sdlc:domain agent
+            • To create config/docs → Launch sdlc:file-updater agent
 
-            ❌ BLOCK if:
-            - Production code file
-            - Type definition file
-            - Any non-test file
+            Why: TDD discipline requires test-first. Writing production code before tests defeats the purpose.
+
+            See: docs/decision-trees/tdd-troubleshooting.md
 
             Respond with JSON:
-            {"ok": true} - if this is a test file
-            {"ok": false, "reason": "sdlc:red can only create test files."} - if not a test file
+            {"ok": true} - if creating test file (tests/, *_test.*, *_spec.*)
+            {"ok": false, "reason": "❌ RED agent can only create test files.\n\n📁 You tried: {file_path}\n\n✅ What you probably want:\n  • Production code → Launch sdlc:green\n  • Type definitions → Launch sdlc:domain\n  • Config/docs → Launch sdlc:file-updater\n\n📖 See: docs/decision-trees/tdd-troubleshooting.md"} - otherwise
   PostToolUse:
     - matcher: Edit
       hooks:

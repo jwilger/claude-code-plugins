@@ -1,5 +1,67 @@
 # SDLC Plugin Changelog
 
+## [9.1.0] - 2026-02-05
+
+### 🎯 Phase 1: Quick Wins (UX Improvements)
+
+**Focus:** Reduce friction, improve error messages, add decision trees
+
+#### ✨ Added
+
+- **Intelligent Domain Triage** - Domain agent now auto-triages change complexity
+  - Trivial changes: Quick pass (30 seconds) - newtype wrappers, single field additions
+  - Simple changes: Standard review (2 minutes) - validation logic, enum variants
+  - Complex changes: Deep review (5+ minutes) - aggregates, state machines
+  - Domain review remains MANDATORY but becomes proportional to complexity
+
+- **User-Friendly Error Messages** - Replaced technical errors with actionable guidance
+  - RED/GREEN/DOMAIN PreToolUse hooks now show:
+    - What went wrong (one line with emoji)
+    - What user tried
+    - What user probably wants (3 bullets)
+    - Why rule exists
+    - Link to troubleshooting
+  - 90% of users understand next action from error message
+
+- **Decision Trees** - Interactive workflow guidance
+  - `docs/decision-trees/workflow-selection.md` - Choose the right skill for your situation
+  - `docs/decision-trees/tdd-troubleshooting.md` - Solve common TDD problems
+  - Covers all entry points, common errors, agent coordination
+
+- **Enforcement Philosophy Documentation** - Transparent rule system
+  - `docs/enforcement-philosophy.md` - Explains HARD/SOFT/EDUCATIONAL tiers
+  - Domain review rationale (why it stays MANDATORY)
+  - Override protocols for SOFT rules
+  - Rule reference table
+
+- **Educational Orchestrator Detection** - PostToolUse hook for delegation awareness
+  - Warns when orchestrator edits files directly
+  - Suggests specialist agent delegation
+  - Non-blocking (EDUCATIONAL enforcement)
+  - Explains separation of concerns benefits
+
+#### 🎨 Improved
+
+- **Domain Agent Intelligence** - Proportional review based on change complexity
+- **Error Message Quality** - Clear guidance instead of JSON-focused technical errors
+- **UX Score:** 6.5 → 7.5 (estimated)
+
+#### 📚 Documentation
+
+- Added enforcement philosophy with three-tier model
+- Added decision trees for workflow selection and TDD troubleshooting
+- Clarified why domain review is HARD (agent expertise, not user override)
+- Documented override protocols for SOFT rules
+
+### 🔧 Technical
+
+- New hook: `orchestrator-edit-detection.sh` (PostToolUse for Edit/Write)
+- Updated hooks.json with PostToolUse section
+- Enhanced domain.md with intelligent triage protocol
+- Updated red.md and green.md with user-friendly PreToolUse messages
+
+---
+
 ## [9.0.0] - 2026-02-05
 
 ### 🚀 BREAKING CHANGES
