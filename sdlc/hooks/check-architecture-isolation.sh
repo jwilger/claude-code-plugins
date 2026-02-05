@@ -3,47 +3,33 @@
 # check-architecture-isolation.sh
 # Enforces: ARCHITECTURE.md changes ONLY in isolation (no other files in same commit)
 #
-# Exit codes:
-#   0 - Check passed
-#   1 - Violation detected (blocks commit)
+# Uses common hook library for reusable functions
 
-set -e
+set -euo pipefail
+
+# Load common hook utilities
+HOOK_DIR="$(dirname "$0")"
+source "$HOOK_DIR/../.claude-plugin/hooks/lib/common.sh"
 
 # Get staged files
-staged_files=$(git diff --cached --name-only)
+STAGED=$(get_staged_files)
 
-# Check if ARCHITECTURE.md is staged
-arch_staged=false
-other_staged=false
+# Find ARCHITECTURE.md if staged
+ARCH_FILE=$(echo "$STAGED" | grep "ARCHITECTURE.md" || echo "")
 
-while IFS= read -r file; do
-  if [[ "$file" == "docs/ARCHITECTURE.md" ]] || [[ "$file" == *"/ARCHITECTURE.md" ]]; then
-    arch_staged=true
-  else
-    other_staged=true
-  fi
-done <<< "$staged_files"
+# Check if ARCHITECTURE.md is staged along with other files
+if [[ -n "$ARCH_FILE" ]]; then
+    OTHER_FILES=$(echo "$STAGED" | grep -v "ARCHITECTURE.md" || echo "")
 
-# If both ARCHITECTURE.md and other files are staged, block
-if [[ "$arch_staged" == "true" ]] && [[ "$other_staged" == "true" ]]; then
-  echo "❌ ARCHITECTURE ISOLATION VIOLATION"
-  echo ""
-  echo "Architecture changes must be committed in isolation."
-  echo ""
-  echo "Staged files:"
-  echo "$staged_files" | sed 's/^/  /'
-  echo ""
-  echo "📋 How to fix:"
-  echo "  1. Unstage other files:     git reset HEAD <file>..."
-  echo "  2. Commit ARCHITECTURE.md:  git commit -m 'feat(arch): <description>'"
-  echo "  3. Then commit other files separately"
-  echo ""
-  echo "OR:"
-  echo "  1. Unstage ARCHITECTURE.md: git reset HEAD docs/ARCHITECTURE.md"
-  echo "  2. Commit other files:      git commit -m '<message>'"
-  echo "  3. Then commit ARCHITECTURE.md separately with ADR format"
-  echo ""
-  exit 1
+    if [[ -n "$OTHER_FILES" ]]; then
+        # Show violation using library function
+        show_violation \
+            "ARCHITECTURE ISOLATION VIOLATION" \
+            "Architecture changes must be committed in isolation.\n\nStaged files:\n$(echo "$STAGED" | sed 's/^/  /')" \
+            "Option 1:\n  1. Unstage other files: git reset HEAD <file>...\n  2. Commit ARCHITECTURE.md: git commit -m 'feat(arch): <description>'\n  3. Then commit other files separately\n\nOption 2:\n  1. Unstage ARCHITECTURE.md: git reset HEAD docs/ARCHITECTURE.md\n  2. Commit other files: git commit -m '<message>'\n  3. Then commit ARCHITECTURE.md separately with ADR format"
+
+        exit 1
+    fi
 fi
 
 # Check passed
