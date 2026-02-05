@@ -231,20 +231,81 @@ gh repo view >/dev/null 2>&1 && echo "✓ Remote added"
 3. **Skip GitHub configuration:** Exit this step, continue with rest of setup.
 
 **Step 3: Configure repository settings (after remote confirmed)**
+
+This step uses dynamic API discovery to present current options to the user.
+
+**3a. Discover current settings and available options:**
 ```bash
 # Get repository name
 REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
 
-# Configure repository settings
-gh api -X PATCH "repos/$REPO" \
-  -f delete_branch_on_merge=true \
-  -f allow_squash_merge=true \
-  -f allow_merge_commit=true \
-  -f allow_rebase_merge=true
+# Get current settings
+gh api "repos/$REPO" --jq '{
+  delete_branch_on_merge,
+  allow_squash_merge,
+  allow_merge_commit,
+  allow_rebase_merge,
+  web_commit_signoff_required,
+  squash_merge_commit_title,
+  squash_merge_commit_message,
+  merge_commit_title,
+  merge_commit_message
+}'
 
-# Create PR template
-mkdir -p .github
-cat > .github/pull_request_template.md <<'EOF'
+# Discover available enum values via GraphQL introspection
+gh api graphql -f query='query { __type(name: "SquashMergeCommitTitle") { enumValues { name description } } }'
+gh api graphql -f query='query { __type(name: "SquashMergeCommitMessage") { enumValues { name description } } }'
+gh api graphql -f query='query { __type(name: "MergeCommitTitle") { enumValues { name description } } }'
+gh api graphql -f query='query { __type(name: "MergeCommitMessage") { enumValues { name description } } }'
+```
+
+**3b. Present configuration options to user:**
+
+Use AskUserQuestion to gather preferences:
+
+1. **Repository features** (multiSelect):
+   - Auto-delete branches after merge
+   - Require commit sign-off
+
+2. **Allowed merge types** (multiSelect):
+   - Squash merging
+   - Merge commits
+   - Rebase merging
+
+3. **Squash merge defaults** (if enabled):
+   - Default title: Options from GraphQL enum
+   - Default message: Options from GraphQL enum
+
+4. **Merge commit defaults** (if enabled):
+   - Default title: Options from GraphQL enum
+   - Default message: Options from GraphQL enum
+
+5. **PR template** (optional):
+   - Create template: Yes/No
+
+6. **Branch protection** (optional):
+   - Require PRs
+   - Require reviews
+   - Skip
+
+**3c. Apply user's selections:**
+```bash
+# Update repository settings based on user input
+gh api -X PATCH "repos/$REPO" \
+  -f delete_branch_on_merge=$USER_DELETE_BRANCH \
+  -f allow_squash_merge=$USER_ALLOW_SQUASH \
+  -f allow_merge_commit=$USER_ALLOW_MERGE \
+  -f allow_rebase_merge=$USER_ALLOW_REBASE \
+  -f web_commit_signoff_required=$USER_REQUIRE_SIGNOFF \
+  -f squash_merge_commit_title=$USER_SQUASH_TITLE \
+  -f squash_merge_commit_message=$USER_SQUASH_MESSAGE \
+  -f merge_commit_title=$USER_MERGE_TITLE \
+  -f merge_commit_message=$USER_MERGE_MESSAGE
+
+# Create PR template only if user requested
+if [ "$USER_CREATE_PR_TEMPLATE" = "yes" ]; then
+  mkdir -p .github
+  cat > .github/pull_request_template.md <<'EOF'
 ## Summary
 <!-- Brief description of changes -->
 
@@ -254,10 +315,17 @@ cat > .github/pull_request_template.md <<'EOF'
 ## Related Issues
 <!-- Link to related issues/tickets -->
 EOF
+fi
 
-# Note: Branch protection rulesets require GitHub API rulesets endpoint
-# and admin permissions on the repository
+# Configure rulesets only if user requested
+# Note: Requires admin permissions on repository
 ```
+
+**Key Benefits of Dynamic Discovery:**
+- No hardcoded configuration options
+- Automatically supports new GitHub features
+- Lower maintenance burden
+- Always current with GitHub API
 
 **Config:**
 ```yaml

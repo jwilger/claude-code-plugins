@@ -1,6 +1,6 @@
 ---
 name: setup
-version: 2.2.1
+version: 3.0.0
 author: jwilger
 repository: jwilger/claude-code-plugins
 description: Interactive multi-stage SDLC configuration with progressive disclosure. Run this first before using any other skills.
@@ -16,7 +16,7 @@ allowed-tools: Bash, Write, AskUserQuestion, Read
 
 # Setup Skill
 
-**Version:** 2.2.1
+**Version:** 3.0.0
 **Portability:** Tool-specific
 
 ---
@@ -512,21 +512,205 @@ fi
 
 **If "Skip" selected:** Exit GitHub configuration, continue with rest of setup.
 
-After remote is confirmed, configure repository settings:
+After remote is confirmed, configure repository settings interactively:
+
+**Step 1: Get current repository settings**
 ```bash
-# Get repository name
 REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
 
-# Configure repository settings
-gh api -X PATCH "repos/$REPO" \
-  -f delete_branch_on_merge=true \
-  -f allow_squash_merge=true \
-  -f allow_merge_commit=true \
-  -f allow_rebase_merge=true
+# Get current settings
+CURRENT=$(gh api "repos/$REPO" --jq '{
+  delete_branch_on_merge,
+  allow_squash_merge,
+  allow_merge_commit,
+  allow_rebase_merge,
+  web_commit_signoff_required,
+  squash_merge_commit_title,
+  squash_merge_commit_message,
+  merge_commit_title,
+  merge_commit_message
+}')
+```
 
-# Set default PR title/body templates (create .github/pull_request_template.md if needed)
-mkdir -p .github
-cat > .github/pull_request_template.md <<'EOF'
+**Step 2: Discover available options via GraphQL**
+```bash
+# Get enum options for merge settings
+SQUASH_TITLE_OPTIONS=$(gh api graphql -f query='query { __type(name: "SquashMergeCommitTitle") { enumValues { name description } } }' --jq '.data.__type.enumValues')
+SQUASH_MSG_OPTIONS=$(gh api graphql -f query='query { __type(name: "SquashMergeCommitMessage") { enumValues { name description } } }' --jq '.data.__type.enumValues')
+MERGE_TITLE_OPTIONS=$(gh api graphql -f query='query { __type(name: "MergeCommitTitle") { enumValues { name description } } }' --jq '.data.__type.enumValues')
+MERGE_MSG_OPTIONS=$(gh api graphql -f query='query { __type(name: "MergeCommitMessage") { enumValues { name description } } }' --jq '.data.__type.enumValues')
+```
+
+**Step 3: Present configuration questions to user**
+
+Use AskUserQuestion with multiSelect for boolean options:
+```javascript
+{
+  "questions": [{
+    "question": "Which repository features would you like to enable?",
+    "header": "Features",
+    "multiSelect": true,
+    "options": [
+      {
+        "label": "Auto-delete branches after merge",
+        "description": "Automatically delete head branches when PRs are merged (delete_branch_on_merge)"
+      },
+      {
+        "label": "Require commit sign-off",
+        "description": "Require 'Signed-off-by' line in commit messages (web_commit_signoff_required)"
+      }
+    ]
+  }]
+}
+```
+
+Use AskUserQuestion for merge type selection:
+```javascript
+{
+  "questions": [{
+    "question": "Which merge types should be allowed?",
+    "header": "Merge Types",
+    "multiSelect": true,
+    "options": [
+      {
+        "label": "Squash merging",
+        "description": "Combine all commits into one (allow_squash_merge). Current: [current_value]"
+      },
+      {
+        "label": "Merge commits",
+        "description": "Standard merge with merge commit (allow_merge_commit). Current: [current_value]"
+      },
+      {
+        "label": "Rebase merging",
+        "description": "Rebase and merge commits (allow_rebase_merge). Current: [current_value]"
+      }
+    ]
+  }]
+}
+```
+
+Use AskUserQuestion for squash merge defaults (if squash merge enabled):
+```javascript
+{
+  "questions": [
+    {
+      "question": "Default title for squash merge commits?",
+      "header": "Squash Title",
+      "multiSelect": false,
+      "options": [
+        /* Dynamically generated from SQUASH_TITLE_OPTIONS */
+        {"label": "PR_TITLE", "description": "Use pull request's title"},
+        {"label": "COMMIT_OR_PR_TITLE", "description": "Use commit title (single commit) or PR title (multiple)"}
+      ]
+    },
+    {
+      "question": "Default message for squash merge commits?",
+      "header": "Squash Message",
+      "multiSelect": false,
+      "options": [
+        /* Dynamically generated from SQUASH_MSG_OPTIONS */
+        {"label": "PR_BODY", "description": "Use pull request's body"},
+        {"label": "COMMIT_MESSAGES", "description": "Use branch's commit messages"},
+        {"label": "BLANK", "description": "Use blank commit message"}
+      ]
+    }
+  ]
+}
+```
+
+Use AskUserQuestion for merge commit defaults (if merge commits enabled):
+```javascript
+{
+  "questions": [
+    {
+      "question": "Default title for merge commits?",
+      "header": "Merge Title",
+      "multiSelect": false,
+      "options": [
+        /* Dynamically generated from MERGE_TITLE_OPTIONS */
+        {"label": "PR_TITLE", "description": "Use pull request's title"},
+        {"label": "MERGE_MESSAGE", "description": "Use classic merge message format"}
+      ]
+    },
+    {
+      "question": "Default message for merge commits?",
+      "header": "Merge Message",
+      "multiSelect": false,
+      "options": [
+        /* Dynamically generated from MERGE_MSG_OPTIONS */
+        {"label": "PR_TITLE", "description": "Use pull request's title"},
+        {"label": "PR_BODY", "description": "Use pull request's body"},
+        {"label": "BLANK", "description": "Use blank commit message"}
+      ]
+    }
+  ]
+}
+```
+
+**Step 4: Optional - PR Template**
+```javascript
+{
+  "questions": [{
+    "question": "Would you like to create a pull request template?",
+    "header": "PR Template",
+    "multiSelect": false,
+    "options": [
+      {
+        "label": "Yes",
+        "description": "Create .github/pull_request_template.md with standard sections"
+      },
+      {
+        "label": "No",
+        "description": "Skip PR template creation"
+      }
+    ]
+  }]
+}
+```
+
+**Step 5: Optional - Branch Protection Rulesets**
+```javascript
+{
+  "questions": [{
+    "question": "Would you like to configure branch protection for main?",
+    "header": "Protection",
+    "multiSelect": false,
+    "options": [
+      {
+        "label": "Yes - Require pull requests",
+        "description": "Require PRs for all changes to main branch (recommended)"
+      },
+      {
+        "label": "Yes - Require reviews",
+        "description": "Require PRs with at least 1 approving review"
+      },
+      {
+        "label": "No",
+        "description": "Skip branch protection (can configure later)"
+      }
+    ]
+  }]
+}
+```
+
+**Step 6: Apply selected configuration**
+```bash
+# Build PATCH request with user's selections
+gh api -X PATCH "repos/$REPO" \
+  -f delete_branch_on_merge=$DELETE_BRANCH \
+  -f allow_squash_merge=$ALLOW_SQUASH \
+  -f allow_merge_commit=$ALLOW_MERGE \
+  -f allow_rebase_merge=$ALLOW_REBASE \
+  -f web_commit_signoff_required=$REQUIRE_SIGNOFF \
+  -f squash_merge_commit_title=$SQUASH_TITLE \
+  -f squash_merge_commit_message=$SQUASH_MESSAGE \
+  -f merge_commit_title=$MERGE_TITLE \
+  -f merge_commit_message=$MERGE_MESSAGE
+
+# Create PR template if requested
+if [ "$CREATE_PR_TEMPLATE" = "yes" ]; then
+  mkdir -p .github
+  cat > .github/pull_request_template.md <<'EOF'
 ## Summary
 <!-- Brief description of changes -->
 
@@ -536,9 +720,10 @@ cat > .github/pull_request_template.md <<'EOF'
 ## Related Issues
 <!-- Link to related issues/tickets -->
 EOF
+fi
 
-# Create branch protection ruleset (requires rulesets API)
-# Note: User needs admin access to configure rulesets
+# Create rulesets if requested
+# Note: Rulesets API requires admin access
 ```
 
 Separate question for output style (always choose one):
@@ -635,6 +820,18 @@ For complete implementation details, configuration schema, and error handling:
 ---
 
 ## Metadata
+
+**Version:** 3.0.0 (2026-02-05) - BREAKING: Interactive GitHub configuration
+- **BREAKING**: GitHub config now fully interactive via AskUserQuestion (no auto-apply)
+- Use dynamic API discovery via GraphQL introspection for enum options
+- Ask user for all configuration choices:
+  - Merge types (squash/merge/rebase)
+  - Default merge titles and messages (discovered via GraphQL)
+  - Branch deletion, commit sign-off
+  - PR template (optional, not automatic)
+  - Branch protection rulesets (optional)
+- Reduces maintenance burden - auto-discovers GitHub API options
+- Shows current values in option descriptions
 
 **Version:** 2.2.1 (2026-02-05):
 - Fix: Ask for repository name instead of assuming directory name
