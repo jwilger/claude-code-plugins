@@ -31,6 +31,8 @@ Guides you through 3 stages: Essential setup → Workflow choice → Advanced op
 ### Fastest Path
 ```bash
 /sdlc:setup
+# Or with template:
+/sdlc:setup --template=api-development
 
 # Stage 1 (30 seconds): Essential Setup
 #   ✓ Check git, gh CLI
