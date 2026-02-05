@@ -289,6 +289,8 @@ Use AskUserQuestion to gather preferences:
    - Skip
 
 **3c. Apply user's selections:**
+
+**Repository settings:**
 ```bash
 # Update repository settings based on user input
 gh api -X PATCH "repos/$REPO" \
@@ -301,8 +303,10 @@ gh api -X PATCH "repos/$REPO" \
   -f squash_merge_commit_message=$USER_SQUASH_MESSAGE \
   -f merge_commit_title=$USER_MERGE_TITLE \
   -f merge_commit_message=$USER_MERGE_MESSAGE
+```
 
-# Create PR template only if user requested
+**PR template (optional):**
+```bash
 if [ "$USER_CREATE_PR_TEMPLATE" = "yes" ]; then
   mkdir -p .github
   cat > .github/pull_request_template.md <<'EOF'
@@ -316,10 +320,94 @@ if [ "$USER_CREATE_PR_TEMPLATE" = "yes" ]; then
 <!-- Link to related issues/tickets -->
 EOF
 fi
-
-# Configure rulesets only if user requested
-# Note: Requires admin permissions on repository
 ```
+
+**CI workflow (optional):**
+```bash
+if [ "$USER_CREATE_CI" = "yes" ]; then
+  mkdir -p .github/workflows
+  cat > .github/workflows/ci.yml <<'EOF'
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Placeholder CI
+        run: echo "CI check passed - customize this workflow for your needs"
+EOF
+fi
+```
+
+**Comprehensive branch protection rulesets:**
+```bash
+if [ "$USER_CONFIGURE_PROTECTION" = "yes" ]; then
+  # Build comprehensive ruleset JSON
+  cat > /tmp/ruleset.json <<EOF
+{
+  "name": "Main Branch Protection",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": ["refs/heads/main"],
+      "exclude": []
+    }
+  },
+  "rules": [
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": $REVIEWS,
+        "dismiss_stale_reviews_on_push": $DISMISS_STALE,
+        "require_code_owner_review": $CODE_OWNERS,
+        "require_last_push_approval": $LAST_PUSH,
+        "required_review_thread_resolution": true
+      }
+    },
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "required_status_checks": [$CI_CHECKS],
+        "strict_required_status_checks_policy": $UP_TO_DATE
+      }
+    },
+    {
+      "type": "non_fast_forward",
+      "parameters": {}
+    }
+  ]
+}
+EOF
+
+  # Add optional rules based on user selections
+  # - required_signatures (if signed commits enabled)
+  # - deletion (if block deletion enabled)
+  # - required_linear_history (if linear history enabled)
+
+  # Create ruleset
+  gh api -X POST "repos/$REPO/rulesets" --input /tmp/ruleset.json
+  rm /tmp/ruleset.json
+fi
+```
+
+**Ruleset features based on user selections:**
+- **Signed commits** (all branches): `required_signatures` rule
+- **Pull request requirements**: Number of reviews, dismiss stale, code owners
+- **Branch updates**: Require up-to-date before merge
+- **CI/status checks**: Required checks to pass
+- **Force push protection**: `non_fast_forward` rule
+- **Deletion protection**: `deletion` rule
+- **Linear history**: `required_linear_history` rule
+
+Note: Rulesets API requires admin permissions on repository
 
 **Key Benefits of Dynamic Discovery:**
 - No hardcoded configuration options
@@ -416,10 +504,27 @@ git:
 # GitHub repository configuration
 github:
   repository_configured: true
+  repository: owner/repo-name
   delete_branch_on_merge: true
   allow_squash_merge: true
-  allow_merge_commit: true
-  allow_rebase_merge: true
+  allow_merge_commit: false
+  allow_rebase_merge: false
+  web_commit_signoff_required: false
+  squash_merge_commit_title: PR_TITLE
+  squash_merge_commit_message: PR_BODY
+  branch_protection:
+    main:
+      require_pull_request: true
+      required_approving_review_count: 1
+      dismiss_stale_reviews: true
+      require_code_owner_review: false
+      require_last_push_approval: false
+      require_up_to_date: true
+      require_ci: true
+      block_force_push: true
+      block_deletion: true
+      require_linear_history: false
+      require_signed_commits: true  # Applies to all branches
 
 # Output style
 output_style: sdlc-rules  # or: sdlc-marvin

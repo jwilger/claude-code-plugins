@@ -1,6 +1,6 @@
 ---
 name: setup
-version: 3.0.0
+version: 3.1.0
 author: jwilger
 repository: jwilger/claude-code-plugins
 description: Interactive multi-stage SDLC configuration with progressive disclosure. Run this first before using any other skills.
@@ -16,7 +16,7 @@ allowed-tools: Bash, Write, AskUserQuestion, Read
 
 # Setup Skill
 
-**Version:** 3.0.0
+**Version:** 3.1.0
 **Portability:** Tool-specific
 
 ---
@@ -669,24 +669,205 @@ Use AskUserQuestion for merge commit defaults (if merge commits enabled):
 ```
 
 **Step 5: Optional - Branch Protection Rulesets**
+
+Ask if user wants branch protection:
 ```javascript
 {
   "questions": [{
-    "question": "Would you like to configure branch protection for main?",
+    "question": "Would you like to configure branch protection?",
     "header": "Protection",
     "multiSelect": false,
     "options": [
       {
-        "label": "Yes - Require pull requests",
-        "description": "Require PRs for all changes to main branch (recommended)"
+        "label": "Yes - Configure rulesets",
+        "description": "Set up comprehensive branch protection rules (recommended)"
       },
       {
-        "label": "Yes - Require reviews",
-        "description": "Require PRs with at least 1 approving review"
+        "label": "No - Skip for now",
+        "description": "Skip branch protection (can configure later via GitHub)"
+      }
+    ]
+  }]
+}
+```
+
+**If "Yes", ask comprehensive ruleset questions:**
+
+**5a. Signed Commits (Repository-wide)**
+```javascript
+{
+  "questions": [{
+    "question": "Require signed commits on all branches?",
+    "header": "Signed Commits",
+    "multiSelect": false,
+    "options": [
+      {
+        "label": "Yes - Require signatures",
+        "description": "Require GPG/SSH signed commits on all branches (recommended for security)"
       },
       {
         "label": "No",
-        "description": "Skip branch protection (can configure later)"
+        "description": "Allow unsigned commits"
+      }
+    ]
+  }]
+}
+```
+
+**5b. Pull Request Requirements**
+```javascript
+{
+  "questions": [{
+    "question": "How many approving reviews should be required for PRs to main?",
+    "header": "Reviews",
+    "multiSelect": false,
+    "options": [
+      {
+        "label": "0 - No reviews required",
+        "description": "Allow merging without approval (solo projects)"
+      },
+      {
+        "label": "1 - Require 1 approval",
+        "description": "At least one approving review (recommended for teams)"
+      },
+      {
+        "label": "2 - Require 2 approvals",
+        "description": "Two approving reviews (high-stakes projects)"
+      }
+    ]
+  }]
+}
+```
+
+**5c. Review Settings**
+```javascript
+{
+  "questions": [{
+    "question": "Which review settings would you like to enable?",
+    "header": "Review Rules",
+    "multiSelect": true,
+    "options": [
+      {
+        "label": "Dismiss stale reviews on new commits",
+        "description": "Re-request approval when PR is updated (recommended)"
+      },
+      {
+        "label": "Require review from code owners",
+        "description": "Require approval from CODEOWNERS (if file exists)"
+      },
+      {
+        "label": "Require last push approval",
+        "description": "Require approval after the most recent push"
+      }
+    ]
+  }]
+}
+```
+
+**5d. Branch Update Requirements**
+```javascript
+{
+  "questions": [{
+    "question": "Require branches to be up to date before merging?",
+    "header": "Branch Updates",
+    "multiSelect": false,
+    "options": [
+      {
+        "label": "Yes - Require up to date",
+        "description": "Force branch updates before merge (prevents integration issues, recommended)"
+      },
+      {
+        "label": "No - Allow outdated branches",
+        "description": "Allow merging without updating (faster but riskier)"
+      }
+    ]
+  }]
+}
+```
+
+**5e. Status Checks (CI/CD)**
+```javascript
+{
+  "questions": [{
+    "question": "Require status checks (CI/CD) to pass before merging?",
+    "header": "CI Checks",
+    "multiSelect": false,
+    "options": [
+      {
+        "label": "Yes - Require CI to pass",
+        "description": "Block merging if CI fails (recommended)"
+      },
+      {
+        "label": "No - Skip CI requirement",
+        "description": "Allow merging without CI checks"
+      }
+    ]
+  }]
+}
+```
+
+**If CI required, ask about creating placeholder workflow:**
+```javascript
+{
+  "questions": [{
+    "question": "Would you like to create a placeholder CI workflow?",
+    "header": "CI Workflow",
+    "multiSelect": false,
+    "options": [
+      {
+        "label": "Yes - Create placeholder",
+        "description": "Create .github/workflows/ci.yml (passes by default, customize later)"
+      },
+      {
+        "label": "No - I'll create it myself",
+        "description": "Skip workflow creation"
+      }
+    ]
+  }]
+}
+```
+
+**If creating placeholder CI workflow:**
+```bash
+mkdir -p .github/workflows
+cat > .github/workflows/ci.yml <<'EOF'
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Placeholder CI
+        run: echo "CI check passed - customize this workflow for your needs"
+EOF
+```
+
+**5f. Force Push and Deletion**
+```javascript
+{
+  "questions": [{
+    "question": "Which restrictions should apply to the main branch?",
+    "header": "Restrictions",
+    "multiSelect": true,
+    "options": [
+      {
+        "label": "Block force pushes (Recommended)",
+        "description": "Prevent git push --force to main branch"
+      },
+      {
+        "label": "Block branch deletion (Recommended)",
+        "description": "Prevent main branch from being deleted"
+      },
+      {
+        "label": "Require linear history",
+        "description": "Prevent merge commits (only allow squash/rebase)"
       }
     ]
   }]
@@ -694,6 +875,8 @@ Use AskUserQuestion for merge commit defaults (if merge commits enabled):
 ```
 
 **Step 6: Apply selected configuration**
+
+**6a. Apply repository settings:**
 ```bash
 # Build PATCH request with user's selections
 gh api -X PATCH "repos/$REPO" \
@@ -706,8 +889,10 @@ gh api -X PATCH "repos/$REPO" \
   -f squash_merge_commit_message=$SQUASH_MESSAGE \
   -f merge_commit_title=$MERGE_TITLE \
   -f merge_commit_message=$MERGE_MESSAGE
+```
 
-# Create PR template if requested
+**6b. Create PR template (if requested):**
+```bash
 if [ "$CREATE_PR_TEMPLATE" = "yes" ]; then
   mkdir -p .github
   cat > .github/pull_request_template.md <<'EOF'
@@ -721,10 +906,103 @@ if [ "$CREATE_PR_TEMPLATE" = "yes" ]; then
 <!-- Link to related issues/tickets -->
 EOF
 fi
-
-# Create rulesets if requested
-# Note: Rulesets API requires admin access
 ```
+
+**6c. Create CI workflow (if requested):**
+```bash
+if [ "$CREATE_CI_WORKFLOW" = "yes" ]; then
+  mkdir -p .github/workflows
+  cat > .github/workflows/ci.yml <<'EOF'
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Placeholder CI
+        run: echo "CI check passed - customize this workflow for your needs"
+EOF
+fi
+```
+
+**6d. Create comprehensive ruleset (if branch protection enabled):**
+```bash
+if [ "$CONFIGURE_PROTECTION" = "yes" ]; then
+  # Build ruleset JSON based on user selections
+  cat > /tmp/ruleset.json <<EOF
+{
+  "name": "Main Branch Protection",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": ["refs/heads/main"],
+      "exclude": []
+    }
+  },
+  "rules": [
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": $REQUIRED_REVIEWS,
+        "dismiss_stale_reviews_on_push": $DISMISS_STALE,
+        "require_code_owner_review": $REQUIRE_CODE_OWNERS,
+        "require_last_push_approval": $REQUIRE_LAST_PUSH,
+        "required_review_thread_resolution": true
+      }
+    },
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "required_status_checks": [
+          $(if [ "$REQUIRE_CI" = "yes" ]; then echo '{"context": "CI"}'; fi)
+        ],
+        "strict_required_status_checks_policy": $REQUIRE_UP_TO_DATE
+      }
+    },
+    {
+      "type": "non_fast_forward",
+      "parameters": {}
+    }
+  ]
+}
+EOF
+
+  # Add signed commits rule if enabled (applies to all branches)
+  if [ "$REQUIRE_SIGNED" = "yes" ]; then
+    # Add to ruleset rules
+    jq '.rules += [{"type": "required_signatures", "parameters": {}}]' /tmp/ruleset.json > /tmp/ruleset-updated.json
+    mv /tmp/ruleset-updated.json /tmp/ruleset.json
+  fi
+
+  # Add deletion protection if enabled
+  if [ "$BLOCK_DELETION" = "yes" ]; then
+    jq '.rules += [{"type": "deletion", "parameters": {}}]' /tmp/ruleset.json > /tmp/ruleset-updated.json
+    mv /tmp/ruleset-updated.json /tmp/ruleset.json
+  fi
+
+  # Add linear history if enabled
+  if [ "$REQUIRE_LINEAR" = "yes" ]; then
+    jq '.rules += [{"type": "required_linear_history", "parameters": {}}]' /tmp/ruleset.json > /tmp/ruleset-updated.json
+    mv /tmp/ruleset-updated.json /tmp/ruleset.json
+  fi
+
+  # Create ruleset via API
+  gh api -X POST "repos/$REPO/rulesets" --input /tmp/ruleset.json
+
+  # Clean up
+  rm /tmp/ruleset.json
+fi
+```
+
+**Note:** Rulesets API requires admin access to the repository.
 
 Separate question for output style (always choose one):
 ```javascript
@@ -820,6 +1098,19 @@ For complete implementation details, configuration schema, and error handling:
 ---
 
 ## Metadata
+
+**Version:** 3.1.0 (2026-02-05) - Comprehensive branch protection
+- Add comprehensive ruleset configuration questions:
+  - Signed commits on all branches (repository-wide)
+  - Number of required approving reviews (0, 1, or 2)
+  - Review settings (dismiss stale, code owners, last push approval)
+  - Require branch up-to-date before merge
+  - CI/status check requirements
+  - Placeholder CI workflow creation (.github/workflows/ci.yml)
+  - Force push and deletion restrictions
+  - Linear history requirement
+- Create complete rulesets via GitHub Rulesets API
+- Save all settings to .claude/sdlc.yaml for reference
 
 **Version:** 3.0.0 (2026-02-05) - BREAKING: Interactive GitHub configuration
 - **BREAKING**: GitHub config now fully interactive via AskUserQuestion (no auto-apply)
