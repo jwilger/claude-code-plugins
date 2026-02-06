@@ -8,6 +8,7 @@ description: >
   "add a story", "break down this feature", "what's ready to work on",
   "show task status", "dot add", "dot ls", "dot ready", "dot tree", or any
   reference to the dot CLI or .dots/ directory.
+allowed-tools: Bash(dot *)
 ---
 
 # Task Management with dot CLI

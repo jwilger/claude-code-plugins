@@ -12,6 +12,7 @@ tags:
   - grep
 portability: high
 dependencies: []
+allowed-tools: Bash(grep *), Bash(find *), Bash(ls *), Bash(cat *), Bash(mkdir *)
 ---
 
 # Memory Protocol

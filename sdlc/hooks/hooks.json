@@ -1,17 +1,6 @@
 {
   "hooks": {
-    "Stop": [
-    {
-      "hooks": [
-        {
-          "type": "prompt",
-          "prompt": "INCOMPLETE TODO DETECTION - WORK COMPLETION ENFORCEMENT\n\nYou are evaluating whether Claude should stop working. Your job is to determine if there are incomplete todo items that Claude should still be working on.\n\n## What to Check\n\nLook for evidence of an active todo list with items that are NOT completed:\n- Items marked as `pending` or `in_progress`\n- Tasks that were mentioned but not finished\n- Explicit TODO markers in the conversation\n- User requests that were acknowledged but not fulfilled\n\n## When to BLOCK Stopping\n\nBlock if ANY of these are true:\n- There are `pending` or `in_progress` items in a TodoWrite todo list\n- Claude mentioned it would do something but hasn't done it yet\n- A multi-step task was started but not all steps were completed\n- The user asked for multiple things and not all were addressed\n\n## When to ALLOW Stopping\n\nAllow stopping if:\n- All todo items are marked `completed`\n- Claude is waiting for user input (asked a question via AskUserQuestion)\n- Claude explicitly needs clarification before proceeding\n- The task is genuinely complete\n- Claude encountered a blocking error that requires user intervention\n\n## Response Format\n\nRespond with JSON:\n- To allow stopping: {\"ok\": true}\n- To block stopping: {\"ok\": false, \"reason\": \"You have incomplete todo items: [list them]. Continue working on these tasks.\"}\n\nBe specific in the reason - list exactly which items remain incomplete so Claude knows what to work on next.",
-          "timeout": 60
-        }
-      ]
-    }
-  ],
-  "PreToolUse": [
+    "PreToolUse": [
     {
       "matcher": "Bash(gh api *)",
       "hooks": [
