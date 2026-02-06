@@ -29,7 +29,6 @@ hooks:
             - File is workflow overview or slice documentation
 
             ❌ BLOCK if:
-            - ADR files (docs/adr/*) - Use sdlc:adr agent
             - ARCHITECTURE.md - Use sdlc:design-facilitator or sdlc:architect
             - Test files, production code, or config files
 
@@ -52,7 +51,6 @@ hooks:
             - Creating slice docs: docs/event_model/workflows/<name>/slices/<slice>.md
 
             ❌ BLOCK if:
-            - ADR files (docs/adr/*) - Use sdlc:adr agent
             - ARCHITECTURE.md - Use sdlc:design-facilitator or sdlc:architect
             - Any other file
 

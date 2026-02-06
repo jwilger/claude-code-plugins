@@ -28,11 +28,8 @@ hooks:
             2. Check the path:
                - ALLOW if path is exactly: docs/ARCHITECTURE.md
                - ALLOW if path ends with: ARCHITECTURE.md (and is in docs/ directory)
-               - BLOCK if path matches: docs/adr/* (ADRs are archival - use sdlc:adr agent)
                - BLOCK if path matches: docs/event_model/* (use design agents)
                - BLOCK if path is any other file
-
-            CRITICAL: ADRs are archival documents. The architect must NEVER edit ADRs.
 
             Respond QUICKLY - this is a simple path check.
 
@@ -52,7 +49,7 @@ hooks:
             Steps:
             1. Extract file_path from the tool_input
             2. ALLOW if path is: docs/ARCHITECTURE.md
-            3. BLOCK for any other path (ADRs, event models, code, etc.)
+            3. BLOCK for any other path (event models, code, etc.)
 
             Respond QUICKLY - this is a simple path check.
 
@@ -128,10 +125,7 @@ For each risk:
 
 **CRITICAL: Use ONLY docs/ARCHITECTURE.md as your reference.**
 
-ADRs exist solely to preserve decision context for when we might reconsider a decision in the future. They are archival documents. You should:
-- NEVER reference ADRs by number in reviews, comments, or dot tasks
-- NEVER cite ADRs as justification (cite ARCHITECTURE.md instead)
-- NEVER suggest reading ADRs as part of implementation work
+ARCHITECTURE.md is the authoritative source. For decision history, use `git log`/`git blame` on ARCHITECTURE.md or review ADR PRs (labeled `adr`).
 
 Check alignment with:
 - **docs/ARCHITECTURE.md** (the ONLY authoritative source for current architecture)

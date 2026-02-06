@@ -25,8 +25,7 @@ hooks:
             Steps:
             1. Extract file_path from the tool_input
             2. Check path-based indicators FIRST (fast path):
-               - BLOCK if path matches: docs/adr/* (Use sdlc:adr agent)
-               - BLOCK if path matches: *ARCHITECTURE.md (Use sdlc:architect)
+               - BLOCK if path matches: *ARCHITECTURE.md (Use sdlc:architect or sdlc:adr)
                - BLOCK if path matches: docs/event_model/* (Use design agents)
                - BLOCK if path contains: tests/, __tests__/, spec/, test/ or matches test file patterns (Use sdlc:red)
                - BLOCK if path is in: src/, lib/, app/ with code file extensions (Use sdlc:green or sdlc:domain)
@@ -55,7 +54,7 @@ hooks:
             Steps:
             1. Extract file_path from the tool_input
             2. Check path-based indicators FIRST:
-               - BLOCK if path matches: docs/adr/*, *ARCHITECTURE.md, docs/event_model/*
+               - BLOCK if path matches: *ARCHITECTURE.md, docs/event_model/*
                - BLOCK if path matches test file or test directory patterns
                - BLOCK if path is production code in src/, lib/, app/
             3. If ambiguous, examine the content being written:
@@ -88,7 +87,7 @@ Defer to specialized agents for:
 - **Test files** → `sdlc:red` agent
 - **Production implementation code** → `sdlc:green` agent
 - **Domain types and models** → `sdlc:domain` agent
-- **Architecture Decision Records** → `sdlc:adr` agent
+- **Architecture decisions (ARCHITECTURE.md)** → `sdlc:adr` agent
 - **GWT scenarios** → `sdlc:gwt` agent
 
 If you receive a task that belongs to a specialized agent, report this back to the main conversation so it can delegate correctly.

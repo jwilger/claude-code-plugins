@@ -28,7 +28,6 @@ hooks:
             - File is a slice document where GWT scenarios are added
 
             ❌ BLOCK if:
-            - ADR files (docs/adr/*) - Use sdlc:adr agent
             - ARCHITECTURE.md - Use sdlc:design-facilitator or sdlc:architect
             - Test files, production code, or config files
 
@@ -49,7 +48,6 @@ hooks:
             - Path matches: docs/event_model/**/*
 
             ❌ BLOCK if:
-            - ADR files (docs/adr/*) - Use sdlc:adr agent
             - ARCHITECTURE.md - Use sdlc:design-facilitator or sdlc:architect
             - Any other file
 

@@ -30,13 +30,12 @@ hooks:
             - Path is: docs/ARCHITECTURE.md
 
             ❌ BLOCK if:
-            - ADR files (docs/adr/*) - Delegate via /sdlc:adr command instead
             - Event model files (docs/event_model/*) - Use design agents (discovery, workflow-designer, gwt, model-checker)
             - Test files, production code, or other files
 
             Respond with JSON:
             {"ok": true} - if this is ARCHITECTURE.md
-            {"ok": false, "reason": "sdlc:design-facilitator can only edit ARCHITECTURE.md directly. For ADRs, use /sdlc:adr command."} - if not
+            {"ok": false, "reason": "sdlc:design-facilitator can only edit ARCHITECTURE.md. Use appropriate agent for this file."} - if not
     - matcher: Write
       hooks:
         - type: prompt
@@ -52,13 +51,12 @@ hooks:
             - Path is: docs/ARCHITECTURE.md
 
             ❌ BLOCK if:
-            - ADR files (docs/adr/*) - Delegate via /sdlc:adr command instead
             - Event model files (docs/event_model/*) - Use design agents
             - Any other file
 
             Respond with JSON:
             {"ok": true} - if this is ARCHITECTURE.md
-            {"ok": false, "reason": "sdlc:design-facilitator can only create ARCHITECTURE.md directly. For ADRs, use /sdlc:adr command."} - if not
+            {"ok": false, "reason": "sdlc:design-facilitator can only create ARCHITECTURE.md. Use appropriate agent for this file."} - if not
 ---
 
 # SDLC Design Facilitator Agent
@@ -125,7 +123,7 @@ For each decision point:
 1. **Present Context**: What problem does this decision solve?
 2. **Present Options**: 2-4 realistic alternatives with clear tradeoffs
 3. **Ask User**: Use AskUserQuestion for their preference
-4. **Create ADR**: After decision, use Bash to run: `/sdlc:adr decide <topic>`
+4. **Record Decision**: After decision, use `/sdlc:adr decide <topic>` to update ARCHITECTURE.md and create an ADR PR
 
 **Example Facilitation**:
 
@@ -138,17 +136,7 @@ Options:
 - "MongoDB" - Schema flexibility, good for documents. No cross-collection transactions.
 ```
 
-After user chooses, create the ADR:
-```bash
-# The /sdlc:adr command will guide through ADR creation
-```
-
-### 4. Synthesize Architecture
-
-After all decisions are made and ADRs accepted:
-
-1. Run `/sdlc:adr synthesize` to create/update `docs/ARCHITECTURE.md`
-2. Store summary using `/sdlc:remember` for future reference
+After user chooses, `/sdlc:adr decide <topic>` handles both the ARCHITECTURE.md update and ADR PR creation.
 
 ### 5. Output Format
 
@@ -180,8 +168,8 @@ Key Decisions Summary:
 Next step:
   /sdlc:plan - Create dot tasks from event model slices
 
-Note: ADRs were created in docs/adr/ to preserve decision context.
-      These are archival records - consult only when reconsidering decisions.
+Note: Each decision has a corresponding ADR PR (labeled 'adr').
+      Merge to accept, close to reject.
       For current architecture, ALWAYS use docs/ARCHITECTURE.md.
 ```
 

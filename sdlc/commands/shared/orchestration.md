@@ -11,21 +11,15 @@ The main conversation is an **orchestrator only**. It coordinates work but never
 
 The orchestrator coordinates work through specialized agents, each with a focused responsibility. Task dependencies enforce workflow discipline mechanically - no manual confirmation gates needed.
 
-## ADR Isolation Principle (CRITICAL)
+## Architecture Source of Truth
 
-**ADRs are archival documents.** They exist ONLY to preserve the context of WHY decisions were made, for use when we might reconsider those decisions in the future.
+**ARCHITECTURE.md is THE authoritative source for current architecture.**
 
-**NEVER reference ADRs in:**
-- GitHub issues or PRs
-- Code comments
-- Review feedback
-- Story/slice documentation
-- Implementation guidance
-- Any day-to-day work output
+When decision context is needed (why a decision was made), use `git log` or `git blame`
+on ARCHITECTURE.md, or review the ADR PRs (labeled `adr` on GitHub).
 
-**ALWAYS reference ARCHITECTURE.md instead** - it is THE authoritative source for current architecture.
-
-The ONLY time ADRs should be consulted is when someone is actively considering changing an architectural decision and needs to understand why the original decision was made.
+Do NOT reference ADR PRs in day-to-day work (issues, code comments, reviews).
+Reference ARCHITECTURE.md instead.
 
 ## Git Operation Protocol (MANDATORY)
 
@@ -65,7 +59,7 @@ The main conversation **MUST NEVER** use Write or Edit tools directly. All file 
 | Test files | `sdlc:red` | All test code, assertions, test fixtures |
 | Implementation code | `sdlc:green` | Production code that makes tests pass |
 | Domain types/models | `sdlc:domain` | Type definitions, domain entities |
-| ADRs | `sdlc:adr` | Architecture Decision Records |
+| Architecture decisions | `sdlc:adr` | docs/ARCHITECTURE.md (via PR) |
 | GWT scenarios | `sdlc:gwt` | Given/When/Then acceptance criteria |
 | Everything else | `sdlc:file-updater` | Config, docs, scripts, tooling |
 
@@ -79,7 +73,7 @@ When the user requests a change, classify it:
 | "Make the test pass" | `sdlc:green` | "Implement the handler" |
 | "Create a type for..." | `sdlc:domain` | "Add an Email type" |
 | "Update the config" | `sdlc:file-updater` | "Change the timeout setting" |
-| "Record a decision" | `sdlc:adr` | "We chose PostgreSQL" |
+| "Record a decision" | `sdlc:adr` | "We chose PostgreSQL" (creates ADR PR) |
 
 ## TDD Workflow
 

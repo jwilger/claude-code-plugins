@@ -76,7 +76,7 @@ await TaskUpdate({
 | Test files | `sdlc:red` | *_test.rs, *.test.ts, test_*.py, *_spec.rb |
 | Production code | `sdlc:green` | src/, lib/, app/ implementation |
 | Type definitions | `sdlc:domain` | Struct/enum/trait signatures only |
-| ADRs | `sdlc:adr` | docs/adr/*.md |
+| Architecture decisions | `sdlc:adr` | docs/ARCHITECTURE.md (via PR) |
 | Event models | `sdlc:discovery`, `sdlc:workflow-designer`, `sdlc:gwt` | docs/event_model/** |
 | Architecture | `sdlc:architect` | docs/ARCHITECTURE.md |
 | Everything else | `sdlc:file-updater` | Config, scripts, general docs |

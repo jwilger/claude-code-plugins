@@ -29,7 +29,6 @@ hooks:
             - File is domain overview or workflow documentation
 
             ❌ BLOCK if:
-            - ADR files (docs/adr/*) - Use sdlc:adr agent
             - ARCHITECTURE.md - Use sdlc:design-facilitator or sdlc:architect
             - Test files, production code, or config files
 
@@ -51,7 +50,6 @@ hooks:
             - Creating domain overview: docs/event_model/domain/overview.md
 
             ❌ BLOCK if:
-            - ADR files (docs/adr/*) - Use sdlc:adr agent
             - ARCHITECTURE.md - Use sdlc:design-facilitator or sdlc:architect
             - Any other file
 

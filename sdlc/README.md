@@ -2,7 +2,7 @@
 
 **Complete Software Development Lifecycle workflow for Claude Code**
 
-Integrates TDD, Event Modeling, Architecture Decision Records, local task management with dot CLI, and the Marvin personality into a cohesive development experience.
+Integrates TDD, Event Modeling, Architecture Decisions, local task management with dot CLI, and the Marvin personality into a cohesive development experience.
 
 ---
 
@@ -76,7 +76,7 @@ Integrates TDD, Event Modeling, Architecture Decision Records, local task manage
 | `/sdlc:complete` | Complete task after PR merge | After PR merges |
 | `/sdlc:review` | Handle PR review feedback | Review cycle |
 | `/sdlc:design` | Event Modeling facilitation | Design phase |
-| `/sdlc:adr` | Create Architecture Decision Record | Document decisions |
+| `/sdlc:adr` | Record architecture decision (creates PR) | Document decisions |
 | `/sdlc:plan` | Create tasks from event model slices | After design |
 | `/sdlc:start` | Auto-detect phase and route | Entry point |
 | `/sdlc:remember` | Store knowledge in auto memory | Learning |
@@ -122,7 +122,7 @@ Integrates TDD, Event Modeling, Architecture Decision Records, local task manage
 |-------|------|--------|
 | **architect** | Review technical complexity | `docs/ARCHITECTURE.md` |
 | **design-facilitator** | Guide architecture decisions | Coordinates architecture work |
-| **adr** | Document decisions | `docs/adr/NNNN-title.md` |
+| **adr** | Record architecture decisions | `docs/ARCHITECTURE.md` (via ADR PR) |
 
 ### Review Agents
 
@@ -421,10 +421,7 @@ project/
 ├── .claude/
 │   └── sdlc.yaml              # Plugin configuration
 ├── docs/
-│   ├── ARCHITECTURE.md         # Current architecture
-│   ├── adr/                    # Architecture Decision Records
-│   │   ├── 0001-use-postgres.md
-│   │   └── 0002-event-sourcing.md
+│   ├── ARCHITECTURE.md         # Current architecture (ADR PRs on GitHub)
 │   └── event_model/            # Event Modeling artifacts
 │       ├── discovery.md
 │       └── workflows/

@@ -36,7 +36,7 @@ Design event model workflows following Martin Dilger's "Understanding Eventsourc
 - `workflow [name]` - Design a specific workflow (creates PR)
 - `gwt <workflow-name>` - Generate GWT scenarios for a workflow
 - `validate` - Validate the complete event model
-- `arch` - Make architecture decisions (creates ARCHITECTURE.md via ADRs)
+- `arch` - Make architecture decisions (creates ARCHITECTURE.md with ADR PRs)
 - `design-system` - Create/update the design system using Atomic Design methodology
 - (no args) - Resume where you left off or start discovery
 
@@ -187,7 +187,7 @@ Use the `sdlc:design-facilitator` agent to facilitate architectural decisions:
 3. Integration Approaches
 4. Cross-Cutting Concerns
 
-For EACH significant decision: present options with tradeoffs, after user decides create ADR via `/sdlc:adr decide <topic>`, wait for user to accept ADR. After all decisions made, run `/sdlc:adr synthesize` to create/update ARCHITECTURE.md.
+For EACH significant decision: present options with tradeoffs, after user decides use `/sdlc:adr decide <topic>`. This updates ARCHITECTURE.md directly and creates an ADR PR.
 
 **Output**:
 ```
@@ -198,7 +198,7 @@ Architecture Document: docs/ARCHITECTURE.md (THE authoritative source)
 Next step:
   /sdlc:plan - Create GitHub issues from event model slices
 
-Note: Decision context preserved in docs/adr/ (archival - consult only when reconsidering decisions).
+Note: Each decision has a corresponding ADR PR (labeled 'adr'). Merge to accept, close to reject.
 ```
 
 #### `design-system`
