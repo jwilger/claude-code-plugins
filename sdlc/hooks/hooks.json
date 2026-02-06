@@ -17,7 +17,7 @@
       "hooks": [
         {
           "type": "command",
-          "command": ".claude-plugin/hooks/gh-api-check.sh"
+          "command": "${CLAUDE_PLUGIN_ROOT}/.claude-plugin/hooks/gh-api-check.sh"
         }
       ]
     }
@@ -53,7 +53,7 @@
       "hooks": [
         {
           "type": "command",
-          "command": ".claude-plugin/hooks/session-start.sh"
+          "command": "${CLAUDE_PLUGIN_ROOT}/.claude-plugin/hooks/session-start.sh"
         }
       ]
     }
@@ -63,7 +63,7 @@
       "hooks": [
         {
           "type": "command",
-          "command": ".claude-plugin/hooks/pre-compact.sh"
+          "command": "${CLAUDE_PLUGIN_ROOT}/.claude-plugin/hooks/pre-compact.sh"
         }
       ]
     }
@@ -74,7 +74,7 @@
       "hooks": [
         {
           "type": "command",
-          "command": ".claude-plugin/hooks/subagent-start-context.sh"
+          "command": "${CLAUDE_PLUGIN_ROOT}/.claude-plugin/hooks/subagent-start-context.sh"
         }
       ]
     }

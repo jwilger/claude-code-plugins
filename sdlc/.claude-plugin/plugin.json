@@ -24,7 +24,6 @@
     "./commands/recall.md",
     "./commands/domain-audit.md"
   ],
-  "hooks": ".claude-plugin/hooks.json",
   "agents": [
     "./agents/red.md",
     "./agents/green.md",
