@@ -91,7 +91,7 @@ Helps you select and begin work on a task, creating the proper git branch/worktr
 
 !`bash -c "echo '**PR Status:** ' && gh pr view --json number,title,url 2>/dev/null | jq -r '\"#\\(.number) - \\(.title)\\n\\(.url)\"' || echo 'No active PR'"`!
 
-!`bash -c "BRANCH=\\$(git branch --show-current 2>/dev/null) && if [[ -n \\\"\\$BRANCH\\\" ]]; then TASK_ID=\\\"\\${BRANCH#feature/}\\\"; echo '**Active Task:** ' && dot task show \\\"\\$TASK_ID\\\" 2>/dev/null | grep -E '^(ID|Title|Status):' || echo 'No task found'; fi"`!
+!`bash -c "BRANCH=\$(git branch --show-current 2>/dev/null) && if [[ -n \"\$BRANCH\" ]]; then TASK_ID=\"\${BRANCH#feature/}\"; echo '**Active Task:** ' && dot task show \"\$TASK_ID\" 2>/dev/null | grep -E '^(ID|Title|Status):' || echo 'No task found'; fi"`!
 
 ---
 

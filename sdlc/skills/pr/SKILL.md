@@ -75,7 +75,7 @@ Runs three-stage code review, enforces mutation testing, and creates/updates Git
 
 !`bash -c "echo '**Branch:** ' && git branch --show-current 2>/dev/null || echo 'No branch'"`!
 
-!`bash -c "echo '**Commits since base:** ' && BASE=\\$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null | sed 's|origin/||') && git log \\$BASE..HEAD --oneline 2>/dev/null | wc -l || echo '0'"`!
+!`bash -c "echo '**Commits since base:** ' && BASE=\$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null | sed 's|origin/||') && git log \$BASE..HEAD --oneline 2>/dev/null | wc -l || echo '0'"`!
 
 !`bash -c "echo '**Recent commits:** ' && git log --oneline -3 2>/dev/null || echo 'No commits'"`!
 
