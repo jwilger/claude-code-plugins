@@ -1,5 +1,21 @@
 # SDLC Plugin Changelog
 
+## [15.0.0] - 2026-02-05
+
+### 💥 Breaking Changes
+
+- **plan skill**: Now creates dots (development tasks) via `dot` CLI instead of GitHub issues
+  - Changed from `gh issue create` to `dot add` commands
+  - Dependencies now use `dot -a` (after) flag instead of GitHub issue relationships
+  - This aligns with the documented workflow in `docs/task-management/`
+  - To migrate: Use `dot ls` to view tasks, `dot ready` to see unblocked work
+
+### 📝 Changed
+
+- Updated `/sdlc:plan` skill documentation to reflect dot-based workflow
+- Changed plugin description from "GitHub integration" to "dot-based planning"
+- Updated keywords: replaced "github" with "dot-cli"
+
 ## [10.0.0] - 2026-02-05
 
 ### 🎯 Major Release: Context Preservation & Learning Agents

@@ -1,40 +1,40 @@
 ---
 name: plan
-version: 1.1.0
+version: 2.0.0
 author: jwilger
 repository: jwilger/claude-code-plugins
-description: Convert event model slices to GitHub issues with dependencies. Use after Event Modeling to create implementation tasks.
+description: Convert event model slices to development tasks (dots) with dependencies. Use after Event Modeling to create implementation plan.
 tags:
   - workflow
   - planning
-  - github
+  - dot-cli
   - event-modeling
 portability: tool-specific
 dependencies:
   - event-modeling
-  - github-issues
+  - dot-cli
 allowed-tools: Bash, Read, Grep
 ---
 
 # Plan Skill
 
-**Version:** 1.1.0
-**Portability:** Tool-specific (requires gh CLI, dot CLI)
+**Version:** 2.0.0
+**Portability:** Tool-specific (requires dot CLI)
 
 ---
 
 ## Quick Start
 
-Create tasks from event model in under 5 minutes.
+Create development tasks from event model in under 5 minutes.
 
 ### What This Does
-Reads event model slices and creates GitHub issues with proper dependencies.
+Reads event model slices and creates development tasks (dots) with proper dependencies.
 
 ### Fastest Path
 1. Complete Event Modeling (`/sdlc:specify`)
 2. Run `/sdlc:plan`
-3. Creates issues for each slice
-4. Sets up dependency graph
+3. Creates dots for each slice
+4. Sets up dependency graph (`-a` flag)
 5. Ready for `/sdlc:work`
 
 ### Basic Example
@@ -43,17 +43,15 @@ Reads event model slices and creates GitHub issues with proper dependencies.
 
 # Reads: docs/event_model/workflows/*/slices/*.md
 #
-# Creates issues:
-# - myproject-user-registration-slice1
-# - myproject-user-registration-slice2
-# - myproject-user-registration-slice3
-#
-# Sets dependencies (slice2 blocks slice3, etc.)
+# Creates dots:
+# myproject-user-registration-slice1 (priority 1)
+# myproject-user-registration-slice2 (priority 2, after slice1)
+# myproject-user-registration-slice3 (priority 3, after slice2)
 #
 # Output:
-# ✓ Created 12 issues
+# ✓ Created 12 dots
 # ✓ Dependencies configured
-# Ready: /sdlc:work
+# Ready: dot ready (or /sdlc:work)
 ```
 
 ---
@@ -63,12 +61,12 @@ Reads event model slices and creates GitHub issues with proper dependencies.
 ### Example 1: Full Event Model
 **When:** Complete event model, need tasks
 **Invoke:** `/sdlc:plan`
-**Result:** All slices → issues with dependencies
+**Result:** All slices → dots with dependencies
 
 ### Example 2: Single Workflow
 **When:** One workflow designed
 **Invoke:** `/sdlc:plan <workflow-name>`
-**Result:** Issues for that workflow only
+**Result:** Dots for that workflow only
 
 ---
 
@@ -81,12 +79,13 @@ Reads event model slices and creates GitHub issues with proper dependencies.
 
 **Don't use when:**
 - No event model (run `/sdlc:specify` first)
-- Tasks already exist
-- Not using Event Modeling (create issues manually)
+- Tasks already exist (check with `dot ls`)
+- Not using Event Modeling (create dots manually with `dot add`)
 
 **Related:**
 - `/sdlc:specify` - Create event model
 - `/sdlc:work` - Start implementation
+- `dot ready` - See unblocked tasks
 
 ---
 
@@ -95,9 +94,9 @@ Reads event model slices and creates GitHub issues with proper dependencies.
 Claude automatically invokes this skill when you say:
 - "Create tasks from the event model"
 - "Let's plan the implementation"
-- "Generate GitHub issues"
+- "Create the development plan"
 - "Convert workflows to tasks"
-- "I'm ready to create tasks"
+- "I'm ready to create dots"
 
 You don't need to type `/sdlc:plan` explicitly - Claude will detect these requests and invoke the skill for you.
 
@@ -105,6 +104,6 @@ You don't need to type `/sdlc:plan` explicitly - Claude will detect these reques
 
 ## Metadata
 
-**Version:** 1.1.0 (2026-02-05): Progressive disclosure
-**Dependencies:** event-modeling, github-issues
-**Portability:** Tool-specific (gh, dot required)
+**Version:** 2.0.0 (2026-02-05): Use dot CLI instead of GitHub issues
+**Dependencies:** event-modeling, dot-cli
+**Portability:** Tool-specific (dot required)
