@@ -1,6 +1,6 @@
 {
   "name": "sdlc",
-  "version": "17.0.0",
+  "version": "17.0.1",
   "description": "Complete SDLC workflow with TDD, Event Modeling, ADRs, and GitHub integration",
   "author": {
     "name": "John Wilger",
@@ -24,6 +24,7 @@
     "./commands/recall.md",
     "./commands/domain-audit.md"
   ],
+  "hooks": ".claude-plugin/hooks.json",
   "agents": [
     "./agents/red.md",
     "./agents/green.md",
