@@ -17,25 +17,9 @@ Use the Task tool to launch agents with proper context. Agents have zero memory 
 ---
 ---
 
-## Task-Based Workflow (v7.0.0)
+## Task-Based Workflow
 
-### Session Task Creation
-
-**Story-level task:** Created by `/sdlc:work` if `session_task_tracking: true`
-
-```javascript
-const storyTask = await TaskCreate({
-  subject: "Work on: Add user authentication",
-  description: "Story: myproject-add-auth-abc123\nWorktree: ../worktrees/myproject-add-auth-abc123\n\nAcceptance Criteria:\n...",
-  activeForm: "Working on story",
-  metadata: { dotTaskId: "myproject-add-auth-abc123", type: "story-session" }
-});
-await TaskUpdate({ taskId: storyTask.id, status: "in_progress" });
-```
-
-### TDD Cycle Tasks (On-Demand)
-
-**Create these when user is ready to implement**, not upfront:
+Use task dependencies to enforce TDD cycle mechanically:
 
 ```javascript
 // Red phase
@@ -43,14 +27,14 @@ const redTask = await TaskCreate({
   subject: "Write failing test for user auth",
   description: "ONE test, ONE assertion",
   activeForm: "Writing failing test",
-  metadata: { phase: "red", storyTaskId: storyTask.id }
+  metadata: { phase: "red", feature: "auth" }
 });
 
 // Domain review (blocked by red)
 const domainTask = await TaskCreate({
-  subject: "Review test and create types",
+  subject: "Create domain types",
   description: "Review test, create needed types with unimplemented!() stubs",
-  activeForm: "Reviewing test design",
+  activeForm: "Creating domain types",
   metadata: { phase: "domain-after-red" }
 });
 await TaskUpdate({
@@ -60,7 +44,7 @@ await TaskUpdate({
 
 // Green phase (blocked by domain)
 const greenTask = await TaskCreate({
-  subject: "Implement user auth",
+  subject: "Implement minimal solution",
   description: "Make test pass, nothing more",
   activeForm: "Implementing minimal code",
   metadata: { phase: "green" }
@@ -81,35 +65,6 @@ await TaskUpdate({
   taskId: domainAfterGreen.id,
   addBlockedBy: [greenTask.id]
 });
-```
-
-### Session State Display
-
-After completing any phase, display "what's next?":
-
-```javascript
-const tasks = await TaskList();
-const storyTask = tasks.find(t => t.metadata?.type === "story-session" && t.status === "in_progress");
-const tddTasks = tasks.filter(t => t.metadata?.storyTaskId === storyTask?.id);
-
-// Format output:
-console.log(`
-## Current Session State
-
-Story: ${storyTask.metadata.dotTaskId}
-Worktree: ${storyTask.metadata.worktreePath}
-
-### Active TDD Cycle
-
-${tddTasks.map(t => {
-  const icon = t.status === "completed" ? "✅" : t.status === "in_progress" ? "🔄" : "⏳";
-  return `${icon} ${t.subject}`;
-}).join("\n")}
-
-### What's Next?
-
-${determineNextAction(tddTasks)}
-`);
 ```
 
 ---
@@ -195,75 +150,6 @@ These apply to ALL projects using the sdlc plugin:
 - Test behavior, not implementation
 - Black-box tests preferred
 - Mock at architectural boundaries, not everywhere
-
----
-
-## Override Protocol for Soft Enforcement (v9.1.0)
-
-When a SOFT enforcement hook blocks (test verification, ADR format), you MUST:
-
-1. **Inform user of the recommendation** and why it matters
-2. **Present override syntax** clearly: "skip [action] because [reason]"
-3. **Wait for user response** - don't assume
-4. **Document override** if user provides reason
-
-**Example conversation:**
-Orchestrator: "Test verification requires running full test suite.
-Would you like me to run tests, or skip test verification because [reason]?"
-
-User: "skip test verification because tests running in CI"
-
-Orchestrator: "Understood. Skipping test verification (reason: CI coverage). Proceeding..."
-
-### What CAN Be Overridden (SOFT)
-
-- Test verification requirements
-- ADR format compliance (non-architecture commits)
-- Mutation testing < 100%
-- Code review warnings
-
-### What CANNOT Be Overridden (HARD)
-
-- Agent file boundaries (RED/GREEN/DOMAIN file type restrictions)
-- **Domain review after RED/GREEN** (domain agent decides if trivial)
-- Architecture isolation (ARCHITECTURE.md in separate commits)
-- Git hook validations (bypass with --no-verify if needed)
-
----
-
-## Why Delegation Matters (Transparency)
-
-**Separation of concerns:**
-- Orchestrator: Workflow coordination, context management
-- Specialists: Deep focus on file types, domain expertise
-
-**Cognitive load:**
-- Orchestrator maintains conversation context
-- Specialists start fresh with explicit context
-- Prevents "context thrashing"
-
-**Quality assurance:**
-- Specialist agents have file-type-specific validation
-- Domain agent checks primitive obsession (orchestrator might miss)
-- RED agent enforces ONE assertion (orchestrator might add more)
-
-**When direct editing is acceptable:**
-- Emergency fixes requiring speed
-- Trivial config/docs changes
-- Prototyping throwaway code
-- User explicitly requests "quick fix"
-
-**Effective delegation pattern:**
-```javascript
-// ❌ Direct edit (loses specialist validation)
-await Edit({ filePath: "src/user.rs", ... });
-
-// ✓ Delegate (specialist validation applied)
-await Task({
-  subagent_type: "sdlc:green",
-  prompt: "Implement create_user() to make test pass. [full context]"
-});
-```
 
 ---
 

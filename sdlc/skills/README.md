@@ -50,7 +50,6 @@ The skills will be available as long as the sdlc plugin is installed.
 
 | Skill | Description | Portability | Version |
 |-------|-------------|-------------|---------|
-| **arch** | Architecture change workflow with ADR-formatted commits (dual-purpose: command + agent instructions) | Universal | 1.0.0 |
 | **tdd-constraints** | Red/green/domain phase boundaries and TDD workflow discipline | Universal | 1.0.0 |
 | **user-input-protocol** | Checkpoint format for pausing work and asking questions | Universal | 1.0.0 |
 | **debugging-protocol** | Systematic debugging methodology with verification steps | Universal | 1.0.0 |
@@ -62,10 +61,9 @@ The skills will be available as long as the sdlc plugin is installed.
 |-------|-------------|-------------|---------|
 | **git-spice** | Stacked PR workflow patterns using git-spice | Tool-specific | 1.0.0 |
 | **github-issues** | GitHub CLI patterns for issue/PR management | Tool-specific | 1.0.0 |
-| **memory-protocol** | File-based auto memory integration | Universal | 1.0.0 |
+| **memory-protocol** | Memento MCP integration for semantic memory | MCP-specific | 1.0.0 |
 | **event-modeling** | Event Modeling facilitation and diagram generation | High | 1.0.0 |
 | **orchestration-protocol** | Agent delegation and coordination rules | Medium | 1.0.0 |
-| **task-management** | Task list coordination for multi-agent workflows | High | 1.0.0 |
 
 ---
 
@@ -146,9 +144,10 @@ Skills are injected into agent context automatically when referenced. Check your
 | Level | Description | Example Use Cases |
 |-------|-------------|-------------------|
 | **Universal** | Works anywhere, no tool dependencies | TDD principles, design patterns |
-| **High** | Minor adaptation needed | Event Modeling, file-based patterns |
+| **High** | Minor adaptation needed | Event Modeling (framework-agnostic) |
 | **Medium** | Significant context required | Orchestration patterns (agent-specific) |
 | **Tool-Specific** | Requires specific tool | git-spice, GitHub CLI |
+| **MCP-Specific** | Requires MCP server | Memento integration |
 
 ---
 
@@ -205,7 +204,7 @@ The sdlc plugin uses these skills extensively:
 - All agents (checkpoint format is universal)
 
 **Agents using memory-protocol:**
-- All agents with auto memory directory access (file-based)
+- All agents with Memento MCP access
 
 **Agents using orchestration-protocol:**
 - Main conversation (orchestrator logic)

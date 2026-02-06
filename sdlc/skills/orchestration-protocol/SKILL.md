@@ -1,5 +1,4 @@
 ---
-user-invocable: false
 name: orchestration-protocol
 version: 1.0.0
 author: jwilger
@@ -13,12 +12,6 @@ tags:
 portability: medium
 dependencies:
   - user-input-protocol
-metadata:
-  role: orchestrator
-  capabilities:
-    - task_management
-    - agent_delegation
-    - workflow_coordination
 ---
 
 # Orchestration Protocol

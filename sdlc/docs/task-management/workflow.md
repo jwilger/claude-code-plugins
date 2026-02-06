@@ -30,32 +30,6 @@ TDD cycle with hooks enforcement:
 - Implement (sdlc:green agent)
 - Review implementation (sdlc:domain agent)
 
-**With Session Task Tracking (v7.0.0):**
-
-If `features.session_task_tracking: true`, TaskTools provides "what's next?" visibility:
-
-```
-## Current Session State
-
-Story: myproject-add-login-abc123 - Add user login form
-Worktree: ../myproject-worktrees/myproject-add-login-abc123
-
-### Active TDD Cycle
-
-✅ Red: Write test for login validation
-✅ Domain (after red): Review test and create types
-🔄 Green: Implement login validation
-⏳ Domain (after green): Review implementation
-
-### What's Next?
-
-You are in GREEN phase.
-Implement minimal code to make test pass. Run tests after each change.
-When test passes, domain review will automatically run.
-```
-
-The orchestrator creates TDD cycle tasks on-demand (when you start implementing) and displays session state after each phase completion.
-
 ### 4. Create PR
 
 ```bash
@@ -75,16 +49,16 @@ The orchestrator creates TDD cycle tasks on-demand (when you start implementing)
 
 ```bash
 # 1. Domain Discovery
-/sdlc:specify discover
+/sdlc:design discover
 
 # 2. Design Workflow
-/sdlc:specify workflow "User Registration"
+/sdlc:design workflow "User Registration"
 
 # 3. Generate GWT Scenarios
-/sdlc:specify gwt "User Registration"
+/sdlc:design gwt "User Registration"
 
 # 4. Architecture Decisions
-/sdlc:specify arch
+/sdlc:design arch
 
 # 5. Create Tasks from Slices
 /sdlc:plan

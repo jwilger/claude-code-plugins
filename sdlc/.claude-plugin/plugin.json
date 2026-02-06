@@ -1,14 +1,29 @@
 {
   "name": "sdlc",
-  "version": "15.0.1",
-  "description": "Complete SDLC workflow with TDD, Event Modeling, commit-based ADRs, and dot-based planning (13 workflow skills, 9 portable skills bundled, 15 agents)",
+  "version": "6.0.0",
+  "description": "Complete SDLC workflow with TDD, Event Modeling, ADRs, and GitHub integration",
   "author": {
     "name": "John Wilger",
     "email": "john@johnwilger.com"
   },
-  "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow", "code-review", "debugging", "hooks", "todo-enforcement", "marvin", "output-style", "skills"],
+  "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow", "code-review", "debugging", "hooks", "todo-enforcement", "marvin", "output-style"],
   "outputStyles": "./output-styles/",
   "skills": "./skills/",
+  "commands": [
+    "./commands/shared/orchestration.md",
+    "./commands/setup.md",
+    "./commands/start.md",
+    "./commands/work.md",
+    "./commands/pr.md",
+    "./commands/complete.md",
+    "./commands/review.md",
+    "./commands/design.md",
+    "./commands/plan.md",
+    "./commands/adr.md",
+    "./commands/remember.md",
+    "./commands/recall.md",
+    "./commands/domain-audit.md"
+  ],
   "agents": [
     "./agents/red.md",
     "./agents/green.md",
@@ -23,7 +38,7 @@
     "./agents/model-checker.md",
     "./agents/design-facilitator.md",
     "./agents/gwt.md",
-    "./agents/file-updater.md",
-    "./agents/hook-verifier.md"
+    "./agents/adr.md",
+    "./agents/file-updater.md"
   ]
 }

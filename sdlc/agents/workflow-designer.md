@@ -386,5 +386,5 @@ Documentation:
       └── ...
 
 Next step:
-  /sdlc:specify gwt <name>
+  /sdlc:design gwt <name>
 ```

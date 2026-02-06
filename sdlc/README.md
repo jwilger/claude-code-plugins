@@ -1,25 +1,8 @@
-# SDLC Plugin v9.0.0
+# SDLC Plugin v5.0.0
 
 **Complete Software Development Lifecycle workflow for Claude Code**
 
-Integrates TDD, Event Modeling, commit-based Architecture Decision Records, local task management with dot CLI, and the Marvin personality into a cohesive development experience.
-
----
-
-## ⚠️ Version 9.0.0 Breaking Changes
-
-**IMPORTANT:** v9.0.0 completes transformation to skills-only architecture. Read `MIGRATION-v9.md` for details.
-
-### What Changed
-
-- **Commands removed**: All 12 commands replaced by skills
-- **Invocation unchanged**: Same syntax (`/sdlc:work`, `/sdlc:pr`, etc.)
-- **Auto-invocation**: Skills can now be invoked by Claude based on context
-- **Progressive disclosure**: Skills use reference files loaded on-demand
-
-### Migration Steps
-
-None required - invocation syntax unchanged. See `MIGRATION-v9.md` for details.
+Integrates TDD, Event Modeling, Architecture Decision Records, local task management with dot CLI, and the Marvin personality into a cohesive development experience.
 
 ---
 
@@ -83,26 +66,22 @@ None required - invocation syntax unchanged. See `MIGRATION-v9.md` for details.
 
 ---
 
-## Skills
+## Commands
 
-All workflow functionality provided by 11 skills (invocable as `/sdlc:skill-name`):
-
-| Skill | Description | Usage |
-|-------|-------------|-------|
+| Command | Description | Usage |
+|---------|-------------|-------|
 | `/sdlc:setup` | Initialize project configuration | One-time setup |
 | `/sdlc:work` | Start TDD workflow for a task | Main development loop |
 | `/sdlc:pr` | Create pull request with review gates | After feature complete |
 | `/sdlc:complete` | Complete task after PR merge | After PR merges |
 | `/sdlc:review` | Handle PR review feedback | Review cycle |
-| `/sdlc:specify` | Event Modeling facilitation | Design phase |
-| `/sdlc:arch` | Architecture change workflow (portable) | Document architecture decisions |
+| `/sdlc:design` | Event Modeling facilitation | Design phase |
+| `/sdlc:adr` | Create Architecture Decision Record | Document decisions |
 | `/sdlc:plan` | Create tasks from event model slices | After design |
 | `/sdlc:start` | Auto-detect phase and route | Entry point |
 | `/sdlc:remember` | Store knowledge in auto memory | Learning |
 | `/sdlc:recall` | Search auto memory knowledge | Context retrieval |
 | `/sdlc:domain-audit` | Audit for primitive obsession | Code review |
-
-**Note:** Skills can also be auto-invoked by Claude based on user intent (no slash command needed).
 
 ---
 
@@ -352,7 +331,7 @@ The SDLC plugin uses Claude Code's built-in **auto memory** for knowledge persis
 
 ### Limitations
 
-File-based memory trade-offs:
+Compared to semantic search systems (like Memento MCP):
 - **No semantic search** - Only exact keyword matching via grep
 - **No relationship graph** - Manual markdown links between files
 - **No automatic capture** - Must manually use `/sdlc:remember`
@@ -407,7 +386,7 @@ impl User {
 
 ```bash
 # 1. Start design session
-/sdlc:specify
+/sdlc:design
 
 # 2. Discovery phase
 # Agent interviews you about domain:

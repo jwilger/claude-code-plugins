@@ -169,7 +169,7 @@ Recommend which workflow to model first and explain WHY:
 
 Once discovery is complete and a starting workflow is agreed upon:
 1. Document the domain overview as specified below
-2. Direct the user to run `/sdlc:specify workflow <name>` to begin detailed modeling
+2. Direct the user to run `/sdlc:design workflow <name>` to begin detailed modeling
 3. The `sdlc:workflow` agent will handle the deep-dive Event Modeling for that workflow
 
 ## Output
@@ -276,5 +276,5 @@ Rationale: <why start here>
 Documentation: docs/event_model/domain/overview.md
 
 Next step:
-  /sdlc:specify workflow <name>
+  /sdlc:design workflow <name>
 ```

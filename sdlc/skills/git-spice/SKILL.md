@@ -1,5 +1,4 @@
 ---
-user-invocable: false
 name: git-spice
 version: 1.0.0
 author: jwilger

@@ -91,9 +91,10 @@ dependencies: []                          # Other skills needed
 
 **Portability assessment:**
 - **Universal:** No tool dependencies, pure principles
-- **High:** Framework-agnostic, minimal adaptation (e.g., file-based patterns)
+- **High:** Framework-agnostic, minimal adaptation
 - **Medium:** Requires some context-specific setup
 - **Tool-Specific:** Requires specific CLI tool (git-spice, gh)
+- **MCP-Specific:** Requires MCP server (memento)
 
 ### Step 5: Write Core Content
 
@@ -288,12 +289,12 @@ grep "^## " skills/skill-name/SKILL.md
 
 ### Pitfall 5: Inaccurate Portability
 
-**Problem:** Claims "Universal" but requires specific tools or setup
+**Problem:** Claims "Universal" but requires specific MCP server
 **Solution:** Honestly assess portability level
 
 **Example:**
-❌ memory-protocol marked "Universal" (requires auto memory directory setup)
-✅ memory-protocol marked "High" (file-based, minimal setup)
+❌ memory-protocol marked "Universal" (needs Memento MCP)
+✅ memory-protocol marked "MCP-Specific"
 
 ---
 

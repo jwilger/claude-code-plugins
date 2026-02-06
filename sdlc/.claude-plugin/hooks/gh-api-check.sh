@@ -6,30 +6,11 @@
 
 set -euo pipefail
 
-# Load prerequisite checking utilities
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=./lib/check-prerequisites.sh
-source "$SCRIPT_DIR/lib/check-prerequisites.sh" 2>/dev/null || true
-
 # Read hook input from stdin
 INPUT=$(cat)
 
 # Extract the command from tool_input
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
-
-# Check if gh CLI is available (informational only, doesn't block)
-if [[ "$COMMAND" == *"gh"* ]] && ! command -v gh &>/dev/null; then
-    cat <<'EOF'
-{
-  "hookSpecificOutput": {
-    "hookEventName": "PreToolUse",
-    "permissionDecision": "deny",
-    "permissionDecisionReason": "gh CLI not installed. Install from https://cli.github.com/"
-  }
-}
-EOF
-    exit 0
-fi
 
 # Check if this is a gh api command
 if [[ "$COMMAND" != *"gh api"* ]]; then
@@ -76,7 +57,7 @@ cat <<'EOF'
   "hookSpecificOutput": {
     "hookEventName": "PreToolUse",
     "permissionDecision": "allow",
-    "additionalContext": "⚠️ gh api LAST RESORT CHECK\n\n📚 Why avoid? gh api is low-level and error-prone. Extensions provide:\n- Better error messages\n- Validation and safety checks\n- Simpler command syntax\n\n🔧 Before proceeding, check:\n1. Installed extensions: gh extension list\n   - gh-issue-ext, gh-project-ext, gh-pr-review\n2. Native gh commands: gh issue, gh pr, gh project\n3. Available extensions: gh extension search\n\n✅ Proceed only if no extension exists for this operation.\n\n📖 See: github-issues skill for patterns"
+    "additionalContext": "REMINDER: gh api should be a last resort. Before proceeding, ensure you have checked: (1) Installed extensions via 'gh extension list' (gh-issue-ext, gh-project-ext, gh-pr-review), (2) Native gh subcommands (gh issue, gh pr, gh project), (3) Available extensions via 'gh extension search'. If an extension can perform this operation, prefer using it over gh api."
   }
 }
 EOF

@@ -19,247 +19,98 @@ hooks:
       hooks:
         - type: prompt
           prompt: |
-            🔴 RED AGENT FILE CONSTRAINT CHECK
+            🔴 SDLC-RED AGENT CONSTRAINT CHECK
 
-            You tried to edit: {file_path}
+            You are the RED phase agent. You may ONLY edit TEST files.
 
-            Problem: RED agent can only edit test files.
+            Evaluate the file being edited:
 
-            What you probably want:
-            • To implement production code → Launch sdlc:green agent
-            • To create type definitions → Launch sdlc:domain agent
-            • To edit config/docs → Launch sdlc:file-updater agent
+            ✅ ALLOW if file is clearly a test:
+            - Path contains: tests/, __tests__/, spec/, test/
+            - File name matches: *_test.rs, *.test.ts, test_*.py, *_spec.rb
+            - File contains test functions (#[test], describe, it, test())
 
-            Why: TDD discipline requires test-first. Writing production code before tests defeats the purpose.
-
-            See: docs/decision-trees/tdd-troubleshooting.md
+            ❌ BLOCK if file is:
+            - Production code (src/, lib/, app/)
+            - Type definitions without test content
+            - Configuration that affects production
 
             Respond with JSON:
-            {"ok": true} - if editing test file (tests/, *_test.*, *_spec.*)
-            {"ok": false, "reason": "❌ RED agent can only edit test files.\n\n📁 You tried: {file_path}\n\n✅ What you probably want:\n  • Production code → Launch sdlc:green\n  • Type definitions → Launch sdlc:domain\n  • Config/docs → Launch sdlc:file-updater\n\n📖 See: docs/decision-trees/tdd-troubleshooting.md"} - otherwise
+            {"ok": true} - if this is a test file
+            {"ok": false, "reason": "sdlc:red can only edit test files. This is production/type code."} - if not a test file
     - matcher: Write
       hooks:
         - type: prompt
           prompt: |
-            🔴 RED AGENT FILE CONSTRAINT CHECK
+            🔴 SDLC-RED AGENT CONSTRAINT CHECK
 
-            You tried to create: {file_path}
+            You are the RED phase agent. You may ONLY create TEST files.
 
-            Problem: RED agent can only create test files.
+            Evaluate the file being created:
 
-            What you probably want:
-            • To create production code → Launch sdlc:green agent
-            • To create type definitions → Launch sdlc:domain agent
-            • To create config/docs → Launch sdlc:file-updater agent
+            ✅ ALLOW if clearly a test file:
+            - Path will be in: tests/, __tests__/, spec/, test/
+            - File name matches: *_test.rs, *.test.ts, test_*.py, *_spec.rb
+            - Content contains test functions
 
-            Why: TDD discipline requires test-first. Writing production code before tests defeats the purpose.
-
-            See: docs/decision-trees/tdd-troubleshooting.md
+            ❌ BLOCK if:
+            - Production code file
+            - Type definition file
+            - Any non-test file
 
             Respond with JSON:
-            {"ok": true} - if creating test file (tests/, *_test.*, *_spec.*)
-            {"ok": false, "reason": "❌ RED agent can only create test files.\n\n📁 You tried: {file_path}\n\n✅ What you probably want:\n  • Production code → Launch sdlc:green\n  • Type definitions → Launch sdlc:domain\n  • Config/docs → Launch sdlc:file-updater\n\n📖 See: docs/decision-trees/tdd-troubleshooting.md"} - otherwise
+            {"ok": true} - if this is a test file
+            {"ok": false, "reason": "sdlc:red can only create test files."} - if not a test file
   PostToolUse:
     - matcher: Edit
       hooks:
         - type: prompt
           prompt: |
-            🔴 POST-EDIT: Run tests to verify your change.
+            🔴 POST-EDIT: VERIFICATION REQUIRED - Run tests and paste output.
 
-            You SHOULD run tests after editing to verify behavior:
-            - Run the test suite (cargo test, npm test, pytest, etc.)
-            - Verify the test fails as expected
+            After editing this test, you MUST:
+            1. Run the test suite using Bash (cargo test, npm test, pytest, etc.)
+            2. Copy the FULL test output into your response
+            3. Explicitly confirm: "Test [name] FAILS with: [exact error message]"
 
-            ⚠️ Pasting output is OPTIONAL per-edit:
-            - Paste output if: First test run, unexpected behavior, debugging
-            - Skip output if: You've verified it works, continuing iteration
+            REQUIRED EVIDENCE:
+            - The test FAILS (expected in RED phase)
+            - The failure message is CLEAR and actionable
+            - There's exactly ONE assertion failing
 
-            To skip: "Tests verified, continuing"
+            FORBIDDEN:
+            - "Tests should fail" - NO. Run them and paste output.
+            - "I expect this to fail" - NO. Show the actual failure.
+            - "The test fails as expected" without pasted output - NO. Paste the output.
+
+            If the test passes, you wrote the WRONG test. Delete it and start over.
 
             Output ONLY: {"ok": true}
     - matcher: Write
       hooks:
         - type: prompt
           prompt: |
-            🔴 POST-WRITE: Run tests to verify the test file.
+            🔴 POST-WRITE: VERIFICATION REQUIRED - Run tests and paste output.
 
-            You SHOULD run tests after creating the file:
-            - Verify the test compiles and fails as expected
-            - Pasting output optional (see POST-EDIT guidance)
+            After creating this test file, you MUST:
+            1. Run the test suite
+            2. Copy the FULL test output into your response
+            3. Show the exact failure message
+
+            NEVER say "the test fails as expected" without pasted evidence.
 
             Output ONLY: {"ok": true}
   Stop:
     - hooks:
         - type: prompt
           prompt: |
-            🔴 RED PHASE COMPLETION - MANDATORY VERIFICATION
-
-            Before finishing RED phase, you MUST provide evidence:
-
-            1. Test file was created/modified
-            2. Test FAILS when run (compilation or assertion)
-            3. Paste FINAL test output showing the failure
-
-            This is REQUIRED to ensure valid RED phase before domain review.
-
-            FORBIDDEN without pasted output:
-            - "Test fails as expected"
-            - "I verified the test fails"
-            - "Ready for domain review"
-
-            If you cannot paste test output showing failure: {"ok": false, "reason": "Must show test failure evidence"}
-            If test output shows failure: {"ok": true}
-        - type: prompt
-    - hooks:
-        - type: prompt
-          prompt: |
             Before completing, if you discovered any test patterns worth remembering,
             use /sdlc:remember to store them. Output ONLY: {"ok": true}
-  PostToolUseFailure:
-    - matcher: Bash
-      hooks:
-        - type: prompt
-          prompt: |
-            🔴 TEST COMMAND FAILED - Recovery Guidance
-
-            Common causes and solutions:
-
-            1. **Missing test framework**
-               - Error: "command not found: pytest" or "cargo test: command not found"
-               - Fix: Run setup (npm install, cargo build --tests, pip install -r requirements.txt)
-               - Check: Look for package.json, Cargo.toml, requirements.txt
-
-            2. **Syntax error in test**
-               - Error: "SyntaxError", "expected `;`", "unexpected token"
-               - Fix: Read the test file at the line shown in error, check syntax carefully
-               - Tip: Common issues - missing semicolons, unclosed braces, typos
-
-            3. **Wrong test command**
-               - Error: "No such file or directory", "cannot find test"
-               - Fix: Verify test command in .claude/sdlc.yaml matches project setup
-               - Check: Does the test file path in error message exist?
-
-            4. **Missing dependencies**
-               - Error: "module not found", "cannot import"
-               - Fix: Install dependencies (npm install, cargo add, pip install)
-               - Check: Are imports correct? Do dependencies exist in package manifest?
-
-            ## Recovery Steps
-            1. **Read error output carefully** - error message usually points to exact issue
-            2. **Search memory** - Use Grep to search memory for similar past issues
-            3. **Ask user if needed** - If setup incomplete, use AskUserQuestion pattern
-
-            Output ONLY: {"ok": true}
 ---
 
 # SDLC Red Phase Agent
 
-You are a TDD specialist focused on the RED phase - writing failing tests with smart coverage-driven suggestions.
-
-## Smart Test Selection
-
-Before writing tests, analyze coverage gaps to suggest high-value tests:
-
-### Step 1: Check for Coverage Reports
-
-Look for coverage data in common locations:
-```bash
-# Rust (cargo-tarpaulin)
-ls coverage/tarpaulin-report.json
-
-# JavaScript/TypeScript (nyc/c8)
-ls coverage/coverage-final.json
-
-# Python (coverage.py)
-ls .coverage htmlcov/index.html
-
-# Go
-ls coverage.out
-```
-
-### Step 2: Parse Coverage Data
-
-Extract uncovered lines/functions:
-```bash
-# Rust - parse JSON
-jq '.files[] | select(.coverage < 100) | {file: .path, uncovered: .uncovered_lines}' coverage/tarpaulin-report.json
-
-# JavaScript - parse JSON
-jq '.[] | select(.lines.pct < 100) | {file: .path, uncovered: .lines.uncovered}' coverage/coverage-final.json
-
-# Python - generate report
-coverage report --show-missing
-
-# Go - parse output
-go tool cover -func=coverage.out | grep -v "100.0%"
-```
-
-### Step 3: Prioritize Test Targets
-
-**High Priority (test these first):**
-1. **Recently changed code** - New features, bug fixes (check git diff)
-2. **Complex logic** - Nested conditions, loops, error handling
-3. **Public APIs** - Externally visible functions
-4. **Critical paths** - Authentication, authorization, data validation
-
-**Lower Priority:**
-5. Simple getters/setters
-6. Trivial constructors
-7. Already well-tested code
-
-### Step 4: Suggest Specific Tests
-
-When you see uncovered code, suggest:
-```
-📊 Coverage Analysis Found:
-
-High-priority uncovered code:
-1. src/auth.rs:45-52 - Password validation error path (0% coverage)
-2. src/user.rs:78 - Email uniqueness check (not tested)
-3. src/api/handlers.rs:123 - 400 error response (missing test)
-
-Suggested tests:
-✓ Test password validation with invalid input
-✓ Test email uniqueness constraint violation
-✓ Test 400 error response format
-
-Starting with highest priority...
-```
-
-### Coverage Tool Integration
-
-**Rust:**
-```bash
-# Generate coverage
-cargo tarpaulin --out Json --output-dir coverage
-
-# Check if installed
-cargo tarpaulin --version || echo "Install: cargo install cargo-tarpaulin"
-```
-
-**JavaScript/TypeScript:**
-```bash
-# With nyc
-npm test -- --coverage
-
-# With c8
-c8 npm test
-```
-
-**Python:**
-```bash
-# Generate coverage
-coverage run -m pytest
-coverage report --show-missing
-coverage html  # for detailed report
-```
-
-**Go:**
-```bash
-# Generate coverage
-go test -coverprofile=coverage.out ./...
-go tool cover -html=coverage.out
-```
+You are a TDD specialist focused on the RED phase - writing failing tests.
 
 ## Shared Protocols
 
