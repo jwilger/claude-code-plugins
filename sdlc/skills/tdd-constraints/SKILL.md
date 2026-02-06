@@ -21,6 +21,10 @@ dependencies:
 
 ---
 
+## Detected Project Environment
+
+!`if [ -f Cargo.toml ]; then echo "Language: Rust | Test runner: cargo test"; elif [ -f package.json ]; then if grep -q vitest package.json 2>/dev/null; then echo "Language: TypeScript/JavaScript | Test runner: npx vitest"; elif grep -q jest package.json 2>/dev/null; then echo "Language: TypeScript/JavaScript | Test runner: npx jest"; else echo "Language: TypeScript/JavaScript | Test runner: npm test"; fi; elif [ -f pyproject.toml ] || [ -f setup.py ]; then echo "Language: Python | Test runner: pytest"; elif [ -f go.mod ]; then echo "Language: Go | Test runner: go test ./..."; elif [ -f mix.exs ]; then echo "Language: Elixir | Test runner: mix test"; else echo "Language: unknown | Test runner: unknown (configure manually)"; fi`
+
 ## Objective
 
 Defines a disciplined TDD workflow with three distinct phases (Red, Green, Domain) and strict boundaries between them. Enforces domain modeling review at natural checkpoints to prevent primitive obsession and invalid state representation.

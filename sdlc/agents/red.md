@@ -17,50 +17,60 @@ hooks:
   PreToolUse:
     - matcher: Edit
       hooks:
-        - type: prompt
+        - type: agent
           prompt: |
-            🔴 SDLC-RED AGENT CONSTRAINT CHECK
+            SDLC RED AGENT FILE-TYPE VERIFICATION
 
-            You are the RED phase agent. You may ONLY edit TEST files.
+            You must verify this is a test file by examining its content and path.
+            The hook input is: $ARGUMENTS
 
-            Evaluate the file being edited:
+            Steps:
+            1. Extract file_path from the tool_input
+            2. Check path-based indicators FIRST (fast path):
+               - Path contains: tests/, __tests__/, spec/, test/
+               - File name matches: *_test.rs, *.test.ts, test_*.py, *_spec.rb, *_test.go
+            3. If path is ambiguous, read the file (if it exists) and check for test content:
+               - Test annotations: #[test], #[cfg(test)], describe(), it(), test(), @Test, func Test
+               - Test framework imports: use ...::test, import { describe }, from pytest, testing
+               - Test directory patterns in module path
 
-            ✅ ALLOW if file is clearly a test:
-            - Path contains: tests/, __tests__/, spec/, test/
-            - File name matches: *_test.rs, *.test.ts, test_*.py, *_spec.rb
-            - File contains test functions (#[test], describe, it, test())
+            ALLOW if this IS a test file (by path OR content evidence).
+            BLOCK if this is NOT a test file.
 
-            ❌ BLOCK if file is:
-            - Production code (src/, lib/, app/)
-            - Type definitions without test content
-            - Configuration that affects production
+            Respond QUICKLY - check path first, only read file if path is ambiguous.
 
             Respond with JSON:
             {"ok": true} - if this is a test file
-            {"ok": false, "reason": "sdlc:red can only edit test files. This is production/type code."} - if not a test file
+            {"ok": false, "reason": "sdlc:red can only edit test files. This file does not contain test code."} - if NOT a test file
+          timeout: 60
     - matcher: Write
       hooks:
-        - type: prompt
+        - type: agent
           prompt: |
-            🔴 SDLC-RED AGENT CONSTRAINT CHECK
+            SDLC RED AGENT FILE-TYPE VERIFICATION
 
-            You are the RED phase agent. You may ONLY create TEST files.
+            You must verify this is a test file being created.
+            The hook input is: $ARGUMENTS
 
-            Evaluate the file being created:
+            Steps:
+            1. Extract file_path from the tool_input
+            2. Check path-based indicators FIRST (fast path):
+               - Path will be in: tests/, __tests__/, spec/, test/
+               - File name matches: *_test.rs, *.test.ts, test_*.py, *_spec.rb, *_test.go
+            3. If path is ambiguous, examine the content being written for test indicators:
+               - Test annotations: #[test], #[cfg(test)], describe(), it(), test(), @Test
+               - Test framework imports
+               - Test structure patterns
 
-            ✅ ALLOW if clearly a test file:
-            - Path will be in: tests/, __tests__/, spec/, test/
-            - File name matches: *_test.rs, *.test.ts, test_*.py, *_spec.rb
-            - Content contains test functions
+            ALLOW if this IS a test file (by path OR content evidence).
+            BLOCK if this is NOT a test file.
 
-            ❌ BLOCK if:
-            - Production code file
-            - Type definition file
-            - Any non-test file
+            Respond QUICKLY - check path first, only examine content if path is ambiguous.
 
             Respond with JSON:
             {"ok": true} - if this is a test file
-            {"ok": false, "reason": "sdlc:red can only create test files."} - if not a test file
+            {"ok": false, "reason": "sdlc:red can only create test files."} - if NOT a test file
+          timeout: 60
   PostToolUse:
     - matcher: Edit
       hooks:

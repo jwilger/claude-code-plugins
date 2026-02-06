@@ -56,5 +56,26 @@
         }
       ]
     }
+  ],
+  "PreCompact": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": ".claude-plugin/hooks/pre-compact.sh"
+        }
+      ]
+    }
+  ],
+  "SubagentStart": [
+    {
+      "matcher": "red|green|domain",
+      "hooks": [
+        {
+          "type": "command",
+          "command": ".claude-plugin/hooks/subagent-start-context.sh"
+        }
+      ]
+    }
   ]
 }

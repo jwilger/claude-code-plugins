@@ -20,6 +20,10 @@ dependencies: []
 
 ---
 
+## Current Task State
+
+!`dot ls --status active 2>/dev/null || echo "No active tasks (dot CLI not available or no tasks)"`
+
 ## Objective
 
 Teaches effective local task management using the `dot` CLI for file-based, hierarchical task tracking with dependency management.

@@ -17,51 +17,58 @@ hooks:
   PreToolUse:
     - matcher: Edit
       hooks:
-        - type: prompt
+        - type: agent
           prompt: |
-            SDLC:GREEN AGENT CONSTRAINT CHECK
+            SDLC GREEN AGENT FILE-TYPE VERIFICATION
 
-            You are the GREEN phase agent. You may ONLY edit PRODUCTION implementation code.
+            You must verify this is production implementation code (NOT a test file, NOT a type-only file).
+            The hook input is: $ARGUMENTS
 
-            Evaluate the file being edited:
+            Steps:
+            1. Extract file_path from the tool_input
+            2. Check path-based indicators FIRST (fast path):
+               - BLOCK if path contains: tests/, __tests__/, spec/, test/
+               - BLOCK if file name matches: *_test.rs, *.test.ts, test_*.py, *_spec.rb, *_test.go
+               - ALLOW if path is in: src/, lib/, app/ (implementation directories)
+            3. If path is ambiguous, read the file and check content:
+               - BLOCK if file contains test annotations (#[test], describe(), @Test) but no production logic
+               - BLOCK if file contains ONLY type definitions (structs/enums/traits/interfaces) with unimplemented!() stubs and no real implementations
+               - ALLOW if file contains function/method implementations with real logic
 
-            ALLOW if file is production implementation:
-            - Path in: src/, lib/, app/ (implementation directories)
-            - Contains function/method bodies to implement
-            - NOT a test file
+            Note: Type DEFINITIONS are sdlc:domain's job. Green implements the BODIES.
 
-            BLOCK if file is:
-            - Test file (*_test.rs, *.test.ts, test_*.py, *_spec.rb)
-            - In tests/, __tests__/, spec/, test/ directories
-            - Type-only file (only struct/enum/trait definitions, no implementations)
-
-            Note: Type DEFINITIONS are sdlc:domain's job. You implement the BODIES.
+            Respond QUICKLY - check path first, only read file if path is ambiguous.
 
             Respond with JSON:
             {"ok": true} - if this is production implementation code
             {"ok": false, "reason": "sdlc:green can only edit production implementation code, not tests or type definitions."} - otherwise
+          timeout: 60
     - matcher: Write
       hooks:
-        - type: prompt
+        - type: agent
           prompt: |
-            SDLC:GREEN AGENT CONSTRAINT CHECK
+            SDLC GREEN AGENT FILE-TYPE VERIFICATION
 
-            You are the GREEN phase agent. You may ONLY create PRODUCTION implementation files.
+            You must verify this is a production implementation file being created.
+            The hook input is: $ARGUMENTS
 
-            Evaluate the file being created:
+            Steps:
+            1. Extract file_path from the tool_input
+            2. Check path-based indicators FIRST (fast path):
+               - BLOCK if path contains: tests/, __tests__/, spec/, test/
+               - BLOCK if file name matches test patterns
+               - ALLOW if path is in: src/, lib/, app/
+            3. If path is ambiguous, examine the content being written:
+               - BLOCK if content is only test code
+               - BLOCK if content is only type definitions with stubs
+               - ALLOW if content contains function implementations
 
-            ALLOW if production implementation file:
-            - Path will be in: src/, lib/, app/
-            - Contains function implementations
-            - NOT a test file
-
-            BLOCK if:
-            - Test file (any test pattern)
-            - Type-only definition file
+            Respond QUICKLY - check path first, only examine content if path is ambiguous.
 
             Respond with JSON:
             {"ok": true} - if this is a production implementation file
             {"ok": false, "reason": "sdlc:green can only create production implementation files."} - otherwise
+          timeout: 60
   PostToolUse:
     - matcher: Edit
       hooks:

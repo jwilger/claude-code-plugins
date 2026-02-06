@@ -59,6 +59,15 @@ If no task ID in branch, ask user which task this PR is for.
 
 **Before mutation testing**, run the code reviewer to catch issues early.
 
+First, check if experimental parallel review is enabled:
+```bash
+echo "${SDLC_EXPERIMENTAL_PARALLEL_REVIEW:-0}"
+```
+
+#### Sequential Review (Default)
+
+If `SDLC_EXPERIMENTAL_PARALLEL_REVIEW` is not set or is `0`, use the standard sequential review:
+
 Use the sdlc:code-reviewer agent:
 
 ```
@@ -87,6 +96,51 @@ Task tool with subagent_type="sdlc:code-reviewer":
     - Check validation boundaries
 
   Report issues by severity (CRITICAL, IMPORTANT, SUGGESTION, FLAG).
+```
+
+#### Parallel Review (Experimental)
+
+If `SDLC_EXPERIMENTAL_PARALLEL_REVIEW=1`, use agent teams to run the three review stages in parallel. This requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` to also be enabled.
+
+**IMPORTANT:** This is experimental and uses significantly more tokens (approximately 3x). The TDD cycle is completely unaffected -- parallel review applies ONLY to this code review step.
+
+Instruct the orchestrator to create an agent team:
+
+```
+Create an agent team to perform a parallel three-stage code review of this PR.
+
+Context for all reviewers:
+- Task: <task-id>
+- Branch: feature/<task-id>
+- Base: main
+- Files changed: <output of git diff --name-only main..HEAD>
+- Tests: <output of git diff --name-only main..HEAD | grep -E 'test|spec'>
+- Acceptance criteria: <from dot show>
+
+Spawn three reviewer teammates:
+
+1. SPEC COMPLIANCE REVIEWER: Check that all acceptance criteria are implemented
+   and tested. For each criterion, verify implementing code exists, a test covers
+   it, and the implementation matches the spec exactly. Report MISSING, INCOMPLETE,
+   OVER-BUILT, or DIVERGENT issues.
+
+2. CODE QUALITY REVIEWER: Review code clarity, domain type usage, error handling,
+   test quality, and YAGNI compliance. Run static analysis if available (cargo
+   clippy, eslint). Report BUG_RISK, MAINTAINABILITY, STYLE, and PERFORMANCE issues.
+
+3. DOMAIN INTEGRITY REVIEWER: Audit tests for compile-time enforcement opportunities,
+   verify domain type usage consistency, check validation boundaries, and verify
+   state representation. Report COMPILE-TIME FLAGS and domain violations.
+
+Each reviewer should produce their stage output in the standard format (STAGE N: ...).
+Synthesize all three into the unified CODE REVIEW SUMMARY format when complete.
+
+If any teammate fails, fall back to sequential review for that stage.
+```
+
+**Fallback:** If agent teams are not available (feature not enabled or not supported), automatically fall back to the sequential review above. Log a note:
+```
+Note: Parallel review requested but agent teams not available. Using sequential review.
 ```
 
 **Review Results:**

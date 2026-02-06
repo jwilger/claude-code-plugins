@@ -21,6 +21,10 @@ dependencies: []
 
 ---
 
+## Memory Directory Status
+
+!`MEMORY_BASE="$HOME/.claude/projects"; if [ -d "$MEMORY_BASE" ]; then PROJECT_MEMORY=$(find "$MEMORY_BASE" -maxdepth 3 -name "memory" -type d 2>/dev/null | head -1); if [ -n "$PROJECT_MEMORY" ] && [ -d "$PROJECT_MEMORY" ]; then echo "Memory directory found: $PROJECT_MEMORY"; ls -1 "$PROJECT_MEMORY" 2>/dev/null | head -10 || echo "(empty)"; else echo "No project memory directory found yet."; fi; else echo "No memory base directory found. Memory will be created on first use."; fi`
+
 ## Objective
 
 Defines patterns for systematic knowledge accumulation and retrieval in agent workflows, enabling agents to learn from past experiences and avoid repeating work.

@@ -2,6 +2,7 @@
 name: domain
 description: INVOKE for type definitions. TYPE DEFINITIONS ONLY. Has VETO POWER over domain violations
 model: inherit
+memory: project
 skills:
   - user-input-protocol
   - memory-protocol
@@ -17,53 +18,61 @@ hooks:
   PreToolUse:
     - matcher: Edit
       hooks:
-        - type: prompt
+        - type: agent
           prompt: |
-            SDLC:DOMAIN AGENT CONSTRAINT CHECK
+            SDLC DOMAIN AGENT FILE-TYPE VERIFICATION
 
-            You are the DOMAIN agent. You may ONLY edit TYPE DEFINITIONS.
+            You must verify this edit is for type definitions ONLY (not tests, not implementations).
+            The hook input is: $ARGUMENTS
 
-            Evaluate the file and change being made:
+            Steps:
+            1. Extract file_path from the tool_input
+            2. Check path-based indicators FIRST (fast path):
+               - BLOCK if path contains: tests/, __tests__/, spec/, test/
+               - BLOCK if file name matches test patterns: *_test.rs, *.test.ts, *_test.go
+            3. Read the file (or examine the edit content) and verify:
+               - ALLOW if content contains type definitions: struct, enum, trait, interface, type alias definitions
+               - ALLOW if function signatures with unimplemented!(), todo!(), raise NotImplementedError, or panic!("not implemented") stubs
+               - ALLOW if module structure files (mod.rs, mod.ts, __init__.py) with type re-exports
+               - BLOCK if function bodies contain real implementation logic (beyond stubs)
+               - BLOCK if file is a test file (contains test annotations/imports)
 
-            ALLOW if editing type definitions:
-            - Struct/enum/trait/interface definitions
-            - Type aliases and module structure
-            - Function SIGNATURES (not bodies)
-            - Adding unimplemented!() stubs
+            CRITICAL: Function bodies must contain ONLY placeholder stubs (unimplemented!(), todo!(), etc.).
+            If a function body has real logic, this is an implementation edit that belongs to sdlc:green.
 
-            BLOCK if:
-            - Test file (tests/, *_test.rs, etc.)
-            - Implementing function bodies (beyond unimplemented!())
-            - Writing business logic
-
-            CRITICAL: Function bodies must contain ONLY unimplemented!()
+            Respond QUICKLY - check path and obvious indicators first.
 
             Respond with JSON:
             {"ok": true} - if this is type definition work
-            {"ok": false, "reason": "sdlc:domain can only create type definitions, not tests or implementations."} - otherwise
+            {"ok": false, "reason": "sdlc:domain can only edit type definitions, not tests or implementations."} - otherwise
+          timeout: 60
     - matcher: Write
       hooks:
-        - type: prompt
+        - type: agent
           prompt: |
-            SDLC:DOMAIN AGENT CONSTRAINT CHECK
+            SDLC DOMAIN AGENT FILE-TYPE VERIFICATION
 
-            You are the DOMAIN agent. You may ONLY create TYPE DEFINITION files.
+            You must verify this file being created contains type definitions ONLY.
+            The hook input is: $ARGUMENTS
 
-            Evaluate the file being created:
+            Steps:
+            1. Extract file_path from the tool_input
+            2. Check path-based indicators FIRST (fast path):
+               - BLOCK if path contains test directories or test file patterns
+            3. Examine the content being written:
+               - ALLOW if content contains struct/enum/trait/interface definitions
+               - ALLOW if function bodies are ONLY unimplemented!() / todo!() / raise NotImplementedError stubs
+               - BLOCK if content is a test file
+               - BLOCK if function bodies contain real implementation logic
 
-            ALLOW if type definition file:
-            - Contains struct/enum/trait/interface definitions
-            - Function bodies are ONLY unimplemented!()
-            - Domain model files
+            CRITICAL: Function bodies must contain ONLY placeholder stubs.
 
-            BLOCK if:
-            - Test file
-            - Contains implementation logic
-            - Function bodies have real code
+            Respond QUICKLY - check obvious indicators first.
 
             Respond with JSON:
             {"ok": true} - if this is a type definition file
             {"ok": false, "reason": "sdlc:domain can only create type definition files."} - otherwise
+          timeout: 60
   PostToolUse:
     - matcher: Edit
       hooks:
@@ -121,6 +130,14 @@ This agent uses shared protocols loaded via skills:
 - **User Input Protocol**: See `sdlc:shared/user-input-protocol` for checkpoint/question format
 - **Memory Protocol**: See `sdlc:shared/memory-protocol` for auto memory usage (file-based)
 - **TDD Constraints**: See `sdlc:shared/tdd-constraints` for phase boundaries
+
+## Persistent Memory
+
+This agent has persistent project-scoped memory. On each invocation:
+1. **Check memory first**: Your MEMORY.md is auto-loaded with the first 200 lines. Review it for project-specific type conventions, common domain violations caught in past reviews, and architectural patterns established for this project.
+2. **Update memory after work**: If you discover new type conventions, catch recurring violations, or establish patterns worth remembering, write them to your memory directory before completing.
+
+Use persistent memory to build cumulative domain knowledge across sessions -- recall naming conventions, validation patterns, and domain modeling decisions made previously.
 
 ## Architecture Alignment (MANDATORY)
 

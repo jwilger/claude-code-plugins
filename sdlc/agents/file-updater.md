@@ -15,60 +15,59 @@ hooks:
   PreToolUse:
     - matcher: Edit
       hooks:
-        - type: prompt
+        - type: agent
           prompt: |
-            📁 SDLC-FILE-UPDATER AGENT CONSTRAINT CHECK
+            SDLC FILE-UPDATER AGENT SCOPE VERIFICATION
 
-            You are the FILE-UPDATER agent. You handle config, scripts, and general docs.
-            You are BLOCKED from editing specialized documentation.
+            You must verify this file is within the file-updater's scope (config, scripts, general docs).
+            The hook input is: $ARGUMENTS
 
-            Evaluate the file being edited:
+            Steps:
+            1. Extract file_path from the tool_input
+            2. Check path-based indicators FIRST (fast path):
+               - BLOCK if path matches: docs/adr/* (Use sdlc:adr agent)
+               - BLOCK if path matches: *ARCHITECTURE.md (Use sdlc:architect)
+               - BLOCK if path matches: docs/event_model/* (Use design agents)
+               - BLOCK if path contains: tests/, __tests__/, spec/, test/ or matches test file patterns (Use sdlc:red)
+               - BLOCK if path is in: src/, lib/, app/ with code file extensions (Use sdlc:green or sdlc:domain)
+            3. If path is ambiguous, read the file and check content:
+               - BLOCK if file contains test code, production implementation, or type definitions
+               - ALLOW if file is configuration (JSON, YAML, TOML, INI, env)
+               - ALLOW if file is a build script, Makefile, Dockerfile, CI config
+               - ALLOW if file is general documentation (README, CONTRIBUTING, CHANGELOG)
+               - ALLOW if file is a shell script or tooling configuration
 
-            ❌ BLOCK if:
-            - ADR files (docs/adr/*) - Use sdlc:adr agent
-            - ARCHITECTURE.md - Use sdlc:design-facilitator or sdlc:architect
-            - Event model files (docs/event_model/*) - Use sdlc:discovery, sdlc:workflow-designer, sdlc:gwt, or sdlc:model-checker
-            - Test files (*_test.*, *.test.*, tests/, __tests__/) - Use sdlc:red
-            - Production code (src/, lib/, app/) - Use sdlc:green
-            - Type definitions - Use sdlc:domain
-
-            ✅ ALLOW if:
-            - Configuration files (*.json, *.yaml, *.toml, etc.)
-            - Build scripts and tooling
-            - General documentation (README, CONTRIBUTING, etc.)
-            - Any file NOT in the blocked categories above
+            Respond QUICKLY - check path first, only read file if ambiguous.
 
             Respond with JSON:
-            {"ok": true} - if this file is within your scope
-            {"ok": false, "reason": "sdlc:file-updater cannot edit this file. Use <agent> instead."} - if blocked
+            {"ok": true} - if this file is within file-updater scope
+            {"ok": false, "reason": "sdlc:file-updater cannot edit this file. Use <appropriate agent> instead."} - if blocked
+          timeout: 60
     - matcher: Write
       hooks:
-        - type: prompt
+        - type: agent
           prompt: |
-            📁 SDLC-FILE-UPDATER AGENT CONSTRAINT CHECK
+            SDLC FILE-UPDATER AGENT SCOPE VERIFICATION
 
-            You are the FILE-UPDATER agent. You handle config, scripts, and general docs.
-            You are BLOCKED from creating specialized documentation.
+            You must verify this file being created is within the file-updater's scope.
+            The hook input is: $ARGUMENTS
 
-            Evaluate the file being created:
+            Steps:
+            1. Extract file_path from the tool_input
+            2. Check path-based indicators FIRST:
+               - BLOCK if path matches: docs/adr/*, *ARCHITECTURE.md, docs/event_model/*
+               - BLOCK if path matches test file or test directory patterns
+               - BLOCK if path is production code in src/, lib/, app/
+            3. If ambiguous, examine the content being written:
+               - BLOCK if content is test code, production code, or type definitions
+               - ALLOW if content is configuration, scripts, or general documentation
 
-            ❌ BLOCK if:
-            - ADR files (docs/adr/*) - Use sdlc:adr agent
-            - ARCHITECTURE.md - Use sdlc:design-facilitator or sdlc:architect
-            - Event model files (docs/event_model/*) - Use design agents
-            - Test files - Use sdlc:red
-            - Production code - Use sdlc:green
-            - Type definitions - Use sdlc:domain
-
-            ✅ ALLOW if:
-            - Configuration files
-            - Build scripts and tooling
-            - General documentation
-            - Any file NOT in the blocked categories above
+            Respond QUICKLY.
 
             Respond with JSON:
-            {"ok": true} - if this file is within your scope
-            {"ok": false, "reason": "sdlc:file-updater cannot create this file. Use <agent> instead."} - if blocked
+            {"ok": true} - if this file is within file-updater scope
+            {"ok": false, "reason": "sdlc:file-updater cannot create this file. Use <appropriate agent> instead."} - if blocked
+          timeout: 60
 ---
 
 # File Updater Agent
