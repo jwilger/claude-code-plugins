@@ -8,6 +8,7 @@ tools:
   - Bash
   - Glob
   - Grep
+  - Skill
 skills:
   - memory-protocol
   - user-input-protocol

@@ -2,7 +2,7 @@
 name: ux
 description: INVOKE when reviewing user journey coherence, accessibility, or interaction design
 model: inherit
-tools: Read, Glob, Grep
+tools: Read, Glob, Grep, Skill
 skills:
   - user-input-protocol
   - memory-protocol

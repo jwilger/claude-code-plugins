@@ -181,13 +181,20 @@ ls docs/event_model/workflows/*/overview.md 2>/dev/null || echo "No workflows"
 
 If prerequisites not met, inform user what's missing and which commands to run first.
 
-Use the `sdlc:design-facilitator` agent to facilitate architectural decisions:
+Invoke the `sdlc:design-facilitator` agent to work through architectural decisions across these categories:
 1. Technology Stack
 2. Domain Boundaries
 3. Integration Approaches
 4. Cross-Cutting Concerns
 
-For EACH significant decision: present options with tradeoffs, after user decides use `/sdlc:adr decide <topic>`. This updates ARCHITECTURE.md directly and creates an ADR PR.
+The agent first presents its identified decision points for review — the user can add, remove, or modify items, or provide pre-made decisions — before facilitating each one.
+
+**CRITICAL — One decision, one PR**:
+- The design-facilitator agent works through decisions ONE AT A TIME
+- For EACH decision: the agent presents options with tradeoffs, gets the user's choice via AskUserQuestion, then invokes `/sdlc:adr decide <topic>` (via the Skill tool) to update ARCHITECTURE.md and create an ADR PR for that single decision
+- Resume the agent between decisions to maintain conversational context
+- Do NOT batch multiple decisions into a single ARCHITECTURE.md write
+- Each `/sdlc:adr decide` invocation = one branch = one PR
 
 **Output**:
 ```

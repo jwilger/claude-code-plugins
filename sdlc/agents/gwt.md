@@ -7,6 +7,7 @@ tools:
   - Write
   - Edit
   - Glob
+  - Skill
 skills:
   - user-input-protocol
   - memory-protocol

@@ -10,6 +10,7 @@ tools:
   - Grep
   - Bash
   - Task
+  - Skill
 skills:
   - user-input-protocol
   - memory-protocol
@@ -22,7 +23,7 @@ hooks:
             🎯 SDLC-DESIGN-FACILITATOR AGENT CONSTRAINT CHECK
 
             You are the DESIGN-FACILITATOR agent. You may edit ARCHITECTURE.md.
-            For ADRs, delegate to sdlc:adr agent via /sdlc:adr command.
+            Use /sdlc:adr decide <topic> (via Skill tool) for ADR creation.
 
             Evaluate the file being edited:
 
@@ -43,7 +44,7 @@ hooks:
             🎯 SDLC-DESIGN-FACILITATOR AGENT CONSTRAINT CHECK
 
             You are the DESIGN-FACILITATOR agent. You may create ARCHITECTURE.md.
-            For ADRs, delegate to sdlc:adr agent via /sdlc:adr command.
+            Use /sdlc:adr decide <topic> (via Skill tool) for ADR creation.
 
             Evaluate the file being created:
 
@@ -116,7 +117,19 @@ For each category, identify what decisions need to be made:
 - Observability - logging, metrics, tracing strategy
 - Error handling and resilience - what happens when things fail
 
-### 3. Facilitate Each Decision
+### 3. Review Decision Agenda with User
+
+Present the complete list of identified decision points to the user, organized by category. For each item, include a one-line summary of why this decision matters.
+
+Ask the user to review the list:
+- **Add** decisions you missed or that the user already has in mind
+- **Remove** decisions the user considers already settled or out of scope
+- **Modify** the framing of any decision point
+- **Provide pre-made decisions** — if the user has already decided something, record it immediately via `/sdlc:adr decide <topic>` without going through the full facilitation for that item
+
+Only proceed to facilitation after the user confirms the agenda.
+
+### 4. Facilitate Each Decision
 
 For each decision point:
 
@@ -124,6 +137,8 @@ For each decision point:
 2. **Present Options**: 2-4 realistic alternatives with clear tradeoffs
 3. **Ask User**: Use AskUserQuestion for their preference
 4. **Record Decision**: After decision, use `/sdlc:adr decide <topic>` to update ARCHITECTURE.md and create an ADR PR
+
+**IMPORTANT**: Call `/sdlc:adr decide <topic>` separately for EACH decision. Do NOT batch multiple decisions — each call creates its own branch and PR.
 
 **Example Facilitation**:
 

@@ -13,6 +13,7 @@ tools:
   - Bash
   - Glob
   - Grep
+  - Skill
 hooks:
   PreToolUse:
     - matcher: Edit

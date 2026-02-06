@@ -2,7 +2,7 @@
 name: story
 description: INVOKE when reviewing story value and slice independence. Business perspective reviewer
 model: inherit
-tools: Read, Glob, Grep
+tools: Read, Glob, Grep, Skill
 skills:
   - user-input-protocol
   - memory-protocol

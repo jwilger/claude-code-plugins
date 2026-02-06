@@ -2,7 +2,7 @@
 name: mutation
 description: INVOKE before PR creation. Enforces 100% mutation score, reports surviving mutants
 model: inherit
-tools: Read, Bash, Glob, Grep
+tools: Read, Bash, Glob, Grep, Skill
 skills:
   - memory-protocol
 ---

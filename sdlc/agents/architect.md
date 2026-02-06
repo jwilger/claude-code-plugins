@@ -9,6 +9,7 @@ tools:
   - Edit
   - Glob
   - Grep
+  - Skill
 skills:
   - user-input-protocol
   - memory-protocol
