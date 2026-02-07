@@ -13,7 +13,7 @@
       "name": "sdlc",
       "source": "./sdlc",
       "description": "Complete SDLC workflow with TDD, Event Modeling, architecture decisions, and GitHub integration (includes Marvin personality option)",
-      "version": "19.0.0",
+      "version": "19.1.0",
       "keywords": [
         "sdlc",
         "tdd",

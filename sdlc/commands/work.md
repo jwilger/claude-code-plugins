@@ -61,12 +61,12 @@ If config doesn't exist, inform user to run `/sdlc:setup` first.
 grep "^sdlc_version:" .claude/sdlc.yaml || echo "sdlc_version: unknown"
 ```
 
-If the version in the config doesn't match the current plugin version (**19.0.0**), show a warning:
+If the version in the config doesn't match the current plugin version (**19.1.0**), show a warning:
 
 ```
 ⚠️  SDLC UPDATE AVAILABLE
 
-Your SDLC configuration was created with v<version> but you're running v19.0.0.
+Your SDLC configuration was created with v<version> but you're running v19.1.0.
 
 To update (preserves your configuration choices):
   /sdlc:setup

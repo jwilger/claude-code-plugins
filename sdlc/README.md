@@ -1,4 +1,4 @@
-# SDLC Plugin v19.0.0
+# SDLC Plugin v19.1.0
 
 **Complete Software Development Lifecycle workflow for Claude Code**
 

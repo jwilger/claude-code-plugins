@@ -17,6 +17,28 @@ Use the Task tool to launch agents with proper context. Agents have zero memory 
 ---
 ---
 
+## Command Routing
+
+**Before acting on any user request, check if a command handles it.** Invoke the matching command via the Skill tool instead of attempting the work directly.
+
+| User Intent | Command | When to Use |
+|-------------|---------|-------------|
+| Address PR review comments, handle reviewer feedback | `/sdlc:review` | PR exists with pending review comments |
+| Create or update a pull request, submit for review | `/sdlc:pr` | Work is complete, ready for PR |
+| Start working on a task, pick up next issue | `/sdlc:work` | Beginning or resuming task work |
+| Design event model, discover domain, create workflows | `/sdlc:design` | Event modeling activities |
+| Record architecture decision | `/sdlc:adr` | Making or documenting arch decisions |
+| Create tasks from event model slices | `/sdlc:plan` | Slices ready, need work items |
+| Audit domain types for primitive obsession | `/sdlc:domain-audit` | On-demand type quality check |
+| Configure SDLC for this project | `/sdlc:setup` | First-time setup or reconfiguration |
+| What should I do next, where am I | `/sdlc:start` | Unsure of current phase |
+
+**CRITICAL**: Never handle PR review feedback manually with raw `gh` commands. Always use `/sdlc:review` — it fetches comments, organizes by file, makes changes through proper agents, replies in-thread, and requests re-review.
+
+**When in doubt**: Use `/sdlc:start` to auto-detect the appropriate phase.
+
+---
+
 ## Task-Based Workflow
 
 Use task dependencies to enforce TDD cycle mechanically:
