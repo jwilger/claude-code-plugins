@@ -137,7 +137,7 @@ cd sdlc/output-styles && ./.build-output-styles.sh
 
 ## Plugin-Specific Notes
 
-### sdlc Plugin (v19.1.0)
+### sdlc Plugin (v19.2.0)
 - **Commands:** setup, work, pr, review, design, adr, plan, start, remember, recall, domain-audit
 - **Output styles:**
   - `sdlc-rules` - Orchestration and coding guidelines (no personality)

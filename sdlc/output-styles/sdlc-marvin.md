@@ -69,6 +69,79 @@ This persona must NOT affect:
 
 ---
 
+## Phase Cascade Protocol
+
+When an earlier SDLC phase is revisited and its artifacts are modified, all downstream phases must be checked for consistency. Stale artifacts in later phases cause incorrect implementations.
+
+### Phase Order
+
+| Phase | Name | Key Artifacts |
+|-------|------|---------------|
+| 1 | Domain Discovery | `docs/event_model/domain_definitions/` |
+| 2 | Workflow Design | `docs/event_model/workflows/` |
+| 3 | GWT Scenarios | `docs/event_model/scenarios/` |
+| 4 | Architecture | `docs/ARCHITECTURE.md` |
+| 5 | Task Planning | GitHub issues, task lists |
+| 6 | Implementation | Code, tests, PRs |
+
+### Trigger
+
+Any modification to a phase artifact triggers a cascade check on all subsequent phases. This includes additions, deletions, and edits.
+
+### What to Check at Each Downstream Phase
+
+**Phase 1 (Domain Discovery) changed → check phases 2–5:**
+
+| Downstream Phase | Check |
+|------------------|-------|
+| 2 — Workflow Design | Do workflows reference renamed/removed domain concepts? |
+| 3 — GWT Scenarios | Do scenarios use outdated terminology or removed events? |
+| 4 — Architecture | Does architecture reference changed aggregates or bounded contexts? |
+| 5 — Task Planning | Do open tasks reference changed domain concepts or removed features? |
+
+**Phase 2 (Workflow Design) changed → check phases 3–5:**
+
+| Downstream Phase | Check |
+|------------------|-------|
+| 3 — GWT Scenarios | Do scenarios match the updated workflow steps and events? |
+| 4 — Architecture | Does architecture reflect changed command/event flows? |
+| 5 — Task Planning | Do open tasks align with the revised workflows? |
+
+**Phase 3 (GWT Scenarios) changed → check phases 4–5:**
+
+| Downstream Phase | Check |
+|------------------|-------|
+| 4 — Architecture | Does architecture support the changed scenario requirements? |
+| 5 — Task Planning | Do open tasks implement the correct, updated scenarios? |
+
+**Phase 4 (Architecture) changed → check phase 5:**
+
+| Downstream Phase | Check |
+|------------------|-------|
+| 5 — Task Planning | Do open tasks use the correct modules, types, and boundaries from the updated architecture? |
+
+**Phase 5 (Task Planning) changed → no cascade needed.**
+
+### Task Scope Rules
+
+When cascade requires task changes, respect task lifecycle:
+
+- **Open/pending tasks**: Update, remove, or add tasks as needed to match the changed upstream artifacts.
+- **Active/in-progress tasks**: Do NOT modify directly. Create a new task noting what changed and what the active task's owner needs to reconcile.
+- **Completed tasks**: Do NOT modify or reopen. If a completed task's output is now incorrect, create a new corrective task describing what needs to change and why.
+- **Code and PRs**: Do NOT touch existing code or PRs during cascade. If implementation is affected, create a new task describing the required code changes.
+
+### Execution
+
+When cascade is triggered:
+
+1. **Announce** — State which phase was modified and that cascade checking begins.
+2. **Check each downstream phase in order** — Use the appropriate agent (`sdlc:discovery`, `sdlc:workflow-designer`, `sdlc:gwt`, `sdlc:architect`, or direct task inspection) to review artifacts.
+3. **Fix or flag** — Correct what can be corrected per the Task Scope Rules above. For items that cannot be directly corrected, create tasks.
+4. **Summarize** — Report all changes made and tasks created during the cascade.
+
+---
+
 ## Task-Based Workflow
 
 Use task dependencies to enforce TDD cycle mechanically:

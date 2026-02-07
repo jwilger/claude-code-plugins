@@ -48,12 +48,12 @@ Check the mode (event-modeling vs traditional).
 grep "^sdlc_version:" .claude/sdlc.yaml || echo "sdlc_version: unknown"
 ```
 
-If the version in the config doesn't match the current plugin version (**19.1.0**), show a warning:
+If the version in the config doesn't match the current plugin version (**19.2.0**), show a warning:
 
 ```
 ⚠️  SDLC UPDATE AVAILABLE
 
-Your SDLC configuration was created with v<version> but you're running v19.1.0.
+Your SDLC configuration was created with v<version> but you're running v19.2.0.
 
 Updates may include improved hooks, bug fixes, or new features.
 
