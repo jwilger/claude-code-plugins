@@ -114,9 +114,7 @@ Store results in `docs/event_model/domain/overview.md`. When complete, suggest t
 
 **Each workflow design happens on its own branch and creates its own PR.**
 
-For git-spice workflow, see the `shared/git-spice` skill.
-
-If not using git-spice, create a fresh branch:
+Create a fresh branch:
 ```bash
 git checkout -b event-model/<workflow-name>
 ```
@@ -196,6 +194,11 @@ The agent first presents its identified decision points for review — the user 
 - Do NOT batch multiple decisions into a single ARCHITECTURE.md write
 - Each `/sdlc:adr decide` invocation = one branch = one PR
 
+**Branching**: Each ADR creates an independent branch from main (not stacked).
+
+**Completion**: After all decisions, the design-facilitator offers to merge all
+ADR PRs and clean up branches.
+
 **Output**:
 ```
 Architecture Design Complete: <project-name>
@@ -235,6 +238,8 @@ Output to `docs/design-system/`
 
 After completing a workflow and its GWT scenarios:
 
+**IMPORTANT**: Do NOT add `Co-Authored-By` trailers to commits.
+
 ```bash
 git add docs/event_model/
 git commit -m "event-model: add <workflow-name> workflow design and scenarios"
@@ -255,8 +260,6 @@ gh pr create --title "Event Model: <Workflow Name>" \
 
 **Note**: This is domain modeling only. No architecture decisions are included or requested."
 ```
-
-For git-spice workflow, see the `shared/git-spice` skill.
 
 ### 6. Store in Auto Memory
 

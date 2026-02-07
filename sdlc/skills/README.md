@@ -59,7 +59,6 @@ The skills will be available as long as the sdlc plugin is installed.
 
 | Skill | Description | Portability | Version |
 |-------|-------------|-------------|---------|
-| **git-spice** | Stacked PR workflow patterns using git-spice | Tool-specific | 1.0.0 |
 | **github-issues** | GitHub CLI patterns for issue/PR management | Tool-specific | 1.0.0 |
 | **memory-protocol** | Memento MCP integration for semantic memory | MCP-specific | 1.0.0 |
 | **event-modeling** | Event Modeling facilitation and diagram generation | High | 1.0.0 |
@@ -146,7 +145,7 @@ Skills are injected into agent context automatically when referenced. Check your
 | **Universal** | Works anywhere, no tool dependencies | TDD principles, design patterns |
 | **High** | Minor adaptation needed | Event Modeling (framework-agnostic) |
 | **Medium** | Significant context required | Orchestration patterns (agent-specific) |
-| **Tool-Specific** | Requires specific tool | git-spice, GitHub CLI |
+| **Tool-Specific** | Requires specific tool | GitHub CLI |
 | **MCP-Specific** | Requires MCP server | Memento integration |
 
 ---
@@ -284,14 +283,13 @@ MIT License - See LICENSE file in repository root
 2. user-input-protocol (from shared/user-input-protocol.md)
 3. debugging-protocol (from shared/debugging-protocol.md)
 4. atomic-design (from shared/atomic-design.md)
-5. git-spice (from shared/git-spice.md)
-6. github-issues (from shared/github-issues.md)
-7. memory-protocol (from shared/memory-protocol.md)
-8. event-modeling (from shared/event-modeling.md)
-9. orchestration-protocol (from shared/orchestration.md)
+5. github-issues (from shared/github-issues.md)
+6. memory-protocol (from shared/memory-protocol.md)
+7. event-modeling (from shared/event-modeling.md)
+8. orchestration-protocol (from shared/orchestration.md)
 
 ---
 
 **Last Updated:** 2026-02-04
-**Skills Count:** 9 active skills
+**Skills Count:** 8 active skills
 **Total Lines:** ~10,000+ lines of protocol documentation

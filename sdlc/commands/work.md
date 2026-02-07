@@ -48,7 +48,7 @@ Start or continue working on a task. This command:
 ### 1. Load Configuration
 
 Read `.claude/sdlc.yaml` to get:
-- Git workflow preference (git-spice vs standard)
+- Git workflow preference
 - **Worktree mode** (`git.worktrees: true` enables parallel development)
 - GitHub project settings
 - Board status names
@@ -190,9 +190,7 @@ After creating the worktree:
 3. Run baseline tests to ensure clean starting state
 4. Optionally store worktree path in auto memory using /sdlc:remember if needed for context
 
-**If using git-spice (no worktrees):** For git-spice workflow guidance, invoke the `sdlc:shared/git-spice` skill or see its documentation.
-
-**If using standard git (no worktrees):**
+**If standard git (no worktrees):**
 ```bash
 git checkout -b feature/<task-id>
 ```
@@ -268,4 +266,4 @@ The SDLC will guide your TDD workflow. Just describe what you want to implement.
 - **Pull fails (diverged)**: Inform user of conflict, suggest `git pull --rebase` or manual resolution
 - **No ready tasks**: Suggest using `/sdlc:plan` to create tasks from event model slices, or manually creating tasks with `dot add`
 - **Task not found**: Show error with task ID, suggest `dot ls` to see all tasks
-- **Git-spice branching issues**: See `sdlc:shared/git-spice` skill for handling stacking scenarios
+

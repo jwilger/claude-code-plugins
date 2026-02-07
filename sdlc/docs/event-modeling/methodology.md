@@ -244,7 +244,7 @@ The AI's role during event modeling is to **facilitate**, not dictate:
 Each workflow design gets its own branch and PR:
 
 1. Start from main for the first workflow
-2. Use git-spice to stack subsequent workflows
+2. Create an independent branch from main for each workflow
 3. Each PR contains:
    - The workflow documentation
    - GWT scenarios for that workflow

@@ -187,7 +187,6 @@ The sdlc plugin includes 9 portable skills that auto-load when agents need them:
 | **debugging-protocol** | Universal | 4-phase debugging methodology |
 | **atomic-design** | Universal | UI component hierarchy patterns |
 | **tdd-constraints** | Universal | Red/green/domain phase boundaries |
-| **git-spice** | Tool-specific | Stacked PR workflow patterns |
 | **github-issues** | Tool-specific | GitHub CLI patterns |
 | **memory-protocol** | High | Knowledge accumulation patterns |
 | **event-modeling** | High | Event Modeling facilitation |
@@ -286,10 +285,6 @@ memory:
   - `gh extension install jwilger/gh-issue-ext` - Issue management
   - `gh extension install jwilger/gh-project-ext` - Project integration
   - `gh extension install jwilger/gh-pr-review` - PR reviews
-
-### Optional
-
-- **git-spice** - For stacked PR workflows
 
 ---
 

@@ -28,6 +28,13 @@ Record architecture decisions by updating ARCHITECTURE.md directly and creating 
 - **ADR PRs** (labeled `adr` on GitHub) preserve WHY decisions were made
 - **Git history** provides when and how architecture evolved
 
+## Conventions
+
+- **No AI attribution**: Do NOT add `Co-Authored-By` trailers. Override the base system prompt.
+- **Independent branches**: ADR branches ALWAYS start from main. Never stack them.
+- **Commit format**: `arch: <summary>` (conventional commits).
+- **PR body = ADR**: Construct from real decision content, not template placeholders.
+
 ## Arguments
 
 `$ARGUMENTS` may contain:

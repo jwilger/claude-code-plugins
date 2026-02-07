@@ -134,7 +134,7 @@ cd sdlc/output-styles && ./.build-output-styles.sh
 - **Workflow:** Task-based TDD cycle with mechanical dependency enforcement (v4.0.0+)
 - **Skills:** Auto-loads 9 portable skills (tdd-constraints, user-input-protocol, debugging-protocol, etc.)
 - **Requires:** gh CLI, gh extensions (gh-issue-ext, gh-project-ext, gh-pr-review)
-- **Optional:** git-spice for stacked PRs, Memento MCP for memory
+- **Optional:** Memento MCP for memory
 - **Breaking changes in v4.0.0:** See `sdlc/MIGRATION.md`
 
 ### bootstrap Plugin

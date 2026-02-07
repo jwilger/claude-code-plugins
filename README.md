@@ -36,7 +36,6 @@ claude set outputStyle sdlc-marvin   # With Marvin personality
   - `gh-issue-ext` - sub-issues, blocking, linked branches
   - `gh-project-ext` - project board management
   - `gh-pr-review` - PR review comment handling
-- git-spice (optional, for stacked PRs)
 - Memento MCP server (for persistent memory)
 
 ### Auto-Approval Patterns
@@ -49,7 +48,6 @@ Bash(gh issue-ext *)
 Bash(gh project *)
 Bash(gh project-ext *)
 Bash(gh pr-review *)
-Bash(gs *)  # if using git-spice
 ```
 
 ---

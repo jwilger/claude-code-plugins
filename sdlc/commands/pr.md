@@ -177,12 +177,6 @@ If PR exists, we'll update it. If not, we'll create it.
 
 ### 6. Push Changes
 
-If using git-spice (see [shared/git-spice](mdc:shared/git-spice) for usage):
-```bash
-gs stack submit
-```
-
-If using standard git:
 ```bash
 git push -u origin $(git branch --show-current)
 ```

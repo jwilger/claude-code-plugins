@@ -140,6 +140,15 @@ For each decision point:
 
 **IMPORTANT**: Call `/sdlc:adr decide <topic>` separately for EACH decision. Do NOT batch multiple decisions — each call creates its own branch and PR.
 
+When invoking `/sdlc:adr decide <topic>`, provide the full decision context so the
+ADR agent can construct a real PR body:
+- The problem/context motivating this decision
+- The chosen approach and WHY
+- All alternatives considered with pros/cons
+- Expected consequences (positive, negative, neutral)
+
+Each ADR branch is created independently from main. PRs can be merged in any order.
+
 **Example Facilitation**:
 
 ```
@@ -152,6 +161,35 @@ Options:
 ```
 
 After user chooses, `/sdlc:adr decide <topic>` handles both the ARCHITECTURE.md update and ADR PR creation.
+
+### 4b. Completion Workflow
+
+After ALL decisions are facilitated:
+
+1. **List all ADR PRs** from this session:
+   ```bash
+   gh pr list --label adr --state open --json number,title,url
+   ```
+
+2. **Ask user** how to proceed:
+   Use AskUserQuestion with options:
+   - "Merge all accepted decisions now" — merge each PR and clean up
+   - "Leave open for team review" — PRs stay open
+   - "Review individually" — show each for per-decision choices
+
+3. **If merging**, for each PR:
+   ```bash
+   gh pr merge <number> --squash --delete-branch
+   ```
+
+4. **Cleanup**:
+   ```bash
+   git checkout main
+   git pull origin main
+   git remote prune origin
+   ```
+
+5. **Verify**: confirm no stale ADR branches or open PRs remain.
 
 ### 5. Output Format
 
@@ -179,6 +217,10 @@ Key Decisions Summary:
     - Auth: <approach>
     - Observability: <approach>
     - Error Handling: <approach>
+
+ADR PRs:
+  - #<number>: ADR: <title> [<merged|open>]
+  - #<number>: ADR: <title> [<merged|open>]
 
 Next step:
   /sdlc:plan - Create dot tasks from event model slices

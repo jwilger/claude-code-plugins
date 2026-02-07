@@ -21,32 +21,13 @@ on ARCHITECTURE.md, or review the ADR PRs (labeled `adr` on GitHub).
 Do NOT reference ADR PRs in day-to-day work (issues, code comments, reviews).
 Reference ARCHITECTURE.md instead.
 
-## Git Operation Protocol (MANDATORY)
+## Git Operation Protocol
 
-Before ANY git operation (commit, branch, rebase, merge, push), check if git-spice manages this project.
+Use standard git commands for all branch and commit operations. Create feature branches
+from main using `git checkout -b <branch>`. Push with `git push -u origin HEAD`.
+Create PRs with `gh pr create`.
 
-### Detection
-
-```bash
-# Check if git-spice is installed AND current branch is managed
-command -v gs >/dev/null 2>&1 && gs branch checkout 2>/dev/null && echo "GS_MANAGED" || echo "REGULAR_GIT"
-```
-
-### Protocol
-
-1. **If GS_MANAGED**: Follow `git-spice` skill patterns and decision tree
-2. **If REGULAR_GIT**: Use standard git commands
-
-### Critical Git-Spice Operations
-
-When using git-spice:
-- **After PR merges**: Run `gs repo sync`, then IMMEDIATELY verify (see git-spice.md Post-Sync Verification)
-- **View stack status**: Use `gs log short` (NOT bare `gs stack` - that doesn't exist)
-- **If sync goes wrong**: Use `gs upstack onto <correct-base>` to recover
-
-### Why This Matters
-
-Git-spice manages branch relationships. Using regular git commands (like `git rebase`) on gs-managed branches can corrupt the stack state, leading to lost work or branches moved to wrong bases.
+**Commit conventions**: See "Git Commit Conventions" in the output style.
 
 ## File Operations (MANDATORY DELEGATION)
 
