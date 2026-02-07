@@ -159,6 +159,17 @@ dot off <task-id> -r "reason"       # Complete (→ closed)
 
 Always provide a close reason with `-r` for audit trail.
 
+**Close tasks on the feature branch.** When a task is done, close it and commit
+the `.dots/` changes on the feature branch *before* creating the PR. This way,
+when the PR merges, main reflects the task as completed.
+
+```bash
+dot off <task-id> -r "Completed"
+git add .dots/
+git commit -m "chore: close task <task-id>"
+# Then create PR — task closure is included
+```
+
 ## Searching
 
 ```bash
@@ -203,11 +214,14 @@ dot ls --json          # Full JSON for custom filtering
 - Use `-P` for parent-child and `-a` for blocking dependencies
 - Use full task IDs in git branch names for traceability
 - Provide close reasons with `-r`
+- Close tasks on the feature branch and commit `.dots/` changes before creating the PR
+- Track `.dots/` in version control so task state lands on main with PRs
 
 **DON'T:**
 - Skip `dot ready` — `dot ls` shows blocked tasks too
 - Create circular dependencies
 - Use short IDs or issue numbers in branch names
+- Close tasks after PR merge — close them before so `.dots/` changes are in the PR
 
 ## Detailed Examples
 

@@ -592,7 +592,7 @@ Write the following content inside the managed markers. The content outside the 
 | Create tasks from slices          | `/sdlc:plan`                 |
 | Create PR with review             | `/sdlc:pr`                   |
 | Address review comments           | `/sdlc:review`               |
-| Complete a task after merge       | `/sdlc:complete`             |
+| Close a task (without PR)         | `/sdlc:complete`             |
 | Record architecture decision      | `/sdlc:adr`                  |
 | Audit domain types                | `/sdlc:domain-audit`         |
 | Save a discovery to memory        | `/sdlc:remember`             |
@@ -674,10 +674,13 @@ dot ls                  # List all tasks
 dot ready               # Show unblocked tasks
 dot add "title"         # Create a task
 dot on <id>             # Start working on a task
-dot off <id>            # Stop working on a task
-dot done <id>           # Mark task complete
+dot off <id> -r "why"   # Close a task
 dot tree                # Show task hierarchy
 ```
+
+**Important:** Close tasks on the feature branch before creating the PR.
+Commit `.dots/` changes so task closure lands on main when the PR merges.
+`/sdlc:pr` handles this automatically.
 
 <!-- sdlc:managed-end -->
 ```

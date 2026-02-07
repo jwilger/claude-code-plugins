@@ -34,15 +34,8 @@ TDD cycle with hooks enforcement:
 
 ```bash
 /sdlc:pr
-# Creates PR referencing task
-```
-
-### 5. Complete Task
-
-```bash
-# After PR merges:
-/sdlc:complete
-# Verifies PR merged, closes task, checks parent
+# Closes the task, commits .dots/ changes, creates PR
+# When PR merges, main reflects the task as completed
 ```
 
 ## Event Modeling Workflow
@@ -96,12 +89,11 @@ cd /path/to/main/project
 # Check epic progress
 dot tree <epic-id>
 
-# Complete last child
-/sdlc:complete <last-child-id>
-# Prompts: "All children complete. Close parent?"
+# Complete last child (via /sdlc:pr or /sdlc:complete)
+# Both commands check parent completion and prompt:
+# "All children complete. Close parent?"
 
-# Close epic
-# (Handled by /sdlc:complete prompt)
+# Parent closure is committed on the branch with .dots/ changes
 ```
 
 ## Dependency Workflow
@@ -161,21 +153,23 @@ BRANCH=$(git branch --show-current)
 TASK_ID=$(echo "$BRANCH" | sed 's/^feature\///')
 dot show "$TASK_ID"
 
-# PR → Task
+# Close task → Commit .dots/ → Create PR
+dot off "$TASK_ID" -r "Completed"
+git add .dots/ && git commit -m "chore: close task $TASK_ID"
 gh pr create --body "Task: $TASK_ID ..."
 
-# Merge → Complete
-/sdlc:complete  # Auto-detects from branch
+# When PR merges, main reflects task as closed
 ```
 
 ## Best Practices
 
 1. **Use dot ready**, not `dot ls --status open` (respects blockers)
 2. **Full task IDs in branches** (`feature/<task-id>`)
-3. **Close with reasons** (`dot off <id> -r "Completed via PR #123"`)
-4. **Hierarchical breakdown** (epic → stories → subtasks)
-5. **Declare dependencies upfront** (`-a` flag on create)
-6. **Commit .dots/** to version control (or add to .gitignore)
+3. **Close tasks on the feature branch** so `.dots/` changes are part of the PR
+4. **Close with reasons** (`dot off <id> -r "Completed"`)
+5. **Hierarchical breakdown** (epic → stories → subtasks)
+6. **Declare dependencies upfront** (`-a` flag on create)
+7. **Commit .dots/** to version control (track task state in the repo)
 
 ## See Also
 

@@ -55,6 +55,11 @@ git checkout -b "feature/<task-id>"
 
 # Extract task ID from branch
 TASK_ID=$(git branch --show-current | sed 's/^feature\///')
+
+# Close task on feature branch (before creating PR)
+dot off <task-id> -r "Completed"
+git add .dots/ && git commit -m "chore: close task <task-id>"
+# .dots/ changes are included in the PR and land on main when merged
 ```
 
 ## See Also

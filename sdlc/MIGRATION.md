@@ -12,7 +12,7 @@ sdlc v5.0.0 replaces GitHub Issues/Projects with local dot CLI for task manageme
 | Task IDs | Issue numbers (#123) | Full task IDs (myproject-add-login-abc123) |
 | Task Status | GitHub Project board | dot CLI (`open`/`active`/`closed`) |
 | Required Tools | `gh-issue-ext`, `gh-project-ext` | `dot` CLI |
-| PR Closure | Automatic (via "Closes #123") | Manual (`/sdlc:complete`) |
+| PR Closure | Automatic (via "Closes #123") | Task closed on branch, `.dots/` in PR |
 
 ### Why the Change
 
@@ -25,7 +25,6 @@ sdlc v5.0.0 replaces GitHub Issues/Projects with local dot CLI for task manageme
 **Trade-offs:**
 - No web UI
 - Single-developer focus
-- Manual task completion
 
 ---
 
@@ -113,9 +112,8 @@ dot add "<title>" -p 2 -d "<body from issue>"
 ```bash
 /sdlc:work          # Pick task
 # ... work ...
-/sdlc:pr            # PR references task
-# PR merges → Manual completion:
-/sdlc:complete      # Close task
+/sdlc:pr            # Close task, commit .dots/, create PR
+# PR merges → main reflects task as closed
 ```
 
 ---
@@ -155,7 +153,7 @@ github:
 | Start work | (auto-assign + move) | `dot on <task-id>` |
 | View task | `gh issue view <num>` | `dot show <task-id>` |
 | View hierarchy | `gh issue-ext sub list` | `dot tree <task-id>` |
-| Complete task | (auto via "Closes #123") | `/sdlc:complete` |
+| Complete task | (auto via "Closes #123") | `/sdlc:pr` (closes task in PR) |
 
 **Unchanged:** `/sdlc:work`, `/sdlc:pr`, `/sdlc:review`, `/sdlc:design`, `/sdlc:plan`
 
@@ -188,11 +186,11 @@ github:
 
 ```bash
 # v5.0.0
-# After PR merges:
-/sdlc:complete
-# Verifies PR merged
-# Closes task: "Completed via PR #125"
-# Prompts to close parent if all children done
+# Task is closed during /sdlc:pr:
+/sdlc:pr
+# Closes task, commits .dots/ changes, creates PR
+# When PR merges, main reflects task as closed
+# Parent completion is checked automatically
 ```
 
 ---
@@ -223,8 +221,9 @@ dot ready  # Shows only unblocked tasks
 
 ### "Parent won't close"
 ```bash
-/sdlc:complete <last-child-id>
-# Will prompt to close parent
+# /sdlc:pr checks parent completion when closing the last child task
+# Or use /sdlc:complete to manually close a parent
+/sdlc:complete <parent-id>
 ```
 
 ---
@@ -243,12 +242,12 @@ A: No. Migrate only active work. Use `/sdlc:plan` for new work from slices.
 **Q: Can I switch back to v4.x?**
 A: Yes, but you'll lose dot tasks. Pin v4.x in plugin settings.
 
-**Q: Why manual task completion?**
-A: Gives control: verify PR merged, close parent epics, better audit trail.
+**Q: How does task completion work now?**
+A: `/sdlc:pr` closes the task and commits `.dots/` changes on the feature branch. When the PR merges, main reflects the task as closed. Use `/sdlc:complete` for manual closure without a PR.
 
 **Q: Can teams use dot CLI?**
 A: dot is single-developer. For teams:
-- Each dev has own `.dots/` (not committed)
+- Commit `.dots/` to version control — task state is shared via PRs
 - Use GitHub PRs for collaboration
 - Or stay on v4.x for team task management
 

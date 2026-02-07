@@ -8,6 +8,13 @@ This is a Claude Code plugin marketplace containing plugins:
 - **sdlc** - Complete SDLC workflow with TDD, Event Modeling, ADRs, and GitHub integration (includes 9 portable agent skills and 2 output styles)
 - **bootstrap** - Project scaffolding with Nix-based development environments
 
+## Setup
+
+On first use (or after a fresh clone), ensure the git hooks path is configured:
+```bash
+git config core.hooksPath .githooks
+```
+
 ## Commands
 
 ```bash
@@ -71,17 +78,29 @@ Commands are namespaced automatically: `/<plugin-name>:<command-filename>`
 
 ## Version Management
 
-**Critical**: When modifying any plugin, update versions in ALL THREE locations:
-1. Plugin manifest: `<plugin>/.claude-plugin/plugin.json`
-2. Marketplace entry: `.claude-plugin/marketplace.json`
-3. **For sdlc plugin**: `sdlc/commands/setup.md` (hardcoded version strings throughout)
+The sdlc plugin version is embedded in 7 files. Use the bump script to update them all at once:
 
-The sdlc setup command contains hardcoded version numbers used for update detection. Search for the old version and replace all instances:
 ```bash
-grep -n "3.12.6" sdlc/commands/setup.md  # Find all version references
+./scripts/bump-version.sh <new-version>   # e.g. ./scripts/bump-version.sh 20.0.0
 ```
 
-Compare against `origin/main` to determine appropriate semver bump. The plugin cache uses version numbers to detect updates - unchanged versions won't refresh the cache.
+**Source of truth:** `sdlc/.claude-plugin/plugin.json`
+
+**Files updated by the script:**
+1. `sdlc/.claude-plugin/plugin.json` — canonical version (jq)
+2. `.claude-plugin/marketplace.json` — sdlc entry (jq)
+3. `sdlc/commands/setup.md` — all occurrences (sed)
+4. `sdlc/commands/start.md` — all occurrences (sed)
+5. `sdlc/commands/work.md` — all occurrences (sed)
+6. `sdlc/README.md` — line 1 heading only (sed)
+7. `CLAUDE.md` — `### sdlc Plugin (vX.Y.Z)` heading only (sed)
+
+**Pre-commit safety net:** A git hook validates version consistency when any of these files is staged. Install once per clone:
+```bash
+git config core.hooksPath .githooks
+```
+
+Compare against `origin/main` to determine appropriate semver bump. The plugin cache uses version numbers to detect updates — unchanged versions won't refresh the cache.
 
 ## Output Style Synchronization
 
@@ -118,7 +137,7 @@ cd sdlc/output-styles && ./.build-output-styles.sh
 
 ## Plugin-Specific Notes
 
-### sdlc Plugin (v4.0.0)
+### sdlc Plugin (v19.0.0)
 - **Commands:** setup, work, pr, review, design, adr, plan, start, remember, recall, domain-audit
 - **Output styles:**
   - `sdlc-rules` - Orchestration and coding guidelines (no personality)
@@ -131,11 +150,10 @@ cd sdlc/output-styles && ./.build-output-styles.sh
   - Review agents: code-reviewer, mutation
   - Story planning agents: story, ux
   - Utility agents: file-updater
-- **Workflow:** Task-based TDD cycle with mechanical dependency enforcement (v4.0.0+)
+- **Workflow:** Task-based TDD cycle with mechanical dependency enforcement
 - **Skills:** Auto-loads 9 portable skills (tdd-constraints, user-input-protocol, debugging-protocol, etc.)
-- **Requires:** gh CLI, gh extensions (gh-issue-ext, gh-project-ext, gh-pr-review)
-- **Optional:** Memento MCP for memory
-- **Breaking changes in v4.0.0:** See `sdlc/MIGRATION.md`
+- **Requires:** gh CLI, dot CLI, gh-pr-review extension
+- **Breaking changes in v19.0.0:** See `sdlc/MIGRATION.md`
 
 ### bootstrap Plugin
 - Commands: rust (bootstraps Rust projects with Nix flake)

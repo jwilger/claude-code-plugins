@@ -6,7 +6,20 @@
     "name": "John Wilger",
     "email": "john@johnwilger.com"
   },
-  "keywords": ["sdlc", "tdd", "event-modeling", "adr", "github", "workflow", "code-review", "debugging", "hooks", "todo-enforcement", "marvin", "output-style"],
+  "keywords": [
+    "sdlc",
+    "tdd",
+    "event-modeling",
+    "adr",
+    "github",
+    "workflow",
+    "code-review",
+    "debugging",
+    "hooks",
+    "todo-enforcement",
+    "marvin",
+    "output-style"
+  ],
   "outputStyles": "./output-styles/",
   "skills": "./skills/",
   "commands": [

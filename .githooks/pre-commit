@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# pre-commit hook — Verify sdlc plugin version consistency across all files
+# that embed the version string.
+#
+# Install:  git config core.hooksPath .githooks
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+PLUGIN_JSON="sdlc/.claude-plugin/plugin.json"
+MARKETPLACE=".claude-plugin/marketplace.json"
+SETUP_MD="sdlc/commands/setup.md"
+START_MD="sdlc/commands/start.md"
+WORK_MD="sdlc/commands/work.md"
+README_MD="sdlc/README.md"
+CLAUDE_MD="CLAUDE.md"
+
+VERSION_FILES=(
+  "$PLUGIN_JSON"
+  "$MARKETPLACE"
+  "$SETUP_MD"
+  "$START_MD"
+  "$WORK_MD"
+  "$README_MD"
+  "$CLAUDE_MD"
+)
+
+# Only run if at least one version file is staged
+STAGED="$(git diff --cached --name-only)"
+HAS_VERSION_FILE=0
+for f in "${VERSION_FILES[@]}"; do
+  if echo "$STAGED" | grep -qx "$f"; then
+    HAS_VERSION_FILE=1
+    break
+  fi
+done
+
+if [[ "$HAS_VERSION_FILE" -eq 0 ]]; then
+  exit 0
+fi
+
+# Read expected version from staged plugin.json (fall back to working copy)
+if echo "$STAGED" | grep -qx "$PLUGIN_JSON"; then
+  EXPECTED="$(git show ":$PLUGIN_JSON" | jq -r '.version')"
+else
+  EXPECTED="$(jq -r '.version' "$REPO_ROOT/$PLUGIN_JSON")"
+fi
+
+if [[ -z "$EXPECTED" || "$EXPECTED" == "null" ]]; then
+  echo "pre-commit: Could not read version from $PLUGIN_JSON"
+  exit 1
+fi
+
+ERRORS=()
+
+# Helper: check a staged file's content, or working-copy if not staged
+file_content() {
+  local path="$1"
+  if echo "$STAGED" | grep -qx "$path"; then
+    git show ":$path"
+  else
+    cat "$REPO_ROOT/$path"
+  fi
+}
+
+# --- Check marketplace.json (sdlc entry) ---
+if echo "$STAGED" | grep -qx "$MARKETPLACE"; then
+  MKT_VER="$(file_content "$MARKETPLACE" | jq -r '.plugins[] | select(.name=="sdlc") | .version')"
+  if [[ "$MKT_VER" != "$EXPECTED" ]]; then
+    ERRORS+=("$MARKETPLACE: sdlc version is $MKT_VER (expected $EXPECTED)")
+  fi
+fi
+
+# Helper: extract plugin-version patterns from markdown files.
+# Matches **X.Y.Z**, vX.Y.Z, and "X.Y.Z" — ignores bare versions like
+# "minimum 0.6.4 required" that refer to other tools.
+extract_plugin_versions() {
+  grep -oP '(?<=\*\*)\d+\.\d+\.\d+(?=\*\*)|(?<=v)\d+\.\d+\.\d+|(?<=")\d+\.\d+\.\d+(?=")' || true
+}
+
+# --- Check setup.md ---
+if echo "$STAGED" | grep -qx "$SETUP_MD"; then
+  SETUP_CONTENT="$(file_content "$SETUP_MD")"
+  BAD_VERSIONS="$(echo "$SETUP_CONTENT" | extract_plugin_versions | sort -u | grep -v "^${EXPECTED}$" || true)"
+  if [[ -n "$BAD_VERSIONS" ]]; then
+    ERRORS+=("$SETUP_MD: found version(s) other than $EXPECTED: $(echo "$BAD_VERSIONS" | tr '\n' ' ')")
+  fi
+fi
+
+# --- Check start.md ---
+if echo "$STAGED" | grep -qx "$START_MD"; then
+  START_CONTENT="$(file_content "$START_MD")"
+  BAD_VERSIONS="$(echo "$START_CONTENT" | extract_plugin_versions | sort -u | grep -v "^${EXPECTED}$" || true)"
+  if [[ -n "$BAD_VERSIONS" ]]; then
+    ERRORS+=("$START_MD: found version(s) other than $EXPECTED: $(echo "$BAD_VERSIONS" | tr '\n' ' ')")
+  fi
+fi
+
+# --- Check work.md ---
+if echo "$STAGED" | grep -qx "$WORK_MD"; then
+  WORK_CONTENT="$(file_content "$WORK_MD")"
+  BAD_VERSIONS="$(echo "$WORK_CONTENT" | extract_plugin_versions | sort -u | grep -v "^${EXPECTED}$" || true)"
+  if [[ -n "$BAD_VERSIONS" ]]; then
+    ERRORS+=("$WORK_MD: found version(s) other than $EXPECTED: $(echo "$BAD_VERSIONS" | tr '\n' ' ')")
+  fi
+fi
+
+# --- Check README.md (line 1 only) ---
+if echo "$STAGED" | grep -qx "$README_MD"; then
+  README_LINE1="$(file_content "$README_MD" | head -1)"
+  README_VER="$(echo "$README_LINE1" | grep -oP '\d+\.\d+\.\d+' || true)"
+  if [[ -n "$README_VER" && "$README_VER" != "$EXPECTED" ]]; then
+    ERRORS+=("$README_MD line 1: version is $README_VER (expected $EXPECTED)")
+  fi
+fi
+
+# --- Check CLAUDE.md (section heading) ---
+if echo "$STAGED" | grep -qx "$CLAUDE_MD"; then
+  CLAUDE_CONTENT="$(file_content "$CLAUDE_MD")"
+  CLAUDE_VER="$(echo "$CLAUDE_CONTENT" | grep -oP '### sdlc Plugin \(v\K[0-9]+\.[0-9]+\.[0-9]+' || true)"
+  if [[ -n "$CLAUDE_VER" && "$CLAUDE_VER" != "$EXPECTED" ]]; then
+    ERRORS+=("$CLAUDE_MD: sdlc Plugin heading shows v$CLAUDE_VER (expected v$EXPECTED)")
+  fi
+fi
+
+# --- Report ---
+if [[ ${#ERRORS[@]} -gt 0 ]]; then
+  echo ""
+  echo "pre-commit: sdlc version mismatch detected!"
+  echo ""
+  echo "Expected version (from $PLUGIN_JSON): $EXPECTED"
+  echo ""
+  for err in "${ERRORS[@]}"; do
+    echo "  - $err"
+  done
+  echo ""
+  echo "Fix with:  ./scripts/bump-version.sh $EXPECTED"
+  echo ""
+  exit 1
+fi
+
+exit 0

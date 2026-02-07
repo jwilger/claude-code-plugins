@@ -48,12 +48,12 @@ Check the mode (event-modeling vs traditional).
 grep "^sdlc_version:" .claude/sdlc.yaml || echo "sdlc_version: unknown"
 ```
 
-If the version in the config doesn't match the current plugin version (**5.0.0**), show a warning:
+If the version in the config doesn't match the current plugin version (**19.0.0**), show a warning:
 
 ```
 ⚠️  SDLC UPDATE AVAILABLE
 
-Your SDLC configuration was created with v<version> but you're running v5.0.0.
+Your SDLC configuration was created with v<version> but you're running v19.0.0.
 
 Updates may include improved hooks, bug fixes, or new features.
 
@@ -71,8 +71,8 @@ This project uses traditional development mode.
 
 Available commands:
   /sdlc:work  - Start working on a task
-  /sdlc:pr    - Create/update a pull request
-  /sdlc:complete - Complete a task after PR merge
+  /sdlc:pr    - Create/update a pull request (closes task automatically)
+  /sdlc:complete - Close a task without a PR
   /sdlc:review - Handle PR review feedback
 
 Task management:
@@ -241,11 +241,8 @@ To check status:
 To continue working:
   (Just start coding - TDD hooks will guide you)
 
-To create/update PR:
+To create/update PR (closes task automatically):
   /sdlc:pr
-
-After PR merges:
-  /sdlc:complete
 
 To handle review feedback:
   /sdlc:review

@@ -48,9 +48,9 @@ dot add "Child" -P parent-id  # Create child task
 **Updated:**
 - `github.owner` + `github.repository` (for PR workflows only)
 
-#### Manual Task Completion
+#### Task Closure in PRs
 
-**BREAKING:** Tasks must be manually completed after PR merge.
+**BREAKING:** Task closure workflow changed.
 
 **Before (v4.x):**
 ```bash
@@ -60,15 +60,11 @@ dot add "Child" -P parent-id  # Create child task
 
 **After (v5.0.0):**
 ```bash
-/sdlc:pr  # Creates PR referencing task
-# PR merges → Manual completion:
-/sdlc:complete  # Closes task, checks parent
+/sdlc:pr  # Closes task, commits .dots/ changes, creates PR
+# PR merges → main reflects task as closed
 ```
 
-**Why:** Explicit completion gives control to:
-- Verify PR actually merged (not just closed)
-- Close parent epics when all children done
-- Better audit trail with completion reasons
+**Why:** `.dots/` changes are committed on the feature branch and included in the PR. When the PR merges, main shows the task as completed. No separate completion step needed.
 
 #### Removed Dependencies
 
@@ -85,17 +81,17 @@ dot add "Child" -P parent-id  # Create child task
 
 #### `/sdlc:complete` Command
 
-New command for explicit task completion after PR merge:
+Command for closing tasks outside the PR workflow:
 
 ```bash
 /sdlc:complete [task-id]  # Auto-detects from branch if omitted
 ```
 
 Features:
-- Verifies PR was merged
-- Closes task with completion reason
+- Closes task and commits `.dots/` changes on the current branch
 - Checks if parent epic should close
 - Prompts to close parent if all children done
+- Use for tasks without a PR (spikes, config changes, manual closure)
 
 #### Branch Naming with Full Task IDs
 

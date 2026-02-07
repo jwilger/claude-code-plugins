@@ -34,9 +34,9 @@ hooks:
 Create or update a pull request for the current work. This command:
 1. Performs three-stage code review (spec compliance, code quality, domain integrity)
 2. Runs mutation testing to verify test quality
-3. Creates or updates the PR
-4. References the task in PR body
-5. Task remains active (must be manually completed with /sdlc:complete after PR merge)
+3. Closes the task and commits `.dots/` changes on the feature branch
+4. Creates or updates the PR (with task closure included)
+5. When PR merges, main branch reflects the task as completed
 
 ## Steps
 
@@ -167,7 +167,44 @@ If mutation score is below 100%:
 - Warn that PR can still be created but may need additional tests
 - Ask user if they want to proceed or fix first
 
-### 5. Check for Existing PR
+### 5. Close the Task
+
+Close the task so the `.dots/` changes are included in this PR. When the PR merges, main branch will reflect the task as completed.
+
+```bash
+dot off <task-id> -r "Completed via PR (pending merge)"
+```
+
+#### Check Parent Task
+
+If the task has a parent, check if all siblings are now complete:
+
+```bash
+PARENT_ID=$(dot show <task-id> --json | jq -r '.parent // empty')
+if [ -n "$PARENT_ID" ]; then
+  CHILDREN=$(dot tree "$PARENT_ID" --json | jq -r '.children[] | .status')
+  INCOMPLETE=$(echo "$CHILDREN" | grep -cv "closed")
+  if [ "$INCOMPLETE" -eq 0 ]; then
+    # All children done — close parent too
+    dot off "$PARENT_ID" -r "All child tasks completed"
+  fi
+fi
+```
+
+If all children are complete, use AskUserQuestion to confirm closing the parent before doing so.
+
+#### Commit .dots/ Changes
+
+Stage and commit the `.dots/` changes on the feature branch:
+
+```bash
+git add .dots/
+git commit -m "chore: close task <task-id>"
+```
+
+This commit ensures the task closure travels with the PR. When merged, main shows the task as closed.
+
+### 6. Check for Existing PR
 
 ```bash
 gh pr list --head $(git branch --show-current) --json number,url
@@ -175,13 +212,13 @@ gh pr list --head $(git branch --show-current) --json number,url
 
 If PR exists, we'll update it. If not, we'll create it.
 
-### 6. Push Changes
+### 7. Push Changes
 
 ```bash
 git push -u origin $(git branch --show-current)
 ```
 
-### 7. Create/Update PR
+### 8. Create/Update PR
 
 #### If creating new PR:
 
@@ -206,14 +243,9 @@ gh pr create \
 - All tests passing
 - Mutation score: <score>%
 
----
-**Note:** After merging, run `/sdlc:complete <task-id>` to close the task.
-
 Related task: <task-id>" \
   --assignee @me
 ```
-
-**Important:** Unlike GitHub Issues with `Closes #123` syntax, dot tasks must be manually completed with `/sdlc:complete` after PR merge.
 
 #### If updating existing PR:
 
@@ -222,31 +254,19 @@ Related task: <task-id>" \
 gh pr view --json url
 ```
 
-### 8. Task Status
-
-The task remains in `active` status during PR review. It must be manually completed after merge using `/sdlc:complete <task-id>`.
-
-This manual step allows you to:
-- Verify the PR was actually merged (not just closed)
-- Check if the parent task should also be closed (all children done?)
-- Add any final notes to memento about the work
-
 ### 9. Display Result
 
 ```
 Pull Request created/updated!
 
 PR: <url>
-Task: <task-id> - <title>
+Task: <task-id> - <title> (closed)
 Mutation Score: <score>%
-
-Status:
-  - Task: active (complete with /sdlc:complete after merge)
 
 Next steps:
   - Wait for review feedback
   - Run /sdlc:review when you have comments to address
-  - After PR merges, run: /sdlc:complete <task-id>
+  - When PR merges, task closure lands on main automatically
 ```
 
 ## Error Handling

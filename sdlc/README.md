@@ -1,4 +1,4 @@
-# SDLC Plugin v5.0.0
+# SDLC Plugin v19.0.0
 
 **Complete Software Development Lifecycle workflow for Claude Code**
 
@@ -37,18 +37,17 @@ Integrates TDD, Event Modeling, Architecture Decisions, local task management wi
 
 **Breaking Change:** Requires dot CLI installation and `/sdlc:setup` re-run.
 
-### 📝 Manual Task Completion
+### 📝 Task Closure in PRs
 
 **Before (v4.x):** GitHub auto-closes issues via "Closes #123"
 
-**Now (v5.0.0):** Explicit task completion with `/sdlc:complete`:
+**Now (v5.0.0):** Tasks are closed on the feature branch, and `.dots/` changes are included in the PR:
 
 ```bash
 /sdlc:work          # Start task
 # ... develop ...
-/sdlc:pr            # Create PR
-# ... PR merges ...
-/sdlc:complete      # Close task, check parent
+/sdlc:pr            # Close task, commit .dots/, create PR
+# PR merges → main reflects task as closed
 ```
 
 ### 🔧 Simplified Dependencies
@@ -73,7 +72,7 @@ Integrates TDD, Event Modeling, Architecture Decisions, local task management wi
 | `/sdlc:setup` | Initialize project configuration | One-time setup |
 | `/sdlc:work` | Start TDD workflow for a task | Main development loop |
 | `/sdlc:pr` | Create pull request with review gates | After feature complete |
-| `/sdlc:complete` | Complete task after PR merge | After PR merges |
+| `/sdlc:complete` | Close task (without PR) | Manual closure |
 | `/sdlc:review` | Handle PR review feedback | Review cycle |
 | `/sdlc:design` | Event Modeling facilitation | Design phase |
 | `/sdlc:adr` | Record architecture decision (creates PR) | Document decisions |
@@ -281,10 +280,9 @@ memory:
 ### Required
 
 - **gh CLI** - GitHub command-line tool
-- **gh extensions:**
-  - `gh extension install jwilger/gh-issue-ext` - Issue management
-  - `gh extension install jwilger/gh-project-ext` - Project integration
-  - `gh extension install jwilger/gh-pr-review` - PR reviews
+- **dot CLI** - Local task management ([github.com/ajeetdsouza/dot](https://github.com/ajeetdsouza/dot))
+- **gh extension:**
+  - `gh extension install agynio/gh-pr-review` - PR review comment handling
 
 ---
 

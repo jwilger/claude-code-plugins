@@ -87,7 +87,12 @@ BRANCH=$(git branch --show-current)
 TASK_ID=$(echo "$BRANCH" | sed 's/^feature\///')
 dot show "$TASK_ID"
 
-# Create PR with task reference
+# Close task and commit .dots/ changes on the feature branch
+dot off "$TASK_ID" -r "Completed"
+git add .dots/
+git commit -m "chore: close task $TASK_ID"
+
+# Create PR (includes task closure)
 gh pr create \
   --title "Add login form" \
   --body "Task: $TASK_ID
@@ -96,8 +101,7 @@ gh pr create \
 - Added login form component
 - Added form validation"
 
-# After PR merge
-dot off "$TASK_ID" -r "Completed via PR #123"
+# When PR merges, main reflects task as closed
 ```
 
 ## Dependency Chains
@@ -137,8 +141,8 @@ dot tree "$EPIC_ID"
 # ├── myapp-add-auth-api-ghi789 (active)    ← last one
 # └── myapp-add-sessions-jkl012 (closed)
 
-# Complete last child
-dot off myapp-add-auth-api-ghi789 -r "Completed via PR #125"
+# Complete last child (on its feature branch, before PR)
+dot off myapp-add-auth-api-ghi789 -r "Completed"
 
 # Check if parent should close
 CHILDREN=$(dot tree "$EPIC_ID" --json | jq -r '.children[] | .status')
