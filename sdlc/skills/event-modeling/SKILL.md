@@ -167,6 +167,7 @@ Expert: "Oh! We backorder them. I guess we need BackorderCreated event..."
 - Make events immutable facts
 - Include relevant data in events (what, when, who)
 - Find right granularity (not too coarse, not too fine)
+- Record domain facts only (true on any machine — no file paths, hostnames, PIDs)
 
 ### DON'T (Event Design):
 - Use present tense (ProcessPayment → PaymentProcessed)
@@ -174,6 +175,8 @@ Expert: "Oh! We backorder them. I guess we need BackorderCreated event..."
 - Modify or delete events (append-only)
 - Include implementation details in event names
 - Make events too broad (DataUpdated) or too narrow (FieldXChanged)
+- Have commands depend on read models (commands use user inputs + event stream)
+- Include runtime context in events (file paths, hostnames, PIDs, working directories)
 
 **Rationale:** Event modeling is a facilitation technique for revealing domain knowledge, not a technical design exercise. Keep it focused on business behavior.
 
@@ -326,6 +329,17 @@ Events → Read Model (query stored events)
 [UserRegistered, EmailChanged, PasswordReset] → UserProfile
 ```
 
+**Command Independence:** Commands derive their inputs from user-provided
+data and the event stream — never from read models. No `ReadModel → Command`
+edges should appear in diagrams. If a command needs to check whether something
+already happened (e.g., idempotency guard), it checks the event stream, not a
+read model.
+
+**No Infrastructure Read Models:** Read models represent meaningful domain
+projections. Infrastructure preconditions ("does directory exist?", "is
+service running?") that are implicit in the command's execution context do not
+need their own read model.
+
 **Pattern 3: Automation**
 ```
 Event → Read Model (todo list) → Process → Command → Event
@@ -392,6 +406,11 @@ Testable: End-to-end in isolation
 - Independently valuable (delivers user value)
 - Testable in isolation (no dependencies on other slices)
 - Small enough to complete in 1-2 days
+
+**Slice Independence:** Slices sharing an event schema are independent — the
+event schema is the shared contract. Command slices test by asserting on
+produced events; view slices test with synthetic event fixtures. Neither needs
+the other implemented first. No artificial dependency chains.
 
 ### Pattern 4: Information Completeness Check
 
@@ -779,6 +798,10 @@ Use this checklist to verify event modeling quality:
 - [ ] Automations have all four components (event, read model, conditional logic, command)
 - [ ] Read model fields use collection types when domain supports concurrent instances
 - [ ] No cross-cutting infrastructure modeled as Translation slices
+- [ ] No `ReadModel → Command` data flows (commands depend on user inputs and event stream)
+- [ ] Events contain domain facts only (no runtime context like file paths or hostnames)
+- [ ] No read models for infrastructure preconditions (directory existence, service status)
+- [ ] Slices sharing an event schema are independently testable (no artificial dependencies)
 
 ---
 

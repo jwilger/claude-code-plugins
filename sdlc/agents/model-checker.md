@@ -122,6 +122,31 @@ Your prompt will specify one of these modes:
 - If concurrent instances are possible, the field should use a collection or aggregate type
 - Flag as a warning to verify with the domain expert, not as a definitive error
 
+#### 10. Command Independence from Read Models
+- Flag any `ReadModel → Command` data flow in diagrams or workflow descriptions
+- Commands must depend on user inputs and the event stream, never on read models
+- Idempotency guards must check the event stream for duplicate events, not query a read model
+- If found, recommend removing the read model dependency and having the command check the event stream directly
+
+#### 11. Runtime State in Events
+- Flag event fields containing runtime context: file paths, working directories, hostnames, PIDs, process-specific data
+- Events must record domain facts that are true on any machine
+- **Test**: "Would this field have the same value if replayed on a different machine?" If no, flag it
+- Common violations: `working_directory`, `hostname`, `pid`, `local_path`, `temp_dir`
+
+#### 12. Infrastructure-Precondition Read Models
+- Flag read models whose sole purpose is checking infrastructure state ("does directory exist?", "is service running?", "is file writable?")
+- These are command-handler implementation details, not domain projections
+- Infrastructure preconditions are either implicit in the execution context or checked within the command handler
+- If found, recommend removing the read model and handling the check in the command implementation
+
+#### 13. Artificial Slice Dependencies
+- Flag slices that require other slices to run first when they share an event schema
+- Command slices and view slices sharing an event type are independent — the event schema is the shared contract
+- Views should be testable with synthetic event fixtures, not by running the producing command first
+- Commands should be testable by asserting on produced events, not by checking a view
+- If found, recommend restructuring tests to use synthetic fixtures and event assertions
+
 ### Validation Output Format
 
 ```

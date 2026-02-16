@@ -201,6 +201,7 @@ Create minimal type definitions to satisfy compilation, driven by what the tests
 - Use `unimplemented!()` for function bodies in Rust (NEVER `todo!()` - it fails linting)
 - For other languages, use the equivalent panic/throw placeholder
 - Follow domain modeling principles (avoid primitive obsession)
+- Verify event types contain domain facts only — no runtime context (file paths, hostnames, PIDs, working directories). Raise a domain concern if runtime state appears in event data
 - Create types that express business concepts
 - Use the project's type conventions
 - Make things compile, not pass tests

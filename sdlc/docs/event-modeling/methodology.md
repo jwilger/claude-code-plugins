@@ -99,6 +99,17 @@ Example:
 [AccountOpened, MoneyDeposited, MoneyWithdrawn] → AccountBalance
 ```
 
+**Command Independence:** Commands derive their inputs from user-provided
+data and the event stream — never from read models. Read models serve views
+and automations only. No `ReadModel → Command` edges in diagrams. If a
+command needs to check whether something already happened (e.g., idempotency),
+it checks the event stream, not a read model.
+
+**No Infrastructure Read Models:** Read models represent meaningful domain
+projections. Infrastructure preconditions ("does directory exist?", "is
+service running?") do not need their own read model — they are implicit in the
+command's execution context.
+
 ### 3. Automation Pattern
 ```
 Event → Read Model (todo list) → Process → Command → Event
@@ -175,6 +186,8 @@ Events should contain:
 - **When it happened**: Timestamp
 - **Who/what caused it**: Correlation ID, user ID
 - **Relevant data**: Just enough to understand the event
+- **Domain facts only**: Event fields must be true on any machine — no file
+  paths, hostnames, PIDs, or working directories
 
 ### Event Granularity
 
@@ -207,6 +220,11 @@ A vertical slice is:
 - From UI through to events
 - Independently valuable
 - Testable in isolation
+
+**Slice Independence:** Slices sharing an event schema are independent — the
+event schema is the shared contract between producers and consumers. Command
+slices test by asserting on produced events. View slices test with synthetic
+event fixtures. No artificial dependency chains between slices.
 
 Slice structure:
 ```

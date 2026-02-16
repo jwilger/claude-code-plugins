@@ -135,6 +135,12 @@ Events MUST be:
 Good: `OrderPlaced`, `PaymentReceived`, `InventoryReserved`
 Bad: `PlaceOrder`, `ProcessPayment`, `ReserveInventory`
 
+**Domain Facts Only:** Events must record domain facts — statements true
+regardless of which machine, process, or environment replays them. Runtime
+context (file paths, hostnames, PIDs, working directories) does not belong in
+event data. **Test:** "Would this field have the same value on a different
+machine?" If no, exclude it.
+
 ### Step 3: Order Events Chronologically (The Plot)
 
 Now arrange the brainstormed events in sequence to tell the story.
@@ -215,6 +221,17 @@ For each read model, verify:
   read model (e.g., `active_journeys: Journey[]` not `current_journey: Journey`)
   and ensure wireframes display lists, not single values.
 
+**Command Independence:** Commands derive their inputs from user-provided data
+and the event stream — never from read models. Read models serve views and
+automations only. When designing read models, ensure none of them feed directly
+into commands. If a command needs to check whether something already happened
+(e.g., idempotency guard), it checks the event stream, not a read model.
+
+**No Infrastructure Read Models:** Read models represent meaningful domain
+projections. Infrastructure preconditions ("does directory exist?", "is service
+running?") that are purely about the execution environment do not need their own
+read model. These are command-handler implementation details, not domain state.
+
 ### Step 7: Find Automations and Translations
 
 **Automations**: Look for places where events should automatically trigger decision-making:
@@ -284,6 +301,16 @@ flowchart LR
     classDef automation fill:#8b5cf6,color:#fff
 ```
 
+**Data Flow Rules:** In workflow diagrams, enforce these directional constraints:
+- Actor/UI → Command (user inputs)
+- Command → Event(s) (state changes)
+- Event → Read Model (projections)
+- Read Model → Actor/UI (views)
+- Event → Automation Read Model → Process → Command (automations)
+
+There must be **no `ReadModel → Command` edges**. If you find one, the command
+is incorrectly depending on a read model instead of the event stream.
+
 ### Step 9: Decompose into Slices
 
 Finally, list all vertical slices. Remember: **each slice is ONE pattern**.
@@ -300,6 +327,16 @@ message bus transport) rather than translating external business data into
 domain events, list it here instead of as a Translation slice.
 
 A workflow with 3 commands, 2 views, and 1 automation = 6 slices.
+
+**Slice Independence:** Slices sharing an event schema are **independent** —
+connected by the event contract, not by execution order. The event schema is the
+shared contract between a command slice (produces events) and a view slice
+(projects from events).
+
+- Command slices test by asserting on produced events
+- View slices test with synthetic event fixtures
+- Neither needs the other implemented or running
+- No artificial dependency chains between slices
 
 ## The Four Patterns
 
