@@ -328,11 +328,22 @@ Events → Read Model (query stored events)
 
 **Pattern 3: Automation**
 ```
-Event → Process → Command → Event
+Event → Read Model (todo list) → Process → Command → Event
 
-OrderPlaced → CheckInventory → ReserveInventory → InventoryReserved
-PaymentReceived → ValidateOrder → ConfirmOrder → OrderConfirmed
-InventoryLow → CheckThreshold → ReorderStock → StockReordered
+All four components required:
+1. Triggering event
+2. Read model consulted (the "todo list")
+3. Conditional process logic (a decision based on state)
+4. Resulting command producing new events
+
+If there is no read model and no conditional logic, it is NOT an automation —
+it is a command producing multiple events. Model as a single State Change slice.
+
+TRUE automation:
+OrderPlaced → UnfulfilledOrders (read model) → CheckInventory (if in stock) → ReserveInventory → InventoryReserved
+
+NOT an automation:
+PlaceOrder → [OrderPlaced, AuditLogCreated] (unconditional co-production, one Command slice)
 ```
 
 **Pattern 4: Translation**
@@ -343,6 +354,11 @@ StripeWebhook{charge.succeeded} → PaymentReceived
 PayPalIPN{payment_status: completed} → PaymentReceived
 ShipStationWebhook{shipped} → ShipmentDispatched
 ```
+
+**Note:** Translation slices handle external *business* data (payment
+confirmations, shipping updates). Generic infrastructure (event persistence,
+message transport) is NOT a Translation — it is cross-cutting implementation
+detail that does not belong in any workflow's slice list.
 
 ### Pattern 3: Vertical Slicing
 
@@ -713,6 +729,7 @@ Use these questions to drive event modeling sessions:
 - "What does [actor] need to see?"
 - "How is this information displayed?"
 - "What queries do users run?"
+- "Can there be multiple instances active at the same time?"
 
 **Automations:**
 - "Does anything happen automatically after this event?"
@@ -759,6 +776,9 @@ Use this checklist to verify event modeling quality:
 - [ ] Every read model field traces to events
 - [ ] No missing data in read models
 - [ ] Event streams complete (no gaps)
+- [ ] Automations have all four components (event, read model, conditional logic, command)
+- [ ] Read model fields use collection types when domain supports concurrent instances
+- [ ] No cross-cutting infrastructure modeled as Translation slices
 
 ---
 

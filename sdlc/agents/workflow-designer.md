@@ -178,6 +178,11 @@ Every field in a wireframe must trace to:
 
 If you can't trace a field, something is missing from the model.
 
+**Concurrency Check:** If the domain supports concurrent instances (e.g.,
+multiple orders, multiple journeys), wireframes should show lists or tables,
+not single-item views. Ask: "Can there be more than one of these in progress
+at the same time?"
+
 ### Step 5: Identify Commands (Inputs)
 
 For EACH event, ask:
@@ -205,15 +210,29 @@ For each read model, verify:
 - It answers a specific question
 - It serves a specific actor's need
 - It has a wireframe showing how it's displayed
+- Does the domain support concurrency? Ask: "Can multiple [entities] be in
+  different states at the same time?" If yes, use collection types in the
+  read model (e.g., `active_journeys: Journey[]` not `current_journey: Journey`)
+  and ensure wireframes display lists, not single values.
 
 ### Step 7: Find Automations and Translations
 
-**Automations**: Look for places where events should automatically trigger other actions:
+**Automations**: Look for places where events should automatically trigger decision-making:
 - "Does this event trigger any automatic responses?"
-- "Should the system do something when this happens?"
-- "Are there notifications, calculations, or follow-up actions?"
+- "Should the system CHECK something and DECIDE what to do when this happens?"
+- "Are there notifications, calculations, or follow-up actions that depend on current state?"
 
 Automations follow the pattern: Event → View (todo list) → Process → Command → Event
+
+**All four components are required for a true Automation:**
+1. A triggering event
+2. A read model (todo list) the process consults
+3. Conditional process logic that decides whether and how to act
+4. A resulting command that produces new events
+
+If there is no read model consulted and no conditional logic — if the events
+are always unconditionally co-produced — it is NOT an Automation. Model it as
+a single Command slice producing multiple events.
 
 Watch for infinite loops - automations should have clear termination conditions.
 
@@ -225,6 +244,13 @@ Watch for infinite loops - automations should have clear termination conditions.
 Use the Translation pattern for external data.
 
 **IMPORTANT**: Note only names and general purposes. NO technical details like APIs, webhooks, protocols, etc.
+
+**Infrastructure vs. Domain Translations:** Only model domain-specific
+external integrations as Translation slices. Cross-cutting infrastructure
+(event persistence, message bus transport, logging) is NOT a Translation
+slice — it is shared by all workflows. If an integration would appear
+identically in every workflow, note it in the overview under "Infrastructure
+Dependencies" rather than listing it as a Translation slice.
 
 ### Step 8: Create Workflow Diagram
 
@@ -268,6 +294,11 @@ Group by pattern type:
 - **Automation Slices**: Each automatic process
 - **Translation Slices**: Each external integration
 
+**Infrastructure Dependencies** (NOT slices):
+If any integration serves a generic technical purpose (event persistence,
+message bus transport) rather than translating external business data into
+domain events, list it here instead of as a Translation slice.
+
 A workflow with 3 commands, 2 views, and 1 automation = 6 slices.
 
 ## The Four Patterns
@@ -294,7 +325,17 @@ How we answer questions. Read models are projections built from events. Views **
 ```
 Event → View (as todo list) → Process → Command → Event
 ```
-When something happens automatically in response to another event.
+When something happens automatically in response to another event, AND the
+system must consult state and make a decision.
+
+**All four components required:**
+1. Triggering event
+2. Read model consulted (the "todo list")
+3. Conditional process logic (a decision)
+4. Resulting command
+
+**Not an Automation:** A command that unconditionally co-produces multiple
+events. That is a single State Change slice with multiple output events.
 
 ### 4. Translation
 ```
@@ -341,6 +382,9 @@ Create the following documents:
 
 ### Translation Slices
 5. [PaymentWebhook](slices/payment-webhook.md)
+
+### Infrastructure Dependencies
+- <list any cross-cutting infrastructure noted during modeling>
 ```
 
 ### `docs/event_model/workflows/<name>/slices/<slice>.md`

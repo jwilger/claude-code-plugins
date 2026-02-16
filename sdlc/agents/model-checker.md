@@ -108,6 +108,20 @@ Your prompt will specify one of these modes:
 - External data sources have anti-corruption layers
 - External events are translated to domain events
 
+#### 7. Infrastructure vs. Domain Translations
+- If the same Translation slice appears in multiple workflows, flag it as likely cross-cutting infrastructure
+- Translation slices must translate external *business* data into internal domain events — generic persistence, transport, or operational concerns are infrastructure, not slices
+
+#### 8. Automation Completeness
+- Every Automation must have all four components: triggering event, read model (todo list), conditional process logic, and resulting command
+- If an "Automation" has no read model and no conditional logic, flag it as likely a command that co-produces multiple events — recommend reclassifying as a Command slice
+- Check that the Automation's process contains genuine conditional logic, not unconditional pass-through
+
+#### 9. Concurrency Awareness
+- For each read model field using a singular value (e.g., `current_phase`, `active_item`), check whether the domain allows multiple concurrent instances
+- If concurrent instances are possible, the field should use a collection or aggregate type
+- Flag as a warning to verify with the domain expert, not as a definitive error
+
 ### Validation Output Format
 
 ```
@@ -202,6 +216,15 @@ If issues found:
 #### 4. Automation Termination
 - For EVERY automation, identify what stops it from running forever
 - If termination is unclear: ASK the user what ends the process
+
+#### 5. Concurrency Constraints
+- For EVERY read model field using a singular value, verify the domain constrains to exactly one instance at a time
+- If multiple concurrent instances are possible, the field must use a collection or aggregate type
+- If concurrency is unclear: ASK the user whether multiple instances can exist simultaneously
+
+#### 6. Automation Four-Component Check
+- For EVERY automation, verify all four components: triggering event, read model consulted, conditional process logic, resulting command
+- If components are missing, ASK the user whether this is truly an automation or a command with co-produced events
 
 ### Completeness Check Output Format
 
