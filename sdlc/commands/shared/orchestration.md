@@ -39,6 +39,8 @@ The main conversation **MUST NEVER** use Write or Edit tools directly. All file 
 |-----------|-------|-------|
 | Test files | `sdlc:red` | All test code, assertions, test fixtures |
 | Implementation code | `sdlc:green` | Production code that makes tests pass |
+| Module scaffolding | `sdlc:green` | lib.rs mod decls, mod.rs, __init__.py, index.ts barrels |
+| Build config deps | `sdlc:file-updater` | Cargo.toml deps, package.json deps, pyproject.toml deps |
 | Domain types/models | `sdlc:domain` | Type definitions, domain entities |
 | Architecture decisions | `sdlc:adr` | docs/ARCHITECTURE.md (via PR) |
 | GWT scenarios | `sdlc:gwt` | Given/When/Then acceptance criteria |
@@ -179,11 +181,17 @@ When launching ANY agent, you MUST provide:
 
 | Information | Why | Example |
 |-------------|-----|---------|
+| Working directory | Agent spawns in main repo, not worktree | "Work in `/home/user/myapp-worktrees/task-123/`" |
 | File paths | Agent can't see what you've been discussing | "Edit `src/domain/user.rs`" |
 | Current test | Green needs to know what to pass | "Make `test_user_creation` pass" |
 | Acceptance criteria | What "done" looks like | "User must have valid email" |
 | Relevant domain types | Prevent primitive obsession | "Use the `Email` type from `types.rs`" |
 | Error messages | What specifically failed | "Test fails with: expected Ok, got Err" |
+
+**When worktrees are active:** WORKING_DIRECTORY is MANDATORY and all file paths
+MUST be absolute paths rooted in the worktree. Agents are spawned in the main
+repository directory, not the worktree. Without absolute paths rooted at the
+worktree, the agent will read and write files in the wrong location.
 
 **NEVER say:**
 - "As discussed earlier..." - Agent wasn't in that discussion
@@ -338,6 +346,33 @@ Orchestrator: Facilitates, proposes compromise
 - Propose middle-ground solutions
 - Know when to escalate (don't let debates drag)
 
+## Agent Failure Recovery (NEVER Self-Fix)
+
+When an agent produces incorrect output — writes to the wrong path, creates
+malformed files, or fails to complete its task — the orchestrator MUST diagnose
+and re-delegate. The orchestrator MUST NOT fix the problem by writing files
+itself, even when the fix seems trivial.
+
+### Recovery Protocol
+
+1. **Diagnose**: What went wrong? Missing working directory? Relative paths? Unclear task?
+2. **Clean up**: If the agent created files in the wrong location, use a shell command to remove them. Do NOT use Write/Edit.
+3. **Fix the context**: Add missing absolute paths, add WORKING_DIRECTORY, clarify the task.
+4. **Re-delegate**: Launch a new agent invocation with corrected context.
+
+### The Self-Fix Trap
+
+When an agent writes a file to the wrong path, the orchestrator sees correct
+content in the wrong place and thinks "I'll just move it." This violates the
+core rule. The correct action is always to re-delegate with corrected context.
+
+| Temptation | Correct Action |
+|------------|----------------|
+| "I'll just move/copy the file" | Re-delegate with correct absolute path |
+| "I'll create the scaffolding myself" | Delegate to green (scaffolding = production code) |
+| "The content is right, just wrong location" | Re-delegate with WORKING_DIRECTORY |
+| "It's just one line" | Re-delegate to the appropriate agent |
+
 ## Parallel Development (Worktrees)
 
 When `git.worktrees: true` in `.claude/sdlc.yaml`, the project supports parallel development.
@@ -345,9 +380,21 @@ When `git.worktrees: true` in `.claude/sdlc.yaml`, the project supports parallel
 ### Worktree-Aware Context
 
 When working in a worktree:
-1. **Check current location**: `git worktree list` shows all active worktrees
-2. **Include worktree path** when launching agents so they know the context
-3. **Store worktree info in memento** for session continuity
+1. **Determine the worktree path**: Run `git worktree list` or check auto memory
+2. **Set WORKING_DIRECTORY**: Every agent delegation MUST include the absolute worktree path
+3. **Use absolute paths in FILES**: All file paths must be absolute, rooted at the worktree
+4. **Store worktree info** in auto memory for session continuity
+
+**Example agent context with worktrees:**
+~~~
+WORKING_DIRECTORY: /home/user/myapp-worktrees/task-123
+TASK: Make the test_user_creation test pass
+FILES: /home/user/myapp-worktrees/task-123/src/domain/user.rs
+CURRENT STATE: Test at /home/user/myapp-worktrees/task-123/tests/user_test.rs:45 fails
+REQUIREMENTS: Implement User::new() returning Result<User, UserError>
+CONSTRAINTS: Use the Email type from types.rs, not String
+ERROR: error[E0433]: failed to resolve: use of undeclared type `User`
+~~~
 
 ### Parallel Slice Prerequisites
 

@@ -170,6 +170,8 @@ await TaskUpdate({
 |-----------|-------|-------|
 | Test files | `sdlc:red` | *_test.rs, *.test.ts, test_*.py, *_spec.rb |
 | Production code | `sdlc:green` | src/, lib/, app/ implementation |
+| Module scaffolding | green/Implementer | lib.rs mod decls, mod.rs, __init__.py, index.ts barrels |
+| Build config deps | file-updater/File Updater | Cargo.toml deps, package.json deps, pyproject.toml deps |
 | Type definitions | `sdlc:domain` | Struct/enum/trait signatures only |
 | Architecture decisions | `sdlc:adr` | docs/ARCHITECTURE.md (via PR) |
 | Event models | `sdlc:discovery`, `sdlc:workflow-designer`, `sdlc:gwt` | docs/event_model/** |
@@ -184,6 +186,7 @@ await TaskUpdate({
 
 When launching ANY agent, you MUST provide:
 
+- **Working directory** - Absolute path to project root (REQUIRED with worktrees; all file paths must be absolute)
 - **File paths** - Agent can't see what you've been discussing
 - **Current test** - Green needs to know what to pass
 - **Acceptance criteria** - What "done" looks like

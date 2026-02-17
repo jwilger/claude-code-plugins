@@ -86,6 +86,7 @@ Test expects: `Email::new(string) -> Result<Email, ValidationError>`"
 
 **Template:**
 ```
+WORKING_DIRECTORY: [Absolute path to project root]
 TASK: [What to accomplish]
 FILES: [Specific paths]
 CURRENT STATE: [What exists, what's failing]
