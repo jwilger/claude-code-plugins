@@ -2,7 +2,7 @@ queue_rules:
   - name: default
     merge_method: squash
     branch_protection_injection_mode: queue
-    queue_conditions:
+    queue_conditions: &default_conditions
       - "base = main"
       - "-draft"
       - "-conflict"
@@ -11,15 +11,7 @@ queue_rules:
       - "github-review-approved"
       - "github-require-last-push-approval"
       - "github-code-owner-review-satisfied"
-    merge_conditions:
-      - "base = main"
-      - "-draft"
-      - "-conflict"
-      - "#approved-reviews-by >= 1"
-      - "#changes-requested-reviews-by = 0"
-      - "github-review-approved"
-      - "github-require-last-push-approval"
-      - "github-code-owner-review-satisfied"
+    merge_conditions: *default_conditions
 
 merge_protections_settings:
   reporting_method: check-runs
@@ -30,12 +22,4 @@ merge_protections:
   - name: default
     if:
       - "base = main"
-    success_conditions:
-      - "base = main"
-      - "-draft"
-      - "-conflict"
-      - "#approved-reviews-by >= 1"
-      - "#changes-requested-reviews-by = 0"
-      - "github-review-approved"
-      - "github-require-last-push-approval"
-      - "github-code-owner-review-satisfied"
+    success_conditions: *default_conditions
